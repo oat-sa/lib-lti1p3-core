@@ -20,9 +20,12 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Deployment;
+namespace OAT\Library\Lti1p3Core\Security\Key;
 
-interface DeploymentRepositoryInterface
+interface KeyChainRepositoryInterface
 {
-    public function findByIssuer(string $issuer): DeploymentInterface;
+    public function find(string $id): KeyChainInterface;
+
+    /** @return KeyChainInterface[] */
+    public function findBySetName(string $setName): array;
 }
