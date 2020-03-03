@@ -20,23 +20,11 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Deployment;
+namespace App\Lti\Core\Deployment;
 
-use OAT\Library\Lti1p3Core\Platform\PlatformInterface;
-use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
-use OAT\Library\Lti1p3Core\Tool\ToolInterface;
-
-interface DeploymentInterface
+interface DeploymentRepositoryInterface
 {
-    public function getOAuth2ClientId(): string;
+    public function find(string $id): ?DeploymentInterface;
 
-    public function getPlatform(): PlatformInterface;
-
-    public function getTool(): ToolInterface;
-
-    public function getPlatformJwksUrl(): string;
-
-    public function getToolKeyPair(): KeyChainInterface;
-
-    public function getPlatformKeyPair(): ?KeyChainInterface;
+    public function findByIssuer(string $issuer): ?DeploymentInterface;
 }
