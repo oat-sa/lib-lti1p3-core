@@ -24,11 +24,11 @@ namespace OAT\Library\Lti1p3Core\Security\Key;
 
 use Lcobucci\JWT\Signer\Key;
 
-interface KeySetInterface
+interface KeyChainInterface
 {
     public function getId(): string;
 
-    public function getName(): string;
+    public function getSetName(): string;
 
     public function getPublicKey(): Key;
 
