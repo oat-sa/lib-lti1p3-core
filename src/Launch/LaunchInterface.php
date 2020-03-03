@@ -24,7 +24,7 @@ namespace OAT\Library\Lti1p3Core\Launch;
 
 use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
 
-interface MessageLaunchInterface
+interface LaunchInterface
 {
     public function getDeployment(): DeploymentInterface;
 }
