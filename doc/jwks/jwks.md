@@ -78,7 +78,7 @@ $keyChain2 = new KeyChain(
 );
 
 /** @var KeyChainRepositoryInterface $keyChainRepository */
-$keySets = $keyChainRepository->findBySetName('mySetName'); // same as [$keyChain1, $keyChain2]
+$keySet = $keyChainRepository->findBySetName('mySetName'); // same as [$keyChain1, $keyChain2]
 ```
 
 To extract the JWKS properties, you can use the [JwksExporter](../../src/Security/Jwks/JwksExporter.php) as following:
