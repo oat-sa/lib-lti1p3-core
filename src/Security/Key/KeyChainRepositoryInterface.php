@@ -24,10 +24,8 @@ namespace OAT\Library\Lti1p3Core\Security\Key;
 
 interface KeyChainRepositoryInterface
 {
-    public function find(string $id): ?KeyChainInterface;
+    public function find(string $id): KeyChainInterface;
 
-    /**
-     * @return KeyChainInterface[]
-     */
+    /** @return KeyChainInterface[] */
     public function findBySetName(string $setName): array;
 }
