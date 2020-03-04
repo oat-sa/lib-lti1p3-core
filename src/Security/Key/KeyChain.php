@@ -41,6 +41,12 @@ class KeyChain implements KeyChainInterface
     /** @var string|null */
     private $privateKeyPassPhrase;
 
+    /** @var Key|null */
+    private $buildPublicKey;
+
+    /** @var Key|null */
+    private $buildPrivateKey;
+
     public function __construct(
         string $id,
         string $setName,
@@ -67,13 +73,23 @@ class KeyChain implements KeyChainInterface
 
     public function getPublicKey(): Key
     {
-        return new Key($this->publicKey);
+        if (null === $this->buildPublicKey) {
+            $this->buildPublicKey = new Key($this->publicKey);
+        }
+
+        return $this->buildPublicKey;
     }
 
     public function getPrivateKey(): ?Key
     {
-        return null !== $this->privateKey
-            ? new Key($this->privateKey, $this->privateKeyPassPhrase)
-            : null;
+        if (null === $this->privateKey) {
+            return null;
+        }
+
+        if (null === $this->buildPrivateKey) {
+            $this->buildPrivateKey = new Key($this->privateKey, $this->privateKeyPassPhrase);
+        }
+
+        return $this->buildPrivateKey;
     }
 }

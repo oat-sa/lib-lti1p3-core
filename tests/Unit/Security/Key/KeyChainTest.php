@@ -67,4 +67,21 @@ class KeyChainTest extends TestCase
             $this->subject->getPrivateKey()
         );
     }
+
+    public function testWithoutPrivateKey(): void
+    {
+        $subject = new KeyChain(
+            '1',
+            'setName',
+            'file://' . __DIR__ . '/../../../Resource/Key/RSA/public.key'
+        );
+
+        $this->assertEquals('1', $subject->getId());
+        $this->assertEquals('setName', $subject->getSetName());
+        $this->assertEquals(
+            new Key('file://' . __DIR__ . '/../../../Resource/Key/RSA/public.key'),
+            $subject->getPublicKey()
+        );
+        $this->assertNull($subject->getPrivateKey());
+    }
 }
