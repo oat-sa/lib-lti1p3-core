@@ -4,8 +4,7 @@
 
 ## Table of contents
 - [Installation](#installation)
-- [Principles](#principles)
-- [Usage](#usage)
+- [Documentation](#documentation)
 - [Tests](#tests)
 
 ## Installation
@@ -14,10 +13,18 @@
 $ composer require oat-sa/lib-lti1p3-core
 ```
 
-## Principles
+## Documentation
 
-TDB
+You can find documentation on following topics:
 
-## Usage
+- how to provide a [JWKS endpoint](doc/jwks/jwks.md)
 
-TBD
+
+## Tests
+
+To run tests:
+
+```console
+$ vendor/bin/phpunit
+```
+**Note**: see [phpunit.xml.dist](phpunit.xml.dist) for available test suites.
