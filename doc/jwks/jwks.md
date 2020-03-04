@@ -50,8 +50,8 @@ Pair 1:
 - private key path: /home/user/.ssh/pair1/id_rsa
 
 Pair 2:
-- public key path: ~/.ssh/pair2/id_rsa.pub
-- private key path: ~/.ssh/pair2/id_rsa
+- public key path: /home/user/.ssh/pair2/id_rsa.pub
+- private key path: /home/user/.ssh/pair2/id_rsa
 
 And considering you provided you own [KeyChainRepositoryInterface](../../src/Security/Key/KeyChainRepositoryInterface.php) implementation:
 
