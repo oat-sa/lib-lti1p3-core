@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\Nonce;
 
 use Carbon\Carbon;
+use DateTimeInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\Nonce;
 use PHPUnit\Framework\TestCase;
 
@@ -40,7 +41,7 @@ class NonceTest extends TestCase
     /**
      * @dataProvider expirationProvider
      */
-    public function testNonceExpiration($expected, $expiredAt): void
+    public function testNonceExpiration(bool $expected, DateTimeInterface $expiredAt): void
     {
         $nonce = new Nonce('nonce_key', $expiredAt);
 
