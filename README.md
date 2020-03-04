@@ -21,3 +21,12 @@ TDB
 ## Usage
 
 TBD
+
+## Tests
+
+To run tests:
+
+```console
+$ vendor/bin/phpunit
+```
+**Note**: see [phpunit.xml.dist](phpunit.xml.dist) for available test suites.

@@ -45,7 +45,8 @@ class JwksExporter
     public function export(string $setName): array
     {
         return [
-            'keys' => array_map(function(KeyChainInterface $keyChain): array {
+            'keys' => array_map(
+                function (KeyChainInterface $keyChain): array {
                     return $this->exporter->export($keyChain);
                 },
                 $this->repository->findBySetName($setName)

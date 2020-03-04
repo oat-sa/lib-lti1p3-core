@@ -38,7 +38,7 @@ class JwkExporter
             openssl_pkey_get_public($keyChain->getPublicKey()->getContent())
         );
 
-        if($details['type'] !== OPENSSL_KEYTYPE_RSA) {
+        if ($details['type'] !== OPENSSL_KEYTYPE_RSA) {
             throw new InvalidArgumentException('Public key type is not OPENSSL_KEYTYPE_RSA');
         }
 
