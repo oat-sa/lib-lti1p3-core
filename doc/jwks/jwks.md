@@ -77,8 +77,8 @@ $keyChain2 = new KeyChain(
     'test'
 );
 
-/** @var KeyChainRepositoryInterface $repository */
-$keySets = $repository->findBySetName('mySetName'); // same as [$keyChain1, $keyChain2]
+/** @var KeyChainRepositoryInterface $keyChainRepository */
+$keySets = $keyChainRepository->findBySetName('mySetName'); // same as [$keyChain1, $keyChain2]
 ```
 
 To extract the JWKS properties, you can use the [JwksExporter](../../src/Security/Jwks/JwksExporter.php) as following:
@@ -89,7 +89,7 @@ To extract the JWKS properties, you can use the [JwksExporter](../../src/Securit
 use OAT\Library\Lti1p3Core\Security\Jwks\JwkExporter;
 use OAT\Library\Lti1p3Core\Security\Jwks\JwksExporter;
 
-$jwksExport = (new JwksExporter($repository, new JwkExporter()))->export('mySetName');
+$jwksExport = (new JwksExporter($keyChainRepository, new JwkExporter()))->export('mySetName');
 ```
 
 **Note**: `$jwksExport` contains the needed [JWKS properties](https://auth0.com/docs/tokens/references/jwks-properties) ready to be exposed from an HTTP endpoint:
