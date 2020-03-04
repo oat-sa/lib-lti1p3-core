@@ -5,7 +5,9 @@
     "license": "GPL-2.0-only",
     "require": {
         "php": "^7.1.3",
-        "lcobucci/jwt": "^3.3"
+        "ext-openssl": "*",
+        "lcobucci/jwt": "^3.3",
+        "phpunit/phpunit": "^9.0"
     },
     "autoload": {
         "psr-4": {
