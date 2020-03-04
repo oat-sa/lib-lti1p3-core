@@ -52,8 +52,8 @@ class JwkExporter
         ];
     }
 
-    private function base64UrlEncode($data)
+    private function base64UrlEncode(string $value): string 
     {
-        return str_replace('=', '', strtr(base64_encode($data), '+/', '-_'));
+        return str_replace('=', '', strtr(base64_encode($value), '+/', '-_'));
     }
 }
