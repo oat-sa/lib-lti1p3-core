@@ -88,15 +88,6 @@ To extract the JWKS properties, you can use the [JwksExporter](../../src/Securit
 
 use OAT\Library\Lti1p3Core\Security\Jwks\JwkExporter;
 use OAT\Library\Lti1p3Core\Security\Jwks\JwksExporter;
-use OAT\Library\Lti1p3Core\Security\Key\KeyChain;
-
-$keyChain = new KeyChain(
-    '1',
-    'mySetName',
-    'file://home/user/.ssh/id_rsa.pub',
-    'file://home/user/.ssh/id_rsa',
-    'test'
-);
 
 $jwksExport = (new JwksExporter($repository, new JwkExporter()))->export('mySetName');
 ```
