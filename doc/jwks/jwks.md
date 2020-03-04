@@ -92,7 +92,7 @@ use OAT\Library\Lti1p3Core\Security\Jwks\JwksExporter;
 $jwksExport = (new JwksExporter($repository, new JwkExporter()))->export('mySetName');
 ```
 
-**Note**: `$jwksExport` contains the needed [JWKS properties](https://auth0.com/docs/tokens/references/jwks-properties):
+**Note**: `$jwksExport` contains the needed [JWKS properties](https://auth0.com/docs/tokens/references/jwks-properties) ready to be exposed from an HTTP endpoint:
 
 ```json
 {
