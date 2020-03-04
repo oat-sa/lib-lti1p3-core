@@ -4,8 +4,7 @@
 
 ## Table of contents
 - [Installation](#installation)
-- [Principles](#principles)
-- [Usage](#usage)
+- [Documentation](#documentation)
 - [Tests](#tests)
 
 ## Installation
