@@ -14,13 +14,12 @@
 $ composer require oat-sa/lib-lti1p3-core
 ```
 
-## Principles
+## Documentation
 
-TDB
+You can find documentation on following topics:
 
-## Usage
+- how to provide a [JWKS endpoint](doc/jwks/jwks.md)
 
-TBD
 
 ## Tests
 

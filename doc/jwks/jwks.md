@@ -1,6 +1,6 @@
 # JWKS endpoint service
 
-> Documentation about how to expose a [JWKS endpoint](https://auth0.com/docs/tokens/concepts/jwks) (JSON Web Key Set) easily from this library, recommended as a Platform.
+> Documentation about how to expose a [JWKS endpoint](https://auth0.com/docs/tokens/concepts/jwks) (JSON Web Key Set) easily from this library.
 
 ## Exporting a JWK from a key chain
 
