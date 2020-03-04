@@ -96,22 +96,23 @@ $jwksExport = (new JwksExporter($keyChainRepository, new JwkExporter()))->export
 
 ```json
 {
-"keys": [
-    {
-        "alg": "RS256",
-        "kty": "RSA",
-        "use": "sig",
-        "n": "...",
-        "e": "...",
-        "kid": "1"
-    },
-    {
-        "alg": "RS256",
-        "kty": "RSA",
-        "use": "sig",
-        "n": "...",
-        "e": "...",
-        "kid": "2"
-    }
-]}
+    "keys": [
+        {
+            "alg": "RS256",
+            "kty": "RSA",
+            "use": "sig",
+            "n": "...",
+            "e": "...",
+            "kid": "1"
+        },
+        {
+            "alg": "RS256",
+            "kty": "RSA",
+            "use": "sig",
+            "n": "...",
+            "e": "...",
+            "kid": "2"
+        }
+    ]
+}
 ```
