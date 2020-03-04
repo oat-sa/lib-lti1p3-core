@@ -28,6 +28,7 @@ use PHPUnit\Framework\TestCase;
 
 class KeyChainTest extends TestCase
 {
+    /** @var KeyChain */
     private $subject;
 
     public function setUp(): void
