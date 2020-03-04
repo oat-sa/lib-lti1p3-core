@@ -52,7 +52,7 @@ class JwksExporterTest extends TestCase
                     'file://' . __DIR__ . '/../../../Resource/Key/RSA/private.key',
                     null
                 ),
-               new KeyChain(
+                new KeyChain(
                     '3',
                     'setName',
                     'file://' . __DIR__ . '/../../../Resource/Key/RSA/public.key',
