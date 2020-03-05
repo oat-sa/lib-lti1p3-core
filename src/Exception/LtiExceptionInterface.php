@@ -20,9 +20,10 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Deployment;
+namespace OAT\Library\Lti1p3Core\Exception;
 
-interface DeploymentRepositoryInterface
+use \Throwable;
+
+interface LtiExceptionInterface extends Throwable
 {
-    public function findByIssuer(string $issuer, string $clientId = null): ?DeploymentInterface;
 }
