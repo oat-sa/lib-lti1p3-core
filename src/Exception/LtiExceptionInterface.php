@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Exception;
 
-use \Throwable;
+use Throwable;
 
 interface LtiExceptionInterface extends Throwable
 {

@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Exception;
 
-use \Exception;
+use Exception;
 
 class LtiException extends Exception implements LtiExceptionInterface
 {
