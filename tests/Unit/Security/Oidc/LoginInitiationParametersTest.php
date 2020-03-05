@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\Oidc;
 
 use OAT\Library\Lti1p3Core\Security\Oidc\LoginInitiationParameters;
+use OAT\Library\Lti1p3Core\Tests\Unit\Helper\LoginInitiationParametersHelper;
 use PHPUnit\Framework\TestCase;
 
 class LoginInitiationParametersTest extends TestCase
@@ -32,14 +33,7 @@ class LoginInitiationParametersTest extends TestCase
 
     public function setUp(): void
     {
-        $this->loginInitiationParameters = new LoginInitiationParameters(
-            'issuer',
-            'loginHint',
-            'targetLinkUri',
-            'ltiMessageHint',
-            'ltiDeploymentId',
-            'clientId'
-        );
+        $this->loginInitiationParameters = LoginInitiationParametersHelper::getLoginInitiationParameters();
     }
 
     public function testGetIssuer(): void

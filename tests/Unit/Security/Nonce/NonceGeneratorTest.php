@@ -45,7 +45,7 @@ class NonceGeneratorTest extends TestCase
         $nonceGivenTtl = (new NonceGenerator())->generate(6);
         $nonceConstructedTtl = (new NonceGenerator(60))->generate();
         $nonceDefaultTtl = (new NonceGenerator())->generate();
-        $nonceGivenAndConstructedTtl = (new NonceGenerator())->generate(1);
+        $nonceGivenAndConstructedTtl = (new NonceGenerator(99))->generate(1);
 
         return [
             'It Generates From Given TTL' => [
