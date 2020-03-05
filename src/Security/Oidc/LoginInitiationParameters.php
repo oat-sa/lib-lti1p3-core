@@ -46,9 +46,9 @@ class LoginInitiationParameters
         string $issuer,
         string $loginHint,
         string $targetLinkUri,
-        string $ltiMessageHint  = null,
-        string $ltiDeploymentId  = null,
-        string $clientId  = null
+        string $ltiMessageHint = null,
+        string $ltiDeploymentId = null,
+        string $clientId = null
     ) {
         $this->issuer = $issuer;
         $this->loginHint = $loginHint;

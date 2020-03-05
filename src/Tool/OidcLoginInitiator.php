@@ -87,8 +87,7 @@ class OidcLoginInitiator
             );
 
             return new AuthenticationRequest($deployment->getPlatform()->getOidcAuthenticationUrl(), $authenticationRequestParameters);
-
-        }  catch (LtiExceptionInterface $exception) {
+        } catch (LtiExceptionInterface $exception) {
             throw $exception;
         } catch (Throwable $exception) {
             throw new LtiException(
