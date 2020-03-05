@@ -17,7 +17,11 @@ $ composer require oat-sa/lib-lti1p3-core
 
 You can find documentation on following topics:
 
-- how to provide a [JWKS endpoint](doc/jwks/jwks.md)
+Tool
+- how to provide an OIDC Login initiation endpoint
+
+Security
+- how to provide a [JWKS endpoint](doc/security/jwks.md)
 
 
 ## Tests

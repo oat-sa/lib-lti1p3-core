@@ -39,7 +39,7 @@ class AuthenticationRequest
         $this->parameters = $parameters;
     }
 
-    public function getUrl(): string
+    public function buildUrl(): string
     {
         return sprintf('%s?%s', $this->baseUrl, http_build_query($this->parameters));
     }

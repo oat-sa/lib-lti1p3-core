@@ -48,10 +48,22 @@ class NonceGeneratorTest extends TestCase
         $nonceGivenAndConstructedTtl = (new NonceGenerator())->generate(1);
 
         return [
-            'It Generates From Given TTL' => [$nonceGivenTtl, (Carbon::create(1988, 12, 22, 06))->addSeconds(6)->getTimestamp()],
-            'It Generates From Constructed TTL' => [$nonceConstructedTtl, (Carbon::create(1988, 12, 22, 06))->addSeconds(60)->getTimestamp()],
-            'It Generates From Default TTL' => [$nonceDefaultTtl, (Carbon::create(1988, 12, 22, 06))->addSeconds(600)->getTimestamp()],
-            'It Generates From Given and Constructed TTL' => [$nonceGivenAndConstructedTtl, (Carbon::create(1988, 12, 22, 06))->addSecond()->getTimestamp()],
+            'It Generates From Given TTL' => [
+                $nonceGivenTtl,
+                (Carbon::create(1988, 12, 22, 06))->addSeconds(6)->getTimestamp()
+            ],
+            'It Generates From Constructed TTL' => [
+                $nonceConstructedTtl,
+                (Carbon::create(1988, 12, 22, 06))->addSeconds(60)->getTimestamp()
+            ],
+            'It Generates From Default TTL' => [
+                $nonceDefaultTtl,
+                (Carbon::create(1988, 12, 22, 06))->addSeconds(600)->getTimestamp()
+            ],
+            'It Generates From Given and Constructed TTL' => [
+                $nonceGivenAndConstructedTtl,
+                (Carbon::create(1988, 12, 22, 06))->addSecond()->getTimestamp()
+            ],
         ];
     }
 
