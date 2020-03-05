@@ -68,25 +68,25 @@ class OidcLoginInitiator
     /**
      * @throws LtiExceptionInterface
      */
-    public function initiate(LoginInitiationParameters $parameters): AuthenticationRequest
+    public function initiate(LoginInitiationParameters $lLoginInitiationParameters): AuthenticationRequest
     {
         try {
-            $deployment = $this->deploymentRepository->findByIssuer($parameters->getIssuer(), $parameters->getClientId());
+            $deployment = $this->deploymentRepository->findByIssuer($lLoginInitiationParameters->getIssuer(), $lLoginInitiationParameters->getClientId());
 
             if (null === $deployment) {
-                throw new LtiException(sprintf('Deployment not found for issuer %s', $parameters->getIssuer()));
+                throw new LtiException(sprintf('Deployment not found for issuer %s', $lLoginInitiationParameters->getIssuer()));
             }
 
-            $parameters = new AuthenticationRequestParameters(
-                $parameters->getTargetLinkUri(),
+            $authenticationRequestParameters = new AuthenticationRequestParameters(
+                $lLoginInitiationParameters->getTargetLinkUri(),
                 $deployment->getClientId(),
-                $parameters->getLoginHint(),
+                $lLoginInitiationParameters->getLoginHint(),
                 $this->generateNonce()->getValue(),
-                $this->stateGenerator->generate($deployment, $parameters),
-                $parameters->getLtiMessageHint()
+                $this->stateGenerator->generate($deployment, $lLoginInitiationParameters),
+                $lLoginInitiationParameters->getLtiMessageHint()
             );
 
-            return new AuthenticationRequest($deployment->getPlatform()->getOidcAuthenticationUrl(), $parameters);
+            return new AuthenticationRequest($deployment->getPlatform()->getOidcAuthenticationUrl(), $authenticationRequestParameters);
 
         }  catch (LtiExceptionInterface $exception) {
             throw $exception;
