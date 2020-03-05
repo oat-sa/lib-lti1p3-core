@@ -38,7 +38,6 @@ class NonceGeneratorTest extends TestCase
      */
     public function testItGeneratesFromDifferentTtl(Nonce $nonce, int $expectedExpirationTimeStamp): void
     {
-//        var_dump($nonce->getExpiredAt()); die;
         $this->assertEquals($nonce->getExpiredAt()->getTimestamp(), $expectedExpirationTimeStamp);
     }
 
