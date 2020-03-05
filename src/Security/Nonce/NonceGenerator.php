@@ -43,4 +43,3 @@ class NonceGenerator implements NonceGeneratorInterface
         );
     }
 }
-

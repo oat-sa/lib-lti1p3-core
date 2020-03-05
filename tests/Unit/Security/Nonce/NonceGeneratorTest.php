@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -59,7 +60,7 @@ class NonceGeneratorTest extends TestCase
         $values = [];
 
         for ($i = 0; $i < 100; $i++) {
-           $values[] = (new NonceGenerator())->generate()->getValue();
+            $values[] = (new NonceGenerator())->generate()->getValue();
         }
 
         $this->assertEquals(array_unique($values), $values);
