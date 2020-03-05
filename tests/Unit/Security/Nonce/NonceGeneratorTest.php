@@ -28,11 +28,6 @@ use PHPUnit\Framework\TestCase;
 
 class NonceGeneratorTest extends TestCase
 {
-    public function setUp(): void
-    {
-
-    }
-
     /**
      * @dataProvider providerTestItGenerates
      */
