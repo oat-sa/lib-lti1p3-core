@@ -41,15 +41,15 @@ class AuthenticationMessageBuilder
     public function getMessage(DeploymentInterface $deployment, NonceInterface $nonce, LoginMessage $loginMessage): AuthenticationRequestMessage
     {
         return (new AuthenticationRequestMessage())
-            ->setResponseType('id_token')
+            ->setResponseType()
             ->setRedirectUri($loginMessage->getTargetLinkUri())
-            ->setResponseMode('form_post')
+            ->setResponseMode()
             ->setClientId($deployment->getClientId())
-            ->setScope('openid')
+            ->setScope()
             ->setState($this->jwtBuilder->generate($deployment, $loginMessage))
             ->setLoginHint($loginMessage->getLoginHint())
             ->setMessageHint($loginMessage->getLtiMessageHint())
-            ->setPrompt('none')
+            ->setPrompt()
             ->setNonce($nonce->getValue());
     }
 }

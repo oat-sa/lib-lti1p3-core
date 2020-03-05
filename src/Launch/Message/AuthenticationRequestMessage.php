@@ -86,7 +86,7 @@ class AuthenticationRequestMessage extends AuthenticationMessageConfiguration im
      * @param string $responseType
      * @return AuthenticationRequestMessage
      */
-    public function setResponseType(string $responseType): AuthenticationRequestMessage
+    public function setResponseType(string $responseType = 'id_token'): AuthenticationRequestMessage
     {
         $this->responseType = $responseType;
         return $this;
@@ -122,7 +122,7 @@ class AuthenticationRequestMessage extends AuthenticationMessageConfiguration im
      * @param string $responseMode
      * @return AuthenticationRequestMessage
      */
-    public function setResponseMode(string $responseMode): AuthenticationRequestMessage
+    public function setResponseMode(string $responseMode = 'form_post'): AuthenticationRequestMessage
     {
         $this->responseMode = $responseMode;
         return $this;
@@ -158,7 +158,7 @@ class AuthenticationRequestMessage extends AuthenticationMessageConfiguration im
      * @param string $scope
      * @return AuthenticationRequestMessage
      */
-    public function setScope(string $scope): AuthenticationRequestMessage
+    public function setScope(string $scope = 'openid'): AuthenticationRequestMessage
     {
         $this->scope = $scope;
         return $this;
@@ -230,7 +230,7 @@ class AuthenticationRequestMessage extends AuthenticationMessageConfiguration im
      * @param string $prompt
      * @return AuthenticationRequestMessage
      */
-    public function setPrompt(string $prompt): AuthenticationRequestMessage
+    public function setPrompt(string $prompt = 'none'): AuthenticationRequestMessage
     {
         $this->prompt = $prompt;
         return $this;
