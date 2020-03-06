@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Security\Nonce;
 
 use Carbon\Carbon;
+use Exception;
 use Ramsey\Uuid\Uuid;
 
 class NonceGenerator implements NonceGeneratorInterface
@@ -35,6 +36,9 @@ class NonceGenerator implements NonceGeneratorInterface
         $this->ttl = $ttl ?? static::DEFAULT_TTL;
     }
 
+    /**
+     * @throws Exception
+     */
     public function generate(int $ttl = null): NonceInterface
     {
         return new Nonce(
