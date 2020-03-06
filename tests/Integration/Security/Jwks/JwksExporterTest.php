@@ -24,7 +24,6 @@ namespace OAT\Library\Lti1p3Core\Tests\Integration\Security\Jwks;
 
 use OAT\Library\Lti1p3Core\Security\Jwks\JwkExporter;
 use OAT\Library\Lti1p3Core\Security\Jwks\JwksExporter;
-use OAT\Library\Lti1p3Core\Security\Key\KeyChain;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
 use OAT\Library\Lti1p3Core\Tests\Traits\KeyChainTestingTrait;
