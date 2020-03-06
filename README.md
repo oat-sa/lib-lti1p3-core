@@ -23,7 +23,6 @@ Tool
 Security
 - how to provide the [JWKS endpoint](doc/security/jwks.md)
 
-
 ## Tests
 
 To run tests:

@@ -27,7 +27,7 @@ use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
 
 trait KeyChainTestingTrait
 {
-    public function getTestingKeyChain(
+    private function getTestingKeyChain(
         string $id = 'id',
         string $setName = 'setName',
         string $publicKey = null,
