@@ -26,7 +26,7 @@ use OAT\Library\Lti1p3Core\Tool\ToolInterface;
 
 trait ToolTestingTrait
 {
-    public function getTestingTool(
+    private function getTestingTool(
         string $name = 'name',
         string $deepLaunchUrl = 'deepLaunchUrl',
         string $oidcLoginInitiationUrl = 'oidcLoginInitiationUrl'

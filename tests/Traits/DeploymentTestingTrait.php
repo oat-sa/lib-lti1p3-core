@@ -33,7 +33,7 @@ trait DeploymentTestingTrait
     use ToolTestingTrait;
     use KeyChainTestingTrait;
 
-    public function getTestingDeployment(
+    private function getTestingDeployment(
         string $id = 'deploymentId',
         string $clientId = 'clientId',
         PlatformInterface $platform = null,

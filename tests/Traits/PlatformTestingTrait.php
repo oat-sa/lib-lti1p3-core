@@ -26,7 +26,7 @@ use OAT\Library\Lti1p3Core\Platform\PlatformInterface;
 
 trait PlatformTestingTrait
 {
-    public function getTestingPlatform(
+    private function getTestingPlatform(
         string $name = 'name',
         string $audience = 'audience',
         string$oAuth2AccessTokenUrl = 'oAuth2AccessTokenUrl',
