@@ -41,7 +41,7 @@ class JwksExporterTest extends TestCase
         $this->subject = new JwksExporter(
             $this->buildKeyChainRepository([
                 $this->getTestingKeyChain('1', 'setName'),
-                $this->getTestingKeyChain('2', 'otherS  etName'),
+                $this->getTestingKeyChain('2', 'otherSetName'),
                 $this->getTestingKeyChain('3', 'setName')
             ]),
             new JwkExporter()
