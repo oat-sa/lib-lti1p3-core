@@ -39,7 +39,7 @@ class AuthenticationRequest
         $this->parameters = $parameters;
     }
 
-    public function buildUrl(): string
+    public function buildUrl(array $queryParameters = []): string
     {
         return sprintf(
             '%s?%s',
