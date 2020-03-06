@@ -23,7 +23,6 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Tool;
 
 use Carbon\Carbon;
-use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Security\Oidc\AuthenticationRequest;
 use OAT\Library\Lti1p3Core\Security\Oidc\LoginInitiationParameters;
@@ -37,9 +36,6 @@ class OidcLoginInitiatorTest extends TestCase
 {
     use DeploymentRepositoryMockTrait;
     use NonceRepositoryMockTrait;
-
-    /** @var LoginInitiationParameters */
-    private $loginInitiationParameters;
 
     public function setUp()
     {

@@ -28,7 +28,7 @@ use PHPUnit\Framework\TestCase;
 
 trait DeploymentRepositoryMockTrait
 {
-    use DeploymentMockTrait;
+    use DeploymentTestingTrait;
 
     public function getDeploymentRepositoryMock(): DeploymentRepositoryInterface
     {

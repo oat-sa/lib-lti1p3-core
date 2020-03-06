@@ -20,31 +20,12 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Tests\Unit\Helper;
+namespace OAT\Library\Lti1p3Core\Tests\Resource;
 
-use OAT\Library\Lti1p3Core\Security\Key\KeyChain;
-
-class KeyChainHelper
+class ResourceLinks
 {
-    public static function getPlatformKeyChain(): KeyChain
-    {
-        return new KeyChain(
-            'platform',
-            'setName',
-            'file://' . __DIR__ . '/../../Resource/Key/RSA/public.key',
-            'file://' . __DIR__ . '/../../Resource/Key/RSA/private.key',
-            'test'
-        );
-    }
-
-    public static function getToolKeyChain(): KeyChain
-    {
-        return new KeyChain(
-            'tool',
-            'setName',
-            'file://' . __DIR__ . '/../../Resource/Key/RSA/public.key',
-            'file://' . __DIR__ . '/../../Resource/Key/RSA/private.key',
-            'test'
-        );
-    }
+    public const RSA_PUBLIC_KEY = 'file://' . __DIR__ . '/Key/RSA/public.key';
+    public const RSA_PRIVATE_KEY = 'file://' . __DIR__ . '/Key/RSA/private.key';
+    public const DSA_PUBLIC_KEY = 'file://' . __DIR__ . '/Key/DSA/public.key';
+    public const DSA_PRIVATE_KEY = 'file://' . __DIR__ . '/Key/DSA/private.key';
 }

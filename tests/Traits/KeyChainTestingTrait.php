@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,19 +21,31 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Traits;
 
-use OAT\Library\Lti1p3Core\Tool\ToolInterface;
-use PHPUnit\Framework\TestCase;
 
-trait ToolMockTrait
+use OAT\Library\Lti1p3Core\Security\Key\KeyChain;
+use OAT\Library\Lti1p3Core\Tests\Resource\ResourceLinks;
+
+trait KeyChainTestingTrait
 {
-    public function getToolMock(): ToolInterface
+    public function getTestingPlatformKeyChain(): KeyChain
     {
-        /** @var TestCase $this */
-        $mockTool = $this->createMock(ToolInterface::class);
-        $mockTool->method('getName')->willReturn('name');
-        $mockTool->method('getDeepLaunchUrl')->willReturn('deep_launch_url');
-        $mockTool->method('getOidcLoginInitiationUrl')->willReturn('oidc_login_initiation_url');
+        return new KeyChain(
+            'platform',
+            'setName',
+            ResourceLinks::RSA_PUBLIC_KEY,
+            ResourceLinks::RSA_PRIVATE_KEY,
+            'test'
+        );
+    }
 
-        return $mockTool;
+    public function getTestingToolKeyChain(): KeyChain
+    {
+        return new KeyChain(
+            'tool',
+            'setName',
+            ResourceLinks::RSA_PUBLIC_KEY,
+            ResourceLinks::RSA_PRIVATE_KEY,
+            'test'
+        );
     }
 }

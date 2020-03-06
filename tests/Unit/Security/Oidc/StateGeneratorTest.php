@@ -23,17 +23,16 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\Oidc;
 
 use Carbon\Carbon;
-use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Security\Oidc\LoginInitiationParameters;
 use OAT\Library\Lti1p3Core\Security\Oidc\StateGenerator;
-use OAT\Library\Lti1p3Core\Tests\Traits\DeploymentMockTrait;
+use OAT\Library\Lti1p3Core\Tests\Traits\DeploymentTestingTrait;
 use OAT\Library\Lti1p3Core\Tests\Unit\Helper\LoginInitiationParametersHelper;
 use PHPUnit\Framework\TestCase;
 
 class StateGeneratorTest extends TestCase
 {
-    use DeploymentMockTrait;
+    use DeploymentTestingTrait;
 
     /** @var LoginInitiationParameters */
     private $loginInitiationParameters;
