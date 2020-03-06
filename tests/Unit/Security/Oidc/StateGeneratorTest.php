@@ -35,9 +35,6 @@ class StateGeneratorTest extends TestCase
 {
     use DeploymentMockTrait;
 
-    /** @var DeploymentInterface */
-    private $mockDeployment;
-
     /** @var LoginInitiationParameters */
     private $loginInitiationParameters;
 
@@ -45,8 +42,6 @@ class StateGeneratorTest extends TestCase
     {
         $knownDate = Carbon::create(1988, 12, 22, 06);
         Carbon::setTestNow($knownDate);
-
-        $this->mockDeployment = $this->getDeploymentMock();
 
         $this->loginInitiationParameters = LoginInitiationParametersHelper::getLoginInitiationParameters();
     }
