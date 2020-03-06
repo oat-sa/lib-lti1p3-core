@@ -27,6 +27,7 @@ use Carbon\CarbonInterface;
 use DateTimeInterface;
 use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\Signer\Ecdsa\Sha512;
+use Lcobucci\JWT\Signer\Rsa\Sha256;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Security\Oidc\LoginInitiationParameters;
 use OAT\Library\Lti1p3Core\Security\Oidc\StateGenerator;
@@ -57,12 +58,14 @@ class StateGeneratorTest extends TestCase
             'loginHint',
             'targetLinkUri',
             'ltiMessageHint',
-            'ltiDeploymentId',
+            'ltiDeploymentId'
         );
 
         $token = (new Parser())->parse(
             $subject->generate($deployment, $loginInitiationParameters)
         );
+
+        $this->assertTrue($token->verify(new Sha256(), $deployment->getToolKeyPair()->getPublicKey()));
 
         $this->assertEquals('RS256', $token->getHeader('alg'));
         $this->assertEquals($this->testDate->getTimestamp(), $token->getClaim('iat'));
