@@ -48,8 +48,15 @@ trait DeploymentTestingTrait
         $toolKeyPair = $toolKeyPair ?? $this->getTestingKeyChain('tool');
         $platformKeyPair = $platformKeyPair ?? $this->getTestingKeyChain('platform');
 
-        return new class($id, $clientId, $platform, $tool, $platformJwksUrl, $toolKeyPair, $platformKeyPair) implements DeploymentInterface
-        {
+        return new class (
+            $id,
+            $clientId,
+            $platform,
+            $tool,
+            $platformJwksUrl,
+            $toolKeyPair,
+            $platformKeyPair
+        ) implements DeploymentInterface {
             /** @var string */
             private $id;
 

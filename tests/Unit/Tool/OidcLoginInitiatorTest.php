@@ -105,7 +105,6 @@ class OidcLoginInitiatorTest extends TestCase
         $this->assertEquals('loginHint', $queryParameters['login_hint']);
         $this->assertEquals('form_post', $queryParameters['response_mode']);
         $this->assertEquals('none', $queryParameters['prompt']);
-
     }
 
     public function testItThrowALTiExceptionWhenNoDeploymentMatchGivenIssuer(): void
