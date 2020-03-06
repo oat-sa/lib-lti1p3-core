@@ -71,10 +71,15 @@ class OidcLoginInitiator
     public function initiate(LoginInitiationParameters $lLoginInitiationParameters): AuthenticationRequest
     {
         try {
-            $deployment = $this->deploymentRepository->findByIssuer($lLoginInitiationParameters->getIssuer(), $lLoginInitiationParameters->getClientId());
+            $deployment = $this->deploymentRepository->findByIssuer(
+                $lLoginInitiationParameters->getIssuer(),
+                $lLoginInitiationParameters->getClientId())
+            ;
 
             if (null === $deployment) {
-                throw new LtiException(sprintf('Deployment not found for issuer %s', $lLoginInitiationParameters->getIssuer()));
+                throw new LtiException(
+                    sprintf('Deployment not found for issuer %s', $lLoginInitiationParameters->getIssuer())
+                );
             }
 
             $authenticationRequestParameters = new AuthenticationRequestParameters(
@@ -86,7 +91,11 @@ class OidcLoginInitiator
                 $lLoginInitiationParameters->getLtiMessageHint()
             );
 
-            return new AuthenticationRequest($deployment->getPlatform()->getOidcAuthenticationUrl(), $authenticationRequestParameters);
+            return new AuthenticationRequest(
+                $deployment->getPlatform()->getOidcAuthenticationUrl(),
+                $authenticationRequestParameters
+            );
+
         } catch (LtiExceptionInterface $exception) {
             throw $exception;
         } catch (Throwable $exception) {
