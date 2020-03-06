@@ -20,9 +20,13 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Deployment;
+namespace OAT\Library\Lti1p3Core\Security\Oidc;
 
-interface DeploymentRepositoryInterface
+use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
+
+interface StateGeneratorInterface
 {
-    public function findByIssuer(string $issuer, string $clientId = null): ?DeploymentInterface;
+    public const DEFAULT_TTL = 600;
+
+    public function generate(DeploymentInterface $deployment, LoginInitiationParameters $parameters): string;
 }

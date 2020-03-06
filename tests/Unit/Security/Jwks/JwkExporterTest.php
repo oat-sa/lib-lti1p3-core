@@ -24,21 +24,15 @@ namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\Jwks;
 
 use InvalidArgumentException;
 use OAT\Library\Lti1p3Core\Security\Jwks\JwkExporter;
-use OAT\Library\Lti1p3Core\Security\Key\KeyChain;
+use OAT\Library\Lti1p3Core\Tests\Traits\KeyChainTestingTrait;
 use PHPUnit\Framework\TestCase;
 
 class JwkExporterTest extends TestCase
 {
+    use KeyChainTestingTrait;
+
     public function testItCanExportAnRSAKeyChain(): void
     {
-        $keyChain = new KeyChain(
-            '1',
-            'setName',
-            'file://' . __DIR__ . '/../../../Resource/Key/RSA/public.key',
-            'file://' . __DIR__ . '/../../../Resource/Key/RSA/private.key',
-            null
-        );
-
         $subject = new JwkExporter();
 
         $this->assertEquals(
@@ -48,9 +42,9 @@ class JwkExporterTest extends TestCase
                 'use' => 'sig',
                 'n' => 'yZXlfd5yqChtTH91N76VokquRu2r1EwNDUjA0GAygrPzCpPbYokasxzs-60Do_lyTIgd7nRzudAzHnujIPr8GOPIlPlOKT8HuL7xQEN6gmUtz33iDhK97zK7zOFEmvS8kYPwFAjQ03YKv-3T9b_DbrBZWy2Vx4Wuxf6mZBggKQfwHUuJxXDv79NenZarUtC5iFEhJ85ovwjW7yMkcflhUgkf1o_GIR5RKoNPttMXhKYZ4hTlLglMm1FgRR63pvYoy9Eq644a9x2mbGelO3HnGbkaFo0HxiKbFW1vplHzixYCyjc15pvtBxw_x26p8-lNthuxzaX5HaFMPGs10rRPLw',
                 'e' => 'AQAB',
-                'kid' => '1',
+                'kid' => 'id',
             ],
-            $subject->export($keyChain)
+            $subject->export($this->getTestingKeyChain())
         );
     }
 
@@ -59,8 +53,8 @@ class JwkExporterTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Public key type is not OPENSSL_KEYTYPE_RSA');
 
-        $keyChain = new KeyChain(
-            '1',
+        $keyChain = $this->getTestingKeyChain(
+            'id',
             'setName',
             'file://' . __DIR__ . '/../../../Resource/Key/DSA/public.key',
             'file://' . __DIR__ . '/../../../Resource/Key/DSA/private.key',

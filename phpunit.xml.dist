@@ -6,6 +6,10 @@
          backupGlobals="false"
          colors="true"
 >
+    <php>
+        <env name="KEYS_ROOT_DIR" value="file://tests/Resource/Key" />
+    </php>
+
     <testsuites>
         <testsuite name="Integration">
             <directory>tests/Integration</directory>

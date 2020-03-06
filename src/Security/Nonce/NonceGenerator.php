@@ -20,9 +20,30 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Deployment;
+namespace OAT\Library\Lti1p3Core\Security\Nonce;
 
-interface DeploymentRepositoryInterface
+use Carbon\Carbon;
+use Exception;
+use Ramsey\Uuid\Uuid;
+
+class NonceGenerator implements NonceGeneratorInterface
 {
-    public function findByIssuer(string $issuer, string $clientId = null): ?DeploymentInterface;
+    /** @var int */
+    private $ttl;
+
+    public function __construct(int $ttl = null)
+    {
+        $this->ttl = $ttl ?? static::DEFAULT_TTL;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function generate(int $ttl = null): NonceInterface
+    {
+        return new Nonce(
+            Uuid::uuid4()->toString(),
+            Carbon::now()->addSeconds($ttl ?? $this->ttl)
+        );
+    }
 }

@@ -20,9 +20,10 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Deployment;
+namespace OAT\Library\Lti1p3Core\Exception;
 
-interface DeploymentRepositoryInterface
+use Exception;
+
+class LtiException extends Exception implements LtiExceptionInterface
 {
-    public function findByIssuer(string $issuer, string $clientId = null): ?DeploymentInterface;
 }

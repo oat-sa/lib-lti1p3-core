@@ -24,13 +24,15 @@ namespace OAT\Library\Lti1p3Core\Tests\Integration\Security\Jwks;
 
 use OAT\Library\Lti1p3Core\Security\Jwks\JwkExporter;
 use OAT\Library\Lti1p3Core\Security\Jwks\JwksExporter;
-use OAT\Library\Lti1p3Core\Security\Key\KeyChain;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
+use OAT\Library\Lti1p3Core\Tests\Traits\KeyChainTestingTrait;
 use PHPUnit\Framework\TestCase;
 
 class JwksExporterTest extends TestCase
 {
+    use KeyChainTestingTrait;
+
     /** @var JwksExporter */
     private $subject;
 
@@ -38,27 +40,9 @@ class JwksExporterTest extends TestCase
     {
         $this->subject = new JwksExporter(
             $this->buildKeyChainRepository([
-                new KeyChain(
-                    '1',
-                    'setName',
-                    'file://' . __DIR__ . '/../../../Resource/Key/RSA/public.key',
-                    'file://' . __DIR__ . '/../../../Resource/Key/RSA/private.key',
-                    null
-                ),
-                new KeyChain(
-                    '2',
-                    'otherSetName',
-                    'file://' . __DIR__ . '/../../../Resource/Key/RSA/public.key',
-                    'file://' . __DIR__ . '/../../../Resource/Key/RSA/private.key',
-                    null
-                ),
-                new KeyChain(
-                    '3',
-                    'setName',
-                    'file://' . __DIR__ . '/../../../Resource/Key/RSA/public.key',
-                    'file://' . __DIR__ . '/../../../Resource/Key/RSA/private.key',
-                    null
-                )
+                $this->getTestingKeyChain('1', 'setName'),
+                $this->getTestingKeyChain('2', 'otherSetName'),
+                $this->getTestingKeyChain('3', 'setName')
             ]),
             new JwkExporter()
         );

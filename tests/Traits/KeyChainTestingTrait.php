@@ -20,9 +20,26 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Deployment;
+namespace OAT\Library\Lti1p3Core\Tests\Traits;
 
-interface DeploymentRepositoryInterface
+use OAT\Library\Lti1p3Core\Security\Key\KeyChain;
+use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
+
+trait KeyChainTestingTrait
 {
-    public function findByIssuer(string $issuer, string $clientId = null): ?DeploymentInterface;
+    private function getTestingKeyChain(
+        string $id = 'id',
+        string $setName = 'setName',
+        string $publicKey = null,
+        string $privateKey = null,
+        string $privateKeyPassPhrase = null
+    ): KeyChainInterface {
+        return new KeyChain(
+            $id,
+            $setName,
+            $publicKey ?? getenv('KEYS_ROOT_DIR') . '/RSA/public.key',
+            $privateKey ?? getenv('KEYS_ROOT_DIR') . '/RSA/private.key',
+            $privateKeyPassPhrase
+        );
+    }
 }
