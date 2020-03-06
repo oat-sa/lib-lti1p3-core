@@ -39,22 +39,25 @@ class AuthenticationRequest
         $this->parameters = $parameters;
     }
 
-    public function buildUrl(): string
+    public function buildUrl(array $queryParameters = []): string
     {
         return sprintf(
             '%s?%s',
             $this->baseUrl,
-            http_build_query([
-                'scope' => $this->parameters->getScope(),
-                'response_type' => $this->parameters->getResponseType(),
-                'client_id' => $this->parameters->getClientId(),
-                'redirect_uri' => $this->parameters->getRedirectUri(),
-                'login_hint' => $this->parameters->getLoginHint(),
-                'state' => $this->parameters->getState(),
-                'response_mode' => $this->parameters->getResponseMode(),
-                'nonce' => $this->parameters->getNonce(),
-                'prompt' => $this->parameters->getPrompt(),
-            ])
+            http_build_query(array_merge(
+                $queryParameters,
+                [
+                    'scope' => $this->parameters->getScope(),
+                    'response_type' => $this->parameters->getResponseType(),
+                    'client_id' => $this->parameters->getClientId(),
+                    'redirect_uri' => $this->parameters->getRedirectUri(),
+                    'login_hint' => $this->parameters->getLoginHint(),
+                    'state' => $this->parameters->getState(),
+                    'response_mode' => $this->parameters->getResponseMode(),
+                    'nonce' => $this->parameters->getNonce(),
+                    'prompt' => $this->parameters->getPrompt(),
+                ]
+            ))
         );
     }
 }
