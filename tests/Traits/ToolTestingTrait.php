@@ -23,13 +23,16 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Traits;
 
 use OAT\Library\Lti1p3Core\Tool\ToolInterface;
-use PHPUnit\Framework\TestCase;
 
 trait ToolTestingTrait
 {
-    public function getTestingTool(array $parameters = []): ToolInterface
-    {
-        return new class($parameters) implements ToolInterface {
+    public function getTestingTool(
+        string $name = 'name',
+        string $deepLaunchUrl = 'deepLaunchUrl',
+        string $oidcLoginInitiationUrl = 'oidcLoginInitiationUrl'
+    ): ToolInterface {
+        return new class($name, $deepLaunchUrl,$oidcLoginInitiationUrl) implements ToolInterface
+        {
             /** @var string */
             private $name;
 
@@ -39,11 +42,11 @@ trait ToolTestingTrait
             /** @var string */
             private $oidcLoginInitiationUrl;
 
-            public function __construct($parameters)
+            public function __construct(string $name, string $deepLaunchUrl, string $oidcLoginInitiationUrl)
             {
-                $this->name = $parameters['getName'] ?? 'name';
-                $this->deepLaunchUrl = $parameters['getDeepLaunchUrl'] ?? 'deep_launch_url';
-                $this->oidcLoginInitiationUrl = $parameters['getOidcLoginInitiationUrl'] ?? 'oidc_login_initiation_url';
+                $this->name = $name;
+                $this->deepLaunchUrl = $deepLaunchUrl;
+                $this->oidcLoginInitiationUrl = $oidcLoginInitiationUrl;
             }
 
             public function getName(): string

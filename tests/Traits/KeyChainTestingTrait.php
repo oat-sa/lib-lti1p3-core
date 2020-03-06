@@ -21,31 +21,24 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Traits;
 
-
 use OAT\Library\Lti1p3Core\Security\Key\KeyChain;
-use OAT\Library\Lti1p3Core\Tests\Resource\ResourceLinks;
+use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
 
 trait KeyChainTestingTrait
 {
-    public function getTestingPlatformKeyChain(): KeyChain
-    {
+    public function getTestingKeyChain(
+        string $id = 'id',
+        string $setName = 'setName',
+        string $publicKey = null,
+        string $privateKey = null,
+        string $privateKeyPassPhrase = null
+    ): KeyChainInterface {
         return new KeyChain(
-            'platform',
-            'setName',
-            ResourceLinks::RSA_PUBLIC_KEY,
-            ResourceLinks::RSA_PRIVATE_KEY,
-            'test'
-        );
-    }
-
-    public function getTestingToolKeyChain(): KeyChain
-    {
-        return new KeyChain(
-            'tool',
-            'setName',
-            ResourceLinks::RSA_PUBLIC_KEY,
-            ResourceLinks::RSA_PRIVATE_KEY,
-            'test'
+            $id,
+            $setName,
+            $publicKey ?? getenv('KEYS_ROOT_DIR') . '/RSA/public.key',
+            $privateKey ?? getenv('KEYS_ROOT_DIR') . '/RSA/private.key',
+            $privateKeyPassPhrase
         );
     }
 }

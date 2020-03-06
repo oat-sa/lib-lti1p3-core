@@ -23,55 +23,128 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Tool;
 
 use Carbon\Carbon;
-use OAT\Library\Lti1p3Core\Exception\LtiException;
+use Exception;
+use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
+use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
+use OAT\Library\Lti1p3Core\Security\Nonce\Nonce;
+use OAT\Library\Lti1p3Core\Security\Nonce\NonceGeneratorInterface;
+use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Oidc\AuthenticationRequest;
 use OAT\Library\Lti1p3Core\Security\Oidc\LoginInitiationParameters;
-use OAT\Library\Lti1p3Core\Tests\Traits\DeploymentRepositoryMockTrait;
-use OAT\Library\Lti1p3Core\Tests\Traits\NonceRepositoryMockTrait;
-use OAT\Library\Lti1p3Core\Tests\Unit\Helper\LoginInitiationParametersHelper;
+use OAT\Library\Lti1p3Core\Tests\Traits\DeploymentTestingTrait;
 use OAT\Library\Lti1p3Core\Tool\OidcLoginInitiator;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class OidcLoginInitiatorTest extends TestCase
 {
-    use DeploymentRepositoryMockTrait;
-    use NonceRepositoryMockTrait;
+    use DeploymentTestingTrait;
+
+    /** @var DeploymentRepositoryInterface|MockObject */
+    private $deploymentRepositoryMock;
+
+    /** @var NonceRepositoryInterface|MockObject */
+    private $nonceRepositoryMock;
+
+    /** @var NonceGeneratorInterface|MockObject */
+    private $nonceGeneratorMock;
+
+    /** @var OidcLoginInitiator */
+    private $subject;
 
     public function setUp()
     {
-        $knownDate = Carbon::create(1988, 12, 22, 06);
-        Carbon::setTestNow($knownDate);
+        Carbon::setTestNow(Carbon::create(1988, 12, 22, 06));
+
+        $this->deploymentRepositoryMock = $this->createMock(DeploymentRepositoryInterface::class);
+        $this->nonceRepositoryMock = $this->createMock(NonceRepositoryInterface::class);
+        $this->nonceGeneratorMock = $this->createMock(NonceGeneratorInterface::class);
+
+        $this->subject = new OidcLoginInitiator(
+            $this->deploymentRepositoryMock,
+            $this->nonceRepositoryMock,
+            $this->nonceGeneratorMock
+        );
     }
 
-    public function testItThrowALtiExceptionWhenNoDeploymentFound(): void
+    public function testItCanGenerateAnAuthenticationRequest(): void
     {
-        $this->expectException(LtiException::class);
-        $this->expectExceptionMessage('Deployment not found for issuer issuer');
+        $deployment = $this->getTestingDeployment();
 
-        (new OidcLoginInitiator(
-            $this->getEmptyDeploymentRepository(),
-            $this->getNonceRepositoryMock()
-        ))->initiate(LoginInitiationParametersHelper::getLoginInitiationParameters());
+        $loginInitiationParameters = new LoginInitiationParameters(
+            'audience',
+            'loginHint',
+            'targetLinkUri'
+        );
+
+        $this->deploymentRepositoryMock
+            ->expects($this->once())
+            ->method('findByIssuer')
+            ->with('audience')
+            ->willReturn($deployment);
+
+        $this->nonceGeneratorMock
+            ->expects($this->once())
+            ->method('generate')
+            ->willReturn(new Nonce('nonce'));
+
+        $result = $this->subject->initiate($loginInitiationParameters);
+
+        $this->assertInstanceOf(AuthenticationRequest::class, $result);
+
+        $this->assertEquals(
+            $deployment->getPlatform()->getOidcAuthenticationUrl(),
+            parse_url($result->buildUrl(), PHP_URL_PATH)
+        );
+
+        parse_str(parse_url($result->buildUrl(), PHP_URL_QUERY), $queryParameters);
+        $this->assertEquals('openid', $queryParameters['scope']);
+        $this->assertEquals('id_token', $queryParameters['response_type']);
+        $this->assertEquals($deployment->getClientId(), $queryParameters['client_id']);
+        $this->assertEquals($loginInitiationParameters->getTargetLinkUri(), $queryParameters['redirect_uri']);
+        $this->assertEquals('loginHint', $queryParameters['login_hint']);
+        $this->assertEquals('form_post', $queryParameters['response_mode']);
+        $this->assertEquals('none', $queryParameters['prompt']);
+
     }
 
-    public function testItThrowALtiExceptionOnThrowableCatch(): void
+    public function testItThrowALTiExceptionWhenNoDeploymentMatchGivenIssuer(): void
     {
-        $this->expectException(LtiException::class);
+        $this->expectException(LtiExceptionInterface::class);
+        $this->expectExceptionMessage('Deployment not found for issuer audience');
+
+        $loginInitiationParameters = new LoginInitiationParameters(
+            'audience',
+            'loginHint',
+            'targetLinkUri'
+        );
+
+        $this->deploymentRepositoryMock
+            ->expects($this->once())
+            ->method('findByIssuer')
+            ->with('audience')
+            ->willReturn(null);
+
+        $this->subject->initiate($loginInitiationParameters);
+    }
+
+    public function testItThrowALTiExceptionOnGenericError(): void
+    {
+        $this->expectException(LtiExceptionInterface::class);
         $this->expectExceptionMessage('OIDC Login Initiation error: custom error');
 
-        (new OidcLoginInitiator(
-            $this->getDeploymentRepositoryExceptionOnMethod('findByIssuer'),
-            $this->getNonceRepositoryMock()
-        ))->initiate(LoginInitiationParametersHelper::getLoginInitiationParameters());
-    }
+        $loginInitiationParameters = new LoginInitiationParameters(
+            'audience',
+            'loginHint',
+            'targetLinkUri'
+        );
 
-    public function testItGeneratesABuildableAuthenticationRequestUrl(): void
-    {
-        $authenticationRequest = (new OidcLoginInitiator(
-            $this->getDeploymentRepositoryMock(),
-            $this->getNonceRepositoryMock()
-        ))->initiate(LoginInitiationParametersHelper::getLoginInitiationParameters());
+        $this->deploymentRepositoryMock
+            ->expects($this->once())
+            ->method('findByIssuer')
+            ->with('audience')
+            ->willThrowException(new Exception('custom error'));
 
-        $this->assertInstanceOf(AuthenticationRequest::class, $authenticationRequest);
+        $this->subject->initiate($loginInitiationParameters);
     }
 }

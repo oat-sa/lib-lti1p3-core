@@ -23,60 +23,73 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\Oidc;
 
 use Carbon\Carbon;
-use OAT\Library\Lti1p3Core\Exception\LtiException;
+use Carbon\CarbonInterface;
+use DateTimeInterface;
+use Lcobucci\JWT\Parser;
+use Lcobucci\JWT\Signer\Ecdsa\Sha512;
+use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Security\Oidc\LoginInitiationParameters;
 use OAT\Library\Lti1p3Core\Security\Oidc\StateGenerator;
+use OAT\Library\Lti1p3Core\Security\Oidc\StateGeneratorInterface;
 use OAT\Library\Lti1p3Core\Tests\Traits\DeploymentTestingTrait;
-use OAT\Library\Lti1p3Core\Tests\Unit\Helper\LoginInitiationParametersHelper;
 use PHPUnit\Framework\TestCase;
 
 class StateGeneratorTest extends TestCase
 {
     use DeploymentTestingTrait;
 
-    /** @var LoginInitiationParameters */
-    private $loginInitiationParameters;
+    /** @var DateTimeInterface|CarbonInterface */
+    private $testDate;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $knownDate = Carbon::create(1988, 12, 22, 06);
-        Carbon::setTestNow($knownDate);
-
-        $this->loginInitiationParameters = LoginInitiationParametersHelper::getLoginInitiationParameters();
+        $this->testDate = Carbon::create(1988, 12, 22, 06);
+        Carbon::setTestNow($this->testDate);
     }
 
     public function testItCanGenerateAState(): void
     {
-        $state = (new StateGenerator())->generate(
-            $this->getDeploymentMock(),
-            LoginInitiationParametersHelper::getLoginInitiationParameters()
+        $subject = new StateGenerator();
+
+        $deployment = $this->getTestingDeployment();
+        $loginInitiationParameters = new LoginInitiationParameters(
+            'audience',
+            'loginHint',
+            'targetLinkUri',
+            'ltiMessageHint',
+            'ltiDeploymentId',
         );
 
-        $statePayload = explode('.', $state);
+        $token = (new Parser())->parse(
+            $subject->generate($deployment, $loginInitiationParameters)
+        );
 
-        $this->assertCount(3, $statePayload);
-
+        $this->assertEquals('RS256', $token->getHeader('alg'));
+        $this->assertEquals($this->testDate->getTimestamp(), $token->getClaim('iat'));
         $this->assertEquals(
-            'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9',
-            $statePayload[0]
+            $this->testDate->addSeconds(StateGeneratorInterface::DEFAULT_TTL)->getTimestamp(),
+            $token->getClaim('exp')
         );
 
-        $this->assertStringContainsString(
-            'LCJhdWQiOiJvX2F1dGgyX2FjY2Vzc190b2tlbl91cmwiLCJwYXJhbXMiOnsiaXNzIjoiaXNzdWVyIiwibG9naW5faGludCI6ImxvZ2luSGludCIsInRhcmdldF9saW5rX3VyaSI6InRhcmdldExpbmtVcmkiLCJsdGlfbWVzc2FnZV9oaW50IjoibHRpTWVzc2FnZUhpbnQiLCJsdGlfZGVwbG95bWVudF9pZCI6Imx0aURlcGxveW1lbnRJZCIsImNsaWVudF9pZCI6ImNsaWVudElkIn19',
-            $statePayload[1]
-        );
-
-        $this->assertEquals(342, strlen($statePayload[2]));
+        $parametersClaim = (array)$token->getClaim('params');
+        $this->assertEquals($deployment->getPlatform()->getAudience(), $parametersClaim['iss']);
+        $this->assertEquals($loginInitiationParameters->getLoginHint(), $parametersClaim['login_hint']);
+        $this->assertEquals($loginInitiationParameters->getTargetLinkUri(), $parametersClaim['target_link_uri']);
+        $this->assertEquals($loginInitiationParameters->getLtiMessageHint(), $parametersClaim['lti_message_hint']);
+        $this->assertEquals($loginInitiationParameters->getLtiDeploymentId(), $parametersClaim['lti_deployment_id']);
+        $this->assertNull($parametersClaim['client_id']);
     }
 
-    public function testItThrowLtiExceptions(): void
+    public function testItThrowsALtiExceptionWithUnexpectedSigner(): void
     {
-        $this->expectException(LtiException::class);
-        $this->expectExceptionMessage('State generation failed: custom error');
+        $this->expectException(LtiExceptionInterface::class);
+        $this->expectExceptionMessage('State generation failed: This key is not compatible with this signer');
 
-        (new StateGenerator())->generate(
-            $this->getDeploymentExceptionOnMethod('getClientId'),
-            LoginInitiationParametersHelper::getLoginInitiationParameters()
+        $subject = new StateGenerator(null, new Sha512());
+
+        $subject->generate(
+            $this->getTestingDeployment(),
+            new LoginInitiationParameters('audience', 'loginHint', 'targetLinkUri')
         );
     }
 }

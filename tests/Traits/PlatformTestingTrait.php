@@ -26,9 +26,14 @@ use OAT\Library\Lti1p3Core\Platform\PlatformInterface;
 
 trait PlatformTestingTrait
 {
-    public function getTestingPlatform(array $parameters = []): PlatformInterface
-    {
-        return new class($parameters) implements PlatformInterface {
+    public function getTestingPlatform(
+        string $name = 'name',
+        string $audience = 'audience',
+        string$oAuth2AccessTokenUrl = 'oAuth2AccessTokenUrl',
+        string $oidcAuthenticationUrl = 'oidcAuthenticationUrl'
+    ): PlatformInterface {
+        return new class($name, $audience, $oAuth2AccessTokenUrl, $oidcAuthenticationUrl) implements PlatformInterface
+        {
             /** @var string */
             private $name;
 
@@ -41,12 +46,12 @@ trait PlatformTestingTrait
             /** @var string */
             private $oidcAuthenticationUrl;
 
-            public function __construct($parameters)
+            public function __construct(string $name, string $audience, string $oAuth2AccessTokenUrl, string $oidcAuthenticationUrl)
             {
-                $this->name = $parameters['getName'] ?? 'name';
-                $this->audience = $parameters['getAudience'] ?? 'audience';
-                $this->oAuth2AccessTokenUrl = $parameters['getOAuth2AccessTokenUrl'] ?? 'o_auth2_access_token_url';
-                $this->oidcAuthenticationUrl = $parameters['getOidcAuthenticationUrl'] ?? 'oidc_authentication_url';
+                $this->name = $name;
+                $this->audience = $audience;
+                $this->oAuth2AccessTokenUrl = $oAuth2AccessTokenUrl;
+                $this->oidcAuthenticationUrl = $oidcAuthenticationUrl;
             }
 
             public function getName(): string

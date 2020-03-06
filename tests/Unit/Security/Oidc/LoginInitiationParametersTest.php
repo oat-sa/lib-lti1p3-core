@@ -23,46 +23,52 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\Oidc;
 
 use OAT\Library\Lti1p3Core\Security\Oidc\LoginInitiationParameters;
-use OAT\Library\Lti1p3Core\Tests\Unit\Helper\LoginInitiationParametersHelper;
 use PHPUnit\Framework\TestCase;
 
 class LoginInitiationParametersTest extends TestCase
 {
     /** @var LoginInitiationParameters  */
-    private $loginInitiationParameters;
+    private $subject;
 
     public function setUp(): void
     {
-        $this->loginInitiationParameters = LoginInitiationParametersHelper::getLoginInitiationParameters();
+        $this->subject = new LoginInitiationParameters(
+            'issuer',
+            'loginHint',
+            'targetLinkUri',
+            'ltiMessageHint',
+            'ltiDeploymentId',
+            'clientId'
+        );
     }
 
     public function testGetIssuer(): void
     {
-        $this->assertEquals('issuer', $this->loginInitiationParameters->getIssuer());
+        $this->assertEquals('issuer', $this->subject->getIssuer());
     }
 
     public function testGetLoginHint(): void
     {
-        $this->assertEquals('loginHint', $this->loginInitiationParameters->getLoginHint());
+        $this->assertEquals('loginHint', $this->subject->getLoginHint());
     }
 
     public function testGetTargetLinkUri(): void
     {
-        $this->assertEquals('targetLinkUri', $this->loginInitiationParameters->getTargetLinkUri());
+        $this->assertEquals('targetLinkUri', $this->subject->getTargetLinkUri());
     }
 
     public function testGetLtiMessageHint(): void
     {
-        $this->assertEquals('ltiMessageHint', $this->loginInitiationParameters->getLtiMessageHint());
+        $this->assertEquals('ltiMessageHint', $this->subject->getLtiMessageHint());
     }
 
     public function testGetLtiDeploymentId(): void
     {
-        $this->assertEquals('ltiDeploymentId', $this->loginInitiationParameters->getLtiDeploymentId());
+        $this->assertEquals('ltiDeploymentId', $this->subject->getLtiDeploymentId());
     }
 
     public function testGetClientId(): void
     {
-        $this->assertEquals('clientId', $this->loginInitiationParameters->getClientId());
+        $this->assertEquals('clientId', $this->subject->getClientId());
     }
 }
