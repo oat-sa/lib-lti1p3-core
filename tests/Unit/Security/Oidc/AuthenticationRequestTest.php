@@ -28,10 +28,10 @@ use PHPUnit\Framework\TestCase;
 
 class AuthenticationRequestTest extends TestCase
 {
-    public function testGetUrl(): void
+    public function testItCanBuildUrl(): void
     {
         $authenticationRequest = new AuthenticationRequest(
-            'uri_or_url',
+            'baseUrl',
             new AuthenticationRequestParameters(
                 'redirectUri',
                 'clientId',
@@ -43,8 +43,49 @@ class AuthenticationRequestTest extends TestCase
         );
 
         $this->assertEquals(
-            'uri_or_url?scope=openid&response_type=id_token&client_id=clientId&redirect_uri=redirectUri&login_hint=loginHint&response_mode=form_post&nonce=nonce&prompt=none&lti_message_hint=ltiMessageHint',
+            'baseUrl?scope=openid&response_type=id_token&client_id=clientId&redirect_uri=redirectUri&login_hint=loginHint&response_mode=form_post&nonce=nonce&prompt=none&lti_message_hint=ltiMessageHint',
             $authenticationRequest->buildUrl()
+        );
+    }
+
+    public function testItCanBuildUrlAndPreserveOidcParameters(): void
+    {
+        $authenticationRequest = new AuthenticationRequest(
+            'baseUrl',
+            new AuthenticationRequestParameters(
+                'redirectUri',
+                'clientId',
+                'loginHint',
+                'nonce'
+            )
+        );
+
+        $this->assertEquals(
+            'baseUrl?scope=openid&response_type=id_token&response_mode=form_post&prompt=none&client_id=clientId&redirect_uri=redirectUri&login_hint=loginHint&nonce=nonce',
+            $authenticationRequest->buildUrl([
+                'scope' => 'invalid',
+                'response_type' => 'invalid',
+                'response_mode' => 'invalid',
+                'prompt' => 'invalid',
+            ])
+        );
+    }
+
+    public function testItCanBuildUrlWithSupplementaryParameters(): void
+    {
+        $authenticationRequest = new AuthenticationRequest(
+            'baseUrl',
+            new AuthenticationRequestParameters(
+                'redirectUri',
+                'clientId',
+                'loginHint',
+                'nonce'
+            )
+        );
+
+        $this->assertEquals(
+            'baseUrl?some=parameter&scope=openid&response_type=id_token&client_id=clientId&redirect_uri=redirectUri&login_hint=loginHint&response_mode=form_post&nonce=nonce&prompt=none',
+            $authenticationRequest->buildUrl(['some' => 'parameter'])
         );
     }
 }
