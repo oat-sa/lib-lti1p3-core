@@ -38,9 +38,6 @@ class OidcLoginInitiatorTest extends TestCase
     use DeploymentRepositoryMockTrait;
     use NonceRepositoryMockTrait;
 
-    /** @var DeploymentInterface */
-    private $mockDeployment;
-
     /** @var LoginInitiationParameters */
     private $loginInitiationParameters;
 
