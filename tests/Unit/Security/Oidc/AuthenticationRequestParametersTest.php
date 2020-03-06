@@ -73,21 +73,33 @@ class AuthenticationRequestParametersTest extends TestCase
 
     public function testGetScope(): void
     {
-        $this->assertEquals(AuthenticationRequestParameters::SCOPE, $this->authenticationRequestParameters->getScope());
+        $this->assertEquals(
+            AuthenticationRequestParameters::SCOPE,
+            $this->authenticationRequestParameters->getScope()
+        );
     }
 
     public function testGetResponseType(): void
     {
-        $this->assertEquals(AuthenticationRequestParameters::RESPONSE_TYPE, $this->authenticationRequestParameters->getResponseType());
+        $this->assertEquals(
+            AuthenticationRequestParameters::RESPONSE_TYPE,
+            $this->authenticationRequestParameters->getResponseType()
+        );
     }
 
     public function testGetResponseMode(): void
     {
-        $this->assertEquals(AuthenticationRequestParameters::RESPONSE_MODE, $this->authenticationRequestParameters->getResponseMode());
+        $this->assertEquals(
+            AuthenticationRequestParameters::RESPONSE_MODE,
+            $this->authenticationRequestParameters->getResponseMode()
+        );
     }
 
     public function testGetPrompt(): void
     {
-        $this->assertEquals(AuthenticationRequestParameters::PROMPT, $this->authenticationRequestParameters->getPrompt());
+        $this->assertEquals(
+            AuthenticationRequestParameters::PROMPT,
+            $this->authenticationRequestParameters->getPrompt()
+        );
     }
 }

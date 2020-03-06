@@ -29,10 +29,10 @@ trait PlatformTestingTrait
     public function getTestingPlatform(
         string $name = 'name',
         string $audience = 'audience',
-        string$oAuth2AccessTokenUrl = 'oAuth2AccessTokenUrl',
+        string $oAuth2AccessTokenUrl = 'oAuth2AccessTokenUrl',
         string $oidcAuthenticationUrl = 'oidcAuthenticationUrl'
     ): PlatformInterface {
-        return new class($name, $audience, $oAuth2AccessTokenUrl, $oidcAuthenticationUrl) implements PlatformInterface
+        return new class ($name, $audience, $oAuth2AccessTokenUrl, $oidcAuthenticationUrl) implements PlatformInterface
         {
             /** @var string */
             private $name;
@@ -46,8 +46,12 @@ trait PlatformTestingTrait
             /** @var string */
             private $oidcAuthenticationUrl;
 
-            public function __construct(string $name, string $audience, string $oAuth2AccessTokenUrl, string $oidcAuthenticationUrl)
-            {
+            public function __construct(
+                string $name,
+                string $audience,
+                string $oAuth2AccessTokenUrl,
+                string $oidcAuthenticationUrl
+            ) {
                 $this->name = $name;
                 $this->audience = $audience;
                 $this->oAuth2AccessTokenUrl = $oAuth2AccessTokenUrl;

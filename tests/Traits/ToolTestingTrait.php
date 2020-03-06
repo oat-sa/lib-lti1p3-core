@@ -31,7 +31,7 @@ trait ToolTestingTrait
         string $deepLaunchUrl = 'deepLaunchUrl',
         string $oidcLoginInitiationUrl = 'oidcLoginInitiationUrl'
     ): ToolInterface {
-        return new class($name, $deepLaunchUrl,$oidcLoginInitiationUrl) implements ToolInterface
+        return new class ($name, $deepLaunchUrl, $oidcLoginInitiationUrl) implements ToolInterface
         {
             /** @var string */
             private $name;

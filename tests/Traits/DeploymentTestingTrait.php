@@ -33,7 +33,7 @@ trait DeploymentTestingTrait
     use ToolTestingTrait;
     use KeyChainTestingTrait;
 
-    public function getTestingDeployment(
+    private function getTestingDeployment(
         string $id = 'deploymentId',
         string $clientId = 'clientId',
         PlatformInterface $platform = null,
@@ -48,8 +48,15 @@ trait DeploymentTestingTrait
         $toolKeyPair = $toolKeyPair ?? $this->getTestingKeyChain('tool');
         $platformKeyPair = $platformKeyPair ?? $this->getTestingKeyChain('platform');
 
-        return new class($id, $clientId, $platform, $tool, $platformJwksUrl, $toolKeyPair, $platformKeyPair) implements DeploymentInterface
-        {
+        return new class (
+            $id,
+            $clientId,
+            $platform,
+            $tool,
+            $platformJwksUrl,
+            $toolKeyPair,
+            $platformKeyPair
+        ) implements DeploymentInterface {
             /** @var string */
             private $id;
 

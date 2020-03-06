@@ -73,8 +73,8 @@ class OidcLoginInitiator
         try {
             $deployment = $this->deploymentRepository->findByIssuer(
                 $lLoginInitiationParameters->getIssuer(),
-                $lLoginInitiationParameters->getClientId())
-            ;
+                $lLoginInitiationParameters->getClientId()
+            );
 
             if (null === $deployment) {
                 throw new LtiException(
@@ -95,7 +95,6 @@ class OidcLoginInitiator
                 $deployment->getPlatform()->getOidcAuthenticationUrl(),
                 $authenticationRequestParameters
             );
-
         } catch (LtiExceptionInterface $exception) {
             throw $exception;
         } catch (Throwable $exception) {
