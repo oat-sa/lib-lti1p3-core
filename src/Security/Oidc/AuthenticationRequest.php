@@ -39,6 +39,16 @@ class AuthenticationRequest
         $this->parameters = $parameters;
     }
 
+    public function getBaseUrl(): string
+    {
+        return $this->baseUrl;
+    }
+
+    public function getParameters(): AuthenticationRequestParameters
+    {
+        return $this->parameters;
+    }
+
     public function buildUrl(array $queryParameters = []): string
     {
         return sprintf(

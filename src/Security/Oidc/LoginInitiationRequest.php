@@ -30,12 +30,41 @@ class LoginInitiationRequest
     /** @var string */
     private $baseUrl;
 
-    /** @var AuthenticationRequestParameters */
+    /** @var LoginInitiationRequestParameters */
     private $parameters;
 
     public function __construct(string $baseUrl, LoginInitiationRequestParameters $parameters)
     {
         $this->baseUrl = $baseUrl;
         $this->parameters = $parameters;
+    }
+
+    public function getBaseUrl(): string
+    {
+        return $this->baseUrl;
+    }
+
+    public function getParameters(): LoginInitiationRequestParameters
+    {
+        return $this->parameters;
+    }
+
+    public function buildUrl(array $queryParameters = []): string
+    {
+        return sprintf(
+            '%s?%s',
+            $this->baseUrl,
+            http_build_query(array_merge(
+                $queryParameters,
+                [
+                    'iss' => $this->parameters->getIssuer(),
+                    'login_hint' => $this->parameters->getLoginHint(),
+                    'target_link_uri' => $this->parameters->getTargetLinkUri(),
+                    'lti_message_hint' => $this->parameters->getLtiMessageHint(),
+                    'lti_deployment_id' => $this->parameters->getLtiDeploymentId(),
+                    'client_id' => $this->parameters->getClientId(),
+                ]
+            ))
+        );
     }
 }
