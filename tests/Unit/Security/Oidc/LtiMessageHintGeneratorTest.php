@@ -28,6 +28,7 @@ use DateTimeInterface;
 use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\Signer\Ecdsa\Sha512;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
+use Lcobucci\JWT\Token;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Security\Oidc\LtiMessageHintGenerator;
 use OAT\Library\Lti1p3Core\Security\Oidc\LtiMessageHintGeneratorInterface;
@@ -52,7 +53,12 @@ class LtiMessageHintGeneratorTest extends TestCase
         $subject = new LtiMessageHintGenerator();
 
         $deployment = $this->getTestingDeployment();
-        $token = (new Parser())->parse($subject->generate($deployment)->__toString());
+
+        $token = $subject->generate($deployment);
+
+        $this->assertInstanceOf(Token::class, $token);
+
+        $token = (new Parser())->parse($token->__toString());
 
         $this->assertTrue($token->verify(new Sha256(), $deployment->getPlatformKeyPair()->getPublicKey()));
 

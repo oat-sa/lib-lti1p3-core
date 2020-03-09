@@ -88,4 +88,36 @@ class AuthenticationRequestTest extends TestCase
             $authenticationRequest->buildUrl(['some' => 'parameter'])
         );
     }
+
+    public function testGetBaseUrl(): void
+    {
+        $authenticationRequest = new AuthenticationRequest(
+            'baseUrl',
+            new AuthenticationRequestParameters(
+                'redirectUri',
+                'clientId',
+                'loginHint',
+                'nonce'
+            )
+        );
+
+        $this->assertEquals('baseUrl', $authenticationRequest->getBaseUrl());
+    }
+
+    public function testGetParameters(): void
+    {
+        $authenticationRequestParameters = new AuthenticationRequestParameters(
+            'redirectUri',
+            'clientId',
+            'loginHint',
+            'nonce'
+        );
+
+        $authenticationRequest = new AuthenticationRequest(
+            'baseUrl',
+            $authenticationRequestParameters
+        );
+
+        $this->assertEquals($authenticationRequestParameters, $authenticationRequest->getParameters());
+    }
 }
