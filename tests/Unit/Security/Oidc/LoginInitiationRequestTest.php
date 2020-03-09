@@ -29,11 +29,11 @@ use PHPUnit\Framework\TestCase;
 class LoginInitiationRequestTest extends TestCase
 {
     /** @var LoginInitiationRequest */
-    private $logintInitiationRequest;
+    private $loginInitiationRequest;
     
     public function setUp()
     {
-        $this->logintInitiationRequest = new LoginInitiationRequest(
+        $this->loginInitiationRequest = new LoginInitiationRequest(
             'baseUrl',
             new LoginInitiationRequestParameters(
                 'issuer',
@@ -50,7 +50,7 @@ class LoginInitiationRequestTest extends TestCase
     {
         $this->assertEquals(
             'baseUrl?iss=issuer&login_hint=loginHint&target_link_uri=targetLinkUri&lti_message_hint=ltiMessageHint&client_id=clientId',
-            $this->logintInitiationRequest->buildUrl()
+            $this->loginInitiationRequest->buildUrl()
         );
     }
 
@@ -58,7 +58,7 @@ class LoginInitiationRequestTest extends TestCase
     {
         $this->assertEquals(
             'baseUrl?iss=issuer&login_hint=loginHint&target_link_uri=targetLinkUri&lti_message_hint=ltiMessageHint&client_id=clientId',
-            $this->logintInitiationRequest->buildUrl([
+            $this->loginInitiationRequest->buildUrl([
                 'iss' => 'invalid',
                 'login_hint' => 'invalid',
                 'target_link_uri' => 'invalid',
@@ -72,13 +72,13 @@ class LoginInitiationRequestTest extends TestCase
     {
         $this->assertEquals(
             'baseUrl?some=parameter&iss=issuer&login_hint=loginHint&target_link_uri=targetLinkUri&lti_message_hint=ltiMessageHint&client_id=clientId',
-            $this->logintInitiationRequest->buildUrl(['some' => 'parameter'])
+            $this->loginInitiationRequest->buildUrl(['some' => 'parameter'])
         );
     }
 
     public function testGetBaseUrl(): void
     {
-        $this->assertEquals('baseUrl', $this->logintInitiationRequest->getBaseUrl());
+        $this->assertEquals('baseUrl', $this->loginInitiationRequest->getBaseUrl());
     }
 
     public function testGetParameters(): void
@@ -91,6 +91,7 @@ class LoginInitiationRequestTest extends TestCase
             null,
             'clientId'
         );
-        $this->assertEquals($loginInitiationRequestParameters, $this->logintInitiationRequest->getParameters());
+
+        $this->assertEquals($loginInitiationRequestParameters, $this->loginInitiationRequest->getParameters());
     }
 }
