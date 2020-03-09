@@ -26,6 +26,7 @@ use Carbon\Carbon;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Signer;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
+use Lcobucci\JWT\Token;
 use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use Ramsey\Uuid\Uuid;
@@ -49,7 +50,7 @@ class LtiMessageHintGenerator implements LtiMessageHintGeneratorInterface
     /**
      * @throws LtiException
      */
-    public function generate(DeploymentInterface $deployment): string
+    public function generate(DeploymentInterface $deployment): Token
     {
         try {
             $now = Carbon::now();
@@ -68,8 +69,7 @@ class LtiMessageHintGenerator implements LtiMessageHintGeneratorInterface
                 ->relatedTo($deployment->getClientId())
                 ->permittedFor($deployment->getTool()->getOidcLoginInitiationUrl())
                 ->withClaim('deployment_id', $deployment->getId())
-                ->getToken($this->signer, $deployment->getPlatformKeyPair()->getPrivateKey())
-                ->__toString();
+                ->getToken($this->signer, $deployment->getPlatformKeyPair()->getPrivateKey());
         } catch (Throwable $exception) {
             throw new LtiException(
                 sprintf('Lti message hint generation failed: %s', $exception->getMessage()),

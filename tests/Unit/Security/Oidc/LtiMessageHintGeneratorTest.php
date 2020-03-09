@@ -52,7 +52,7 @@ class LtiMessageHintGeneratorTest extends TestCase
         $subject = new LtiMessageHintGenerator();
 
         $deployment = $this->getTestingDeployment();
-        $token = (new Parser())->parse($subject->generate($deployment));
+        $token = (new Parser())->parse($subject->generate($deployment)->__toString());
 
         $this->assertTrue($token->verify(new Sha256(), $deployment->getPlatformKeyPair()->getPublicKey()));
 

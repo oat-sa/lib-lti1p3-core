@@ -62,7 +62,7 @@ class StateGeneratorTest extends TestCase
         );
 
         $token = (new Parser())->parse(
-            $subject->generate($deployment, $loginInitiationParameters)
+            $subject->generate($deployment, $loginInitiationParameters)->__toString()
         );
 
         $this->assertTrue($token->verify(new Sha256(), $deployment->getToolKeyPair()->getPublicKey()));

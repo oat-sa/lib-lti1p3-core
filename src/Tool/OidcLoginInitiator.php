@@ -87,7 +87,7 @@ class OidcLoginInitiator
                 $deployment->getClientId(),
                 $lLoginInitiationParameters->getLoginHint(),
                 $this->generateNonce()->getValue(),
-                $this->stateGenerator->generate($deployment, $lLoginInitiationParameters),
+                $this->stateGenerator->generate($deployment, $lLoginInitiationParameters)->__toString(),
                 $lLoginInitiationParameters->getLtiMessageHint()
             );
 
