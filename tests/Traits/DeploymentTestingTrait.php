@@ -137,7 +137,6 @@ trait DeploymentTestingTrait
                 $this->platformKeyPair = $keyChainInterface;
                 return $this;
             }
-
         };
     }
 }

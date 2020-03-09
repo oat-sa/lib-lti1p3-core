@@ -59,7 +59,8 @@ class OidcLoginCreator
             $deployment = $this->deploymentRepository->findByIssuer($issuer, $clientId);
 
             if (null === $deployment) {
-                throw new LtiException(sprintf('Deployment not found for issuer %s', $issuer));}
+                throw new LtiException(sprintf('Deployment not found for issuer %s', $issuer));
+            }
 
             $loginInitiationRequestParameters = new LoginInitiationRequestParameters(
                 $issuer,
