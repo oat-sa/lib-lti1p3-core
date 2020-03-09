@@ -72,7 +72,7 @@ class LtiMessageHintGenerator implements LtiMessageHintGeneratorInterface
                 ->__toString();
         } catch (Throwable $exception) {
             throw new LtiException(
-                sprintf('Lti messahe hint generation failed: %s', $exception->getMessage()),
+                sprintf('Lti message hint generation failed: %s', $exception->getMessage()),
                 $exception->getCode(),
                 $exception
             );
