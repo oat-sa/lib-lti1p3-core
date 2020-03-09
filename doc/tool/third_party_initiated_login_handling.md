@@ -1,4 +1,4 @@
-# TOOL - Third-party Initiated Login
+# TOOL - Third-party Initiated Login Handling
 
 > Documentation about how to expose, as a Tool, a [3rd party initiated login handling endpoint](https://www.imsglobal.org/spec/security/v1p0/#step-2-authentication-request).
 

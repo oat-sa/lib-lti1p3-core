@@ -27,8 +27,8 @@ $creator = new OidcLoginCreator($deploymentRepository);
 
 // and initialise the tool's 3rd party login initiation service
 $loginInitiationRequest = $creator->create(
-    'http://platform.com',  // issuer (the platform)
-    'login hint',           // login hint for later user authentication om platform side
+    'http://platform.com',      // issuer (the platform)
+    'login hint',               // login hint for later user authentication om platform side
     'http://tool.com/endpoint'  // The actual tool end-point that should be executed
 );
 
