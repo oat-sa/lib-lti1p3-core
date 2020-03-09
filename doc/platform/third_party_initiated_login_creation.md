@@ -2,7 +2,7 @@
 
 > Documentation about how to use, as a Platform, a [3rd party initiated login creation](https://www.imsglobal.org/spec/security/v1p0/#step-1-third-party-initiated-login) service to ease tool interactions.
 
-## Preparing required repositories
+## Preparing required repository
 
 For this feature, you need to provide first:
 -  a [DeploymentRepositoryInterface](../../src/Deployment/DeploymentRepositoryInterface.php) implementation (to retrieve your deployments configurations)
