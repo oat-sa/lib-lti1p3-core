@@ -29,5 +29,5 @@ interface StateGeneratorInterface
 {
     public const DEFAULT_TTL = 600;
 
-    public function generate(DeploymentInterface $deployment, LoginInitiationParameters $parameters): Token;
+    public function generate(DeploymentInterface $deployment, LoginInitiationRequestParameters $parameters): Token;
 }

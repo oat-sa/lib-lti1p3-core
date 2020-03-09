@@ -25,7 +25,7 @@ namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\Oidc;
 use OAT\Library\Lti1p3Core\Security\Oidc\LoginInitiationRequestParameters;
 use PHPUnit\Framework\TestCase;
 
-class LoginInitiationParametersTest extends TestCase
+class LoginInitiationRequestParametersTest extends TestCase
 {
     /** @var LoginInitiationRequestParameters  */
     private $subject;

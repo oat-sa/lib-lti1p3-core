@@ -49,7 +49,7 @@ class StateGenerator implements StateGeneratorInterface
     /**
      * @throws LtiException
      */
-    public function generate(DeploymentInterface $deployment, LoginInitiationParameters $parameters): Token
+    public function generate(DeploymentInterface $deployment, LoginInitiationRequestParameters $parameters): Token
     {
         try {
             $now = Carbon::now();
@@ -69,7 +69,10 @@ class StateGenerator implements StateGeneratorInterface
                     'lti_deployment_id' => $parameters->getLtiDeploymentId(),
                     'client_id' => $parameters->getClientId(),
                 ])
-                ->getToken($this->signer, $deployment->getToolKeyPair()->getPrivateKey());
+                ->getToken(
+                    $this->signer,
+                    $deployment->getToolKeyPair()->getPrivateKey()
+                );
         } catch (Throwable $exception) {
             throw new LtiException(
                 sprintf('State generation failed: %s', $exception->getMessage()),

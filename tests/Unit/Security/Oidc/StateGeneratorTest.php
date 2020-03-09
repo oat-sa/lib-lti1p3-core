@@ -28,6 +28,7 @@ use DateTimeInterface;
 use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\Signer\Ecdsa\Sha512;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
+use Lcobucci\JWT\Token;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Security\Oidc\LoginInitiationRequestParameters;
 use OAT\Library\Lti1p3Core\Security\Oidc\StateGenerator;
@@ -61,9 +62,11 @@ class StateGeneratorTest extends TestCase
             'ltiDeploymentId'
         );
 
-        $token = (new Parser())->parse(
-            $subject->generate($deployment, $loginInitiationParameters)->__toString()
-        );
+        $result = $subject->generate($deployment, $loginInitiationParameters);
+
+        $this->assertInstanceOf(Token::class, $result);
+
+        $token = (new Parser())->parse($result->__toString());
 
         $this->assertTrue($token->verify(new Sha256(), $deployment->getToolKeyPair()->getPublicKey()));
 
