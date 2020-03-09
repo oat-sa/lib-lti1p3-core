@@ -65,7 +65,7 @@ class OidcLoginCreator
                 $issuer,
                 $loginHint,
                 $targetLinkUri,
-                $this->ltiMessageHintGenerator->generate($deployment),
+                $this->ltiMessageHintGenerator->generate($deployment)->__toString(),
                 $deployment->getId(),
                 $deployment->getClientId()
             );
