@@ -26,6 +26,7 @@ use Carbon\Carbon;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Signer;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
+use Lcobucci\JWT\Token;
 use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use Ramsey\Uuid\Uuid;
@@ -48,7 +49,7 @@ class StateGenerator implements StateGeneratorInterface
     /**
      * @throws LtiException
      */
-    public function generate(DeploymentInterface $deployment, LoginInitiationRequestParameters $parameters): string
+    public function generate(DeploymentInterface $deployment, LoginInitiationParameters $parameters): Token
     {
         try {
             $now = Carbon::now();
@@ -68,8 +69,7 @@ class StateGenerator implements StateGeneratorInterface
                     'lti_deployment_id' => $parameters->getLtiDeploymentId(),
                     'client_id' => $parameters->getClientId(),
                 ])
-                ->getToken($this->signer, $deployment->getToolKeyPair()->getPrivateKey())
-                ->__toString();
+                ->getToken($this->signer, $deployment->getToolKeyPair()->getPrivateKey());
         } catch (Throwable $exception) {
             throw new LtiException(
                 sprintf('State generation failed: %s', $exception->getMessage()),

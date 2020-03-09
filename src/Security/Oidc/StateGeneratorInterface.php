@@ -22,11 +22,12 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Security\Oidc;
 
+use Lcobucci\JWT\Token;
 use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
 
 interface StateGeneratorInterface
 {
     public const DEFAULT_TTL = 600;
 
-    public function generate(DeploymentInterface $deployment, LoginInitiationRequestParameters $parameters): string;
+    public function generate(DeploymentInterface $deployment, LoginInitiationParameters $parameters): Token;
 }

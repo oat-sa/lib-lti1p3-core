@@ -29,13 +29,12 @@ use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\Signer\Ecdsa\Sha512;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
-use OAT\Library\Lti1p3Core\Security\Oidc\LoginInitiationRequestParameters;
-use OAT\Library\Lti1p3Core\Security\Oidc\StateGenerator;
-use OAT\Library\Lti1p3Core\Security\Oidc\StateGeneratorInterface;
+use OAT\Library\Lti1p3Core\Security\Oidc\LtiMessageHintGenerator;
+use OAT\Library\Lti1p3Core\Security\Oidc\LtiMessageHintGeneratorInterface;
 use OAT\Library\Lti1p3Core\Tests\Traits\DeploymentTestingTrait;
 use PHPUnit\Framework\TestCase;
 
-class StateGeneratorTest extends TestCase
+class LtiMessageHintGeneratorTest extends TestCase
 {
     use DeploymentTestingTrait;
 
@@ -48,51 +47,46 @@ class StateGeneratorTest extends TestCase
         Carbon::setTestNow($this->testDate);
     }
 
-    public function testItCanGenerateAState(): void
+    public function testItCanGenerateALtiMessageHint(): void
     {
-        $subject = new StateGenerator();
+        $subject = new LtiMessageHintGenerator();
 
         $deployment = $this->getTestingDeployment();
-        $loginInitiationParameters = new LoginInitiationRequestParameters(
-            'audience',
-            'loginHint',
-            'targetLinkUri',
-            'ltiMessageHint',
-            'ltiDeploymentId'
-        );
+        $token = (new Parser())->parse($subject->generate($deployment)->__toString());
 
-        $token = (new Parser())->parse(
-            $subject->generate($deployment, $loginInitiationParameters)->__toString()
-        );
-
-        $this->assertTrue($token->verify(new Sha256(), $deployment->getToolKeyPair()->getPublicKey()));
+        $this->assertTrue($token->verify(new Sha256(), $deployment->getPlatformKeyPair()->getPublicKey()));
 
         $this->assertEquals('RS256', $token->getHeader('alg'));
         $this->assertEquals($this->testDate->getTimestamp(), $token->getClaim('iat'));
         $this->assertEquals(
-            $this->testDate->addSeconds(StateGeneratorInterface::DEFAULT_TTL)->getTimestamp(),
+            $this->testDate->addSeconds(LtiMessageHintGeneratorInterface::DEFAULT_TTL)->getTimestamp(),
             $token->getClaim('exp')
         );
 
-        $parametersClaim = (array)$token->getClaim('params');
-        $this->assertEquals($deployment->getPlatform()->getAudience(), $parametersClaim['iss']);
-        $this->assertEquals($loginInitiationParameters->getLoginHint(), $parametersClaim['login_hint']);
-        $this->assertEquals($loginInitiationParameters->getTargetLinkUri(), $parametersClaim['target_link_uri']);
-        $this->assertEquals($loginInitiationParameters->getLtiMessageHint(), $parametersClaim['lti_message_hint']);
-        $this->assertEquals($loginInitiationParameters->getLtiDeploymentId(), $parametersClaim['lti_deployment_id']);
-        $this->assertNull($parametersClaim['client_id']);
+        $this->assertEquals($deployment->getId(), $token->getClaim('deployment_id'));
+        $this->assertEquals($deployment->getPlatform()->getName(), $token->getClaim('iss'));
+        $this->assertEquals($deployment->getClientId(), $token->getClaim('sub'));
+        $this->assertEquals($deployment->getTool()->getOidcLoginInitiationUrl(), $token->getClaim('aud'));
     }
 
     public function testItThrowsALtiExceptionWithUnexpectedSigner(): void
     {
         $this->expectException(LtiExceptionInterface::class);
-        $this->expectExceptionMessage('State generation failed: This key is not compatible with this signer');
+        $this->expectExceptionMessage('Lti message hint generation failed: This key is not compatible with this signer');
 
-        $subject = new StateGenerator(null, new Sha512());
+        $subject = new LtiMessageHintGenerator(null, new Sha512());
 
-        $subject->generate(
-            $this->getTestingDeployment(),
-            new LoginInitiationRequestParameters('audience', 'loginHint', 'targetLinkUri')
-        );
+        $subject->generate($this->getTestingDeployment());
+    }
+
+    public function testItThrowsALtiExceptionWithoutPlatformKeyPair(): void
+    {
+        $this->expectException(LtiExceptionInterface::class);
+        $this->expectExceptionMessage('Deployment id deploymentId does not have a platform key pair configured');
+
+        $subject = new LtiMessageHintGenerator(null, new Sha512());
+        $deployment = $this->getTestingDeployment()->setPlatformKeyPair();
+
+        $subject->generate($deployment);
     }
 }

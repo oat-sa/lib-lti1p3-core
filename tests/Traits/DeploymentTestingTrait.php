@@ -131,6 +131,13 @@ trait DeploymentTestingTrait
             {
                 return $this->platformKeyPair;
             }
+
+            public function setPlatformKeyPair(KeyChainInterface $keyChainInterface = null): self
+            {
+                $this->platformKeyPair = $keyChainInterface;
+                return $this;
+            }
+
         };
     }
 }
