@@ -18,7 +18,7 @@ $ composer require oat-sa/lib-lti1p3-core
 You can find documentation on following topics:
 
 Platform
-- how to provide the [3rd party login initiation creation endpoint](doc/platform/third_party_initiated_login_creation.md)
+- how to use the [3rd party login initiation creation service](doc/platform/third_party_initiated_login_creation.md)
 
 Tool
 - how to provide the [3rd party login initiation handling endpoint](doc/tool/third_party_initiated_login_handling.md)
