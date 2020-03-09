@@ -48,7 +48,7 @@ class StateGenerator implements StateGeneratorInterface
     /**
      * @throws LtiException
      */
-    public function generate(DeploymentInterface $deployment, LoginInitiationParameters $parameters): string
+    public function generate(DeploymentInterface $deployment, LoginInitiationRequestParameters $parameters): string
     {
         try {
             $now = Carbon::now();

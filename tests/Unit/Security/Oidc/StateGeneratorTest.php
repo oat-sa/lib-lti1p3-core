@@ -29,7 +29,7 @@ use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\Signer\Ecdsa\Sha512;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
-use OAT\Library\Lti1p3Core\Security\Oidc\LoginInitiationParameters;
+use OAT\Library\Lti1p3Core\Security\Oidc\LoginInitiationRequestParameters;
 use OAT\Library\Lti1p3Core\Security\Oidc\StateGenerator;
 use OAT\Library\Lti1p3Core\Security\Oidc\StateGeneratorInterface;
 use OAT\Library\Lti1p3Core\Tests\Traits\DeploymentTestingTrait;
@@ -53,7 +53,7 @@ class StateGeneratorTest extends TestCase
         $subject = new StateGenerator();
 
         $deployment = $this->getTestingDeployment();
-        $loginInitiationParameters = new LoginInitiationParameters(
+        $loginInitiationParameters = new LoginInitiationRequestParameters(
             'audience',
             'loginHint',
             'targetLinkUri',
@@ -92,7 +92,7 @@ class StateGeneratorTest extends TestCase
 
         $subject->generate(
             $this->getTestingDeployment(),
-            new LoginInitiationParameters('audience', 'loginHint', 'targetLinkUri')
+            new LoginInitiationRequestParameters('audience', 'loginHint', 'targetLinkUri')
         );
     }
 }

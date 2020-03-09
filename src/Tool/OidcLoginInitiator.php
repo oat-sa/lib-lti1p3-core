@@ -31,7 +31,7 @@ use OAT\Library\Lti1p3Core\Security\Nonce\NonceInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Oidc\AuthenticationRequest;
 use OAT\Library\Lti1p3Core\Security\Oidc\AuthenticationRequestParameters;
-use OAT\Library\Lti1p3Core\Security\Oidc\LoginInitiationParameters;
+use OAT\Library\Lti1p3Core\Security\Oidc\LoginInitiationRequestParameters;
 use OAT\Library\Lti1p3Core\Security\Oidc\StateGenerator;
 use OAT\Library\Lti1p3Core\Security\Oidc\StateGeneratorInterface;
 use Throwable;
@@ -68,7 +68,7 @@ class OidcLoginInitiator
     /**
      * @throws LtiExceptionInterface
      */
-    public function initiate(LoginInitiationParameters $lLoginInitiationParameters): AuthenticationRequest
+    public function initiate(LoginInitiationRequestParameters $lLoginInitiationParameters): AuthenticationRequest
     {
         try {
             $deployment = $this->deploymentRepository->findByIssuer(
