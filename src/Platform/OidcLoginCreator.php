@@ -53,8 +53,11 @@ class OidcLoginCreator
     /**
      * @throws LtiExceptionInterface
      */
-    public function create(string $issuer, string $loginHint, string $targetLinkUri, string $clientId = null): LoginInitiationRequest
-    {
+    public function create(
+        string $issuer,
+        string $loginHint,
+        string $targetLinkUri,
+        string $clientId = null): LoginInitiationRequest {
         try {
             $deployment = $this->deploymentRepository->findByIssuer($issuer, $clientId);
 
