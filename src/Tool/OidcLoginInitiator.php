@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tool;
 
+use Exception;
 use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
@@ -106,6 +107,9 @@ class OidcLoginInitiator
         }
     }
 
+    /**
+     * @throws Exception
+     */
     private function generateNonce(): NonceInterface
     {
         $nonce = $this->nonceGenerator->generate();
