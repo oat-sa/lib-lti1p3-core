@@ -29,9 +29,8 @@ use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\Signer\Ecdsa\Sha512;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
-use OAT\Library\Lti1p3Core\Security\Oidc\LoginInitiationParameters;
 use OAT\Library\Lti1p3Core\Security\Oidc\LtiMessageHintGenerator;
-use OAT\Library\Lti1p3Core\Security\Oidc\StateGenerator;
+use OAT\Library\Lti1p3Core\Security\Oidc\LtiMessageHintGeneratorInterface;
 use OAT\Library\Lti1p3Core\Tests\Traits\DeploymentTestingTrait;
 use PHPUnit\Framework\TestCase;
 
@@ -60,7 +59,7 @@ class LtiMessageHintGeneratorTest extends TestCase
         $this->assertEquals('RS256', $token->getHeader('alg'));
         $this->assertEquals($this->testDate->getTimestamp(), $token->getClaim('iat'));
         $this->assertEquals(
-            $this->testDate->addSeconds(600)->getTimestamp(),
+            $this->testDate->addSeconds(LtiMessageHintGeneratorInterface::DEFAULT_TTL)->getTimestamp(),
             $token->getClaim('exp')
         );
 
