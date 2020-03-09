@@ -96,7 +96,6 @@ trait DeploymentTestingTrait
                 $this->platformKeyPair = $platformKeyPair;
             }
 
-
             public function getId(): string
             {
                 return $this->id;
@@ -135,6 +134,7 @@ trait DeploymentTestingTrait
             public function setPlatformKeyPair(KeyChainInterface $keyChainInterface = null): self
             {
                 $this->platformKeyPair = $keyChainInterface;
+
                 return $this;
             }
         };
