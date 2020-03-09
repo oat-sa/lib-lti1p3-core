@@ -36,12 +36,14 @@ class AuthenticationRequestTest extends TestCase
                 'redirectUri',
                 'clientId',
                 'loginHint',
-                'nonce'
+                'nonce',
+                null,
+                'ltiMessageHint'
             )
         );
 
         $this->assertEquals(
-            'baseUrl?scope=openid&response_type=id_token&client_id=clientId&redirect_uri=redirectUri&login_hint=loginHint&response_mode=form_post&nonce=nonce&prompt=none',
+            'baseUrl?scope=openid&response_type=id_token&client_id=clientId&redirect_uri=redirectUri&login_hint=loginHint&response_mode=form_post&nonce=nonce&prompt=none&lti_message_hint=ltiMessageHint',
             $authenticationRequest->buildUrl()
         );
     }

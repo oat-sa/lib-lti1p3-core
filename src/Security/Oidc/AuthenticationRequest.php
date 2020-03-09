@@ -56,6 +56,7 @@ class AuthenticationRequest
                     'response_mode' => $this->parameters->getResponseMode(),
                     'nonce' => $this->parameters->getNonce(),
                     'prompt' => $this->parameters->getPrompt(),
+                    'lti_message_hint' => $this->parameters->getLtiMessageHint(),
                 ]
             ))
         );
