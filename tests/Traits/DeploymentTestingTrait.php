@@ -57,6 +57,7 @@ trait DeploymentTestingTrait
             $toolKeyPair,
             $platformKeyPair
         ) implements DeploymentInterface {
+
             /** @var string */
             private $id;
 

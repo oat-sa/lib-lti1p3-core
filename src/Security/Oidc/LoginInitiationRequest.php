@@ -23,7 +23,7 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Security\Oidc;
 
 /**
- * https://www.imsglobal.org/spec/security/v1p0/#step-1-third-party-initiated-login
+ * @see https://www.imsglobal.org/spec/security/v1p0/#step-1-third-party-initiated-login
  */
 class LoginInitiationRequest
 {
