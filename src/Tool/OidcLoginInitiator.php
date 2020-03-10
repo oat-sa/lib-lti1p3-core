@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tool;
 
+use Exception;
 use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
@@ -31,7 +32,7 @@ use OAT\Library\Lti1p3Core\Security\Nonce\NonceInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Oidc\AuthenticationRequest;
 use OAT\Library\Lti1p3Core\Security\Oidc\AuthenticationRequestParameters;
-use OAT\Library\Lti1p3Core\Security\Oidc\LoginInitiationParameters;
+use OAT\Library\Lti1p3Core\Security\Oidc\LoginInitiationRequestParameters;
 use OAT\Library\Lti1p3Core\Security\Oidc\StateGenerator;
 use OAT\Library\Lti1p3Core\Security\Oidc\StateGeneratorInterface;
 use Throwable;
@@ -68,27 +69,27 @@ class OidcLoginInitiator
     /**
      * @throws LtiExceptionInterface
      */
-    public function initiate(LoginInitiationParameters $lLoginInitiationParameters): AuthenticationRequest
+    public function initiate(LoginInitiationRequestParameters $loginInitiationRequestParameters): AuthenticationRequest
     {
         try {
             $deployment = $this->deploymentRepository->findByIssuer(
-                $lLoginInitiationParameters->getIssuer(),
-                $lLoginInitiationParameters->getClientId()
+                $loginInitiationRequestParameters->getIssuer(),
+                $loginInitiationRequestParameters->getClientId()
             );
 
             if (null === $deployment) {
                 throw new LtiException(
-                    sprintf('Deployment not found for issuer %s', $lLoginInitiationParameters->getIssuer())
+                    sprintf('Deployment not found for issuer %s', $loginInitiationRequestParameters->getIssuer())
                 );
             }
 
             $authenticationRequestParameters = new AuthenticationRequestParameters(
-                $lLoginInitiationParameters->getTargetLinkUri(),
+                $loginInitiationRequestParameters->getTargetLinkUri(),
                 $deployment->getClientId(),
-                $lLoginInitiationParameters->getLoginHint(),
+                $loginInitiationRequestParameters->getLoginHint(),
                 $this->generateNonce()->getValue(),
-                $this->stateGenerator->generate($deployment, $lLoginInitiationParameters),
-                $lLoginInitiationParameters->getLtiMessageHint()
+                $this->stateGenerator->generate($deployment, $loginInitiationRequestParameters)->__toString(),
+                $loginInitiationRequestParameters->getLtiMessageHint()
             );
 
             return new AuthenticationRequest(
@@ -106,6 +107,9 @@ class OidcLoginInitiator
         }
     }
 
+    /**
+     * @throws Exception
+     */
     private function generateNonce(): NonceInterface
     {
         $nonce = $this->nonceGenerator->generate();

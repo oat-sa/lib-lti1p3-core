@@ -22,17 +22,17 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\Oidc;
 
-use OAT\Library\Lti1p3Core\Security\Oidc\LoginInitiationParameters;
+use OAT\Library\Lti1p3Core\Security\Oidc\LoginInitiationRequestParameters;
 use PHPUnit\Framework\TestCase;
 
-class LoginInitiationParametersTest extends TestCase
+class LoginInitiationRequestParametersTest extends TestCase
 {
-    /** @var LoginInitiationParameters  */
+    /** @var LoginInitiationRequestParameters  */
     private $subject;
 
     public function setUp(): void
     {
-        $this->subject = new LoginInitiationParameters(
+        $this->subject = new LoginInitiationRequestParameters(
             'issuer',
             'loginHint',
             'targetLinkUri',

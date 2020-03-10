@@ -25,9 +25,9 @@ namespace OAT\Library\Lti1p3Core\Security\Oidc;
 use Lcobucci\JWT\Token;
 use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
 
-interface StateGeneratorInterface
+interface LtiMessageHintGeneratorInterface
 {
     public const DEFAULT_TTL = 600;
 
-    public function generate(DeploymentInterface $deployment, LoginInitiationRequestParameters $parameters): Token;
+    public function generate(DeploymentInterface $deployment): Token;
 }

@@ -27,11 +27,12 @@ use PHPUnit\Framework\TestCase;
 
 class AuthenticationRequestParametersTest extends TestCase
 {
-    private $authenticationRequestParameters;
+    /** @var AuthenticationRequestParameters */
+    private $subject;
     
     public function setUp(): void
     {
-        $this->authenticationRequestParameters = new AuthenticationRequestParameters(
+        $this->subject = new AuthenticationRequestParameters(
             'redirectUri',
             'clientId',
             'loginHint',
@@ -43,39 +44,39 @@ class AuthenticationRequestParametersTest extends TestCase
 
     public function testGetRedirectUri(): void
     {
-        $this->assertEquals('redirectUri', $this->authenticationRequestParameters->getRedirectUri());
+        $this->assertEquals('redirectUri', $this->subject->getRedirectUri());
     }
 
     public function testGetClientId(): void
     {
-        $this->assertEquals('clientId', $this->authenticationRequestParameters->getClientId());
+        $this->assertEquals('clientId', $this->subject->getClientId());
     }
 
     public function testGetLoginHint(): void
     {
-        $this->assertEquals('loginHint', $this->authenticationRequestParameters->getLoginHint());
+        $this->assertEquals('loginHint', $this->subject->getLoginHint());
     }
 
     public function testGetNonce(): void
     {
-        $this->assertEquals('nonce', $this->authenticationRequestParameters->getNonce());
+        $this->assertEquals('nonce', $this->subject->getNonce());
     }
 
     public function testGetState(): void
     {
-        $this->assertEquals('state', $this->authenticationRequestParameters->getState());
+        $this->assertEquals('state', $this->subject->getState());
     }
 
     public function testGetLtiMessageHint(): void
     {
-        $this->assertEquals('ltiMessageHint', $this->authenticationRequestParameters->getLtiMessageHint());
+        $this->assertEquals('ltiMessageHint', $this->subject->getLtiMessageHint());
     }
 
     public function testGetScope(): void
     {
         $this->assertEquals(
             AuthenticationRequestParameters::SCOPE,
-            $this->authenticationRequestParameters->getScope()
+            $this->subject->getScope()
         );
     }
 
@@ -83,7 +84,7 @@ class AuthenticationRequestParametersTest extends TestCase
     {
         $this->assertEquals(
             AuthenticationRequestParameters::RESPONSE_TYPE,
-            $this->authenticationRequestParameters->getResponseType()
+            $this->subject->getResponseType()
         );
     }
 
@@ -91,7 +92,7 @@ class AuthenticationRequestParametersTest extends TestCase
     {
         $this->assertEquals(
             AuthenticationRequestParameters::RESPONSE_MODE,
-            $this->authenticationRequestParameters->getResponseMode()
+            $this->subject->getResponseMode()
         );
     }
 
@@ -99,7 +100,7 @@ class AuthenticationRequestParametersTest extends TestCase
     {
         $this->assertEquals(
             AuthenticationRequestParameters::PROMPT,
-            $this->authenticationRequestParameters->getPrompt()
+            $this->subject->getPrompt()
         );
     }
 }

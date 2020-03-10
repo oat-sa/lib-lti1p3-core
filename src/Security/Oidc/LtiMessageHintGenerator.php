@@ -30,9 +30,10 @@ use Lcobucci\JWT\Token;
 use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use Ramsey\Uuid\Uuid;
+use RuntimeException;
 use Throwable;
 
-class StateGenerator implements StateGeneratorInterface
+class LtiMessageHintGenerator implements LtiMessageHintGeneratorInterface
 {
     /** @var int */
     private $ttl;
@@ -49,33 +50,29 @@ class StateGenerator implements StateGeneratorInterface
     /**
      * @throws LtiException
      */
-    public function generate(DeploymentInterface $deployment, LoginInitiationRequestParameters $parameters): Token
+    public function generate(DeploymentInterface $deployment): Token
     {
         try {
             $now = Carbon::now();
+
+            if (!$deployment->getPlatformKeyPair()) {
+                throw new RuntimeException(
+                    sprintf('Deployment id %s does not have a platform key pair configured', $deployment->getId())
+                );
+            }
 
             return (new Builder())
                 ->identifiedBy(Uuid::uuid4())
                 ->issuedAt($now->getTimestamp())
                 ->expiresAt($now->addSeconds($this->ttl)->getTimestamp())
-                ->issuedBy($deployment->getTool()->getName())
+                ->issuedBy($deployment->getPlatform()->getName())
                 ->relatedTo($deployment->getClientId())
-                ->permittedFor($deployment->getPlatform()->getOAuth2AccessTokenUrl())
-                ->withClaim('params', [
-                    'iss' => $parameters->getIssuer(),
-                    'login_hint' => $parameters->getLoginHint(),
-                    'target_link_uri' => $parameters->getTargetLinkUri(),
-                    'lti_message_hint' => $parameters->getLtiMessageHint(),
-                    'lti_deployment_id' => $parameters->getLtiDeploymentId(),
-                    'client_id' => $parameters->getClientId(),
-                ])
-                ->getToken(
-                    $this->signer,
-                    $deployment->getToolKeyPair()->getPrivateKey()
-                );
+                ->permittedFor($deployment->getTool()->getOidcLoginInitiationUrl())
+                ->withClaim('deployment_id', $deployment->getId())
+                ->getToken($this->signer, $deployment->getPlatformKeyPair()->getPrivateKey());
         } catch (Throwable $exception) {
             throw new LtiException(
-                sprintf('State generation failed: %s', $exception->getMessage()),
+                sprintf('Lti message hint generation failed: %s', $exception->getMessage()),
                 $exception->getCode(),
                 $exception
             );

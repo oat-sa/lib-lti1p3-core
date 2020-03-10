@@ -23,17 +23,17 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Security\Oidc;
 
 /**
- * @see https://www.imsglobal.org/spec/security/v1p0/#step-2-authentication-request
+ * @see https://www.imsglobal.org/spec/security/v1p0/#step-1-third-party-initiated-login
  */
-class AuthenticationRequest
+class LoginInitiationRequest
 {
     /** @var string */
     private $baseUrl;
 
-    /** @var AuthenticationRequestParameters */
+    /** @var LoginInitiationRequestParameters */
     private $parameters;
 
-    public function __construct(string $baseUrl, AuthenticationRequestParameters $parameters)
+    public function __construct(string $baseUrl, LoginInitiationRequestParameters $parameters)
     {
         $this->baseUrl = $baseUrl;
         $this->parameters = $parameters;
@@ -44,7 +44,7 @@ class AuthenticationRequest
         return $this->baseUrl;
     }
 
-    public function getParameters(): AuthenticationRequestParameters
+    public function getParameters(): LoginInitiationRequestParameters
     {
         return $this->parameters;
     }
@@ -57,16 +57,12 @@ class AuthenticationRequest
             http_build_query(array_merge(
                 $queryParameters,
                 [
-                    'scope' => $this->parameters->getScope(),
-                    'response_type' => $this->parameters->getResponseType(),
-                    'client_id' => $this->parameters->getClientId(),
-                    'redirect_uri' => $this->parameters->getRedirectUri(),
+                    'iss' => $this->parameters->getIssuer(),
                     'login_hint' => $this->parameters->getLoginHint(),
-                    'state' => $this->parameters->getState(),
-                    'response_mode' => $this->parameters->getResponseMode(),
-                    'nonce' => $this->parameters->getNonce(),
-                    'prompt' => $this->parameters->getPrompt(),
+                    'target_link_uri' => $this->parameters->getTargetLinkUri(),
                     'lti_message_hint' => $this->parameters->getLtiMessageHint(),
+                    'lti_deployment_id' => $this->parameters->getLtiDeploymentId(),
+                    'client_id' => $this->parameters->getClientId(),
                 ]
             ))
         );

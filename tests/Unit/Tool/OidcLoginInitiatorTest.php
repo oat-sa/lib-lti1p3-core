@@ -30,7 +30,7 @@ use OAT\Library\Lti1p3Core\Security\Nonce\Nonce;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceGeneratorInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Oidc\AuthenticationRequest;
-use OAT\Library\Lti1p3Core\Security\Oidc\LoginInitiationParameters;
+use OAT\Library\Lti1p3Core\Security\Oidc\LoginInitiationRequestParameters;
 use OAT\Library\Lti1p3Core\Tests\Traits\DeploymentTestingTrait;
 use OAT\Library\Lti1p3Core\Tool\OidcLoginInitiator;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -71,7 +71,7 @@ class OidcLoginInitiatorTest extends TestCase
     {
         $deployment = $this->getTestingDeployment();
 
-        $loginInitiationParameters = new LoginInitiationParameters(
+        $loginInitiationParameters = new LoginInitiationRequestParameters(
             'audience',
             'loginHint',
             'targetLinkUri'
@@ -112,7 +112,7 @@ class OidcLoginInitiatorTest extends TestCase
         $this->expectException(LtiExceptionInterface::class);
         $this->expectExceptionMessage('Deployment not found for issuer audience');
 
-        $loginInitiationParameters = new LoginInitiationParameters(
+        $loginInitiationParameters = new LoginInitiationRequestParameters(
             'audience',
             'loginHint',
             'targetLinkUri'
@@ -132,7 +132,7 @@ class OidcLoginInitiatorTest extends TestCase
         $this->expectException(LtiExceptionInterface::class);
         $this->expectExceptionMessage('OIDC Login Initiation error: custom error');
 
-        $loginInitiationParameters = new LoginInitiationParameters(
+        $loginInitiationParameters = new LoginInitiationRequestParameters(
             'audience',
             'loginHint',
             'targetLinkUri'
