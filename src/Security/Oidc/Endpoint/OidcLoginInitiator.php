@@ -33,6 +33,9 @@ use OAT\Library\Lti1p3Core\Security\Oidc\Request\OidcAuthenticationRequest;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
 
+/**
+ * @see https://www.imsglobal.org/spec/security/v1p0/#step-2-authentication-request
+ */
 class OidcLoginInitiator
 {
     /** @var DeploymentRepositoryInterface */

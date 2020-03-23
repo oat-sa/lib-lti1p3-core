@@ -35,6 +35,9 @@ use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\User\UserIdentityInterface;
 use Throwable;
 
+/**
+ * @see http://www.imsglobal.org/spec/lti/v1p3#launch-from-a-resource-link-0
+ */
 class LtiLaunchRequestBuilder
 {
     /** @var MessageBuilder */

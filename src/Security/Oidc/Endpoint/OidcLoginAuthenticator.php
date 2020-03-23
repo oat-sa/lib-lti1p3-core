@@ -37,6 +37,9 @@ use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
 
+/**
+ * @see https://www.imsglobal.org/spec/security/v1p0/#step-3-authentication-response
+ */
 class OidcLoginAuthenticator
 {
     /** @var DeploymentRepositoryInterface */
