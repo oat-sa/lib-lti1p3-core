@@ -85,9 +85,7 @@ class OidcLoginAuthenticator
             /** @var OidcAuthenticationRequest $oidcRequest */
             $oidcRequest = OidcAuthenticationRequest::fromServerRequest($request);
 
-            $originalMessageToken = $this->parser->parse($oidcRequest->getLtiMessageHint());
-
-            $originalMessage = new LtiMessage($originalMessageToken);
+            $originalMessage = new LtiMessage($this->parser->parse($oidcRequest->getLtiMessageHint()));
 
             $deployment = $this->repository->find($originalMessage->getDeploymentId());
 
@@ -111,7 +109,7 @@ class OidcLoginAuthenticator
 
             if (!$authenticationResult->isAnonymous()) {
                 return $this->requestBuilder
-                    ->copy($originalMessageToken)
+                    ->copyMessage($originalMessage)
                     ->buildUserResourceLinkLtiLaunchRequest(
                         $originalMessage->getResourceLink(),
                         $deployment,
@@ -123,7 +121,7 @@ class OidcLoginAuthenticator
             }
 
             return $this->requestBuilder
-                ->copy($originalMessageToken)
+                ->copyMessage($originalMessage)
                 ->buildResourceLinkLtiLaunchRequest(
                     $originalMessage->getResourceLink(),
                     $deployment,

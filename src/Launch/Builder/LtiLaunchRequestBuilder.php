@@ -32,6 +32,7 @@ use OAT\Library\Lti1p3Core\Message\Builder\MessageBuilder;
 use OAT\Library\Lti1p3Core\Message\Claim\MessageClaimInterface;
 use OAT\Library\Lti1p3Core\Message\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+use OAT\Library\Lti1p3Core\Message\MessageInterface;
 use OAT\Library\Lti1p3Core\User\UserIdentityInterface;
 use Throwable;
 
@@ -48,10 +49,10 @@ class LtiLaunchRequestBuilder
         $this->messageBuilder = $messageBuilder ?? new MessageBuilder();
     }
 
-    public function copy(Token $token): self
+    public function copyMessage(MessageInterface $message): self
     {
         /** @var Claim $claim */
-        foreach ($token->getClaims() as $claim) {
+        foreach ($message->getToken()->getClaims() as $claim) {
             $this->messageBuilder->withClaim($claim->getName(), $claim->getValue());
         }
 
