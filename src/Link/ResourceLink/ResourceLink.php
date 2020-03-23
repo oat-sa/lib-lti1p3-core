@@ -20,14 +20,35 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Security\Oidc;
+namespace OAT\Library\Lti1p3Core\Link\ResourceLink;
 
-use Lcobucci\JWT\Token;
-use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
+use OAT\Library\Lti1p3Core\Link\AbstractLink;
 
-interface StateGeneratorInterface
+/**
+ * @see http://www.imsglobal.org/spec/lti/v1p3/#resource-link-0
+ */
+class ResourceLink extends AbstractLink implements ResourceLinkInterface
 {
-    public const DEFAULT_TTL = 600;
+    public function __construct(string $identifier, string $url = null, string $title = null, string $description = null)
+    {
+        parent::__construct($identifier, static::TYPE, $url, [
+            'title' => $title,
+            'description' => $description
+        ]);
+    }
 
-    public function generate(DeploymentInterface $deployment, LoginInitiationRequestParameters $parameters): Token;
+    public function getType(): string
+    {
+        return static::TYPE;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->getParameter('title');
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->getParameter('description');
+    }
 }

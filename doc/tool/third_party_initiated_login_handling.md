@@ -5,12 +5,12 @@
 ## Preparing required repositories
 
 For this feature, you need to provide first:
--  a [DeploymentRepositoryInterface](../../src/Deployment/DeploymentRepositoryInterface.php) implementation (to retrieve your deployments configurations)
--  a [NonceRepositoryInterface](../../src/Security/Nonce/NonceRepositoryInterface.php) implementation (to save and retrieve security nonces)
+-  a [DeploymentRepositoryInterface](../../src/Domain/Deployment/DeploymentRepositoryInterface.php) implementation (to retrieve your deployments configurations)
+-  a [NonceRepositoryInterface](../../src/Core/Security/Nonce/NonceRepositoryInterface.php) implementation (to save and retrieve security nonces)
 
 ## Using the service and expose it as HTTP endpoint
 
-This library provide the [OidcLoginInitiator](../../src/Tool/OidcLoginInitiator.php) that allow you to initiate a 3rd party login and prepare the redirection to the OIDC authentication endpoint of the platform.
+This library provide the [OidcLoginInitiator](../../src/Message/Oidc/OidcLoginInitiator.php) that allow you to initiate a 3rd party login and prepare the redirection to the OIDC authentication endpoint of the platform.
 
 An usage example:
 

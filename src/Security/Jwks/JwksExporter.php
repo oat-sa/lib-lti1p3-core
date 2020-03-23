@@ -33,23 +33,23 @@ class JwksExporter
     /** @var KeyChainRepositoryInterface */
     private $repository;
 
-    /** @var JwkExporter */
+    /** @var JwksRS256Exporter */
     private $exporter;
 
-    public function __construct(KeyChainRepositoryInterface $repository, JwkExporter $exporter)
+    public function __construct(KeyChainRepositoryInterface $repository, JwkExporterInterface $exporter = null)
     {
         $this->repository = $repository;
-        $this->exporter = $exporter;
+        $this->exporter = $exporter ?? new JwksRS256Exporter();
     }
 
-    public function export(string $setName): array
+    public function export(string $keySetName): array
     {
         return [
             'keys' => array_map(
                 function (KeyChainInterface $keyChain): array {
                     return $this->exporter->export($keyChain);
                 },
-                $this->repository->findBySetName($setName)
+                $this->repository->findByKeySetName($keySetName)
             )
         ];
     }

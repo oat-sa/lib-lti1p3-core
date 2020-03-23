@@ -20,17 +20,17 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Security\Key;
+namespace OAT\Library\Lti1p3Core\Link;
 
-use Lcobucci\JWT\Signer\Key;
-
-interface KeyChainInterface
+interface LinkInterface
 {
     public function getIdentifier(): string;
 
-    public function getKeySetName(): string;
+    public function getType(): string;
 
-    public function getPublicKey(): Key;
+    public function getUrl(): ?string;
 
-    public function getPrivateKey(): ?Key;
+    public function getParameters(): array;
+
+    public function getParameter(string $parameterName, $default = null): ?string;
 }

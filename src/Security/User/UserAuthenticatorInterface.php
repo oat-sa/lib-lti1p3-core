@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,17 +19,9 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Security\Key;
+namespace OAT\Library\Lti1p3Core\Security\User;
 
-use Lcobucci\JWT\Signer\Key;
-
-interface KeyChainInterface
+interface UserAuthenticatorInterface
 {
-    public function getIdentifier(): string;
-
-    public function getKeySetName(): string;
-
-    public function getPublicKey(): Key;
-
-    public function getPrivateKey(): ?Key;
+    public function authenticate(string $loginHint): UserAuthenticationResultInterface;
 }

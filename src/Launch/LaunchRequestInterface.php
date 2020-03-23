@@ -20,17 +20,26 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Security\Key;
+namespace OAT\Library\Lti1p3Core\Launch;
 
-use Lcobucci\JWT\Signer\Key;
+use Psr\Http\Message\ServerRequestInterface;
 
-interface KeyChainInterface
+/**
+ * @see http://www.imsglobal.org/spec/lti/v1p3/#lti-launch-0
+ */
+interface LaunchRequestInterface
 {
-    public function getIdentifier(): string;
+    public static function fromServerRequest(ServerRequestInterface $request): LaunchRequestInterface;
 
-    public function getKeySetName(): string;
+    public function getUrl(): string;
 
-    public function getPublicKey(): Key;
+    public function getParameters(): array;
 
-    public function getPrivateKey(): ?Key;
+    public function getParameter(string $parameterName, string $default = null): ?string;
+
+    public function toUrl(): string;
+
+    public function toHtmlLink(string $title, array $attributes = []): string;
+
+    public function toHtmlRedirectForm(bool $autoSubmit = true): string;
 }

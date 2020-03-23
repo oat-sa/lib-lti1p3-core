@@ -22,10 +22,12 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Security\Oidc;
 
+use OAT\Library\Lti1p3Core\Launch\AbstractLaunchRequest;
+
 /**
  * @see https://www.imsglobal.org/spec/security/v1p0/#step-2-authentication-request
  */
-class AuthenticationRequestParameters
+class OidcAuthenticationRequest extends AbstractLaunchRequest
 {
     public const SCOPE = 'openid';
     public const RESPONSE_TYPE = 'id_token';
@@ -51,19 +53,27 @@ class AuthenticationRequestParameters
     private $ltiMessageHint;
 
     public function __construct(
+        string $url,
         string $redirectUri,
         string $clientId,
         string $loginHint,
         string $nonce,
         string $state = null,
-        string $ltiMessageHint = null
+        string $ltiMessageHint = null,
+        array $parameters = []
     ) {
-        $this->redirectUri = $redirectUri;
-        $this->clientId = $clientId;
-        $this->loginHint = $loginHint;
-        $this->nonce = $nonce;
-        $this->state = $state;
-        $this->ltiMessageHint = $ltiMessageHint;
+        parent::__construct($url, array_merge($parameters, [
+            'scope' => static::SCOPE,
+            'response_type' => static::RESPONSE_TYPE,
+            'client_id' => $clientId,
+            'redirect_uri' => $redirectUri,
+            'login_hint' => $loginHint,
+            'state' => $state,
+            'response_mode' => static::RESPONSE_MODE,
+            'nonce' => $nonce,
+            'prompt' => static::PROMPT,
+            'lti_message_hint' => $ltiMessageHint,
+        ]));
     }
 
     public function getRedirectUri(): string

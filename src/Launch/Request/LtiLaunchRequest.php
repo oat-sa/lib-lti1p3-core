@@ -20,17 +20,30 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Security\Key;
+namespace OAT\Library\Lti1p3Core\Launch\Request;
 
-use Lcobucci\JWT\Signer\Key;
+use OAT\Library\Lti1p3Core\Launch\AbstractLaunchRequest;
 
-interface KeyChainInterface
+/**
+ * @see http://www.imsglobal.org/spec/lti/v1p3/#lti-launch-0
+ */
+class LtiLaunchRequest extends AbstractLaunchRequest
 {
-    public function getIdentifier(): string;
+    public function __construct(string $url, string $idToken, string $state = null, array $parameters = [])
+    {
+        parent::__construct($url, array_merge($parameters, [
+            'id_token' => $idToken,
+            'state' => $state
+        ]));
+    }
 
-    public function getKeySetName(): string;
+    public function getLtiMessage(): string
+    {
+        return $this->getParameter('id_token');
+    }
 
-    public function getPublicKey(): Key;
-
-    public function getPrivateKey(): ?Key;
+    public function getOidcState(): ?string
+    {
+        return $this->getParameter('state');
+    }
 }

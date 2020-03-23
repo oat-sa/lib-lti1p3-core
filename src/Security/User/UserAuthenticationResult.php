@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,11 +19,36 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Launch;
+namespace OAT\Library\Lti1p3Core\Security\User;
 
-use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
+use OAT\Library\Lti1p3Core\User\UserIdentityInterface;
 
-interface LaunchInterface
+class UserAuthenticationResult implements UserAuthenticationResultInterface
 {
-    public function getDeployment(): DeploymentInterface;
+    /** @var bool */
+    private $success;
+
+    /** @var UserIdentityInterface|null */
+    private $userIdentity;
+
+    public function __construct(bool $success, UserIdentityInterface $userIdentity = null)
+    {
+        $this->success = $success;
+        $this->userIdentity = $userIdentity;
+    }
+
+    public function isSuccess(): bool
+    {
+        return $this->success;
+    }
+
+    public function isAnonymous(): bool
+    {
+        return null !== $this->userIdentity;
+    }
+
+    public function getUserIdentity(): ?UserIdentityInterface
+    {
+        return $this->userIdentity;
+    }
 }

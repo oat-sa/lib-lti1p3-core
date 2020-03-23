@@ -20,17 +20,31 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Security\Key;
+namespace OAT\Library\Lti1p3Core\Message;
 
-use Lcobucci\JWT\Signer\Key;
+use Lcobucci\JWT\Token;
 
-interface KeyChainInterface
+/**
+ * @see http://www.imsglobal.org/spec/lti/v1p3/#json-web-token-0
+ */
+interface MessageInterface
 {
-    public function getIdentifier(): string;
+    // TTL
+    public const TTL = 600;
 
-    public function getKeySetName(): string;
+    // Headers
+    public const HEADER_KID = 'kid';
 
-    public function getPublicKey(): Key;
+    // Claims
+    public const CLAIM_ISS = 'iss';
+    public const CLAIM_SUB = 'sub';
+    public const CLAIM_AUD = 'aud';
+    public const CLAIM_EXP = 'exp';
+    public const CLAIM_IAT = 'iat';
 
-    public function getPrivateKey(): ?Key;
+    // OIDC claims
+    public const CLAIM_NONCE = 'nonce';
+    public const CLAIM_PARAMETERS = 'parameters';
+
+    public function getToken(): Token;
 }

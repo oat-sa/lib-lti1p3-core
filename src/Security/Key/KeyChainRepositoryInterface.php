@@ -27,5 +27,5 @@ interface KeyChainRepositoryInterface
     public function find(string $id): ?KeyChainInterface;
 
     /** @return KeyChainInterface[] */
-    public function findBySetName(string $setName): array;
+    public function findByKeySetName(string $keySetName): array;
 }

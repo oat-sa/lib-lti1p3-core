@@ -20,17 +20,24 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Security\Key;
+namespace OAT\Library\Lti1p3Core\Security\Jwt;
 
-use Lcobucci\JWT\Signer\Key;
+use Lcobucci\JWT\Parsing\Decoder;
+use RuntimeException;
 
-interface KeyChainInterface
+class AssociativeDecoder extends Decoder
 {
-    public function getIdentifier(): string;
+    public function jsonDecode($json)
+    {
+        $data = json_decode($json, true);
 
-    public function getKeySetName(): string;
+        if (json_last_error() != JSON_ERROR_NONE) {
+            throw new RuntimeException(
+                sprintf('Error while decoding to JSON: %s', json_last_error_msg())
+            );
+        }
 
-    public function getPublicKey(): Key;
+        return $data;
+    }
 
-    public function getPrivateKey(): ?Key;
 }

@@ -20,17 +20,13 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Security\Key;
+namespace OAT\Library\Lti1p3Core\Message\Claim;
 
-use Lcobucci\JWT\Signer\Key;
-
-interface KeyChainInterface
+interface MessageClaimInterface
 {
-    public function getIdentifier(): string;
+    public static function getClaimName(): string;
 
-    public function getKeySetName(): string;
+    public static function denormalize(array $claimData);
 
-    public function getPublicKey(): Key;
-
-    public function getPrivateKey(): ?Key;
+    public function normalize(): array;
 }

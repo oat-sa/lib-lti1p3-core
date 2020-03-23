@@ -24,5 +24,7 @@ namespace OAT\Library\Lti1p3Core\Deployment;
 
 interface DeploymentRepositoryInterface
 {
+    public function find(string $identifier): ?DeploymentInterface;
+
     public function findByIssuer(string $issuer, string $clientId = null): ?DeploymentInterface;
 }

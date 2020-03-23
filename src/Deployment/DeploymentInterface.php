@@ -26,9 +26,12 @@ use OAT\Library\Lti1p3Core\Platform\PlatformInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
 use OAT\Library\Lti1p3Core\Tool\ToolInterface;
 
+/**
+ * @see http://www.imsglobal.org/spec/lti/v1p3/#tool-deployment-0
+ */
 interface DeploymentInterface
 {
-    public function getId(): string;
+    public function getIdentifier(): string;
 
     public function getClientId(): string;
 
@@ -36,9 +39,11 @@ interface DeploymentInterface
 
     public function getTool(): ToolInterface;
 
-    public function getPlatformJwksUrl(): string;
+    public function getPlatformKeyChain(): ?KeyChainInterface;
 
-    public function getToolKeyPair(): KeyChainInterface;
+    public function getToolKeyChain(): ?KeyChainInterface;
 
-    public function getPlatformKeyPair(): ?KeyChainInterface;
+    public function getPlatformJwksUrl(): ?string;
+
+    public function getToolJwksUrl(): ?string;
 }

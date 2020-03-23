@@ -9,7 +9,7 @@ Considering you have for example on your side this key pair:
 - private key path: /home/user/.ssh/id_rsa
 - private key passphrase: test
 
-To extract the JWK properties, you can use the [JwkExporter](../../src/Security/Jwks/JwkExporter.php) as following:
+To extract the JWK properties, you can use the [JwkExporter](../../src/Core/Security/Jwks/JwkExporter.php) as following:
 
 ```php
 <?php
@@ -53,7 +53,7 @@ Pair 2:
 - public key path: /home/user/.ssh/pair2/id_rsa.pub
 - private key path: /home/user/.ssh/pair2/id_rsa
 
-And considering you provided you own [KeyChainRepositoryInterface](../../src/Security/Key/KeyChainRepositoryInterface.php) implementation:
+And considering you provided you own [KeyChainRepositoryInterface](../../src/Core/Security/Key/KeyChainRepositoryInterface.php) implementation:
 
 ```php
 <?php
@@ -81,7 +81,7 @@ $keyChain2 = new KeyChain(
 $keySet = $keyChainRepository->findBySetName('mySetName'); // same as [$keyChain1, $keyChain2]
 ```
 
-To extract the JWKS properties, you can use the [JwksExporter](../../src/Security/Jwks/JwksExporter.php) as following:
+To extract the JWKS properties, you can use the [JwksExporter](../../src/Core/Security/Jwks/JwksExporter.php) as following:
 
 ```php
 <?php

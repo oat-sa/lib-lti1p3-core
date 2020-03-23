@@ -20,17 +20,18 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Security\Key;
+namespace OAT\Library\Lti1p3Core\Link\ResourceLink;
 
-use Lcobucci\JWT\Signer\Key;
+use OAT\Library\Lti1p3Core\Link\LinkInterface;
 
-interface KeyChainInterface
+/**
+ * @see http://www.imsglobal.org/spec/lti/v1p3/#resource-link-0
+ */
+interface ResourceLinkInterface extends LinkInterface
 {
-    public function getIdentifier(): string;
+    public const TYPE = 'LtiResourceLinkRequest';
 
-    public function getKeySetName(): string;
+    public function getTitle(): ?string;
 
-    public function getPublicKey(): Key;
-
-    public function getPrivateKey(): ?Key;
+    public function getDescription(): ?string;
 }

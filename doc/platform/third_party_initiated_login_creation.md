@@ -5,11 +5,11 @@
 ## Preparing required repository
 
 For this feature, you need to provide first:
--  a [DeploymentRepositoryInterface](../../src/Deployment/DeploymentRepositoryInterface.php) implementation (to retrieve your deployments configurations)
+-  a [DeploymentRepositoryInterface](../../src/Domain/Deployment/DeploymentRepositoryInterface.php) implementation (to retrieve your deployments configurations)
 
 ## Using the service to create preconfigured LTI Links
 
-This library provide the [OidcLoginCreator](../../src/Platform/OidcLoginCreator.php) that allow you to create a 3rd party initiated login and prepare the redirection to the OIDC login endpoint of the tool.
+This library provide the [OidcLoginCreator](../../src/Message/Oidc/OidcLoginCreator.php) that allow you to create a 3rd party initiated login and prepare the redirection to the OIDC login endpoint of the tool.
 
 An usage example:
 

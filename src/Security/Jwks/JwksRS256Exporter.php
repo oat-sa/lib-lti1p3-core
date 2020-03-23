@@ -28,9 +28,9 @@ use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
 use const OPENSSL_KEYTYPE_RSA;
 
 /**
- * @see https://auth0.com/docs/tokens/concepts/jwks
+ * @see https://tools.ietf.org/html/rfc7517
  */
-class JwkExporter
+class JwksRS256Exporter implements JwkExporterInterface
 {
     public function export(KeyChainInterface $keyChain): array
     {
@@ -48,7 +48,7 @@ class JwkExporter
             'use' => 'sig',
             'n' => $this->base64UrlEncode($details['rsa']['n']),
             'e' => $this->base64UrlEncode($details['rsa']['e']),
-            'kid' => $keyChain->getId(),
+            'kid' => $keyChain->getIdentifier(),
         ];
     }
 

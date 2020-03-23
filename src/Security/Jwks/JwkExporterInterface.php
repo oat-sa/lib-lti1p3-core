@@ -20,14 +20,14 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Security\Oidc;
+namespace OAT\Library\Lti1p3Core\Security\Jwks;
 
-use Lcobucci\JWT\Token;
-use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
+use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
 
-interface LtiMessageHintGeneratorInterface
+/**
+ * @see https://tools.ietf.org/html/rfc7517
+ */
+interface JwkExporterInterface
 {
-    public const DEFAULT_TTL = 600;
-
-    public function generate(DeploymentInterface $deployment): Token;
+    public function export(KeyChainInterface $keyChain): array;
 }

@@ -27,10 +27,10 @@ use Lcobucci\JWT\Signer\Key;
 class KeyChain implements KeyChainInterface
 {
     /** @var string */
-    private $id;
+    private $identifier;
 
     /** @var string */
-    private $setName;
+    private $keySetName;
 
     /** @var string */
     private $publicKey;
@@ -42,42 +42,42 @@ class KeyChain implements KeyChainInterface
     private $privateKeyPassPhrase;
 
     /** @var Key|null */
-    private $buildPublicKey;
+    private $cachedPublicKey;
 
     /** @var Key|null */
-    private $buildPrivateKey;
+    private $cachedPrivateKey;
 
     public function __construct(
-        string $id,
-        string $setName,
+        string $identifier,
+        string $keySetName,
         string $publicKey,
         string $privateKey = null,
         string $privateKeyPassPhrase = null
     ) {
-        $this->id = $id;
-        $this->setName = $setName;
+        $this->identifier = $identifier;
+        $this->keySetName = $keySetName;
         $this->publicKey = $publicKey;
         $this->privateKey = $privateKey;
         $this->privateKeyPassPhrase = $privateKeyPassPhrase;
     }
 
-    public function getId(): string
+    public function getIdentifier(): string
     {
-        return $this->id;
+        return $this->identifier;
     }
 
-    public function getSetName(): string
+    public function getKeySetName(): string
     {
-        return $this->setName;
+        return $this->keySetName;
     }
 
     public function getPublicKey(): Key
     {
-        if (null === $this->buildPublicKey) {
-            $this->buildPublicKey = new Key($this->publicKey);
+        if (null === $this->cachedPublicKey) {
+            $this->cachedPublicKey = new Key($this->publicKey);
         }
 
-        return $this->buildPublicKey;
+        return $this->cachedPublicKey;
     }
 
     public function getPrivateKey(): ?Key
@@ -86,10 +86,10 @@ class KeyChain implements KeyChainInterface
             return null;
         }
 
-        if (null === $this->buildPrivateKey) {
-            $this->buildPrivateKey = new Key($this->privateKey, $this->privateKeyPassPhrase);
+        if (null === $this->cachedPrivateKey) {
+            $this->cachedPrivateKey = new Key($this->privateKey, $this->privateKeyPassPhrase);
         }
 
-        return $this->buildPrivateKey;
+        return $this->cachedPrivateKey;
     }
 }
