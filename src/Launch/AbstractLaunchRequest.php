@@ -22,7 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Launch;
 
-use function GuzzleHttp\Psr7\parse_query;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -78,7 +77,9 @@ abstract class AbstractLaunchRequest implements LaunchRequestInterface
         $method = strtoupper($request->getMethod());
 
         if ($method === 'GET') {
-            return new static($request->getUri()->__toString(), parse_query($request->getUri()->getQuery()));
+            parse_str($request->getUri()->getQuery(), $parameters);
+
+            return new static($request->getUri()->__toString(), $parameters);
         } elseif ($method === 'POST') {
             return new static($request->getUri()->__toString(), $request->getServerParams());
         } else {
