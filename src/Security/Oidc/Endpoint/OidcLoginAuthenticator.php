@@ -65,15 +65,14 @@ class OidcLoginAuthenticator
         UserAuthenticatorInterface $authenticator,
         LtiLaunchRequestBuilder $requestBuilder = null,
         MessageBuilder $messageBuilder = null,
-        Signer $signer = null,
-        Parser $parser = null
+        Signer $signer = null
     ) {
         $this->repository = $repository;
         $this->authenticator = $authenticator;
         $this->requestBuilder = $requestBuilder ?? new LtiLaunchRequestBuilder();
         $this->messageBuilder = $messageBuilder ?? new MessageBuilder();
         $this->signer = $signer ?? new Sha256();
-        $this->parser = $parser ?? new Parser(new AssociativeDecoder());
+        $this->parser = new Parser(new AssociativeDecoder());
     }
 
     /**

@@ -73,14 +73,13 @@ class LtiLaunchRequestAuthenticator
         DeploymentRepositoryInterface $deploymentRepository,
         NonceRepositoryInterface $nonceRepository,
         JwksFetcherInterface $jwksFetcher = null,
-        Signer $signer = null,
-        Parser $parser = null
+        Signer $signer = null
     ) {
         $this->deploymentRepository = $deploymentRepository;
         $this->nonceRepository = $nonceRepository;
         $this->fetcher = $jwksFetcher ?? new GuzzleJwksFetcher();
         $this->signer = $signer ?? new Sha256();
-        $this->parser = $parser ?? new Parser(new AssociativeDecoder());
+        $this->parser = new Parser(new AssociativeDecoder());
     }
 
     /**
