@@ -29,11 +29,11 @@ use OAT\Library\Lti1p3Core\Message\Builder\MessageBuilder;
 use OAT\Library\Lti1p3Core\Message\MessageInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceGenerator;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceGeneratorInterface;
-use OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticationRequest;
+use OAT\Library\Lti1p3Core\Security\Oidc\Request\OidcAuthenticationRequest;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
 
-class ToolOidcLoginInitiator
+class OidcLoginInitiator
 {
     /** @var DeploymentRepositoryInterface */
     private $repository;
@@ -80,15 +80,14 @@ class ToolOidcLoginInitiator
                 ->withClaim(MessageInterface::CLAIM_NONCE, $nonce->getValue())
                 ->withClaim(MessageInterface::CLAIM_PARAMETERS, $oidcRequest->getParameters());
 
-            return new OidcAuthenticationRequest(
-                $deployment->getPlatform()->getOidcAuthenticationUrl(),
-                $oidcRequest->getTargetLinkUri(),
-                $deployment->getClientId(),
-                $oidcRequest->getLoginHint(),
-                $nonce->getValue(),
-                $this->builder->getMessage($deployment->getToolKeyChain())->getToken()->__toString(),
-                $oidcRequest->getLtiMessageHint()
-            );
+            return new OidcAuthenticationRequest($deployment->getPlatform()->getOidcAuthenticationUrl(), [
+                'redirect_uri' => $oidcRequest->getTargetLinkUri(),
+                'client_id' => $deployment->getClientId(),
+                'login_hint' => $oidcRequest->getLoginHint(),
+                'nonce' => $nonce->getValue(),
+                'state' => $this->builder->getMessage($deployment->getToolKeyChain())->getToken()->__toString(),
+                'lti_message_hint' => $oidcRequest->getLtiMessageHint()
+            ]);
 
         } catch (LtiException $exception) {
             throw $exception;

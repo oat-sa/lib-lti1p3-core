@@ -76,15 +76,14 @@ class OidcLaunchRequestBuilder
                 }
             }
 
-            return new OidcLaunchRequest(
-                $deployment->getTool()->getOidcLoginInitiationUrl(),
-                $deployment->getPlatform()->getAudience(),
-                $loginHint,
-                $targetLinkUri,
-                $this->messageBuilder->getMessage($deployment->getPlatformKeyChain())->getToken()->__toString(),
-                $deployment->getIdentifier(),
-                $deployment->getClientId()
-            );
+            return new OidcLaunchRequest($deployment->getTool()->getOidcLoginInitiationUrl(), [
+                'iss' => $deployment->getPlatform()->getAudience(),
+                'login_hint' => $loginHint,
+                'target_link_uri' => $targetLinkUri,
+                'lti_message_hint' => $this->messageBuilder->getMessage($deployment->getPlatformKeyChain())->getToken()->__toString(),
+                'lti_deployment_id' => $deployment->getIdentifier(),
+                'client_id' => $deployment->getClientId(),
+            ]);
 
         } catch (LtiException $exception) {
             throw $exception;

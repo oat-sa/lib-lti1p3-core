@@ -20,14 +20,11 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Security\Jwks;
+namespace OAT\Library\Lti1p3Core\Security\Jwks\Fetcher;
 
-use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
+use Lcobucci\JWT\Signer\Key;
 
-/**
- * @see https://tools.ietf.org/html/rfc7517
- */
-interface JwkExporterInterface
+interface JwksFetcherInterface
 {
-    public function export(KeyChainInterface $keyChain): array;
+    public function fetchKey(string $jwksUrl, string $kId): Key;
 }

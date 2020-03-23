@@ -59,7 +59,7 @@ class Message implements MessageInterface
             return $this->token->getClaim($claim);
         } catch (Throwable $exception) {
             throw new LtiException(
-                sprintf('Cannot read %s claim: %s', $claim, $exception->getMessage()),
+                sprintf('Cannot read mandatory %s claim: %s', $claim, $exception->getMessage()),
                 $exception->getCode(),
                 $exception
             );

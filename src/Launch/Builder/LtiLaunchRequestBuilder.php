@@ -22,6 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Launch\Builder;
 
+use Lcobucci\JWT\Claim;
+use Lcobucci\JWT\Token;
 use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Launch\Request\LtiLaunchRequest;
@@ -41,6 +43,16 @@ class LtiLaunchRequestBuilder
     public function __construct(MessageBuilder $messageBuilder = null)
     {
         $this->messageBuilder = $messageBuilder ?? new MessageBuilder();
+    }
+
+    public function copy(Token $token): self
+    {
+        /** @var Claim $claim */
+        foreach ($token->getClaims() as $claim) {
+            $this->messageBuilder->withClaim($claim->getName(), $claim->getValue());
+        }
+
+        return $this;
     }
 
     /**
@@ -85,7 +97,6 @@ class LtiLaunchRequestBuilder
 
         $this->messageBuilder
             ->withClaim(LtiMessageInterface::CLAIM_LTI_MESSAGE_TYPE, $resourceLink->getType())
-            ->withClaim(LtiMessageInterface::CLAIM_LTI_DEPLOYMENT_ID, $deployment->getIdentifier())
             ->withClaim(LtiMessageInterface::CLAIM_LTI_TARGET_LINK_URI, $targetLinkUri)
             ->withClaim(LtiMessageInterface::CLAIM_LTI_ROLES, $roles)
             ->withClaim($resourceLinkClaim);
@@ -103,6 +114,12 @@ class LtiLaunchRequestBuilder
         string $state = null
     ): LtiLaunchRequest {
         try {
+            $this->messageBuilder
+                ->withClaim(LtiMessageInterface::CLAIM_ISS, $deployment->getPlatform()->getAudience())
+                ->withClaim(LtiMessageInterface::CLAIM_AUD, $deployment->getClientId())
+                ->withClaim(LtiMessageInterface::CLAIM_SUB, $deployment->getClientId())
+                ->withClaim(LtiMessageInterface::CLAIM_LTI_DEPLOYMENT_ID, $deployment->getIdentifier());
+
             foreach ($optionalClaims as $claimName => $claim) {
                 if ($claim instanceof MessageClaimInterface) {
                     $this->messageBuilder->withClaim($claim);
@@ -111,11 +128,10 @@ class LtiLaunchRequestBuilder
                 }
             }
 
-            return new LtiLaunchRequest(
-                $url,
-                $this->messageBuilder->getLtiMessage($deployment->getPlatformKeyChain())->getToken()->__toString(),
-                $state
-            );
+            return new LtiLaunchRequest($url, [
+                'id_token' => $this->messageBuilder->getLtiMessage($deployment->getPlatformKeyChain())->getToken()->__toString(),
+                'state' => $state
+            ]);
 
         } catch (LtiException $exception) {
             throw $exception;

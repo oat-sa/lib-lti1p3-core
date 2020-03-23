@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Launch\Request;
 
+use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Launch\AbstractLaunchRequest;
 
 /**
@@ -29,39 +30,28 @@ use OAT\Library\Lti1p3Core\Launch\AbstractLaunchRequest;
  */
 class OidcLaunchRequest extends AbstractLaunchRequest
 {
-    public function __construct(
-        string $url,
-        string $issuer,
-        string $loginHint,
-        string $targetLinkUri,
-        string $ltiMessageHint = null,
-        string $ltiDeploymentId = null,
-        string $clientId = null,
-        array $parameters = []
-    ) {
-        parent::__construct($url, array_merge($parameters, [
-            'iss' => $issuer,
-            'login_hint' => $loginHint,
-            'target_link_uri' => $targetLinkUri,
-            'lti_message_hint' => $ltiMessageHint,
-            'lti_deployment_id' => $ltiDeploymentId,
-            'client_id' => $clientId,
-        ]));
-    }
-
+    /**
+     * @throws LtiException
+     */
     public function getIssuer(): string
     {
-        return $this->getParameter('iss');
+        return $this->getMandatoryParameter('iss');
     }
 
+    /**
+     * @throws LtiException
+     */
     public function getLoginHint(): string
     {
-        return $this->getParameter('login_hint');
+        return $this->getMandatoryParameter('login_hint');
     }
 
+    /**
+     * @throws LtiException
+     */
     public function getTargetLinkUri(): string
     {
-        return $this->getParameter('target_link_uri');
+        return $this->getMandatoryParameter('target_link_uri');
     }
 
     public function getLtiMessageHint(): ?string

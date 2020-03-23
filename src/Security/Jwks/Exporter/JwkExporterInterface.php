@@ -20,28 +20,14 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Launch;
+namespace OAT\Library\Lti1p3Core\Security\Jwks\Exporter;
 
-use Psr\Http\Message\ServerRequestInterface;
+use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
 
 /**
- * @see http://www.imsglobal.org/spec/lti/v1p3/#lti-launch-0
+ * @see https://tools.ietf.org/html/rfc7517
  */
-interface LaunchRequestInterface
+interface JwkExporterInterface
 {
-    public function getUrl(): string;
-
-    public function getParameters(): array;
-
-    public function getMandatoryParameter(string $parameterName): string;
-
-    public function getParameter(string $parameterName, string $default = null): ?string;
-
-    public static function fromServerRequest(ServerRequestInterface $request): LaunchRequestInterface;
-
-    public function toUrl(): string;
-
-    public function toHtmlLink(string $title, array $attributes = []): string;
-
-    public function toHtmlRedirectForm(bool $autoSubmit = true): string;
+    public function export(KeyChainInterface $keyChain): array;
 }

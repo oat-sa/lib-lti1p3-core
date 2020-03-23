@@ -47,4 +47,8 @@ interface MessageInterface
     public const CLAIM_PARAMETERS = 'parameters';
 
     public function getToken(): Token;
+
+    public function getMandatoryClaim(string $claim);
+
+    public function getClaim(string $claim, $default = null);
 }

@@ -20,8 +20,9 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Security\Oidc;
+namespace OAT\Library\Lti1p3Core\Security\Oidc\Request;
 
+use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Launch\AbstractLaunchRequest;
 
 /**
@@ -34,76 +35,46 @@ class OidcAuthenticationRequest extends AbstractLaunchRequest
     public const RESPONSE_MODE = 'form_post';
     public const PROMPT = 'none';
 
-    /** @var string */
-    private $redirectUri;
-
-    /** @var string */
-    private $clientId;
-
-    /** @var string */
-    private $loginHint;
-
-    /** @var string */
-    private $nonce;
-
-    /** @var string|null */
-    private $state;
-
-    /** @var string|null */
-    private $ltiMessageHint;
-
-    public function __construct(
-        string $url,
-        string $redirectUri,
-        string $clientId,
-        string $loginHint,
-        string $nonce,
-        string $state = null,
-        string $ltiMessageHint = null,
-        array $parameters = []
-    ) {
-        parent::__construct($url, array_merge($parameters, [
-            'scope' => static::SCOPE,
-            'response_type' => static::RESPONSE_TYPE,
-            'client_id' => $clientId,
-            'redirect_uri' => $redirectUri,
-            'login_hint' => $loginHint,
-            'state' => $state,
-            'response_mode' => static::RESPONSE_MODE,
-            'nonce' => $nonce,
-            'prompt' => static::PROMPT,
-            'lti_message_hint' => $ltiMessageHint,
-        ]));
-    }
-
+    /**
+     * @throws LtiException
+     */
     public function getRedirectUri(): string
     {
-        return $this->redirectUri;
+        return $this->getMandatoryParameter('redirect_uri');
     }
 
+    /**
+     * @throws LtiException
+     */
     public function getClientId(): string
     {
-        return $this->clientId;
+        return $this->getMandatoryParameter('client_id');
     }
 
+    /**
+     * @throws LtiException
+     */
     public function getLoginHint(): string
     {
-        return $this->loginHint;
+        return $this->getMandatoryParameter('login_hint');
     }
 
+    /**
+     * @throws LtiException
+     */
     public function getNonce(): string
     {
-        return $this->nonce;
+        return $this->getMandatoryParameter('nonce');
     }
 
     public function getState(): ?string
     {
-        return $this->state;
+        return $this->getParameter('state');
     }
 
     public function getLtiMessageHint(): ?string
     {
-        return $this->ltiMessageHint;
+        return $this->getParameter('lti_message_hint');
     }
 
     public function getScope(): string

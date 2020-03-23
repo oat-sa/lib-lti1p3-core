@@ -22,6 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Launch;
 
+use function GuzzleHttp\Psr7\parse_query;
+use OAT\Library\Lti1p3Core\Exception\LtiException;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -41,11 +43,6 @@ abstract class AbstractLaunchRequest implements LaunchRequestInterface
         $this->parameters = $parameters;
     }
 
-    public static function fromServerRequest(ServerRequestInterface $request): LaunchRequestInterface
-    {
-        return new static($request->getUri()->__toString(), $request->getParsedBody());
-    }
-
     public function getUrl(): string
     {
         return $this->url;
@@ -56,9 +53,37 @@ abstract class AbstractLaunchRequest implements LaunchRequestInterface
         return $this->parameters;
     }
 
+    /**
+     * @throws LtiException
+     */
+    public function getMandatoryParameter(string $parameterName): string
+    {
+        if (!isset($this->parameters[$parameterName])){
+            throw new LtiException(sprintf('Mandatory parameter %s cannot be found', $parameterName));
+        }
+
+        return $this->parameters[$parameterName];
+    }
+
     public function getParameter(string $parameterName, string $default = null): ?string
     {
         return $this->parameters[$parameterName] ?? $default;
+    }
+
+    /**
+     * @throws LtiException
+     */
+    public static function fromServerRequest(ServerRequestInterface $request): LaunchRequestInterface
+    {
+        $method = strtoupper($request->getMethod());
+
+        if ($method === 'GET') {
+            return new static($request->getUri()->__toString(), parse_query($request->getUri()->getQuery()));
+        } elseif ($method === 'POST') {
+            return new static($request->getUri()->__toString(), $request->getServerParams());
+        } else {
+            throw new LtiException(sprintf('Unsupported request method %s', $method));
+        }
     }
 
     public function toUrl(): string

@@ -34,19 +34,25 @@ use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Message;
 use OAT\Library\Lti1p3Core\Message\MessageInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
+use OAT\Library\Lti1p3Core\Security\Nonce\NonceGenerator;
+use OAT\Library\Lti1p3Core\Security\Nonce\NonceGeneratorInterface;
 use Ramsey\Uuid\Uuid;
 use Throwable;
 
 class MessageBuilder
 {
+    /** @var NonceGeneratorInterface */
+    private $generator;
+
     /** @var Builder */
     private $builder;
 
     /** @var Signer */
     private $signer;
 
-    public function __construct(Builder $builder = null, Signer $signer = null)
+    public function __construct(NonceGeneratorInterface $generator = null, Builder $builder = null, Signer $signer = null)
     {
+        $this->generator = $generator ?? new NonceGenerator();
         $this->builder = $builder ?? new Builder();
         $this->signer = $signer ?? new Sha256();
     }
@@ -91,6 +97,7 @@ class MessageBuilder
 
             $this->builder
                 ->withHeader(MessageInterface::HEADER_KID, $keyChain->getIdentifier())
+                ->withClaim(MessageInterface::CLAIM_NONCE, $this->generator->generate()->getValue())
                 ->identifiedBy(Uuid::uuid4()->toString())
                 ->issuedAt($now->getTimestamp())
                 ->expiresAt($now->addSeconds(MessageInterface::TTL)->getTimestamp());

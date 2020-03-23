@@ -31,12 +31,13 @@ use OAT\Library\Lti1p3Core\Launch\Builder\LtiLaunchRequestBuilder;
 use OAT\Library\Lti1p3Core\Launch\Request\LtiLaunchRequest;
 use OAT\Library\Lti1p3Core\Message\Builder\MessageBuilder;
 use OAT\Library\Lti1p3Core\Message\LtiMessage;
-use OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticationRequest;
+use OAT\Library\Lti1p3Core\Security\Jwt\AssociativeDecoder;
+use OAT\Library\Lti1p3Core\Security\Oidc\Request\OidcAuthenticationRequest;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
 
-class PlatformOidcLoginAuthenticator
+class OidcLoginAuthenticator
 {
     /** @var DeploymentRepositoryInterface */
     private $repository;
@@ -61,15 +62,15 @@ class PlatformOidcLoginAuthenticator
         UserAuthenticatorInterface $authenticator,
         LtiLaunchRequestBuilder $requestBuilder = null,
         MessageBuilder $messageBuilder = null,
-        Parser $parser = null,
-        Signer $signer = null
+        Signer $signer = null,
+        Parser $parser = null
     ) {
         $this->repository = $repository;
         $this->authenticator = $authenticator;
         $this->requestBuilder = $requestBuilder ?? new LtiLaunchRequestBuilder();
         $this->messageBuilder = $messageBuilder ?? new MessageBuilder();
-        $this->parser = $parser ?? new Parser();
         $this->signer = $signer ?? new Sha256();
+        $this->parser = $parser ?? new Parser(new AssociativeDecoder());
     }
 
     /**
@@ -81,7 +82,9 @@ class PlatformOidcLoginAuthenticator
             /** @var OidcAuthenticationRequest $oidcRequest */
             $oidcRequest = OidcAuthenticationRequest::fromServerRequest($request);
 
-            $originalMessage = new LtiMessage($this->parser->parse($oidcRequest->getLtiMessageHint()));
+            $originalMessageToken = $this->parser->parse($oidcRequest->getLtiMessageHint());
+
+            $originalMessage = new LtiMessage($originalMessageToken);
 
             $deployment = $this->repository->find($originalMessage->getDeploymentId());
 
@@ -104,19 +107,27 @@ class PlatformOidcLoginAuthenticator
             }
 
             if (!$authenticationResult->isAnonymous()) {
-                return $this->requestBuilder->buildUserResourceLinkLtiLaunchRequest(
-                    $originalMessage->getResourceLink(),
-                    $deployment,
-                    $authenticationResult->getUserIdentity(),
-                    $originalMessage->getRoles()
-                );
+                return $this->requestBuilder
+                    ->copy($originalMessageToken)
+                    ->buildUserResourceLinkLtiLaunchRequest(
+                        $originalMessage->getResourceLink(),
+                        $deployment,
+                        $authenticationResult->getUserIdentity(),
+                        $originalMessage->getRoles(),
+                        [],
+                        $oidcRequest->getState()
+                    );
             }
 
-            return $this->requestBuilder->buildResourceLinkLtiLaunchRequest(
-                $originalMessage->getResourceLink(),
-                $deployment,
-                $originalMessage->getRoles()
-            );
+            return $this->requestBuilder
+                ->copy($originalMessageToken)
+                ->buildResourceLinkLtiLaunchRequest(
+                    $originalMessage->getResourceLink(),
+                    $deployment,
+                    $originalMessage->getRoles(),
+                    [],
+                    $oidcRequest->getState()
+                );
 
         } catch (LtiException $exception) {
             throw $exception;

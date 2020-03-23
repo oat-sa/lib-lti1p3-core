@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Launch\Request;
 
+use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Launch\AbstractLaunchRequest;
 
 /**
@@ -29,17 +30,12 @@ use OAT\Library\Lti1p3Core\Launch\AbstractLaunchRequest;
  */
 class LtiLaunchRequest extends AbstractLaunchRequest
 {
-    public function __construct(string $url, string $idToken, string $state = null, array $parameters = [])
-    {
-        parent::__construct($url, array_merge($parameters, [
-            'id_token' => $idToken,
-            'state' => $state
-        ]));
-    }
-
+    /**
+     * @throws LtiException
+     */
     public function getLtiMessage(): string
     {
-        return $this->getParameter('id_token');
+        return $this->getMandatoryParameter('id_token');
     }
 
     public function getOidcState(): ?string

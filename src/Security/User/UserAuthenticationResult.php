@@ -44,7 +44,7 @@ class UserAuthenticationResult implements UserAuthenticationResultInterface
 
     public function isAnonymous(): bool
     {
-        return null !== $this->userIdentity;
+        return null === $this->userIdentity;
     }
 
     public function getUserIdentity(): ?UserIdentityInterface
