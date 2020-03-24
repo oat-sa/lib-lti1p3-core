@@ -48,7 +48,7 @@ class LtiLaunchRequestBuilder
         $this->messageBuilder = $messageBuilder ?? new MessageBuilder();
     }
 
-    public function copyMessage(MessageInterface $message): self
+    public function copyFromMessage(MessageInterface $message): self
     {
         /** @var Claim $claim */
         foreach ($message->getToken()->getClaims() as $claim) {
@@ -120,7 +120,6 @@ class LtiLaunchRequestBuilder
             $this->messageBuilder
                 ->withClaim(LtiMessageInterface::CLAIM_ISS, $deployment->getPlatform()->getAudience())
                 ->withClaim(LtiMessageInterface::CLAIM_AUD, $deployment->getClientId())
-                ->withClaim(LtiMessageInterface::CLAIM_SUB, $deployment->getClientId())
                 ->withClaim(LtiMessageInterface::CLAIM_LTI_DEPLOYMENT_ID, $deployment->getIdentifier());
 
             foreach ($optionalClaims as $claimName => $claim) {

@@ -36,7 +36,7 @@ abstract class AbstractLink implements LinkInterface
     /** @var string[] */
     private $parameters;
 
-    public function __construct(string $identifier, string $type, string $url = null, array $parameters = null)
+    public function __construct(string $identifier, string $type, string $url = null, array $parameters = [])
     {
         $this->identifier = $identifier;
         $this->type = $type;

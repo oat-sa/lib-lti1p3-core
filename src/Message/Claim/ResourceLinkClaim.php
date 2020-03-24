@@ -22,25 +22,55 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Message\Claim;
 
-use OAT\Library\Lti1p3Core\Link\ResourceLink\ResourceLink;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 
 /**
  * @see http://www.imsglobal.org/spec/lti/v1p3/#resource-link-claim-0
  */
-class ResourceLinkClaim extends ResourceLink implements MessageClaimInterface
+class ResourceLinkClaim implements MessageClaimInterface
 {
+    /** @var string */
+    private $id;
+
+    /** @var string|null */
+    private $title;
+
+    /** @var string|null */
+    private $description;
+
     public static function getClaimName(): string
     {
         return LtiMessageInterface::CLAIM_LTI_RESOURCE_LINK;
     }
 
+    public function __construct(string $id, string $title = null, string $description = null)
+    {
+        $this->id = $id;
+        $this->title = $title;
+        $this->description = $description;
+    }
+
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
     public function normalize(): array
     {
         return array_filter([
-            'id' => $this->getIdentifier(),
-            'title' => $this->getTitle(),
-            'description' => $this->getDescription()
+            'id' => $this->id,
+            'title' => $this->title,
+            'description' => $this->description
         ]);
     }
 

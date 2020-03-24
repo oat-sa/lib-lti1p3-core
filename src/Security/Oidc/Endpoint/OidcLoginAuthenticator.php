@@ -29,8 +29,10 @@ use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Launch\Builder\LtiLaunchRequestBuilder;
 use OAT\Library\Lti1p3Core\Launch\Request\LtiLaunchRequest;
+use OAT\Library\Lti1p3Core\Link\ResourceLink\ResourceLink;
 use OAT\Library\Lti1p3Core\Message\Builder\MessageBuilder;
 use OAT\Library\Lti1p3Core\Message\LtiMessage;
+use OAT\Library\Lti1p3Core\Message\MessageInterface;
 use OAT\Library\Lti1p3Core\Security\Jwt\AssociativeDecoder;
 use OAT\Library\Lti1p3Core\Security\Oidc\Request\OidcAuthenticationRequest;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
@@ -100,6 +102,13 @@ class OidcLoginAuthenticator
                 throw new LtiException('Message hint expired');
             }
 
+            $originalResourceLink = new ResourceLink(
+                $originalMessage->getResourceLink()->getId(),
+                $originalMessage->getTargetLinkUri(),
+                $originalMessage->getResourceLink()->getTitle(),
+                $originalMessage->getResourceLink()->getDescription()
+            );
+
             $authenticationResult = $this->authenticator->authenticate($oidcRequest->getLoginHint());
 
             if (!$authenticationResult->isSuccess()) {
@@ -108,9 +117,9 @@ class OidcLoginAuthenticator
 
             if (!$authenticationResult->isAnonymous()) {
                 return $this->requestBuilder
-                    ->copyMessage($originalMessage)
+                    ->copyFromMessage($originalMessage, [MessageInterface::CLAIM_SUB])
                     ->buildUserResourceLinkLtiLaunchRequest(
-                        $originalMessage->getResourceLink(),
+                        $originalResourceLink,
                         $deployment,
                         $authenticationResult->getUserIdentity(),
                         $originalMessage->getRoles(),
@@ -120,9 +129,9 @@ class OidcLoginAuthenticator
             }
 
             return $this->requestBuilder
-                ->copyMessage($originalMessage)
+                ->copyFromMessage($originalMessage,  [])
                 ->buildResourceLinkLtiLaunchRequest(
-                    $originalMessage->getResourceLink(),
+                    $originalResourceLink,
                     $deployment,
                     $originalMessage->getRoles(),
                     [],
@@ -133,7 +142,7 @@ class OidcLoginAuthenticator
             throw $exception;
         } catch (Throwable $exception) {
             throw new LtiException(
-                sprintf('OIDC login initiation failed: %s', $exception->getMessage()),
+                sprintf('OIDC login authentication failed: %s', $exception->getMessage()),
                 $exception->getCode(),
                 $exception
             );

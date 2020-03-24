@@ -20,11 +20,11 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Launch\Authenticator;
+namespace OAT\Library\Lti1p3Core\Launch\Validator;
 
 use OAT\Library\Lti1p3Core\Message\LtiMessage;
 
-class LtiLaunchRequestAuthenticationResult
+class LtiLaunchRequestValidationResult
 {
     /** @var LtiMessage */
     private $ltiMessage;

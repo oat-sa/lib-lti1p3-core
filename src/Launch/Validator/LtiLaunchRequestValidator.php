@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Launch\Authenticator;
+namespace OAT\Library\Lti1p3Core\Launch\Validator;
 
 use Carbon\Carbon;
 use Lcobucci\JWT\Parser;
@@ -46,7 +46,7 @@ use Throwable;
 /**
  * @see https://www.imsglobal.org/spec/security/v1p0/#authentication-response-validation
  */
-class LtiLaunchRequestAuthenticator
+class LtiLaunchRequestValidator
 {
     /** @var DeploymentRepositoryInterface */
     private $deploymentRepository;
@@ -85,7 +85,7 @@ class LtiLaunchRequestAuthenticator
     /**
      * @throws LtiException
      */
-    public function authenticate(ServerRequestInterface $request): LtiLaunchRequestAuthenticationResult
+    public function authenticate(ServerRequestInterface $request): LtiLaunchRequestValidationResult
     {
         $this->reset();
 
@@ -115,7 +115,7 @@ class LtiLaunchRequestAuthenticator
                 ->validateStateSignature($deployment, $oidcState)
                 ->validateStateExpiry($oidcState);
 
-            return new LtiLaunchRequestAuthenticationResult($ltiMessage, $this->successes, $this->failures);
+            return new LtiLaunchRequestValidationResult($ltiMessage, $this->successes, $this->failures);
 
         } catch (LtiException $exception) {
             throw $exception;
