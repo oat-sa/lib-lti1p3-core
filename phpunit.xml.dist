@@ -7,7 +7,7 @@
          colors="true"
 >
     <php>
-        <env name="KEYS_ROOT_DIR" value="file://tests/Resource/Key" />
+        <env name="TEST_KEYS_ROOT_DIR" value="file://tests/Resource/Key" />
     </php>
 
     <testsuites>

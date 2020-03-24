@@ -22,6 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Security\Jwks\Exporter;
 
+use OAT\Library\Lti1p3Core\Security\Jwks\Exporter\Jwk\JwkExporterInterface;
+use OAT\Library\Lti1p3Core\Security\Jwks\Exporter\Jwk\JwkRS256Exporter;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
 
@@ -33,13 +35,13 @@ class JwksExporter
     /** @var KeyChainRepositoryInterface */
     private $repository;
 
-    /** @var JwksRS256Exporter */
+    /** @var JwkExporterInterface */
     private $exporter;
 
     public function __construct(KeyChainRepositoryInterface $repository, JwkExporterInterface $exporter = null)
     {
         $this->repository = $repository;
-        $this->exporter = $exporter ?? new JwksRS256Exporter();
+        $this->exporter = $exporter ?? new JwkRS256Exporter();
     }
 
     public function export(string $keySetName): array

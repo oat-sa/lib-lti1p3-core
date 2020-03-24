@@ -79,11 +79,15 @@ class OidcLaunchRequestBuilder
                 }
             }
 
+            $ltiMessageHintToken = $this->messageBuilder
+                ->getMessage($deployment->getPlatformKeyChain())
+                ->getToken();
+
             return new OidcLaunchRequest($deployment->getTool()->getOidcLoginInitiationUrl(), [
                 'iss' => $deployment->getPlatform()->getAudience(),
                 'login_hint' => $loginHint,
                 'target_link_uri' => $targetLinkUri,
-                'lti_message_hint' => $this->messageBuilder->getMessage($deployment->getPlatformKeyChain())->getToken()->__toString(),
+                'lti_message_hint' => $ltiMessageHintToken->__toString(),
                 'lti_deployment_id' => $deployment->getIdentifier(),
                 'client_id' => $deployment->getClientId(),
             ]);

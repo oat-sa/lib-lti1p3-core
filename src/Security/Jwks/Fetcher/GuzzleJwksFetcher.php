@@ -52,7 +52,7 @@ class GuzzleJwksFetcher implements JwksFetcherInterface
         try {
             $response = $this->client->request('GET', $jwksUrl, ['headers' => ['Accept' => 'application/json']]);
 
-            $responseData = json_decode($response->getBody());
+            $responseData = json_decode($response->getBody()->__toString(), true);
 
             if (JSON_ERROR_NONE !== json_last_error()) {
                 throw new RuntimeException(sprintf('json_decode error: %s', json_last_error_msg()));
@@ -66,7 +66,7 @@ class GuzzleJwksFetcher implements JwksFetcherInterface
 
         } catch (Throwable $exception) {
             throw new LtiException(
-                sprintf('Error during fetching JWK for url %s', $jwksUrl),
+                sprintf('Error during fetching JWK for url %s: %s', $jwksUrl, $exception->getMessage()),
                 $exception->getCode(),
                 $exception
             );
