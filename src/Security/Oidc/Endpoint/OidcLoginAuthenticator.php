@@ -117,7 +117,7 @@ class OidcLoginAuthenticator
 
             if (!$authenticationResult->isAnonymous()) {
                 return $this->requestBuilder
-                    ->copyFromMessage($originalMessage, [MessageInterface::CLAIM_SUB])
+                    ->copyFromMessage($originalMessage)
                     ->buildUserResourceLinkLtiLaunchRequest(
                         $originalResourceLink,
                         $deployment,
@@ -129,7 +129,7 @@ class OidcLoginAuthenticator
             }
 
             return $this->requestBuilder
-                ->copyFromMessage($originalMessage,  [])
+                ->copyFromMessage($originalMessage)
                 ->buildResourceLinkLtiLaunchRequest(
                     $originalResourceLink,
                     $deployment,
