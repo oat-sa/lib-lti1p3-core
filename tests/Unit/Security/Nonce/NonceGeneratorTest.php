@@ -25,56 +25,47 @@ namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\Nonce;
 use Carbon\Carbon;
 use OAT\Library\Lti1p3Core\Security\Nonce\Nonce;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceGenerator;
+use OAT\Library\Lti1p3Core\Security\Nonce\NonceGeneratorInterface;
 use PHPUnit\Framework\TestCase;
 
 class NonceGeneratorTest extends TestCase
 {
-    /**
-     * @dataProvider providerTestItGenerates
-     */
-    public function testItGeneratesFromDifferentTtl(Nonce $nonce, int $expectedExpirationTimeStamp): void
+    public function testItGenerateUniqueValues(): void
     {
-        $this->assertEquals($nonce->getExpiredAt()->getTimestamp(), $expectedExpirationTimeStamp);
+        $subject = new NonceGenerator();
+
+        $nonce1 = $subject->generate();
+        $nonce2 = $subject->generate();
+        $nonce3 = $subject->generate();
+
+        $this->assertNotEquals($nonce1->getValue(), $nonce2->getValue());
+        $this->assertNotEquals($nonce1->getValue(), $nonce3->getValue());
+        $this->assertNotEquals($nonce2->getValue(), $nonce3->getValue());
     }
 
-    public function providerTestItGenerates(): array
+    public function testItGeneratesWithDefaultTtl(): void
     {
-        $knownDate = Carbon::create(1988, 12, 22, 06);
+        $now = Carbon::now();
 
-        Carbon::setTestNow($knownDate);
-        $nonceGivenTtl = (new NonceGenerator())->generate(6);
-        $nonceConstructedTtl = (new NonceGenerator(60))->generate();
-        $nonceDefaultTtl = (new NonceGenerator())->generate();
-        $nonceGivenAndConstructedTtl = (new NonceGenerator(99))->generate(1);
+        Carbon::setTestNow($now);
 
-        return [
-            'It Generates From Given TTL' => [
-                $nonceGivenTtl,
-                (Carbon::create(1988, 12, 22, 06))->addSeconds(6)->getTimestamp()
-            ],
-            'It Generates From Constructed TTL' => [
-                $nonceConstructedTtl,
-                (Carbon::create(1988, 12, 22, 06))->addSeconds(60)->getTimestamp()
-            ],
-            'It Generates From Default TTL' => [
-                $nonceDefaultTtl,
-                (Carbon::create(1988, 12, 22, 06))->addSeconds(600)->getTimestamp()
-            ],
-            'It Generates From Given and Constructed TTL' => [
-                $nonceGivenAndConstructedTtl,
-                (Carbon::create(1988, 12, 22, 06))->addSecond()->getTimestamp()
-            ],
-        ];
+        $subject = new NonceGenerator();
+
+        $nonce = $subject->generate();
+
+        $this->assertEquals($now->addSeconds(NonceGeneratorInterface::DEFAULT_TTL), $nonce->getExpiredAt());
     }
 
-    public function testItGeneratesUniqueValues(): void
+    public function testItGeneratesWithGivenTtl(): void
     {
-        $values = [];
+        $now = Carbon::now();
 
-        for ($i = 0; $i < 100; $i++) {
-            $values[] = (new NonceGenerator())->generate()->getValue();
-        }
+        Carbon::setTestNow($now);
 
-        $this->assertEquals(array_unique($values), $values);
+        $subject = new NonceGenerator();
+
+        $nonce = $subject->generate(123);
+
+        $this->assertEquals($now->addSeconds(123), $nonce->getExpiredAt());
     }
 }

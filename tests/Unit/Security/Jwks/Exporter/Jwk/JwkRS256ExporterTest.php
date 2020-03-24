@@ -20,20 +20,20 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\Jwks;
+namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\Jwks\Exporter\Jwk;
 
 use InvalidArgumentException;
-use OAT\Library\Lti1p3Core\Security\Jwks\JwkExporter;
-use OAT\Library\Lti1p3Core\Tests\Traits\KeyChainTestingTrait;
+use OAT\Library\Lti1p3Core\Security\Jwks\Exporter\Jwk\JwkRS256Exporter;
+use OAT\Library\Lti1p3Core\Tests\Traits\SecurityTestingTrait;
 use PHPUnit\Framework\TestCase;
 
-class JwkExporterTest extends TestCase
+class JwkRS256ExporterTest extends TestCase
 {
-    use KeyChainTestingTrait;
+    use SecurityTestingTrait;
 
-    public function testItCanExportAnRSAKeyChain(): void
+    public function testItCanExportRS256KeyChain(): void
     {
-        $subject = new JwkExporter();
+        $subject = new JwkRS256Exporter();
 
         $this->assertEquals(
             [
@@ -42,25 +42,27 @@ class JwkExporterTest extends TestCase
                 'use' => 'sig',
                 'n' => 'yZXlfd5yqChtTH91N76VokquRu2r1EwNDUjA0GAygrPzCpPbYokasxzs-60Do_lyTIgd7nRzudAzHnujIPr8GOPIlPlOKT8HuL7xQEN6gmUtz33iDhK97zK7zOFEmvS8kYPwFAjQ03YKv-3T9b_DbrBZWy2Vx4Wuxf6mZBggKQfwHUuJxXDv79NenZarUtC5iFEhJ85ovwjW7yMkcflhUgkf1o_GIR5RKoNPttMXhKYZ4hTlLglMm1FgRR63pvYoy9Eq644a9x2mbGelO3HnGbkaFo0HxiKbFW1vplHzixYCyjc15pvtBxw_x26p8-lNthuxzaX5HaFMPGs10rRPLw',
                 'e' => 'AQAB',
-                'kid' => 'id',
+                'kid' => 'keyChainIdentifier',
             ],
-            $subject->export($this->getTestingKeyChain())
+            $subject->export($this->createTestKeyChain())
         );
     }
 
-    public function testItCannotExportOtherThanRSAKeyChain(): void
+    public function testItCannotExportAnotherAlgorithmThanRS256(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Public key type is not OPENSSL_KEYTYPE_RSA');
 
-        $keyChain = $this->getTestingKeyChain(
-            'id',
-            'setName',
-            'file://' . __DIR__ . '/../../../Resource/Key/DSA/public.key',
-            'file://' . __DIR__ . '/../../../Resource/Key/DSA/private.key',
-            null
+        $subject = new JwkRS256Exporter();
+
+        $dsaKeyChain = $this->createTestKeyChain(
+            'keyChainIdentifier',
+            'keySetName',
+            $publicKey ?? getenv('TEST_KEYS_ROOT_DIR') . '/DSA/public.key',
+            $privateKey ?? getenv('TEST_KEYS_ROOT_DIR') . '/DSA/private.key',
+
         );
 
-        (new JwkExporter())->export($keyChain);
+        $subject->export($dsaKeyChain);
     }
 }

@@ -22,24 +22,38 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Traits;
 
+use Lcobucci\JWT\Parser;
+use Lcobucci\JWT\Signer\Key;
+use Lcobucci\JWT\Signer\Rsa\Sha256;
+use Lcobucci\JWT\Token;
+use OAT\Library\Lti1p3Core\Security\Jwt\AssociativeDecoder;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChain;
-use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
 
-trait KeyChainTestingTrait
+trait SecurityTestingTrait
 {
-    private function getTestingKeyChain(
-        string $id = 'id',
-        string $setName = 'setName',
+    private function createTestKeyChain(
+        string $identifier = 'keyChainIdentifier',
+        string $keySetName = 'keySetName',
         string $publicKey = null,
         string $privateKey = null,
         string $privateKeyPassPhrase = null
-    ): KeyChainInterface {
+    ): KeyChain {
         return new KeyChain(
-            $id,
-            $setName,
-            $publicKey ?? getenv('KEYS_ROOT_DIR') . '/RSA/public.key',
-            $privateKey ?? getenv('KEYS_ROOT_DIR') . '/RSA/private.key',
+            $identifier,
+            $keySetName,
+            $publicKey ?? getenv('TEST_KEYS_ROOT_DIR') . '/RSA/public.key',
+            $privateKey ?? getenv('TEST_KEYS_ROOT_DIR') . '/RSA/private.key',
             $privateKeyPassPhrase
         );
+    }
+
+    private function parseJwt(string $tokenString): Token
+    {
+        return (new Parser(new AssociativeDecoder()))->parse($tokenString);
+    }
+
+    private function verifyJwt(Token $token, Key $key): bool
+    {
+        return $token->verify(new Sha256(), $key);
     }
 }

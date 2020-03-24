@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Security\Jwks\Exporter;
+namespace OAT\Library\Lti1p3Core\Security\Jwks\Exporter\Jwk;
 
 use InvalidArgumentException;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
@@ -30,7 +30,7 @@ use const OPENSSL_KEYTYPE_RSA;
 /**
  * @see https://tools.ietf.org/html/rfc7517
  */
-class JwksRS256Exporter implements JwkExporterInterface
+class JwkRS256Exporter implements JwkExporterInterface
 {
     public function export(KeyChainInterface $keyChain): array
     {

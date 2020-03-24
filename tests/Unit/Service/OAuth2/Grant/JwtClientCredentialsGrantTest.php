@@ -40,7 +40,7 @@ use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
 use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
 use OAT\Library\Lti1p3Core\Service\OAuth2\Grant\JwtClientCredentialsGrant;
-use OAT\Library\Lti1p3Core\Tests\Traits\KeyChainTestingTrait;
+use OAT\Library\Lti1p3Core\Tests\Traits\SecurityTestingTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
@@ -48,7 +48,7 @@ use Ramsey\Uuid\Uuid;
 
 class JwtClientCredentialsGrantTest extends TestCase
 {
-    use KeyChainTestingTrait;
+    use SecurityTestingTrait;
 
     /** @var JwtClientCredentialsGrant */
     private $subject;
@@ -64,7 +64,7 @@ class JwtClientCredentialsGrantTest extends TestCase
     
     protected function setUp()
     {
-        $this->keyChain = $this->getTestingKeyChain();
+        $this->keyChain = $this->createTestKeyChain();
 
         $this->deploymentRepository = $this->createMock(DeploymentRepositoryInterface::class);
 

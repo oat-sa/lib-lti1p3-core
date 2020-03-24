@@ -20,14 +20,22 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Security\Key;
+namespace OAT\Library\Lti1p3Core\Tests\Traits;
 
-interface KeyChainRepositoryInterface
+use Nyholm\Psr7\Factory\HttplugFactory;
+use Nyholm\Psr7\Factory\Psr17Factory;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+
+trait NetworkTestingTrait
 {
-    public function find(string $identifier): ?KeyChainInterface;
+    private function createServerRequest(string $method, $uri, array $serverParams = []): ServerRequestInterface
+    {
+        return (new Psr17Factory())->createServerRequest($method, $uri, $serverParams);
+    }
 
-    /**
-     * @return KeyChainInterface[]
-     */
-    public function findByKeySetName(string $keySetName): array;
+    private function createResponse($content = null, int $statusCode = 200, array $headers = []): ResponseInterface
+    {
+        return (new HttplugFactory())->createResponse($statusCode, null, $headers, $content);
+    }
 }

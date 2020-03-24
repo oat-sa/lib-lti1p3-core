@@ -34,28 +34,28 @@ class KeyChainTest extends TestCase
     public function setUp(): void
     {
         $this->subject = new KeyChain(
-            '1',
-            'setName',
-            'file://' . __DIR__ . '/../../../Resource/Key/RSA/public.key',
-            'file://' . __DIR__ . '/../../../Resource/Key/RSA/private.key',
-            'test'
+            'identifier',
+            'keySetName',
+            getenv('TEST_KEYS_ROOT_DIR') . '/RSA/public.key',
+            getenv('TEST_KEYS_ROOT_DIR') . '/RSA/private.key',
+            'passPhrase'
         );
     }
 
-    public function testGetId(): void
+    public function testGetIdentifier(): void
     {
-        $this->assertEquals('1', $this->subject->getId());
+        $this->assertEquals('identifier', $this->subject->getIdentifier());
     }
 
-    public function testSetName(): void
+    public function testKeySetName(): void
     {
-        $this->assertEquals('setName', $this->subject->getSetName());
+        $this->assertEquals('keySetName', $this->subject->getKeySetName());
     }
 
     public function testGetPublicKey(): void
     {
         $this->assertEquals(
-            new Key('file://' . __DIR__ . '/../../../Resource/Key/RSA/public.key'),
+            new Key(getenv('TEST_KEYS_ROOT_DIR') . '/RSA/public.key'),
             $this->subject->getPublicKey()
         );
     }
@@ -63,7 +63,7 @@ class KeyChainTest extends TestCase
     public function testGetPrivateKey(): void
     {
         $this->assertEquals(
-            new Key('file://' . __DIR__ . '/../../../Resource/Key/RSA/private.key', 'test'),
+            new Key(getenv('TEST_KEYS_ROOT_DIR') . '/RSA/private.key', 'passPhrase'),
             $this->subject->getPrivateKey()
         );
     }
@@ -71,17 +71,11 @@ class KeyChainTest extends TestCase
     public function testWithoutPrivateKey(): void
     {
         $subject = new KeyChain(
-            '1',
-            'setName',
-            'file://' . __DIR__ . '/../../../Resource/Key/RSA/public.key'
+            'identifier',
+            'keySetName',
+            getenv('TEST_KEYS_ROOT_DIR') . '/RSA/public.key'
         );
 
-        $this->assertEquals('1', $subject->getId());
-        $this->assertEquals('setName', $subject->getSetName());
-        $this->assertEquals(
-            new Key('file://' . __DIR__ . '/../../../Resource/Key/RSA/public.key'),
-            $subject->getPublicKey()
-        );
         $this->assertNull($subject->getPrivateKey());
     }
 }

@@ -23,7 +23,6 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Launch\Builder;
 
 use Lcobucci\JWT\Claim;
-use Lcobucci\JWT\Token;
 use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Launch\Request\LtiLaunchRequest;

@@ -6,18 +6,21 @@
     "require": {
         "php": "^7.1.3",
         "ext-openssl": "*",
+        "ext-json": "*",
         "lcobucci/jwt": "^3.3",
         "nesbot/carbon": "^2.31",
         "ramsey/uuid": "^3.9",
         "psr/http-message": "^1.0",
-        "nyholm/psr7": "^1.2",
         "codercat/jwk-to-pem": "^0.0.3",
-        "guzzlehttp/guzzle": "^6.5",
         "league/oauth2-server": "^8.0"
     },
     "require-dev": {
         "phpunit/phpunit": "7.5.20",
-        "ext-json": "*"
+        "nyholm/psr7": "^1.2",
+        "guzzlehttp/guzzle": "^6.5"
+    },
+    "suggest": {
+        "guzzlehttp/guzzle": "For using guzzle based JWKS fetcher"
     },
     "autoload": {
         "psr-4": {

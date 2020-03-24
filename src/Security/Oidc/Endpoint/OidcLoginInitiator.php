@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Security\Oidc\Endpoint;
 
+use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
 use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Launch\Request\OidcLaunchRequest;
@@ -66,13 +67,7 @@ class OidcLoginInitiator
             /** @var OidcLaunchRequest $oidcRequest */
             $oidcRequest = OidcLaunchRequest::fromServerRequest($request);
 
-            if($oidcRequest->getLtiDeploymentId()) {
-                $deployment = $this->repository->find($oidcRequest->getLtiDeploymentId());
-            } elseif ($oidcRequest->getIssuer()) {
-                $deployment = $this->repository->findByIssuer($oidcRequest->getIssuer(), $oidcRequest->getClientId());
-            } else {
-                throw new LtiException('Cannot determinate deployment');
-            }
+            $deployment = $this->findOidcLaunchRequestDeployment($oidcRequest);
 
             $nonce = $this->generator->generate();
 
@@ -101,5 +96,25 @@ class OidcLoginInitiator
                 $exception
             );
         }
+    }
+
+    /**
+     * @throws LtiException
+     */
+    private function findOidcLaunchRequestDeployment(OidcLaunchRequest $oidcRequest): DeploymentInterface
+    {
+        $deployment = null;
+
+        if ($oidcRequest->getLtiDeploymentId()) {
+            $deployment = $this->repository->find($oidcRequest->getLtiDeploymentId());
+        } elseif ($oidcRequest->getIssuer()) {
+            $deployment = $this->repository->findByIssuer($oidcRequest->getIssuer(), $oidcRequest->getClientId());
+        }
+
+        if (null === $deployment) {
+            throw new LtiException('Cannot find deployment for OIDC request');
+        }
+
+        return $deployment;
     }
 }
