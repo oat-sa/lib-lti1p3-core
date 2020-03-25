@@ -22,31 +22,30 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Message\Claim;
 
-use OAT\Library\Lti1p3Core\Message\Claim\ContextClaim;
+use OAT\Library\Lti1p3Core\Message\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use PHPUnit\Framework\TestCase;
 
-class ContextClaimTest extends TestCase
+class ResourceLinkClaimTest extends TestCase
 {
-    /** @var ContextClaim */
+    /** @var ResourceLinkClaim */
     private $subject;
 
     public function setUp(): void
     {
-        $this->subject = new ContextClaim('id', ['type'], 'label', 'title');
+        $this->subject = new ResourceLinkClaim('id', 'title', 'description');
     }
 
     public function testGetClaimName(): void
     {
-        $this->assertEquals(LtiMessageInterface::CLAIM_LTI_CONTEXT, $this->subject::getClaimName());
+        $this->assertEquals(LtiMessageInterface::CLAIM_LTI_RESOURCE_LINK, $this->subject::getClaimName());
     }
 
     public function testGetters(): void
     {
         $this->assertEquals('id', $this->subject->getId());
-        $this->assertEquals(['type'], $this->subject->getTypes());
-        $this->assertEquals('label', $this->subject->getLabel());
         $this->assertEquals('title', $this->subject->getTitle());
+        $this->assertEquals('description', $this->subject->getDescription());
     }
 
     public function testNormalisation(): void
@@ -54,9 +53,8 @@ class ContextClaimTest extends TestCase
         $this->assertEquals(
             [
                 'id' => 'id',
-                'type' => ['type'],
-                'label' => 'label',
-                'title' => 'title'
+                'title' => 'title',
+                'description' => 'description'
             ],
             $this->subject->normalize()
         );
@@ -64,17 +62,15 @@ class ContextClaimTest extends TestCase
 
     public function testDenormalisation(): void
     {
-        $denormalisation = ContextClaim::denormalize([
+        $denormalisation = ResourceLinkClaim::denormalize([
             'id' => 'id',
-            'type' => ['type'],
-            'label' => 'label',
-            'title' => 'title'
+            'title' => 'title',
+            'description' => 'description'
         ]);
 
-        $this->assertInstanceOf(ContextClaim::class, $denormalisation);
+        $this->assertInstanceOf(ResourceLinkClaim::class, $denormalisation);
         $this->assertEquals('id', $denormalisation->getId());
-        $this->assertEquals(['type'], $denormalisation->getTypes());
-        $this->assertEquals('label', $denormalisation->getLabel());
         $this->assertEquals('title', $denormalisation->getTitle());
+        $this->assertEquals('description', $denormalisation->getDescription());
     }
 }

@@ -32,7 +32,6 @@ use OAT\Library\Lti1p3Core\Launch\Request\LtiLaunchRequest;
 use OAT\Library\Lti1p3Core\Link\ResourceLink\ResourceLink;
 use OAT\Library\Lti1p3Core\Message\Builder\MessageBuilder;
 use OAT\Library\Lti1p3Core\Message\LtiMessage;
-use OAT\Library\Lti1p3Core\Message\MessageInterface;
 use OAT\Library\Lti1p3Core\Security\Jwt\AssociativeDecoder;
 use OAT\Library\Lti1p3Core\Security\Oidc\Request\OidcAuthenticationRequest;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;

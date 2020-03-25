@@ -85,7 +85,7 @@ class LtiLaunchRequestValidator
     /**
      * @throws LtiException
      */
-    public function authenticate(ServerRequestInterface $request): LtiLaunchRequestValidationResult
+    public function validate(ServerRequestInterface $request): LtiLaunchRequestValidationResult
     {
         $this->reset();
 
@@ -208,7 +208,7 @@ class LtiLaunchRequestValidator
             if (!$nonce->isExpired()) {
                 $this->addFailure('JWT id_token nonce already used');
             } else {
-                $this->addSuccess('JWT id_token nonce is valid');
+                $this->addSuccess('JWT id_token nonce already used but expired');
             }
         } else {
             $this->nonceRepository->save(
@@ -243,7 +243,7 @@ class LtiLaunchRequestValidator
         if ($deployment->getClientId() != $ltiMessage->getMandatoryClaim(MessageInterface::CLAIM_AUD)) {
             $this->addFailure('JWT id_token aud claim does not match tool oauth2 client id');
         } else {
-            $this->addSuccess('JWT id_token aud claim issuer matches tool oauth2 client id');
+            $this->addSuccess('JWT id_token aud claim matches tool oauth2 client id');
         }
 
         return $this;
@@ -256,9 +256,9 @@ class LtiLaunchRequestValidator
     {
         if (null !== $oidsState) {
             if(!$oidsState->getToken()->verify($this->signer,  $deployment->getToolKeyChain()->getPublicKey())) {
-                $this->addFailure('JWT state signature validation failure');
+                $this->addFailure('JWT OIDC state signature validation failure');
             } else {
-                $this->addSuccess('JWT state signature validation success');
+                $this->addSuccess('JWT OIDC state signature validation success');
             }
         }
 
@@ -272,9 +272,9 @@ class LtiLaunchRequestValidator
     {
         if (null !== $oidsState) {
             if ($oidsState->getToken()->isExpired()) {
-                $this->addFailure('JWT state is expired');
+                $this->addFailure('JWT OIDC state is expired');
             } else {
-                $this->addSuccess('JWT state is not expired');
+                $this->addSuccess('JWT OIDC state is not expired');
             }
         }
 

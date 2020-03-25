@@ -130,8 +130,12 @@ class LtiLaunchRequestBuilder
                 }
             }
 
+            $idToken = $this->messageBuilder
+                ->getLtiMessage($deployment->getPlatformKeyChain())
+                ->getToken();
+
             return new LtiLaunchRequest($url, [
-                'id_token' => $this->messageBuilder->getLtiMessage($deployment->getPlatformKeyChain())->getToken()->__toString(),
+                'id_token' => $idToken->__toString(),
                 'state' => $state
             ]);
 

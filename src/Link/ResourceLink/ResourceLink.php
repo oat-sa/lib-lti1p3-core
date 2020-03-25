@@ -31,7 +31,7 @@ class ResourceLink extends AbstractLink implements ResourceLinkInterface
 {
     public function __construct(string $identifier, string $url = null, string $title = null, string $description = null)
     {
-        parent::__construct($identifier, static::TYPE, $url, [
+        parent::__construct($identifier, $url, [
             'title' => $title,
             'description' => $description
         ]);

@@ -80,6 +80,5 @@ class LaunchPresentationClaimTest extends TestCase
         $this->assertEquals('width', $denormalisation->getWidth());
         $this->assertEquals('returnUrl', $denormalisation->getReturnUrl());
         $this->assertEquals('locale', $denormalisation->getLocale());
-
     }
 }

@@ -22,11 +22,11 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Launch\Validator;
 
-use OAT\Library\Lti1p3Core\Message\LtiMessage;
+use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 
 class LtiLaunchRequestValidationResult
 {
-    /** @var LtiMessage */
+    /** @var LtiMessageInterface */
     private $ltiMessage;
 
     /** @var string[] */
@@ -35,14 +35,14 @@ class LtiLaunchRequestValidationResult
     /** @var string[] */
     private $failures;
 
-    public function __construct(LtiMessage $ltiMessage, array $successes = [], array $failures = [])
+    public function __construct(LtiMessageInterface $ltiMessage, array $successes = [], array $failures = [])
     {
         $this->ltiMessage = $ltiMessage;
         $this->successes = $successes;
         $this->failures = $failures;
     }
 
-    public function getLtiMessage(): LtiMessage
+    public function getLtiMessage(): LtiMessageInterface
     {
         return $this->ltiMessage;
     }
