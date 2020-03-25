@@ -34,14 +34,12 @@ use OAT\Library\Lti1p3Core\Message\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\Message\LtiMessage;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
-use OAT\Library\Lti1p3Core\Tests\Traits\SecurityTestingTrait;
 use OAT\Library\Lti1p3Core\User\UserIdentityInterface;
 use PHPUnit\Framework\TestCase;
 
 class LtiMessageTest extends TestCase
 {
     use DomainTestingTrait;
-    use SecurityTestingTrait;
 
     /** @var LtiLaunchRequestBuilder */
     private $builder;

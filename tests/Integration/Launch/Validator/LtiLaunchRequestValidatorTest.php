@@ -41,14 +41,12 @@ use OAT\Library\Lti1p3Core\Security\Oidc\Endpoint\OidcLoginAuthenticator;
 use OAT\Library\Lti1p3Core\Security\Oidc\Endpoint\OidcLoginInitiator;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
 use OAT\Library\Lti1p3Core\Tests\Traits\NetworkTestingTrait;
-use OAT\Library\Lti1p3Core\Tests\Traits\SecurityTestingTrait;
 use PHPUnit\Framework\TestCase;
 
 class LtiLaunchRequestValidatorTest extends TestCase
 {
     use DomainTestingTrait;
     use NetworkTestingTrait;
-    use SecurityTestingTrait;
 
     public function testValidationSuccessOnAnonymousLtiLaunchRequest(): void
     {

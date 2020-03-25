@@ -150,9 +150,6 @@ class LtiLaunchRequestValidator
         return $this;
     }
 
-    /**
-     * @throws LtiException
-     */
     private function validateMessageExpiry(LtiMessageInterface $ltiMessage): self
     {
         if ($ltiMessage->getToken()->isExpired()) {
@@ -164,9 +161,6 @@ class LtiLaunchRequestValidator
         return $this;
     }
 
-    /**
-     * @throws LtiException
-     */
     private function validateMessageNonce(LtiMessageInterface $ltiMessage): self
     {
         $nonceValue = $ltiMessage->getMandatoryClaim(MessageInterface::CLAIM_NONCE);
@@ -190,9 +184,6 @@ class LtiLaunchRequestValidator
         return $this;
     }
 
-    /**
-     * @throws LtiException
-     */
     private function validateMessageIssuer(DeploymentInterface $deployment, LtiMessageInterface $ltiMessage): self
     {
         if ($deployment->getPlatform()->getAudience() != $ltiMessage->getMandatoryClaim(MessageInterface::CLAIM_ISS)) {
@@ -204,9 +195,6 @@ class LtiLaunchRequestValidator
         return $this;
     }
 
-    /**
-     * @throws LtiException
-     */
     private function validateMessageAudience(DeploymentInterface $deployment, LtiMessageInterface $ltiMessage): self
     {
         if ($deployment->getClientId() != $ltiMessage->getMandatoryClaim(MessageInterface::CLAIM_AUD)) {
@@ -218,13 +206,10 @@ class LtiLaunchRequestValidator
         return $this;
     }
 
-    /**
-     * @throws LtiException
-     */
-    private function validateStateSignature(DeploymentInterface $deployment, MessageInterface $oidsState = null): self
+    private function validateStateSignature(DeploymentInterface $deployment, MessageInterface $oidcState = null): self
     {
-        if (null !== $oidsState) {
-            if(!$oidsState->getToken()->verify($this->signer,  $deployment->getToolKeyChain()->getPublicKey())) {
+        if (null !== $oidcState) {
+            if(!$oidcState->getToken()->verify($this->signer,  $deployment->getToolKeyChain()->getPublicKey())) {
                 $this->addFailure('JWT OIDC state signature validation failure');
             } else {
                 $this->addSuccess('JWT OIDC state signature validation success');
@@ -234,13 +219,10 @@ class LtiLaunchRequestValidator
         return $this;
     }
 
-    /**
-     * @throws LtiException
-     */
-    private function validateStateExpiry(MessageInterface $oidsState = null): self
+    private function validateStateExpiry(MessageInterface $oidcState = null): self
     {
-        if (null !== $oidsState) {
-            if ($oidsState->getToken()->isExpired()) {
+        if (null !== $oidcState) {
+            if ($oidcState->getToken()->isExpired()) {
                 $this->addFailure('JWT OIDC state is expired');
             } else {
                 $this->addSuccess('JWT OIDC state is not expired');
