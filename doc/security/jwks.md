@@ -1,20 +1,20 @@
 # JWKS endpoint service
 
-> Documentation about how to expose a [JWKS endpoint](https://auth0.com/docs/tokens/concepts/jwks) (JSON Web Key Set) easily from this library.
+> Documentation about how to expose a [JWKS endpoint](https://auth0.com/docs/tokens/concepts/jwks) (JSON Web Key Set) with this library.
 
-## Exporting a JWK from a key chain
+## Exporting a JWK from a key chain (RS SHA 256)
 
 Considering you have for example on your side this key pair:
-- public key path: /home/user/.ssh/id_rsa.pub
-- private key path: /home/user/.ssh/id_rsa
-- private key passphrase: test
+- public key path: `/home/user/.ssh/id_rsa.pub`
+- private key path: `/home/user/.ssh/id_rsa`
+- private key passphrase: `test`
 
-To extract the JWK properties, you can use the [JwkExporter](../../src/Core/Security/Jwks/JwkExporter.php) as following:
+To extract the JWK properties, you can use the [JwkRS256Exporter](../../src/Security/Jwks/Exporter/Jwk/JwkRS256Exporter.php) as following:
 
 ```php
 <?php
 
-use OAT\Library\Lti1p3Core\Security\Jwks\JwkExporter;
+use OAT\Library\Lti1p3Core\Security\Jwks\Exporter\Jwk\JwkRS256Exporter;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChain;
 
 $keyChain = new KeyChain(
@@ -25,74 +25,79 @@ $keyChain = new KeyChain(
     'test'
 );
 
-$jwkExport = (new JwkExporter())->export($keyChain);
+$jwkExport = (new JwkRS256Exporter())->export($keyChain);
 ```
 
-**Note**: `$jwkExport` contains the needed [JWK properties](https://auth0.com/docs/tokens/references/jwks-properties):
+**Notes**:
+- the variable `$jwkExport` will contain the needed [JWK properties](https://auth0.com/docs/tokens/references/jwks-properties):
+    ```json
+    {
+        "alg": "RS256",
+        "kty": "RSA",
+        "use": "sig",
+        "n": "...",
+        "e": "...",
+        "kid": "1"
+    }
+    ```
+- If you want to support other algorithms than RS SHA 256, you can  implement the [JwkExporterInterface](../../src/Security/Jwks/Exporter/Jwk/JwkExporterInterface.php)
 
-```json
-{
-    "alg": "RS256",
-    "kty": "RSA",
-    "use": "sig",
-    "n": "...",
-    "e": "...",
-    "kid": "1"
-}
-```
-
-## Exposing a JWKS form several key chains
+## Create a JWKS endpoint from several key chains
 
 Considering you have for example on your side those key pairs:
 
 Pair 1:
-- public key path: /home/user/.ssh/pair1/id_rsa.pub
-- private key path: /home/user/.ssh/pair1/id_rsa
+- public key path: `/home/user/.ssh/pair1/id_rsa.pub`
+- private key path: `/home/user/.ssh/pair1/id_rsa`
 
 Pair 2:
-- public key path: /home/user/.ssh/pair2/id_rsa.pub
-- private key path: /home/user/.ssh/pair2/id_rsa
+- public key path: `/home/user/.ssh/pair2/id_rsa.pub`
+- private key path: `/home/user/.ssh/pair2/id_rsa`
 
-And considering you provided you own [KeyChainRepositoryInterface](../../src/Core/Security/Key/KeyChainRepositoryInterface.php) implementation:
+You can then use the [KeyChainRepository](../../src/Security/Key/KeyChainRepository.php):
 
 ```php
 <?php
 
 use OAT\Library\Lti1p3Core\Security\Key\KeyChain;
-use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
+use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepository;
 
 $keyChain1 = new KeyChain(
-    '1',
-    'mySetName',
+    'kid1',
+    'myKeySetName',
     'file://home/user/.ssh/pair1/id_rsa.pub',
     'file://home/user/.ssh/pair1/id_rsa',
     'test'
 );
 
 $keyChain2 = new KeyChain(
-    '2',
-    'mySetName',
+    'kid2',
+    'myKeySetName',
     'file://home/user/.ssh/pair2/id_rsa.pub',
     'file://home/user/.ssh/pair2/id_rsa',
     'test'
 );
 
-/** @var KeyChainRepositoryInterface $keyChainRepository */
-$keySet = $keyChainRepository->findBySetName('mySetName'); // same as [$keyChain1, $keyChain2]
-```
+$keyChainRepository = new KeyChainRepository();
+$keyChainRepository
+    ->addKeyChain($keyChain1)
+    ->addKeyChain($keyChain2);
 
-To extract the JWKS properties, you can use the [JwksExporter](../../src/Core/Security/Jwks/JwksExporter.php) as following:
+$keySet = $keyChainRepository->findByKeySetName('myKeySetName'); //  = [$keyChain1, $keyChain2]
+```
+**Note**: you can also provide your own [KeyChainRepositoryInterface](../../src/Security/Key/KeyChainRepositoryInterface.php) implementation, to store keys in database by example.
+
+To extract the JWKS properties, you can use the [JwksExporter](../../src/Security/Jwks/Exporter/JwksExporter.php) as following:
 
 ```php
 <?php
 
-use OAT\Library\Lti1p3Core\Security\Jwks\JwkExporter;
-use OAT\Library\Lti1p3Core\Security\Jwks\JwksExporter;
+use OAT\Library\Lti1p3Core\Security\Jwks\Exporter\JwksExporter;
 
-$jwksExport = (new JwksExporter($keyChainRepository, new JwkExporter()))->export('mySetName');
+$jwksExport = (new JwksExporter($keyChainRepository))->export('myKeySetName');
 ```
 
-**Note**: `$jwksExport` contains the needed [JWKS properties](https://auth0.com/docs/tokens/references/jwks-properties) ready to be exposed from an HTTP endpoint:
+**Note**: `$jwksExport` contains the needed [JWKS properties](https://auth0.com/docs/tokens/references/jwks-properties) ready to be exposed from an HTTP JSON response:
 
 ```json
 {
@@ -103,7 +108,7 @@ $jwksExport = (new JwksExporter($keyChainRepository, new JwkExporter()))->export
             "use": "sig",
             "n": "...",
             "e": "...",
-            "kid": "1"
+            "kid": "kid1"
         },
         {
             "alg": "RS256",
@@ -111,7 +116,7 @@ $jwksExport = (new JwksExporter($keyChainRepository, new JwkExporter()))->export
             "use": "sig",
             "n": "...",
             "e": "...",
-            "kid": "2"
+            "kid": "kid2"
         }
     ]
 }
