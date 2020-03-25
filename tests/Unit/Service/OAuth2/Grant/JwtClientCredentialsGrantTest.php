@@ -40,20 +40,21 @@ use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
 use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
 use OAT\Library\Lti1p3Core\Service\OAuth2\Grant\JwtClientCredentialsGrant;
-use OAT\Library\Lti1p3Core\Tests\Traits\SecurityTestingTrait;
-use PHPUnit\Framework\MockObject\MockObject;
+use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
+use OAT\Library\Lti1p3Core\Tests\Traits\NetworkTestingTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use Ramsey\Uuid\Uuid;
 
 class JwtClientCredentialsGrantTest extends TestCase
 {
-    use SecurityTestingTrait;
+    use DomainTestingTrait;
+    use NetworkTestingTrait;
 
     /** @var JwtClientCredentialsGrant */
     private $subject;
     
-    /** @var DeploymentRepositoryInterface|MockObject */
+    /** @var DeploymentRepositoryInterface */
     private $deploymentRepository;
 
     /** @var Builder */
@@ -66,7 +67,7 @@ class JwtClientCredentialsGrantTest extends TestCase
     {
         $this->keyChain = $this->createTestKeyChain();
 
-        $this->deploymentRepository = $this->createMock(DeploymentRepositoryInterface::class);
+        $this->deploymentRepository = $this->createTestDeploymentRepository([$this->createDeployment()]);
 
         $this->subject = new JwtClientCredentialsGrant($this->deploymentRepository);
     }
@@ -84,12 +85,12 @@ class JwtClientCredentialsGrantTest extends TestCase
     public function testItCanCheckRequestParametersCorrectly(): void
     {
         $this->assertTrue($this->subject->canRespondToAccessTokenRequest($this->createCorrectRequest()));
-        $this->assertFalse($this->subject->canRespondToAccessTokenRequest($this->createWrongRequest()));
+        $this->assertFalse($this->subject->canRespondToAccessTokenRequest($this->createServerRequest('method', 'uri')));
     }
 
     public function testItCanAddAccessTokenToResponse(): void
     {
-        $this->prepareMockClasses($this->createDeployment());
+        $this->prepareMockClasses();
 
         $request = $this->createCorrectRequest((string) $this->createJWT());
         /** @var ResponseTypeInterface $responseType */
@@ -113,7 +114,7 @@ class JwtClientCredentialsGrantTest extends TestCase
     {
         $this->prepareMockClasses();
 
-        $request = $this->createCorrectRequest((string) $this->createJWT());
+        $request = $this->createCorrectRequest((string) $this->createJWT('invalid issuer'));
         /** @var ResponseTypeInterface $responseType */
         $responseType = $this->createMock(ResponseTypeInterface::class);
 
@@ -124,9 +125,9 @@ class JwtClientCredentialsGrantTest extends TestCase
 
     public function testItThrowsExceptionIfTokenIsExpired(): void
     {
-        $this->prepareMockClasses($this->createDeployment());
+        $this->prepareMockClasses();
 
-        $request = $this->createCorrectRequest((string) $this->createJWT(-1));
+        $request = $this->createCorrectRequest((string) $this->createJWT('platformAudience', -1));
         /** @var ResponseTypeInterface $responseType */
         $responseType = $this->createMock(ResponseTypeInterface::class);
 
@@ -135,11 +136,9 @@ class JwtClientCredentialsGrantTest extends TestCase
         $this->subject->respondToAccessTokenRequest($request, $responseType, new DateInterval('PT1H'));
     }
 
-    private function prepareMockClasses(DeploymentInterface $deployment = null): void
+    private function prepareMockClasses(): void
     {
         $this->builder = new Builder();
-
-        $this->deploymentRepository->method('findByIssuer')->with('issuer', 'subject')->willReturn($deployment);
 
         /** @var ClientRepositoryInterface $clientRepository */
         $clientRepository = $this->createMock(ClientRepositoryInterface::class);
@@ -161,39 +160,23 @@ class JwtClientCredentialsGrantTest extends TestCase
         $this->subject->setAccessTokenRepository($accessTokenRepository);
     }
 
-    /**
-     * @return ServerRequestInterface|MockObject
-     */
     private function createCorrectRequest(string $jwtToken = null): ServerRequestInterface
     {
-        $request = $this->createMock(ServerRequestInterface::class);
-
-        $request
-            ->method('getParsedBody')
-            ->willReturn([
+        return $this->createServerRequest('method', 'uri')
+            ->withParsedBody([
                 'grant_type' => 'client_credentials',
                 'client_assertion' => $jwtToken,
                 'client_assertion_type' => 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
             ]);
-
-        return $request;
     }
 
-    /**
-     * @return ServerRequestInterface|MockObject
-     */
-    private function createWrongRequest(): ServerRequestInterface
-    {
-        return $this->createMock(ServerRequestInterface::class);
-    }
-
-    private function createJWT(int $ttl = 3600): Token
+    private function createJWT(string $issuer = 'platformAudience', int $ttl = 3600): Token
     {
         $now = Carbon::now();
 
         $this->builder
-            ->withClaim('iss', 'issuer')
-            ->withClaim('sub', 'subject')
+            ->withClaim('iss', $issuer)
+            ->withClaim('sub', 'deploymentClientId')
             ->identifiedBy(Uuid::uuid4()->toString())
             ->issuedAt($now->getTimestamp())
             ->expiresAt($now->addSeconds($ttl)->getTimestamp());
@@ -203,10 +186,13 @@ class JwtClientCredentialsGrantTest extends TestCase
 
     private function createDeployment(): DeploymentInterface
     {
-        /** @var DeploymentInterface|MockObject $deployment */
-        $deployment = $this->createMock(DeploymentInterface::class);
-        $deployment->method('getToolKeyChain')->willReturn($this->keyChain);
-
-        return $deployment;
+        return $this->createTestDeployment(
+            'deploymentIdentifier',
+            'deploymentClientId',
+            $this->createTestPlatform(),
+            null,
+            null,
+            $this->keyChain
+        );
     }
 }
