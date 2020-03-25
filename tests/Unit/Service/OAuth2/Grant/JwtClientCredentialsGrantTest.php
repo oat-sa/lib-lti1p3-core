@@ -62,7 +62,7 @@ class JwtClientCredentialsGrantTest extends TestCase
     /** @var KeyChainInterface */
     private $keyChain;
     
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->keyChain = $this->createTestKeyChain();
 
