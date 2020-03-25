@@ -102,12 +102,11 @@ class LtiLaunchRequestValidator
             $deployment = $this->deploymentRepository->find($ltiMessage->getDeploymentId());
 
             if (null === $deployment)  {
-                throw new LtiException(sprintf('Not deployment found with id %s', $ltiMessage->getDeploymentId()));
+                throw new LtiException(sprintf('No deployment found with id %s', $ltiMessage->getDeploymentId()));
             }
 
             $this
                 ->validateMessageSignature($deployment, $ltiMessage)
-                ->validateMessageClaims($ltiMessage)
                 ->validateMessageExpiry($ltiMessage)
                 ->validateMessageNonce($ltiMessage)
                 ->validateMessageIssuer($deployment, $ltiMessage)
@@ -146,36 +145,6 @@ class LtiLaunchRequestValidator
             $this->addFailure('JWT id_token signature validation failure');
         } else {
             $this->addSuccess('JWT id_token signature validation success');
-        }
-
-        return $this;
-    }
-
-    /**
-     * @throws LtiException
-     */
-    private function validateMessageClaims(LtiMessageInterface $ltiMessage): self
-    {
-        $mandatoryClaims = [
-            MessageInterface::CLAIM_ISS,
-            MessageInterface::CLAIM_AUD,
-            MessageInterface::CLAIM_SUB,
-            MessageInterface::CLAIM_EXP,
-            MessageInterface::CLAIM_IAT,
-            MessageInterface::CLAIM_NONCE,
-        ];
-
-        $didFail = false;
-
-        foreach ($mandatoryClaims as $mandatoryClaim) {
-            if(!$ltiMessage->getToken()->hasClaim($mandatoryClaim)) {
-                $this->addFailure(sprintf('Missing mandatory id_token JWT claim %s', $mandatoryClaim));
-                $didFail = true;
-            }
-        }
-
-        if (!$didFail) {
-            $this->addSuccess('JWT id_token mandatory claims were all provided');
         }
 
         return $this;

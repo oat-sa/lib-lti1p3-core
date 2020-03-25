@@ -101,9 +101,28 @@ trait DomainTestingTrait
         );
     }
 
+    private function createTestDeploymentWithJwksPlatform(
+        string $identifier = 'deploymentIdentifier',
+        string $clientId = 'deploymentClientId',
+        string $platformJwksUrl = 'http://platform.com/jwks'
+    ): Deployment {
+        return new Deployment(
+            $identifier,
+            $clientId,
+            $platform ?? $this->createTestPlatform(),
+            $tool ?? $this->createTestTool(),
+            null,
+            $toolKeyChain ?? $this->createTestKeyChain('toolKeyChain'),
+            $platformJwksUrl,
+            null
+        );
+    }
+
     private function createTestDeploymentRepository(array $deployments = []): DeploymentRepositoryInterface
     {
-        $deployments = $deployments?:[$this->createTestDeployment()];
+        $deployments = !empty($deployments)
+            ? $deployments
+            : [$this->createTestDeployment()];
 
         return new class ($deployments) implements DeploymentRepositoryInterface
         {

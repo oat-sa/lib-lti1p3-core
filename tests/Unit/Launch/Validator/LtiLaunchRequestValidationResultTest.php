@@ -37,7 +37,7 @@ class LtiLaunchRequestValidationResultTest extends TestCase
         $this->assertEquals($ltiMessageMock, $subject->getLtiMessage());
     }
 
-    public function testResultBehavior(): void
+    public function testBehavior(): void
     {
         $subject = new LtiLaunchRequestValidationResult($this->createMock(LtiMessageInterface::class));
 
