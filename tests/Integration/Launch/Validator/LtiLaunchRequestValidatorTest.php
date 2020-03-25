@@ -26,13 +26,11 @@ use Carbon\Carbon;
 use Exception;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Signer\Hmac\Sha384;
-use Lcobucci\JWT\Signer\Rsa\Sha256;
 use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
 use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Launch\Builder\LtiLaunchRequestBuilder;
 use OAT\Library\Lti1p3Core\Launch\Builder\OidcLaunchRequestBuilder;
-use OAT\Library\Lti1p3Core\Launch\Request\LtiLaunchRequest;
 use OAT\Library\Lti1p3Core\Launch\Validator\LtiLaunchRequestValidationResult;
 use OAT\Library\Lti1p3Core\Launch\Validator\LtiLaunchRequestValidator;
 use OAT\Library\Lti1p3Core\Message\Builder\MessageBuilder;
@@ -52,7 +50,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
     use NetworkTestingTrait;
     use SecurityTestingTrait;
 
-    public function testValidationSuccessAnonymousLtiLaunchRequest(): void
+    public function testValidationSuccessOnAnonymousLtiLaunchRequest(): void
     {
         $subject = new LtiLaunchRequestValidator(
             $this->createTestDeploymentRepository(),
@@ -88,7 +86,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
         $this->assertNull($result->getLtiMessage()->getUserIdentity());
     }
 
-    public function testValidationSuccessUserLtiLaunchRequest(): void
+    public function testValidationSuccessOnUserLtiLaunchRequest(): void
     {
         $subject = new LtiLaunchRequestValidator(
             $this->createTestDeploymentRepository(),
@@ -128,7 +126,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
         );
     }
 
-    public function testValidationSuccessAnonymousOidcLaunchRequest(): void
+    public function testValidationSuccessOnAnonymousOidcLaunchRequest(): void
     {
         $deploymentRepository = $this->createTestDeploymentRepository();
 
@@ -183,7 +181,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
         $this->assertNull($result->getLtiMessage()->getUserIdentity());
     }
 
-    public function testValidationSuccessOidcLaunchRequest(): void
+    public function testValidationSuccessOnOidcLaunchRequest(): void
     {
         $deploymentRepository = $this->createTestDeploymentRepository();
 
@@ -238,7 +236,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
         );
     }
 
-    public function testItFallbackOnJwksFetcherWhenPlatformPublicKeyIsNotAvailable(): void
+    public function testItFallsBackOnJwksFetcherWhenPlatformPublicKeyIsNotConfigured(): void
     {
         $keyChain = $this->createTestKeyChain('platformKeyChain');
 
@@ -378,7 +376,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
         $this->assertEquals(['JWT id_token aud claim does not match tool oauth2 client id'], $result->getFailures());
     }
 
-    public function testValidationFailureOnInvalidStateSignature(): void
+    public function testValidationFailureOnInvalidOidcStateSignature(): void
     {
         $state = (new Builder())->getToken(new Sha384(), $this->createTestKeyChain()->getPrivateKey())->__toString();
 
@@ -402,7 +400,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
         $this->assertEquals(['JWT OIDC state signature validation failure'], $result->getFailures());
     }
 
-    public function testValidationFailureOnExpiredState(): void
+    public function testValidationFailureOnExpiredOidcState(): void
     {
         $now = Carbon::now();
 
