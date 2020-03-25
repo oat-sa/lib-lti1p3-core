@@ -104,7 +104,11 @@ class MessageBuilder
 
             return $this->builder->getToken($this->signer, $keyChain->getPrivateKey());
         } catch (Throwable $exception) {
-            throw new LtiException($exception->getMessage(), $exception->getCode(), $exception);
+            throw new LtiException(
+                sprintf('Cannot generate message token: %s', $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 }

@@ -60,6 +60,7 @@ class OidcLoginInitiatorTest extends TestCase
         $result = $this->subject->initiate($this->createServerRequest('GET', $oidcLaunchRequest->toUrl()));
 
         $this->assertInstanceOf(OidcAuthenticationRequest::class, $result);
+
         $this->assertEquals($deployment->getPlatform()->getOidcAuthenticationUrl(), $result->getUrl());
         $this->assertEquals($resourceLink->getUrl(), $result->getRedirectUri());
         $this->assertEquals($deployment->getClientId(), $result->getClientId());

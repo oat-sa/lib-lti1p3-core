@@ -27,19 +27,15 @@ abstract class AbstractLink implements LinkInterface
     /** @var string */
     private $identifier;
 
-    /** @var string */
-    private $type;
-
     /** @var string|null */
     private $url;
 
     /** @var string[] */
     private $parameters;
 
-    public function __construct(string $identifier, string $type, string $url = null, array $parameters = null)
+    public function __construct(string $identifier, string $url = null, array $parameters = [])
     {
         $this->identifier = $identifier;
-        $this->type = $type;
         $this->url = $url;
         $this->parameters = $parameters;
     }
@@ -47,11 +43,6 @@ abstract class AbstractLink implements LinkInterface
     public function getIdentifier(): string
     {
         return $this->identifier;
-    }
-
-    public function getType(): string
-    {
-        return $this->type;
     }
 
     public function getUrl(): ?string

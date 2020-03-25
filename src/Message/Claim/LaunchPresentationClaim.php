@@ -104,8 +104,8 @@ class LaunchPresentationClaim implements MessageClaimInterface
     {
         return new self(
             $claimData['document_target'] ?? null,
-            (string)$claimData['height'] ?? null,
-            (string)$claimData['width'] ?? null,
+            isset($claimData['height']) ? (string)$claimData['height'] : null,
+            isset($claimData['width']) ? (string)$claimData['width'] : null,
             $claimData['return_url'] ?? null,
             $claimData['locale'] ?? null
         );

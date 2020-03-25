@@ -20,35 +20,23 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Link\ResourceLink;
+namespace OAT\Library\Lti1p3Core\Tests\Unit\Tool;
 
-use OAT\Library\Lti1p3Core\Link\AbstractLink;
+use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @see http://www.imsglobal.org/spec/lti/v1p3/#resource-link-0
- */
-class ResourceLink extends AbstractLink implements ResourceLinkInterface
+class ToolTest extends TestCase
 {
-    public function __construct(string $identifier, string $url = null, string $title = null, string $description = null)
-    {
-        parent::__construct($identifier, $url, [
-            'title' => $title,
-            'description' => $description
-        ]);
-    }
+    use DomainTestingTrait;
 
-    public function getType(): string
+    public function testGetters(): void
     {
-        return static::TYPE;
-    }
+        $subject = $this->createTestTool();
 
-    public function getTitle(): ?string
-    {
-        return $this->getParameter('title');
-    }
-
-    public function getDescription(): ?string
-    {
-        return $this->getParameter('description');
+        $this->assertEquals('toolIdentifier', $subject->getIdentifier());
+        $this->assertEquals('toolName', $subject->getName());
+        $this->assertEquals('http://tool.com/oidc-init', $subject->getOidcLoginInitiationUrl());
+        $this->assertEquals('http://tool.com/launch', $subject->getLaunchUrl());
+        $this->assertEquals('http://tool.com/deep-launch', $subject->getDeepLinkLaunchUrl());
     }
 }

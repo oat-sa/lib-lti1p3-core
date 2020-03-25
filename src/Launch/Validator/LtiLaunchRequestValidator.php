@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Launch\Authenticator;
+namespace OAT\Library\Lti1p3Core\Launch\Validator;
 
 use Carbon\Carbon;
 use Lcobucci\JWT\Parser;
@@ -46,7 +46,7 @@ use Throwable;
 /**
  * @see https://www.imsglobal.org/spec/security/v1p0/#authentication-response-validation
  */
-class LtiLaunchRequestAuthenticator
+class LtiLaunchRequestValidator
 {
     /** @var DeploymentRepositoryInterface */
     private $deploymentRepository;
@@ -85,7 +85,7 @@ class LtiLaunchRequestAuthenticator
     /**
      * @throws LtiException
      */
-    public function authenticate(ServerRequestInterface $request): LtiLaunchRequestAuthenticationResult
+    public function validate(ServerRequestInterface $request): LtiLaunchRequestValidationResult
     {
         $this->reset();
 
@@ -102,12 +102,11 @@ class LtiLaunchRequestAuthenticator
             $deployment = $this->deploymentRepository->find($ltiMessage->getDeploymentId());
 
             if (null === $deployment)  {
-                throw new LtiException(sprintf('Not deployment found with id %s', $ltiMessage->getDeploymentId()));
+                throw new LtiException(sprintf('No deployment found with id %s', $ltiMessage->getDeploymentId()));
             }
 
             $this
                 ->validateMessageSignature($deployment, $ltiMessage)
-                ->validateMessageClaims($ltiMessage)
                 ->validateMessageExpiry($ltiMessage)
                 ->validateMessageNonce($ltiMessage)
                 ->validateMessageIssuer($deployment, $ltiMessage)
@@ -115,7 +114,7 @@ class LtiLaunchRequestAuthenticator
                 ->validateStateSignature($deployment, $oidcState)
                 ->validateStateExpiry($oidcState);
 
-            return new LtiLaunchRequestAuthenticationResult($ltiMessage, $this->successes, $this->failures);
+            return new LtiLaunchRequestValidationResult($ltiMessage, $this->successes, $this->failures);
 
         } catch (LtiException $exception) {
             throw $exception;
@@ -154,36 +153,6 @@ class LtiLaunchRequestAuthenticator
     /**
      * @throws LtiException
      */
-    private function validateMessageClaims(LtiMessageInterface $ltiMessage): self
-    {
-        $mandatoryClaims = [
-            MessageInterface::CLAIM_ISS,
-            MessageInterface::CLAIM_AUD,
-            MessageInterface::CLAIM_SUB,
-            MessageInterface::CLAIM_EXP,
-            MessageInterface::CLAIM_IAT,
-            MessageInterface::CLAIM_NONCE,
-        ];
-
-        $didFail = false;
-
-        foreach ($mandatoryClaims as $mandatoryClaim) {
-            if(!$ltiMessage->getToken()->hasClaim($mandatoryClaim)) {
-                $this->addFailure(sprintf('Missing mandatory id_token JWT claim %s', $mandatoryClaim));
-                $didFail = true;
-            }
-        }
-
-        if (!$didFail) {
-            $this->addSuccess('JWT id_token mandatory claims were all provided');
-        }
-
-        return $this;
-    }
-
-    /**
-     * @throws LtiException
-     */
     private function validateMessageExpiry(LtiMessageInterface $ltiMessage): self
     {
         if ($ltiMessage->getToken()->isExpired()) {
@@ -208,7 +177,7 @@ class LtiLaunchRequestAuthenticator
             if (!$nonce->isExpired()) {
                 $this->addFailure('JWT id_token nonce already used');
             } else {
-                $this->addSuccess('JWT id_token nonce is valid');
+                $this->addSuccess('JWT id_token nonce already used but expired');
             }
         } else {
             $this->nonceRepository->save(
@@ -243,7 +212,7 @@ class LtiLaunchRequestAuthenticator
         if ($deployment->getClientId() != $ltiMessage->getMandatoryClaim(MessageInterface::CLAIM_AUD)) {
             $this->addFailure('JWT id_token aud claim does not match tool oauth2 client id');
         } else {
-            $this->addSuccess('JWT id_token aud claim issuer matches tool oauth2 client id');
+            $this->addSuccess('JWT id_token aud claim matches tool oauth2 client id');
         }
 
         return $this;
@@ -256,9 +225,9 @@ class LtiLaunchRequestAuthenticator
     {
         if (null !== $oidsState) {
             if(!$oidsState->getToken()->verify($this->signer,  $deployment->getToolKeyChain()->getPublicKey())) {
-                $this->addFailure('JWT state signature validation failure');
+                $this->addFailure('JWT OIDC state signature validation failure');
             } else {
-                $this->addSuccess('JWT state signature validation success');
+                $this->addSuccess('JWT OIDC state signature validation success');
             }
         }
 
@@ -272,9 +241,9 @@ class LtiLaunchRequestAuthenticator
     {
         if (null !== $oidsState) {
             if ($oidsState->getToken()->isExpired()) {
-                $this->addFailure('JWT state is expired');
+                $this->addFailure('JWT OIDC state is expired');
             } else {
-                $this->addSuccess('JWT state is not expired');
+                $this->addSuccess('JWT OIDC state is not expired');
             }
         }
 

@@ -20,7 +20,7 @@
         "guzzlehttp/guzzle": "^6.5"
     },
     "suggest": {
-        "guzzlehttp/guzzle": "For using guzzle based JWKS fetcher"
+        "guzzlehttp/guzzle": "For using the provided guzzle based JwksFetcherInterface implementation"
     },
     "autoload": {
         "psr-4": {
