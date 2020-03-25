@@ -22,6 +22,9 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Link;
 
+/**
+ * @psee http://www.imsglobal.org/spec/lti/v1p3#lti-links-0
+ */
 abstract class AbstractLink implements LinkInterface
 {
     /** @var string */
