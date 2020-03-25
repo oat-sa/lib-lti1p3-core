@@ -26,7 +26,7 @@ use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
 use League\OAuth2\Server\Entities\ScopeEntityInterface;
 use League\OAuth2\Server\ResponseTypes\BearerTokenResponse;
 
-class CustomBearerResponseType extends BearerTokenResponse
+class ScopeBearerResponseType extends BearerTokenResponse
 {
     /**
      * {@inheritdoc}

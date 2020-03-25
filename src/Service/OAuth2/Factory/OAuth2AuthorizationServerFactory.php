@@ -29,7 +29,7 @@ use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
 use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
 use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
 use OAT\Library\Lti1p3Core\Service\OAuth2\Grant\JwtClientCredentialsGrant;
-use OAT\Library\Lti1p3Core\Service\OAuth2\ResponseType\CustomBearerResponseType;
+use OAT\Library\Lti1p3Core\Service\OAuth2\ResponseType\ScopeBearerResponseType;
 
 class OAuth2AuthorizationServerFactory
 {
@@ -42,14 +42,14 @@ class OAuth2AuthorizationServerFactory
     /** @var ScopeRepositoryInterface */
     private $scopeRepository;
 
+    /** @var DeploymentRepositoryInterface */
+    private $deploymentRepository;
+
     /** @var CryptKey */
     private $privateKey;
 
     /** @var string */
     private $encryptionKey;
-
-    /** @var DeploymentRepositoryInterface */
-    private $deploymentRepository;
 
     public function __construct(
         AccessTokenRepositoryInterface $accessTokenRepository,
@@ -75,7 +75,7 @@ class OAuth2AuthorizationServerFactory
             $this->scopeRepository,
             $this->privateKey,
             $this->encryptionKey,
-            new CustomBearerResponseType()
+            new ScopeBearerResponseType()
         );
 
         $server->enableGrantType(new JwtClientCredentialsGrant($this->deploymentRepository));

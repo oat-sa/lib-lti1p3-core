@@ -26,6 +26,11 @@ Tool
 Security
 - how to provide a [JWKS endpoint](doc/security/jwks.md)
 
+OAuth2
+
+- how to create an [authorization server](doc/oauth2/create_authorization_server.md)
+- how to generate an [access token](doc/oauth2/generate_access_token.md)
+
 ## Tests
 
 To run tests:
