@@ -22,10 +22,14 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Integration\Security\Oidc\Endpoint;
 
+use Carbon\Carbon;
+use Lcobucci\JWT\Signer\Hmac\Sha384;
+use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Launch\Builder\OidcLaunchRequestBuilder;
 use OAT\Library\Lti1p3Core\Launch\Request\LtiLaunchRequest;
 use OAT\Library\Lti1p3Core\Message\LtiMessage;
+use OAT\Library\Lti1p3Core\Message\MessageInterface;
 use OAT\Library\Lti1p3Core\Security\Oidc\Endpoint\OidcLoginAuthenticator;
 use OAT\Library\Lti1p3Core\Security\Oidc\Endpoint\OidcLoginInitiator;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
@@ -126,12 +130,9 @@ class OidcLoginAuthenticatorTest extends TestCase
         $oidcLoginInitiator = new OidcLoginInitiator($deploymentRepository);
         $subject = new OidcLoginAuthenticator($deploymentRepository, $this->createTestUserAuthenticator(false));
 
-        $resourceLink = $this->createTestResourceLink();
-        $deployment = $this->createTestDeployment();
-
         $oidcLaunchRequest = (new OidcLaunchRequestBuilder())->buildResourceLinkOidcLaunchRequest(
-            $resourceLink,
-            $deployment,
+            $this->createTestResourceLink(),
+            $this->createTestDeployment(),
             'loginHint'
         );
 
@@ -142,5 +143,103 @@ class OidcLoginAuthenticatorTest extends TestCase
         $subject->authenticate(
             $this->createServerRequest('POST', $oidcAuthRequest->getUrl(), $oidcAuthRequest->getParameters())
         );
+    }
+
+    public function testFailureOnInvalidMessageHintDeploymentId(): void
+    {
+        $this->expectException(LtiException::class);
+        $this->expectExceptionMessage('Invalid message hint deployment id');
+
+        $deploymentRepository = $this->createTestDeploymentRepository([$this->createMock(DeploymentInterface::class)]);
+        $oidcLoginInitiator = new OidcLoginInitiator($this->createTestDeploymentRepository());
+
+        $subject = new OidcLoginAuthenticator($deploymentRepository, $this->createTestUserAuthenticator());
+
+        $oidcLaunchRequest = (new OidcLaunchRequestBuilder())->buildResourceLinkOidcLaunchRequest(
+            $this->createTestResourceLink(),
+            $this->createTestDeployment(),
+            'loginHint'
+        );
+
+        $oidcAuthRequest = $oidcLoginInitiator->initiate(
+            $this->createServerRequest('GET', $oidcLaunchRequest->toUrl())
+        );
+
+        $subject->authenticate(
+            $this->createServerRequest('POST', $oidcAuthRequest->getUrl(), $oidcAuthRequest->getParameters())
+        );
+    }
+
+    public function testFailureOnInvalidMessageHintSignature(): void
+    {
+        $this->expectException(LtiException::class);
+        $this->expectExceptionMessage('Invalid message hint signature');
+
+        $deploymentRepository = $this->createTestDeploymentRepository();
+        $oidcLoginInitiator = new OidcLoginInitiator($deploymentRepository);
+
+        $subject = new OidcLoginAuthenticator(
+            $deploymentRepository,
+            $this->createTestUserAuthenticator(),
+            null,
+            null,
+            new Sha384()
+        );
+
+        $oidcLaunchRequest = (new OidcLaunchRequestBuilder())->buildResourceLinkOidcLaunchRequest(
+            $this->createTestResourceLink(),
+            $this->createTestDeployment(),
+            'loginHint'
+        );
+
+        $oidcAuthRequest = $oidcLoginInitiator->initiate(
+            $this->createServerRequest('GET', $oidcLaunchRequest->toUrl())
+        );
+
+        $subject->authenticate(
+            $this->createServerRequest('POST', $oidcAuthRequest->getUrl(), $oidcAuthRequest->getParameters())
+        );
+    }
+
+    public function testFailureOnInvalidExpiredMessageHint(): void
+    {
+        $this->expectException(LtiException::class);
+        $this->expectExceptionMessage('Message hint expired');
+
+        $now = Carbon::now();
+
+        Carbon::setTestNow($now->subSeconds(MessageInterface::TTL + 1));
+        $deploymentRepository = $this->createTestDeploymentRepository();
+        $oidcLoginInitiator = new OidcLoginInitiator($deploymentRepository);
+
+        $subject = new OidcLoginAuthenticator($deploymentRepository, $this->createTestUserAuthenticator(false));
+
+        $oidcLaunchRequest = (new OidcLaunchRequestBuilder())->buildResourceLinkOidcLaunchRequest(
+            $this->createTestResourceLink(),
+            $this->createTestDeployment(),
+            'loginHint'
+        );
+
+        $oidcAuthRequest = $oidcLoginInitiator->initiate(
+            $this->createServerRequest('GET', $oidcLaunchRequest->toUrl())
+        );
+
+        Carbon::setTestNow();
+
+        $subject->authenticate(
+            $this->createServerRequest('POST', $oidcAuthRequest->getUrl(), $oidcAuthRequest->getParameters())
+        );
+    }
+
+    public function testItThrowAnLtiExceptionOnGenericError(): void
+    {
+        $this->expectException(LtiException::class);
+
+        $subject = new OidcLoginAuthenticator(
+            $this->createTestDeploymentRepository(),
+            $this->createTestUserAuthenticator()
+        );
+
+        $subject->authenticate($this->createServerRequest('GET', 'url'));
     }
 }
