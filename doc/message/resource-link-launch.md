@@ -147,6 +147,6 @@ if (!$result->hasFailures()) {
     echo $result->getLtiMessage()->getVersion();              // '1.3.0'
     echo $result->getLtiMessage()->getContext()->getId();     // 'contextId'
     echo $result->getLtiMessage()->getClaim('myCustomClaim'); // 'myCustomValue'
-    echo $result->getLtiMessage()->getUserIdentity();         // 'same as above $userIdentity 
+    echo $result->getLtiMessage()->getUserIdentity();         // same as above $userIdentity 
 } 
 ```
