@@ -1,0 +1,34 @@
+{
+    "name": "oat-sa/lib-lti1p3-core",
+    "description": "OAT LTI 1.3 Core Library",
+    "type": "library",
+    "license": "GPL-2.0-only",
+    "require": {
+        "php": "^7.1.3",
+        "ext-openssl": "*",
+        "ext-json": "*",
+        "lcobucci/jwt": "^3.3",
+        "nesbot/carbon": "^2.31",
+        "ramsey/uuid": "^3.9",
+        "psr/http-message": "^1.0",
+        "codercat/jwk-to-pem": "^0.0.3"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "7.5.20",
+        "nyholm/psr7": "^1.2",
+        "guzzlehttp/guzzle": "^6.5"
+    },
+    "suggest": {
+        "guzzlehttp/guzzle": "For using the provided guzzle based JwksFetcherInterface implementation"
+    },
+    "autoload": {
+        "psr-4": {
+            "OAT\\Library\\Lti1p3Core\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "OAT\\Library\\Lti1p3Core\\Tests\\": "tests/"
+        }
+    }
+}
