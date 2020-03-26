@@ -55,12 +55,12 @@ You can find below some tutorials, presented by topics.
 - how to implement the [library required interfaces](doc/tutorials/interfaces.md)
 - how to provide a [JWKS endpoint](doc/tutorials/jwks.md)
 
-### LTI Messages
+### Messages interactions
 
-- how to use the [3rd party login initiation creation service](doc/platform/third_party_initiated_login_creation.md)
-- how to provide the [3rd party login initiation handling endpoint](doc/tool/third_party_initiated_login_handling.md)
+- how to handle a [LTI resource link launch](doc/tutorials/message/resource-link-launch.md)
+- how to handle a [LTI resource link launch with OpenId Connect](doc/tutorials/message/resource-link-launch.md)
 
-### LTI Services
+### Services interactions
 
 - to be done
 

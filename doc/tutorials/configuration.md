@@ -18,11 +18,11 @@ You can then provide the following [key chain](../../src/Security/Key/KeyChainIn
 use OAT\Library\Lti1p3Core\Security\Key\KeyChain;
 
 $keyChain = new KeyChain(
-    '1',                                // [required] identifier (for kid)
+    '1',                                // [required] identifier (used for JWT kid header)
     'mySetName',                        // [required] key set name (for grouping)
     'file://home/user/.ssh/id_rsa.pub', // [required] public key (file or content)
     'file://home/user/.ssh/id_rsa',     // [optional] private key (file or content)
-    'test'                              // [optional] private key passphrase
+    'test'                              // [optional] private key passphrase (if existing)
 );
 ```
 **Note**: given example deals with local key files, automatically done when prefixed by `file://`. You can provide the public / private key contents by passing them as a constructor argument instead (if you want to fetch your keys from a bucket or a database by example).
@@ -95,7 +95,7 @@ $deployment = new Deployment(
 );
 ```
 **Notes**:
-- you can also provide your own implementation of the [DeploymentInterface](../../src/Deployment/DeploymentInterface.php),
-- depending on the side you act (platform or tool), you need to configure what is relevant regarding the keys and the JWKS urls,
-- for signature verification, the library will try first to use first the configured key chain if given, and fallback on a JWKS call to avoid performances issues,
-- since you should be in control of the way you give your configuration (from YML files, array, database, etc), you have to provide your own implementation of the [DeploymentRepositoryInterface](../../src/Deployment/DeploymentRepositoryInterface.php).
+- you can also provide your own implementation of the [DeploymentInterface](../../src/Deployment/DeploymentInterface.php)
+- depending on the side you act (platform or tool), you need to configure what is relevant regarding the keys and the JWKS urls
+- for signature verification, the library will try first to use first the configured key chain if given, and fallback on a JWKS call to avoid performances issues
+- since you should be in control of the way you give your configuration (from YML files, array, database, etc), you have to provide your own implementation of the [DeploymentRepositoryInterface](../../src/Deployment/DeploymentRepositoryInterface.php)
