@@ -17,7 +17,7 @@ $deploymentRepository = new class implements DeploymentRepositoryInterface
 {
    public function find(string $identifier): ?DeploymentInterface
    {
-       // TODO: Implement find() method to find a deployment by identifier.
+       // TODO: Implement find() method to find a deployment by identifier, or null if not found.
    }
 
    public function findByIssuer(string $issuer, string $clientId = null): ?DeploymentInterface
@@ -66,7 +66,7 @@ $nonceRepository = new class implements NonceRepositoryInterface
 {
     public function find(string $value) : ?NonceInterface
     {
-        // TODO: Implement find() method to find a nonce by value.
+        // TODO: Implement find() method to find a nonce by value, or null if not found.
     }
 
     public function save(NonceInterface $nonce) : void
@@ -98,4 +98,4 @@ $fetcher = new class implements JwksFetcherInterface
 ```
 **Notes**:
 - it is recommended to put in cache the JWKS endpoint responses, to improve performances since they dont change often. Your implementation can then rely on an injected PSR6 cache by example.
-- you can find a ready to use implementation in [GuzzleJwksFetcher](../../src/Security/Jwks/Fetcher/GuzzleJwksFetcher.php). You need to provide it a [guzzle](http://docs.guzzlephp.org/en/stable/) client, with enabled [cache middleware](https://github.com/Kevinrob/guzzle-cache-middleware).
+- you can find a ready to use implementation in [GuzzleJwksFetcher](../../src/Security/Jwks/Fetcher/GuzzleJwksFetcher.php): you need to provide it a [guzzle](http://docs.guzzlephp.org/en/stable/) client, with enabled [cache middleware](https://github.com/Kevinrob/guzzle-cache-middleware).

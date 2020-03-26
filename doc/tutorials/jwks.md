@@ -2,6 +2,8 @@
 
 > How to expose a [JWKS endpoint](https://auth0.com/docs/tokens/concepts/jwks) (JSON Web Key Set) with this library.
 
+**Note**: The algorithm `RS SHA256` is used by default, library wide.
+
 ## Exporting a JWK from a key chain
 
 Considering you have for example on your side this key chain:
@@ -29,7 +31,7 @@ $jwkExport = (new JwkRS256Exporter())->export($keyChain);
 ```
 
 **Notes**:
-- the variable `$jwkExport` will contain the needed [JWK properties](https://auth0.com/docs/tokens/references/jwks-properties):
+- the `$jwkExport` variable now contain the needed [JWK properties](https://auth0.com/docs/tokens/references/jwks-properties):
     ```json
     {
         "alg": "RS256",
@@ -40,9 +42,9 @@ $jwkExport = (new JwkRS256Exporter())->export($keyChain);
         "kid": "1"
     }
     ```
-- If you want to support other algorithms than RS SHA256, you can  implement the [JwkExporterInterface](../../src/Security/Jwks/Exporter/Jwk/JwkExporterInterface.php)
+- If you want to support other algorithms than RS SHA256, you can implement the [JwkExporterInterface](../../src/Security/Jwks/Exporter/Jwk/JwkExporterInterface.php).
 
-## Create a JWKS endpoint from several key chains
+## Create a JWKS endpoint from multiple key chains
 
 Considering you have for example on your side those key chains:
 
@@ -97,7 +99,7 @@ use OAT\Library\Lti1p3Core\Security\Jwks\Exporter\JwksExporter;
 $jwksExport = (new JwksExporter($keyChainRepository))->export('myKeySetName');
 ```
 
-**Note**: `$jwksExport` contains the needed [JWKS properties](https://auth0.com/docs/tokens/references/jwks-properties) ready to be exposed from an HTTP JSON response:
+Now the `$jwksExport` variable contains the needed [JWKS properties](https://auth0.com/docs/tokens/references/jwks-properties) ready to be exposed from an HTTP JSON response, from your application:
 
 ```json
 {
