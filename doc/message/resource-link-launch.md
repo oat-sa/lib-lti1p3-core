@@ -10,7 +10,7 @@ You can find below required steps to generate a LTI launch request, needed only 
 
 A [LTI resource link](http://www.imsglobal.org/spec/lti/v1p3#resource-link-0) represent a resource made available from a tool to a platform.
 
-First of all, you need to create a [ResourceLink](../../../src/Link/ResourceLink/ResourceLinkInterface.php) instance:
+First of all, you need to create a [ResourceLink](../../src/Link/ResourceLink/ResourceLinkInterface.php) instance:
 ```php
 <?php
 
@@ -25,13 +25,13 @@ $resourceLink = new ResourceLink(
 ```
 **Notes**:
 - if no resource link url is given, the launch will be done on the default launch url of the deployed tool
-- since the platform can retrieve them from database for example, you can implement your own [ResourceLinkInterface](../../../src/Link/ResourceLink/ResourceLinkInterface.php)
+- since the platform can retrieve them from database for example, you can implement your own [ResourceLinkInterface](../../src/Link/ResourceLink/ResourceLinkInterface.php)
 
 ### Create a launch request for the resource link
 
 Once your `ResourceLinkInterface` implementation is ready, you need to launch it to a deployed tool, within the context of a deployment.
 
-To do so, you can use the [LtiLaunchRequestBuilder](../../../src/Launch/Builder/LtiLaunchRequestBuilder.php) to create an anonymous launch request:
+To do so, you can use the [LtiLaunchRequestBuilder](../../src/Launch/Builder/LtiLaunchRequestBuilder.php) to create an anonymous launch request:
 ```php
 <?php
 
@@ -59,9 +59,9 @@ $launchRequest = $builder->buildResourceLinkLtiLaunchRequest(
     ]
 );
 ```
-**Note**: like the `ContextClaim` class, any claim that implement the [MessageClaimInterface](../../../src/Message/Claim/MessageClaimInterface.php) will be automatically normalized and added to the message's claims.
+**Note**: like the `ContextClaim` class, any claim that implement the [MessageClaimInterface](../../src/Message/Claim/MessageClaimInterface.php) will be automatically normalized and added to the message's claims.
 
-You can also create a user launch request by providing to the builder your own [UserIdentityInterface](../../../src/User/UserIdentityInterface.php) implementation:
+You can also create a user launch request by providing to the builder your own [UserIdentityInterface](../../src/User/UserIdentityInterface.php) implementation:
 ```php
 <?php
 
@@ -85,7 +85,7 @@ $launchRequest = $builder->buildUserResourceLinkLtiLaunchRequest(
 );
 ```
 
-As a result of the build, you get a [LtiLaunchRequest](../../../src/Launch/Request/LtiLaunchRequest.php) instance that can be used in several ways:
+As a result of the build, you get a [LtiLaunchRequest](../../src/Launch/Request/LtiLaunchRequest.php) instance that can be used in several ways:
 ```php
 <?php
 
@@ -113,10 +113,10 @@ You can find below required steps to validate a LTI launch request, needed only 
 
 As a tool, you'll receive an HTTP request containing the [launch request](http://www.imsglobal.org/spec/lti/v1p3#resource-link-launch-request-message).
 
-The [LtiLaunchRequestValidator](../../../src/Launch/Validator/LtiLaunchRequestValidator.php) can be used for this:
-- it requires a deployment repository and a nonce repository implementations [as explained here](../interfaces.md)
+The [LtiLaunchRequestValidator](../../src/Launch/Validator/LtiLaunchRequestValidator.php) can be used for this:
+- it requires a deployment repository and a nonce repository implementations [as explained here](../quickstart/interfaces.md)
 - it expect a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface) to validate
-- and it will output a [LtiLaunchRequestValidationResult](../../../src/Launch/Validator/LtiLaunchRequestValidationResult.php) representing the launch validation and the message itself.
+- and it will output a [LtiLaunchRequestValidationResult](../../src/Launch/Validator/LtiLaunchRequestValidationResult.php) representing the launch validation and the message itself.
 
 By example:
 ```php

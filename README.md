@@ -51,14 +51,14 @@ You can find below some tutorials, presented by topics.
 
 ### Quick start
 
-- how to [configure the library](doc/tutorials/jwks.md)
-- how to implement the [library required interfaces](doc/tutorials/interfaces.md)
-- how to provide a [JWKS endpoint](doc/tutorials/jwks.md)
+- how to [configure the library](doc/quickstart/jwks.md)
+- how to implement the [library required interfaces](doc/quickstart/interfaces.md)
+- how to provide a [JWKS endpoint](doc/quickstart/jwks.md)
 
 ### Messages interactions
 
-- how to handle a [LTI resource link launch](doc/tutorials/message/resource-link-launch.md)
-- how to handle a [LTI resource link launch with OpenId Connect](doc/tutorials/message/oidc-resource-link-launch.md)
+- how to handle a [LTI resource link launch](doc/message/resource-link-launch.md)
+- how to handle a [LTI resource link launch with OpenId Connect](doc/message/oidc-resource-link-launch.md)
 
 ### Services interactions
 

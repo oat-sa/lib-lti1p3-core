@@ -10,7 +10,7 @@ You can find below required steps to generate a OIDC LTI launch request, needed 
 
 A [LTI resource link](http://www.imsglobal.org/spec/lti/v1p3#resource-link-0) represent a resource made available from a tool to a platform.
 
-First of all, you need to create a [ResourceLink](../../../src/Link/ResourceLink/ResourceLinkInterface.php) instance:
+First of all, you need to create a [ResourceLink](../../src/Link/ResourceLink/ResourceLinkInterface.php) instance:
 ```php
 <?php
 
@@ -25,13 +25,13 @@ $resourceLink = new ResourceLink(
 ```
 **Notes**:
 - if no resource link url is given, the launch will be done on the default launch url of the deployed tool
-- since the platform can retrieve them from database for example, you can implement your own [ResourceLinkInterface](../../../src/Link/ResourceLink/ResourceLinkInterface.php)
+- since the platform can retrieve them from database for example, you can implement your own [ResourceLinkInterface](../../src/Link/ResourceLink/ResourceLinkInterface.php)
 
 ### Create a OIDC launch request for the resource link
 
 Once your `ResourceLinkInterface` implementation is ready, you need to launch it to a deployed tool following the [OIDC workflow](https://www.imsglobal.org/spec/security/v1p0#openid_connect_launch_flow), within the context of a deployment.
 
-To do so, you can use the [OidcLaunchRequestBuilder](../../../src/Launch/Builder/OidcLaunchRequestBuilder.php) to create an OIDC launch request:
+To do so, you can use the [OidcLaunchRequestBuilder](../../src/Launch/Builder/OidcLaunchRequestBuilder.php) to create an OIDC launch request:
 ```php
 <?php
 
@@ -60,9 +60,9 @@ $launchRequest = $builder->buildResourceLinkOidcLaunchRequest(
     ]
 );
 ```
-**Note**: like the `ContextClaim` class, any claim that implement the [MessageClaimInterface](../../../src/Message/Claim/MessageClaimInterface.php) will be automatically normalized and added to the message's claims.
+**Note**: like the `ContextClaim` class, any claim that implement the [MessageClaimInterface](../../src/Message/Claim/MessageClaimInterface.php) will be automatically normalized and added to the message's claims.
 
-As a result of the build, you get a [OidcLaunchRequest](../../../src/Launch/Request/OidcLaunchRequest.php) instance that can be used in several ways:
+As a result of the build, you get a [OidcLaunchRequest](../../src/Launch/Request/OidcLaunchRequest.php) instance that can be used in several ways:
 ```php
 <?php
 
@@ -90,10 +90,10 @@ You can find below required steps to initiate an OIDC login, needed only if you'
 
 As a tool, you'll receive an HTTP request containing the [OIDC launch request login initiation](https://www.imsglobal.org/spec/security/v1p0#step-2-authentication-request).
 
-You can use the [LtiLaunchRequestValidator](../../../src/Security/Oidc/Endpoint/OidcLoginInitiator.php) to handle this:
-- it requires a deployment repository implementation [as explained here](../interfaces.md)
+You can use the [LtiLaunchRequestValidator](../../src/Security/Oidc/Endpoint/OidcLoginInitiator.php) to handle this:
+- it requires a deployment repository implementation [as explained here](../quickstart/interfaces.md)
 - it expect a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface) to handle
-- and it will output a [OidcAuthenticationRequest](../../../src/Security/Oidc/Request/OidcAuthenticationRequest.php) to be sent back to the platform.
+- and it will output a [OidcAuthenticationRequest](../../src/Security/Oidc/Request/OidcAuthenticationRequest.php) to be sent back to the platform.
 
 By example:
 ```php
@@ -126,12 +126,12 @@ You can find below required steps to authenticate an OIDC login and performing a
 
 ### Perform the authentication and launching the resource link
 
-After the redirection of the tool to the platform, the platform will receive as a HTTP request the [OidcAuthenticationRequest](../../../src/Security/Oidc/Request/OidcAuthenticationRequest.php).
+After the redirection of the tool to the platform, the platform will receive as a HTTP request the [OidcAuthenticationRequest](../../src/Security/Oidc/Request/OidcAuthenticationRequest.php).
 
-It can be handled with the [OidcLoginAuthenticator](../../../src/Security/Oidc/Endpoint/OidcLoginAuthenticator.php):
-- it requires a deployment repository and a user authenticator implementation [as explained here](../interfaces.md)
+It can be handled with the [OidcLoginAuthenticator](../../src/Security/Oidc/Endpoint/OidcLoginAuthenticator.php):
+- it requires a deployment repository and a user authenticator implementation [as explained here](../quickstart/interfaces.md)
 - it expect a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface) to handle
-- and it will output a [LtiLaunchRequest](../../../src/Launch/Request/LtiLaunchRequest.php) to be sent back to the platform.
+- and it will output a [LtiLaunchRequest](../../src/Launch/Request/LtiLaunchRequest.php) to be sent back to the platform.
 
 By example:
 ```php
@@ -169,10 +169,10 @@ You can find below required steps to validate a LTI launch request, needed only 
 
 As a tool, you'll receive an HTTP request containing the [launch request](http://www.imsglobal.org/spec/lti/v1p3#resource-link-launch-request-message).
 
-The [LtiLaunchRequestValidator](../../../src/Launch/Validator/LtiLaunchRequestValidator.php) can be used for this:
-- it requires a deployment repository and a nonce repository implementations [as explained here](../interfaces.md)
+The [LtiLaunchRequestValidator](../../src/Launch/Validator/LtiLaunchRequestValidator.php) can be used for this:
+- it requires a deployment repository and a nonce repository implementations [as explained here](../quickstart/interfaces.md)
 - it expect a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface) to validate
-- and it will output a [LtiLaunchRequestValidationResult](../../../src/Launch/Validator/LtiLaunchRequestValidationResult.php) representing the launch validation and the message itself.
+- and it will output a [LtiLaunchRequestValidationResult](../../src/Launch/Validator/LtiLaunchRequestValidationResult.php) representing the launch validation and the message itself.
 
 By example:
 ```php
