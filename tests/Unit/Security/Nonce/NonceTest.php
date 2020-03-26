@@ -23,36 +23,52 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\Nonce;
 
 use Carbon\Carbon;
-use DateTimeInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\Nonce;
 use PHPUnit\Framework\TestCase;
 
 class NonceTest extends TestCase
 {
-    public function testNonceComponents(): void
+    public function testGetValue(): void
+    {
+        $subject = new Nonce('value');
+
+        $this->assertEquals('value', $subject->getValue());
+    }
+
+    public function testGetExpiredAt(): void
     {
         $now = Carbon::now();
-        $nonce = new Nonce('nonce_key', $now);
 
-        $this->assertEquals('nonce_key', $nonce->getValue());
-        $this->assertEquals($now, $nonce->getExpiredAt());
+        $subject = new Nonce('value', $now);
+
+        $this->assertEquals($now, $subject->getExpiredAt());
     }
 
-    /**
-     * @dataProvider expirationProvider
-     */
-    public function testNonceExpiration(bool $expected, DateTimeInterface $expiredAt): void
+    public function testExpiryWhenConstructedWithoutExpiredAt(): void
     {
-        $nonce = new Nonce('nonce_key', $expiredAt);
+        $subject = new Nonce('value');
 
-        $this->assertEquals($expected, $nonce->isExpired());
+        Carbon::setTestNow(Carbon::now()->subSecond());
+
+        $this->assertFalse($subject->isExpired());
+
+        Carbon::setTestNow(Carbon::now()->addSecond());
+
+        $this->assertFalse($subject->isExpired());
     }
 
-    public function expirationProvider(): array
+    public function testExpiryWhenConstructedWithExpiredAt(): void
     {
-        return [
-            'nonce is valid' => [false, Carbon::now()->addSeconds(10)],
-            'nonce is expired' => [true, Carbon::now()->subSecond()]
-        ];
+        Carbon::setTestNow();
+
+        $subject = new Nonce('value', Carbon::now());
+
+        Carbon::setTestNow(Carbon::now()->subSecond());
+
+        $this->assertFalse($subject->isExpired());
+
+        Carbon::setTestNow(Carbon::now()->addSecond());
+
+        $this->assertTrue($subject->isExpired());
     }
 }

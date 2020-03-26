@@ -51,6 +51,8 @@ class Nonce implements NonceInterface
 
     public function isExpired(): bool
     {
-        return Carbon::now()->greaterThan($this->expiredAt);
+        return $this->expiredAt
+            ? Carbon::now()->greaterThan($this->expiredAt)
+            : false;
     }
 }

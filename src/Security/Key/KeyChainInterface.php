@@ -26,9 +26,9 @@ use Lcobucci\JWT\Signer\Key;
 
 interface KeyChainInterface
 {
-    public function getId(): string;
+    public function getIdentifier(): string;
 
-    public function getSetName(): string;
+    public function getKeySetName(): string;
 
     public function getPublicKey(): Key;
 
