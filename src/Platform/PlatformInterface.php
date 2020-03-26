@@ -23,7 +23,7 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Platform;
 
 /**
- * @psee http://www.imsglobal.org/spec/lti/v1p3/#platforms-and-tools
+ * @see http://www.imsglobal.org/spec/lti/v1p3/#platforms-and-tools
  */
 interface PlatformInterface
 {
@@ -33,7 +33,7 @@ interface PlatformInterface
 
     public function getAudience(): string;
 
-    public function getOidcAuthenticationUrl(): string;
+    public function getOidcAuthenticationUrl(): ?string;
 
     public function getOAuth2AccessTokenUrl(): ?string;
 }

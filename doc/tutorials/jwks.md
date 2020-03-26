@@ -1,10 +1,12 @@
-# JWKS endpoint service
+# JWKS endpoint
 
-> Documentation about how to expose a [JWKS endpoint](https://auth0.com/docs/tokens/concepts/jwks) (JSON Web Key Set) with this library.
+> How to expose a [JWKS endpoint](https://auth0.com/docs/tokens/concepts/jwks) (JSON Web Key Set) with this library.
 
-## Exporting a JWK from a key chain (RS SHA 256)
+**Note**: The algorithm `RSSHA256` is used by default, library wide.
 
-Considering you have for example on your side this key pair:
+## Exporting a JWK from a key chain
+
+Considering you have for example on your side this key chain:
 - public key path: `/home/user/.ssh/id_rsa.pub`
 - private key path: `/home/user/.ssh/id_rsa`
 - private key passphrase: `test`
@@ -29,7 +31,7 @@ $jwkExport = (new JwkRS256Exporter())->export($keyChain);
 ```
 
 **Notes**:
-- the variable `$jwkExport` will contain the needed [JWK properties](https://auth0.com/docs/tokens/references/jwks-properties):
+- the `$jwkExport` variable now contain the needed [JWK properties](https://auth0.com/docs/tokens/references/jwks-properties):
     ```json
     {
         "alg": "RS256",
@@ -40,19 +42,19 @@ $jwkExport = (new JwkRS256Exporter())->export($keyChain);
         "kid": "1"
     }
     ```
-- If you want to support other algorithms than RS SHA 256, you can  implement the [JwkExporterInterface](../../src/Security/Jwks/Exporter/Jwk/JwkExporterInterface.php)
+- If you want to support other algorithms than RSSHA256, you can implement the [JwkExporterInterface](../../src/Security/Jwks/Exporter/Jwk/JwkExporterInterface.php).
 
-## Create a JWKS endpoint from several key chains
+## Create a JWKS endpoint from multiple key chains
 
-Considering you have for example on your side those key pairs:
+Considering you have for example on your side those key chains:
 
-Pair 1:
-- public key path: `/home/user/.ssh/pair1/id_rsa.pub`
-- private key path: `/home/user/.ssh/pair1/id_rsa`
+Chain 1:
+- public key path: `/home/user/.ssh/chain1/id_rsa.pub`
+- private key path: `/home/user/.ssh/chain1/id_rsa`
 
-Pair 2:
-- public key path: `/home/user/.ssh/pair2/id_rsa.pub`
-- private key path: `/home/user/.ssh/pair2/id_rsa`
+Chain 2:
+- public key path: `/home/user/.ssh/chain2/id_rsa.pub`
+- private key path: `/home/user/.ssh/chain2/id_rsa`
 
 You can then use the [KeyChainRepository](../../src/Security/Key/KeyChainRepository.php):
 
@@ -65,16 +67,16 @@ use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepository;
 $keyChain1 = new KeyChain(
     'kid1',
     'myKeySetName',
-    'file://home/user/.ssh/pair1/id_rsa.pub',
-    'file://home/user/.ssh/pair1/id_rsa',
+    'file://home/user/.ssh/chain1/id_rsa.pub',
+    'file://home/user/.ssh/chain1/id_rsa',
     'test'
 );
 
 $keyChain2 = new KeyChain(
     'kid2',
     'myKeySetName',
-    'file://home/user/.ssh/pair2/id_rsa.pub',
-    'file://home/user/.ssh/pair2/id_rsa',
+    'file://home/user/.ssh/chain2/id_rsa.pub',
+    'file://home/user/.ssh/chain2/id_rsa',
     'test'
 );
 
@@ -97,7 +99,7 @@ use OAT\Library\Lti1p3Core\Security\Jwks\Exporter\JwksExporter;
 $jwksExport = (new JwksExporter($keyChainRepository))->export('myKeySetName');
 ```
 
-**Note**: `$jwksExport` contains the needed [JWKS properties](https://auth0.com/docs/tokens/references/jwks-properties) ready to be exposed from an HTTP JSON response:
+Now the `$jwksExport` variable contains the needed [JWKS properties](https://auth0.com/docs/tokens/references/jwks-properties) ready to be exposed from an HTTP JSON response, from your application:
 
 ```json
 {

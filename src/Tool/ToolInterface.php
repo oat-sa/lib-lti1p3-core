@@ -23,7 +23,7 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tool;
 
 /**
- * @psee http://www.imsglobal.org/spec/lti/v1p3/#platforms-and-tools
+ * @see http://www.imsglobal.org/spec/lti/v1p3/#platforms-and-tools
  */
 interface ToolInterface
 {
@@ -31,7 +31,7 @@ interface ToolInterface
 
     public function getName(): string;
 
-    public function getOidcLoginInitiationUrl(): string;
+    public function getOidcLoginInitiationUrl(): ?string;
 
     public function getLaunchUrl(): ?string;
 
