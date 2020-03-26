@@ -51,7 +51,7 @@ You can find below some tutorials, presented by topics.
 
 ### Quick start
 
-- how to [configure the library](doc/quickstart/jwks.md)
+- how to [configure the library](doc/quickstart/configuration.md)
 - how to implement the [library required interfaces](doc/quickstart/interfaces.md)
 - how to provide a [JWKS endpoint](doc/quickstart/jwks.md)
 
