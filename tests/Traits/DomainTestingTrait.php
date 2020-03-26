@@ -118,6 +118,23 @@ trait DomainTestingTrait
         );
     }
 
+    private function createTestDeploymentWithoutToolKeyChain(
+        string $identifier = 'deploymentIdentifier',
+        string $clientId = 'deploymentClientId',
+        KeyChainInterface $platformKeyChain = null
+    ): Deployment {
+        return new Deployment(
+            $identifier,
+            $clientId,
+            $platform ?? $this->createTestPlatform(),
+            $tool ?? $this->createTestTool(),
+            $platformKeyChain ?? $this->createTestKeyChain('platformKeyChain'),
+            null,
+            null,
+            null
+        );
+    }
+
     private function createTestDeploymentRepository(array $deployments = []): DeploymentRepositoryInterface
     {
         $deployments = !empty($deployments)

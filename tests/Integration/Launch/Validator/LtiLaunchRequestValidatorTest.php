@@ -26,6 +26,7 @@ use Carbon\Carbon;
 use Exception;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Signer\Hmac\Sha384;
+use Lcobucci\JWT\Signer\Rsa\Sha256;
 use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
 use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
@@ -372,6 +373,31 @@ class LtiLaunchRequestValidatorTest extends TestCase
         $this->assertInstanceOf(LtiLaunchRequestValidationResult::class, $result);
         $this->assertTrue($result->hasFailures());
         $this->assertEquals(['JWT id_token aud claim does not match tool oauth2 client id'], $result->getFailures());
+    }
+
+    public function testValidationFailureOnIMissingToolKeyChain(): void
+    {
+        $this->expectException(LtiException::class);
+        $this->expectExceptionMessage('Tool key chain not configured');
+
+        $state = (new Builder())->getToken(new Sha256(), $this->createTestKeyChain()->getPrivateKey())->__toString();
+
+        $deployment = $this->createTestDeploymentWithoutToolKeyChain();
+
+        $subject = new LtiLaunchRequestValidator(
+            $this->createTestDeploymentRepository([$deployment]),
+            $this->createTestNonceRepository()
+        );
+
+        $launchRequest = (new LtiLaunchRequestBuilder())->buildResourceLinkLtiLaunchRequest(
+            $this->createTestResourceLink(),
+            $deployment,
+            [],
+            [],
+            $state
+        );
+
+        $subject->validate($this->createServerRequest('GET', $launchRequest->toUrl()));
     }
 
     public function testValidationFailureOnInvalidOidcStateSignature(): void

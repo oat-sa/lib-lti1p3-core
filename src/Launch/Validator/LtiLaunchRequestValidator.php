@@ -186,7 +186,7 @@ class LtiLaunchRequestValidator
 
     private function validateMessageIssuer(DeploymentInterface $deployment, LtiMessageInterface $ltiMessage): self
     {
-        if ($deployment->getPlatform()->getAudience() != $ltiMessage->getMandatoryClaim(MessageInterface::CLAIM_ISS)) {
+        if ($deployment->getPlatform()->getAudience() !== $ltiMessage->getMandatoryClaim(MessageInterface::CLAIM_ISS)) {
             $this->addFailure('JWT id_token iss claim does not match platform audience');
         } else {
             $this->addSuccess('JWT id_token iss claim matches platform audience');
@@ -197,7 +197,7 @@ class LtiLaunchRequestValidator
 
     private function validateMessageAudience(DeploymentInterface $deployment, LtiMessageInterface $ltiMessage): self
     {
-        if ($deployment->getClientId() != $ltiMessage->getMandatoryClaim(MessageInterface::CLAIM_AUD)) {
+        if ($deployment->getClientId() !== $ltiMessage->getMandatoryClaim(MessageInterface::CLAIM_AUD)) {
             $this->addFailure('JWT id_token aud claim does not match tool oauth2 client id');
         } else {
             $this->addSuccess('JWT id_token aud claim matches tool oauth2 client id');
@@ -206,9 +206,16 @@ class LtiLaunchRequestValidator
         return $this;
     }
 
+    /**
+     * @throws LtiException
+     */
     private function validateStateSignature(DeploymentInterface $deployment, MessageInterface $oidcState = null): self
     {
         if (null !== $oidcState) {
+            if (null === $deployment->getToolKeyChain()) {
+                throw new LtiException('Tool key chain not configured');
+            }
+
             if (!$oidcState->getToken()->verify($this->signer, $deployment->getToolKeyChain()->getPublicKey())) {
                 $this->addFailure('JWT OIDC state signature validation failure');
             } else {

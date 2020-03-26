@@ -182,7 +182,6 @@ class OidcLoginAuthenticatorTest extends TestCase
             $deploymentRepository,
             $this->createTestUserAuthenticator(),
             null,
-            null,
             new Sha384()
         );
 

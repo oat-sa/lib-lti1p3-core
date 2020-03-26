@@ -31,7 +31,7 @@ class AssociativeDecoder extends Decoder
     {
         $data = json_decode($json, true);
 
-        if (json_last_error() != JSON_ERROR_NONE) {
+        if (json_last_error() !== JSON_ERROR_NONE) {
             throw new RuntimeException(
                 sprintf('Error while decoding to JSON: %s', json_last_error_msg())
             );

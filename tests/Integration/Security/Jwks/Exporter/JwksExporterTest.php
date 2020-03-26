@@ -34,7 +34,7 @@ class JwksExporterTest extends TestCase
     /** @var JwksExporter */
     private $subject;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $repository = new KeyChainRepository([
             $this->createTestKeyChain('keyChainIdentifier1', 'keySetName1'),
