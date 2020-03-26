@@ -47,12 +47,16 @@ Services represent direct connections between platforms and tools.
 
 ## Tutorials
 
-Some tutorials, presented by topics.
+You can find below some tutorials, presented by topics.
+
+### Required implementations
+
+- how to implement the library [required interfaces](doc/tut/jwks.md)
+
+- how to provide a [JWKS endpoint](doc/security/jwks.md)
 
 ### Resource Link
 - how to use the [3rd party login initiation creation service](doc/platform/third_party_initiated_login_creation.md)
-
-Tool
 - how to provide the [3rd party login initiation handling endpoint](doc/tool/third_party_initiated_login_handling.md)
 
 ### Security
