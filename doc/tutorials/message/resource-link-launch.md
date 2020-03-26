@@ -103,7 +103,7 @@ echo $launchRequest->toHtmlLink();         // HTML link, where href is the outpu
 echo $launchRequest->toHtmlRedirectForm(); // HTML hidden form, with possibility of auto redirection
 ```
 
-All you need to do now, it to present this launch request to the users, to launch them to the tool.
+All you need to do now is to present this launch request to the users, to launch them to the tool.
 
 ## Tool side
 
@@ -147,5 +147,6 @@ if (!$result->hasFailures()) {
     echo $result->getLtiMessage()->getVersion();              // '1.3.0'
     echo $result->getLtiMessage()->getContext()->getId();     // 'contextId'
     echo $result->getLtiMessage()->getClaim('myCustomClaim'); // 'myCustomValue'
+    echo $result->getLtiMessage()->getUserIdentity();         // 'same as above $userIdentity 
 } 
 ```
