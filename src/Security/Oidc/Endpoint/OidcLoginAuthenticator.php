@@ -30,7 +30,6 @@ use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Launch\Builder\LtiLaunchRequestBuilder;
 use OAT\Library\Lti1p3Core\Launch\Request\LtiLaunchRequest;
 use OAT\Library\Lti1p3Core\Link\ResourceLink\ResourceLink;
-use OAT\Library\Lti1p3Core\Message\Builder\MessageBuilder;
 use OAT\Library\Lti1p3Core\Message\LtiMessage;
 use OAT\Library\Lti1p3Core\Security\Jwt\AssociativeDecoder;
 use OAT\Library\Lti1p3Core\Security\Oidc\Request\OidcAuthenticationRequest;
@@ -52,9 +51,6 @@ class OidcLoginAuthenticator
     /** @var LtiLaunchRequestBuilder */
     private $requestBuilder;
 
-    /** @var MessageBuilder */
-    private $messageBuilder;
-
     /** @var Signer */
     private $signer;
 
@@ -65,13 +61,11 @@ class OidcLoginAuthenticator
         DeploymentRepositoryInterface $repository,
         UserAuthenticatorInterface $authenticator,
         LtiLaunchRequestBuilder $requestBuilder = null,
-        MessageBuilder $messageBuilder = null,
         Signer $signer = null
     ) {
         $this->repository = $repository;
         $this->authenticator = $authenticator;
         $this->requestBuilder = $requestBuilder ?? new LtiLaunchRequestBuilder();
-        $this->messageBuilder = $messageBuilder ?? new MessageBuilder();
         $this->signer = $signer ?? new Sha256();
         $this->parser = new Parser(new AssociativeDecoder());
     }

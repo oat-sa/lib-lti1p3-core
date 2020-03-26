@@ -80,11 +80,13 @@ abstract class AbstractLaunchRequest implements LaunchRequestInterface
             parse_str($request->getUri()->getQuery(), $parameters);
 
             return new static($request->getUri()->__toString(), $parameters);
-        } elseif ($method === 'POST') {
-            return new static($request->getUri()->__toString(), $request->getServerParams());
-        } else {
-            throw new LtiException(sprintf('Unsupported request method %s', $method));
         }
+
+        if ($method === 'POST') {
+            return new static($request->getUri()->__toString(), $request->getServerParams());
+        }
+
+        throw new LtiException(sprintf('Unsupported request method %s', $method));
     }
 
     public function toUrl(): string

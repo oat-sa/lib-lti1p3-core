@@ -76,7 +76,6 @@ class Tool implements ToolInterface
         return $this->launchUrl;
     }
 
-
     public function getDeepLinkLaunchUrl(): ?string
     {
         return $this->deepLinkLaunchUrl;

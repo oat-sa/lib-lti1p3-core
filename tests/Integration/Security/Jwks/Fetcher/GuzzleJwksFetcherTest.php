@@ -51,7 +51,7 @@ class GuzzleJwksFetcherTest extends TestCase
     /** @var KeyChainInterface */
     private $keyChain;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->clientMock = $this->createMock(ClientInterface::class);
 

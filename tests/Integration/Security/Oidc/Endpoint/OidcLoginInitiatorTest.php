@@ -41,7 +41,7 @@ class OidcLoginInitiatorTest extends TestCase
     /** @var OidcLoginInitiator */
     private $subject;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->subject = new OidcLoginInitiator($this->createTestDeploymentRepository());
     }

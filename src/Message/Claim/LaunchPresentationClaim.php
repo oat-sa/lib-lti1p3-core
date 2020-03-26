@@ -88,7 +88,6 @@ class LaunchPresentationClaim implements MessageClaimInterface
         return $this->locale;
     }
 
-
     public function normalize(): array
     {
        return array_filter([
