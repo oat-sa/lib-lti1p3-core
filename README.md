@@ -23,9 +23,9 @@ $ composer require oat-sa/lib-lti1p3-core
 
 ## Concepts
 
-Extraction of the main concepts of the [LTI 1.3 Core](http://www.imsglobal.org/spec/lti/v1p3) specification:
+You can find below the implementations of the main concepts of the [LTI 1.3 Core](http://www.imsglobal.org/spec/lti/v1p3) specification.
 
-###  Platforms and tools
+###  Platforms, tools and deployments
 
 - [Platform](src/Platform/PlatformInterface.php): any kind of platform that needs to delegate bits of functionality out to a suite of tools.
 - [Tool](src/Tool/ToolInterface.php): external application or service providing functionality to a platform.
@@ -49,18 +49,20 @@ Services represent direct connections between platforms and tools.
 
 You can find below some tutorials, presented by topics.
 
-### Required implementations
+### Quick start
 
-- how to implement the library [required interfaces](doc/tut/jwks.md)
+- how to [configure the library](doc/tutorials/jwks.md)
+- how to implement the [library required interfaces](doc/tutorials/interfaces.md)
+- how to provide a [JWKS endpoint](doc/tutorials/jwks.md)
 
-- how to provide a [JWKS endpoint](doc/security/jwks.md)
+### LTI Messages
 
-### Resource Link
 - how to use the [3rd party login initiation creation service](doc/platform/third_party_initiated_login_creation.md)
 - how to provide the [3rd party login initiation handling endpoint](doc/tool/third_party_initiated_login_handling.md)
 
-### Security
-- how to provide a [JWKS endpoint](doc/security/jwks.md)
+### LTI Services
+
+- to be done
 
 ## Tests
 

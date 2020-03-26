@@ -1,4 +1,4 @@
-# Library interfaces
+# Library configuration
 
 > Depending on the top level services you want to use, you have to provide your own implementation of the following interfaces.
 
