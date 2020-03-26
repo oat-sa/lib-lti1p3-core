@@ -31,10 +31,10 @@ class ScopeBearerResponseType extends BearerTokenResponse
     /**
      * {@inheritdoc}
      */
-    protected function getExtraParams(AccessTokenEntityInterface $accessToken)
+    protected function getExtraParams(AccessTokenEntityInterface $accessToken): array
     {
         return [
-            'scope' => join(' ', array_map(function (ScopeEntityInterface $scope) {
+            'scope' => join(' ', array_map(static function (ScopeEntityInterface $scope) {
                 return $scope->getIdentifier();
             }, $accessToken->getScopes()))
         ];

@@ -26,8 +26,6 @@ use DateInterval;
 use InvalidArgumentException;
 use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
-use League\Event\EmitterAwareTrait;
-use League\OAuth2\Server\CryptTrait;
 use League\OAuth2\Server\Exception\OAuthServerException;
 use League\OAuth2\Server\Grant\AbstractGrant;
 use League\OAuth2\Server\Repositories\AccessTokenRepositoryInterface;
@@ -40,9 +38,6 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class JwtClientCredentialsGrant extends AbstractGrant
 {
-    use EmitterAwareTrait;
-    use CryptTrait;
-
     /** @var DateInterval */
     protected $refreshTokenTTL;
 
@@ -80,8 +75,11 @@ class JwtClientCredentialsGrant extends AbstractGrant
             && $body['client_assertion_type'] === 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer';
     }
 
-    public function respondToAccessTokenRequest(ServerRequestInterface $request, ResponseTypeInterface $responseType, DateInterval $accessTokenTTL)
-    {
+    public function respondToAccessTokenRequest(
+        ServerRequestInterface $request,
+        ResponseTypeInterface $responseType,
+        DateInterval $accessTokenTTL
+    ): ResponseTypeInterface {
         $body = (array)$request->getParsedBody();
 
         // Validate request
@@ -127,13 +125,13 @@ class JwtClientCredentialsGrant extends AbstractGrant
             throw OAuthServerException::invalidRequest('client_assertion', 'Deployment not found');
         }
 
-        $publicKey = $deployment->getToolKeyChain()->getPublicKey();
+        $toolKeyChain = $deployment->getToolKeyChain();
 
         if (
             // validate timestamps at the moment
             $token->isExpired()
             // if public key is set and verification fails
-            || false === $token->verify(new Sha256(), $publicKey)
+            || ($toolKeyChain && !$token->verify(new Sha256(), $toolKeyChain->getPublicKey()))
         ) {
             throw OAuthServerException::invalidRequest('client_assertion', 'Provided JWT is not valid');
         }
