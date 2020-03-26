@@ -1,4 +1,4 @@
-# LTI resource link launch process with OpenId Connect login initiation flow
+# LTI resource link launch process with OIDC login initiation
 
 > How to perform a [OIDC LTI launch](https://www.imsglobal.org/spec/security/v1p0#openid_connect_launch_flow) for a [LTI resource link](http://www.imsglobal.org/spec/lti/v1p3#resource-link-0).
 
