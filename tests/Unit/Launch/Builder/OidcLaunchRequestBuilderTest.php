@@ -29,13 +29,11 @@ use OAT\Library\Lti1p3Core\Launch\Request\OidcLaunchRequest;
 use OAT\Library\Lti1p3Core\Message\Claim\ContextClaim;
 use OAT\Library\Lti1p3Core\Message\LtiMessage;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
-use OAT\Library\Lti1p3Core\Tests\Traits\SecurityTestingTrait;
 use PHPUnit\Framework\TestCase;
 
 class OidcLaunchRequestBuilderTest extends TestCase
 {
     use DomainTestingTrait;
-    use SecurityTestingTrait;
 
     /** @var OidcLaunchRequestBuilder */
     private $subject;

@@ -50,8 +50,11 @@ class MessageBuilder
     /** @var Signer */
     private $signer;
 
-    public function __construct(NonceGeneratorInterface $generator = null, Builder $builder = null, Signer $signer = null)
-    {
+    public function __construct(
+        NonceGeneratorInterface $generator = null,
+        Builder $builder = null,
+        Signer $signer = null
+    ) {
         $this->generator = $generator ?? new NonceGenerator();
         $this->builder = $builder ?? new Builder();
         $this->signer = $signer ?? new Sha256();

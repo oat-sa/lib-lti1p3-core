@@ -121,7 +121,6 @@ class UserIdentity implements UserIdentityInterface
             'middle_name' => $this->getMiddleName(),
             'locale' => $this->getLocale(),
             'picture' => $this->getPicture(),
-
         ]);
     }
 }

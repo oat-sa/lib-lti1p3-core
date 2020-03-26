@@ -57,7 +57,7 @@ abstract class AbstractLaunchRequest implements LaunchRequestInterface
      */
     public function getMandatoryParameter(string $parameterName): string
     {
-        if (!isset($this->parameters[$parameterName])){
+        if (!isset($this->parameters[$parameterName])) {
             throw new LtiException(sprintf('Mandatory parameter %s cannot be found', $parameterName));
         }
 

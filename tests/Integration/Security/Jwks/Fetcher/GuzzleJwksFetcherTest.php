@@ -75,7 +75,16 @@ class GuzzleJwksFetcherTest extends TestCase
         $key = $this->subject->fetchKey('http://test.com', $this->keyChain->getIdentifier());
 
         $this->assertInstanceOf(Key::class, $key);
-        $this->assertEquals($this->keyChain->getPublicKey(), $key);
+
+        $expectedDetails = openssl_pkey_get_details(
+            openssl_pkey_get_public($this->keyChain->getPublicKey()->getContent())
+        );
+
+        $jwksDetails = openssl_pkey_get_details(
+            openssl_pkey_get_public($key->getContent())
+        );
+
+        $this->assertEquals($expectedDetails, $jwksDetails);
     }
 
     public function testItThrowAnLtiExceptionOnNoKeyFound(): void

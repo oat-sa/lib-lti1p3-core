@@ -59,8 +59,7 @@ class JwkRS256ExporterTest extends TestCase
             'keyChainIdentifier',
             'keySetName',
             $publicKey ?? getenv('TEST_KEYS_ROOT_DIR') . '/DSA/public.key',
-            $privateKey ?? getenv('TEST_KEYS_ROOT_DIR') . '/DSA/private.key',
-
+            $privateKey ?? getenv('TEST_KEYS_ROOT_DIR') . '/DSA/private.key'
         );
 
         $subject->export($dsaKeyChain);

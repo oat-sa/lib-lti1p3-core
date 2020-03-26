@@ -30,13 +30,11 @@ use OAT\Library\Lti1p3Core\Message\Claim\ContextClaim;
 use OAT\Library\Lti1p3Core\Message\LtiMessage;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
-use OAT\Library\Lti1p3Core\Tests\Traits\SecurityTestingTrait;
 use PHPUnit\Framework\TestCase;
 
 class LtiLaunchRequestBuilderTest extends TestCase
 {
     use DomainTestingTrait;
-    use SecurityTestingTrait;
 
     /** @var LtiLaunchRequestBuilder */
     private $subject;
@@ -89,7 +87,7 @@ class LtiLaunchRequestBuilderTest extends TestCase
                 $this->createTestTool(),
                 $invalidKeyChain,
                 $invalidKeyChain
-            ),
+            )
         );
     }
 

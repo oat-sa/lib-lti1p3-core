@@ -23,7 +23,6 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\Nonce;
 
 use Carbon\Carbon;
-use OAT\Library\Lti1p3Core\Security\Nonce\Nonce;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceGenerator;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceGeneratorInterface;
 use PHPUnit\Framework\TestCase;
