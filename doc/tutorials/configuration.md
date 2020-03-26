@@ -1,101 +1,101 @@
 # Library configuration
 
-> Depending on the top level services you want to use, you have to provide your own implementation of the following interfaces.
+> How to provide configuration step by step, to be able to use the library as a tool, or a platform, or both.
 
-## Deployment repository
+## Configure keys
 
-In order to be able to retrieve your deployments from your configuration storage, you need to provide an implementation of the [DeploymentRepositoryInterface](../../src/Deployment/DeploymentRepositoryInterface.php).
+Whether you act as platform, tool or both, you need to provide security keys to be able to sign the messages that will be exchanged during LTI interactions.
 
-By example:
+Considering you have for example on your side this key chain:
+- public key path: `/home/user/.ssh/id_rsa.pub`
+- private key path: `/home/user/.ssh/id_rsa`
+- private key passphrase: `test`
+
+You can then provide the following [key chain](../../src/Security/Key/KeyChainInterface.php):
 ```php
 <?php
 
-use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
-use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
+use OAT\Library\Lti1p3Core\Security\Key\KeyChain;
 
-$deploymentRepository = new class implements DeploymentRepositoryInterface
-{
-   public function find(string $identifier): ?DeploymentInterface
-   {
-       // TODO: Implement find() method to find a deployment by identifier.
-   }
-
-   public function findByIssuer(string $issuer, string $clientId = null): ?DeploymentInterface
-   {
-        // TODO: Implement findByIssuer() method to find a deployment by issuer, and client id if provided.
-   }
-};
+$keyChain = new KeyChain(
+    '1',                                // [required] identifier (for kid)
+    'mySetName',                        // [required] key set name (for grouping)
+    'file://home/user/.ssh/id_rsa.pub', // [required] public key (file or content)
+    'file://home/user/.ssh/id_rsa',     // [optional] private key (file or content)
+    'test'                              // [optional] private key passphrase
+);
 ```
-**Note**: you can find a simple implementation example of this interface in the method `createTestDeploymentRepository()` of the [DomainTestingTrait](../../tests/Traits/DomainTestingTrait.php).
+**Note**: given example deals with local key files, automatically done when prefixed by `file://`. You can provide the public / private key contents by passing them as a constructor argument instead (if you want to fetch your keys from a bucket or a database by example).
 
-## User authenticator
+## Configure a platform
 
-During the [OIDC authentication handling](https://www.imsglobal.org/spec/security/v1p0#step-3-authentication-response) on the platform side, you need to define how to delegate the user authentication by providing an implementation of the [UserAuthenticatorInterface](../../src/Security/User/UserAuthenticatorInterface.php).
+You need to provide configuration for the [platform](http://www.imsglobal.org/spec/lti/v1p3#platforms-and-tools):
+- you are representing if you use the library from platform side
+- where your tool is deployed on, if you use the library from tool side
 
 By example:
 ```php
 <?php
 
-use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
-use OAT\Library\Lti1p3Core\Security\User\UserAuthenticationResultInterface;
+use OAT\Library\Lti1p3Core\Platform\Platform;
 
-$userAuthenticator = new class implements UserAuthenticatorInterface
-{
-   public function authenticate(string $loginHint): UserAuthenticationResultInterface
-   {
-       // TODO: Implement authenticate() method to perform user authentication (ex: ldap, auth server, session, etc)
-   }
-};
+$platform = new Platform(
+    'platformIdentifier',                       // [required] identifier
+    'platformName',                             // [required] name
+    'https://platform.com',                     // [required] audience
+    'https://platform.com/oidc-auth',           // [optional] OIDC authentication url
+    'https://platform.com/oauth2-access-token'  // [optional] OAuth2 access token url
+);
 ```
-**Notes**:
-- you can find a simple implementation example of this interface in the method `createTestUserAuthenticator()` of the [SecurityTestingTrait](../../tests/Traits/SecurityTestingTrait.php).
-- you can find a ready to use `UserAuthenticationResultInterface` implementation is available in [UserAuthenticationResult](../../src/Security/User/UserAuthenticationResult.php)
+**Note**: you can also provide your own implementation of the [PlatformInterface](../../src/Platform/PlatformInterface.php).
 
-## Nonce repository
+## Configure a tool
 
-In order to be able to store security nonce the way you want, you need to provide an implementation of the [NonceRepositoryInterface](../../src/Security/Nonce/NonceRepositoryInterface.php).
+You need to provide configuration for the [tool](http://www.imsglobal.org/spec/lti/v1p3#platforms-and-tools):
+- you are representing if you use the library from tool side
+- you want to provide functionality from, if you use the library from platform side
 
 By example:
 ```php
 <?php
 
-use OAT\Library\Lti1p3Core\Security\Nonce\NonceInterface;
-use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepositoryInterface;
+use OAT\Library\Lti1p3Core\Tool\Tool;
 
-$nonceRepository = new class implements NonceRepositoryInterface
-{
-    public function find(string $value) : ?NonceInterface
-    {
-        // TODO: Implement find() method to find a nonce by value.
-    }
-
-    public function save(NonceInterface $nonce) : void
-    {
-        // TODO: Implement save() method to save a nonce (cache, database, etc)
-    }
-};
+$tool = new Tool(
+    'toolIdentifier',                   // [required] identifier
+    'toolName',                         // [required] name
+    'https://platform.com/oidc-init',   // [optional] OIDC login initiation url
+    'https://platform.com/launch',      // [optional] LTI default ResourceLink launch url
+    'https://platform.com/deep-launch'  // [optional] LTI DeepLink launch url
+);
 ```
-**Note**: you can find a simple implementation example of this interface in the method `createTestNonceRepository()` of the [SecurityTestingTrait](../../tests/Traits/SecurityTestingTrait.php).
+**Note**: you can also provide your own implementation of the [ToolInterface](../../src/Tool/ToolInterface.php).
 
-## JWKS fetcher
+## Configure a deployment
 
-In order to be able to fetch public keys JWK from configured [JWKS endpoint](https://auth0.com/docs/tokens/concepts/jwks), you need to provide an implementation of the [JwksFetcherInterface](../../src/Security/Jwks/Fetcher/JwksFetcherInterface.php).
+You need then to create a [deployment](http://www.imsglobal.org/spec/lti/v1p3#tool-deployment-0), referencing how the tool is deployed for the platform.
+
+A same platform instance can deploy several tools (or several times the same tool instance), that is why this bind is handled on deployment level.
 
 By example:
 ```php
 <?php
 
-use OAT\Library\Lti1p3Core\Security\Jwks\Fetcher\JwksFetcherInterface;
-use Lcobucci\JWT\Signer\Key;
+use OAT\Library\Lti1p3Core\Deployment\Deployment;
 
-$fetcher = new class implements JwksFetcherInterface
-{
-    public function fetchKey(string $jwksUrl,string $kId) : Key
-    {
-        // TODO: Implement fetchKey() method to find a Key via an HTTP call to the $jwksUrl, for the kid $kId.
-    }
-};
+$deployment = new Deployment(
+    'deploymentIdentifier',  // [required] identifier
+    'deploymentClientId',    // [required] client id
+    $platform,               // [required] (PlatformInterface) platform 
+    $tool,                   // [required] (ToolInterface) tool 
+    $platformKeyChain,       // [optional] (KeyChainInterface) key chain of the platform 
+    $toolKeyChain,           // [optional] (KeyChainInterface) key chain of the tool 
+    $platformJwksUrl,        // [optional] JWKS url of the platform
+    $toolJwksUrl,            // [optional] JWKS url of the tool
+);
 ```
 **Notes**:
-- it is recommended to put in cache the JWKS endpoint responses, to improve performances since they dont change often. Your implementation can then rely on an injected PSR6 cache by example.
-- you can find a ready to use implementation in [GuzzleJwksFetcher](../../src/Security/Jwks/Fetcher/GuzzleJwksFetcher.php). You need to provide it a [guzzle](http://docs.guzzlephp.org/en/stable/) client, with enabled [cache middleware](https://github.com/Kevinrob/guzzle-cache-middleware).
+- you can also provide your own implementation of the [DeploymentInterface](../../src/Deployment/DeploymentInterface.php),
+- depending on the side you act (platform or tool), you need to configure what is relevant regarding the keys and the JWKS urls,
+- for signature verification, the library will try first to use first the configured key chain if given, and fallback on a JWKS call to avoid performances issues,
+- since you should be in control of the way you give your configuration (from YML files, array, database, etc), you have to provide your own implementation of the [DeploymentRepositoryInterface](../../src/Deployment/DeploymentRepositoryInterface.php).

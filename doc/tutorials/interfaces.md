@@ -43,7 +43,7 @@ $userAuthenticator = new class implements UserAuthenticatorInterface
 {
    public function authenticate(string $loginHint): UserAuthenticationResultInterface
    {
-       // TODO: Implement authenticate() method to perform user authentication (ex: ldap, auth server, session, etc)
+       // TODO: Implement authenticate() method to perform user authentication (ex: session, LDAP, etc)
    }
 };
 ```

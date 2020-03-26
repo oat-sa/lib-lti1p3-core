@@ -36,7 +36,7 @@ class Platform implements PlatformInterface
     /** @var string */
     private $audience;
 
-    /** @var string */
+    /** @var string|null */
     private $oidcAuthenticationUrl;
 
     /** @var string|null */
@@ -46,7 +46,7 @@ class Platform implements PlatformInterface
         string $identifier,
         string $name,
         string $audience,
-        string $oidcAuthenticationUrl,
+        string $oidcAuthenticationUrl = null,
         string $oAuth2AccessTokenUrl = null
     ) {
         $this->identifier = $identifier;
@@ -71,7 +71,7 @@ class Platform implements PlatformInterface
         return $this->audience;
     }
 
-    public function getOidcAuthenticationUrl(): string
+    public function getOidcAuthenticationUrl(): ?string
     {
         return $this->oidcAuthenticationUrl;
     }

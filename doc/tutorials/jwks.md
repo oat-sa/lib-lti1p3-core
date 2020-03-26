@@ -2,7 +2,7 @@
 
 > How to expose a [JWKS endpoint](https://auth0.com/docs/tokens/concepts/jwks) (JSON Web Key Set) with this library.
 
-**Note**: The algorithm `RS SHA256` is used by default, library wide.
+**Note**: The algorithm `RSSHA256` is used by default, library wide.
 
 ## Exporting a JWK from a key chain
 
@@ -42,7 +42,7 @@ $jwkExport = (new JwkRS256Exporter())->export($keyChain);
         "kid": "1"
     }
     ```
-- If you want to support other algorithms than RS SHA256, you can implement the [JwkExporterInterface](../../src/Security/Jwks/Exporter/Jwk/JwkExporterInterface.php).
+- If you want to support other algorithms than RSSHA256, you can implement the [JwkExporterInterface](../../src/Security/Jwks/Exporter/Jwk/JwkExporterInterface.php).
 
 ## Create a JWKS endpoint from multiple key chains
 

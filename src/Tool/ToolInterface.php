@@ -31,7 +31,7 @@ interface ToolInterface
 
     public function getName(): string;
 
-    public function getOidcLoginInitiationUrl(): string;
+    public function getOidcLoginInitiationUrl(): ?string;
 
     public function getLaunchUrl(): ?string;
 

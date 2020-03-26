@@ -33,7 +33,7 @@ interface PlatformInterface
 
     public function getAudience(): string;
 
-    public function getOidcAuthenticationUrl(): string;
+    public function getOidcAuthenticationUrl(): ?string;
 
     public function getOAuth2AccessTokenUrl(): ?string;
 }
