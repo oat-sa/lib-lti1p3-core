@@ -43,7 +43,8 @@ Messages represent integration between platforms and tools intermediated by a us
 
 Services represent direct connections between platforms and tools.
 
-- to be done
+- [Client](src/Service/Client/ServiceClientInterface.php): client that allow authenticated calls the the services endpoints
+- [Server](src/Service/OAuth2): authentication server to protect service endpoints
 
 ## Tutorials
 
@@ -62,12 +63,8 @@ You can find below some tutorials, presented by topics.
 
 ### Services interactions
 
+- how to set up an [LTI service authorisation server](doc/service/authorization-server.md)
 - how to use the [LTI service client](doc/service/service-client.md)
-
-OAuth2
-
-- how to create an [authorization server](doc/oauth2/create_authorization_server.md)
-- how to generate an [access token](doc/oauth2/generate_access_token.md)
 
 ## Tests
 

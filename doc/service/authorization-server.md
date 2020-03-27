@@ -1,4 +1,4 @@
-# OAuth2 - Authorization Server creation
+# OAuth authorization server
 
 > Documentation about how to create an authorization server with JWT token as client credentials
 
@@ -15,7 +15,6 @@ For this feature, you need to provide first:
 This library provides the factory [OAuth2AuthorizationServerFactory](../../src/Service/OAuth2/Factory/OAuth2AuthorizationServerFactory.php) that allows you to create [AuthorizationServer](https://github.com/thephpleague/oauth2-server/blob/master/src/AuthorizationServer.php) with a custom grant [JwtClientCredentialsGrant](../../src/Service/OAuth2/Grant/JwtClientCredentialsGrant.php) and response type [ScopeBearerResponseType](../../src/Service/OAuth2/ResponseType/ScopeBearerResponseType.php).  
 
 An usage example:
-
 ```php
 <?php
 
@@ -54,3 +53,33 @@ $factory = new OAuth2AuthorizationServerFactory(
 // and create an authorization server
 $authorizationServer = $factory->create();
 ```
+
+## Using the OAuth2AccessTokenGenerator to generate tokens
+
+This library provides [OAuth2AccessTokenGenerator](../../src/Service/OAuth2/OAuth2AccessTokenGenerator.php) that allows you to generate an access token.
+
+For using this service you need to provide the server instance created on previous step.
+
+```php
+<?php
+
+use League\OAuth2\Server\AuthorizationServer;
+use OAT\Library\Lti1p3Core\Service\OAuth2\Factory\OAuth2AuthorizationServerFactory;
+use OAT\Library\Lti1p3Core\Service\OAuth2\OAuth2AccessTokenGenerator;use Psr\Http\Message\ResponseInterface;use Psr\Http\Message\ServerRequestInterface;
+
+// prepare the required authorization server
+/** @var AuthorizationServer $authorizationServer */
+$authorizationServer = (new OAuth2AuthorizationServerFactory(/* ... */))->create();
+
+// create a generator instance
+$generator = new OAuth2AccessTokenGenerator($authorizationServer);
+
+/** @var ServerRequestInterface $psr7Request */
+$psr7Request = ...
+
+/** @var ResponseInterface $psrResponse */
+$psrResponse = ...
+
+// and generate an access token
+$accessToken = $generator->generate($psr7Request, $psrResponse);
+``` 

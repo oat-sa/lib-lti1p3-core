@@ -99,3 +99,9 @@ $fetcher = new class implements JwksFetcherInterface
 **Notes**:
 - it is recommended to put in cache the JWKS endpoint responses, to improve performances since they dont change often. Your implementation can then rely on an injected PSR6 cache by example.
 - you can find a ready to use implementation in [JwksFetcher](../../src/Security/Jwks/Fetcher/JwksFetcher.php): you need to provide it a [guzzle](http://docs.guzzlephp.org/en/stable/) client, with enabled [cache middleware](https://github.com/Kevinrob/guzzle-cache-middleware).
+
+## OAuthServer required interfaces
+
+- a [AccessTokenRepositoryInterface](https://github.com/thephpleague/oauth2-server/blob/master/src/Repositories/AccessTokenRepositoryInterface.php) implementation (to store the created access tokens)
+- a [ClientRepositoryInterface](https://github.com/thephpleague/oauth2-server/blob/master/src/Repositories/ClientRepositoryInterface.php) implementation (to retrieve your clients)
+- a [ScopeRepositoryInterface](https://github.com/thephpleague/oauth2-server/blob/master/src/Repositories/ScopeRepositoryInterface.php) implementation (to retrieve your scopes)
