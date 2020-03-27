@@ -30,7 +30,7 @@ use OAT\Library\Lti1p3Core\Exception\LtiException;
 use RuntimeException;
 use Throwable;
 
-class GuzzleJwksFetcher implements JwksFetcherInterface
+class JwksFetcher implements JwksFetcherInterface
 {
     /** @var ClientInterface */
     private $client;

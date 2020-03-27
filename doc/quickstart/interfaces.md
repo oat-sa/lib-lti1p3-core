@@ -98,4 +98,4 @@ $fetcher = new class implements JwksFetcherInterface
 ```
 **Notes**:
 - it is recommended to put in cache the JWKS endpoint responses, to improve performances since they dont change often. Your implementation can then rely on an injected PSR6 cache by example.
-- you can find a ready to use implementation in [GuzzleJwksFetcher](../../src/Security/Jwks/Fetcher/GuzzleJwksFetcher.php): you need to provide it a [guzzle](http://docs.guzzlephp.org/en/stable/) client, with enabled [cache middleware](https://github.com/Kevinrob/guzzle-cache-middleware).
+- you can find a ready to use implementation in [JwksFetcher](../../src/Security/Jwks/Fetcher/JwksFetcher.php): you need to provide it a [guzzle](http://docs.guzzlephp.org/en/stable/) client, with enabled [cache middleware](https://github.com/Kevinrob/guzzle-cache-middleware).

@@ -62,7 +62,7 @@ You can find below some tutorials, presented by topics.
 
 ### Services interactions
 
-- to be done
+- how to use the [LTI service client](doc/service/service-client.md)
 
 OAuth2
 
