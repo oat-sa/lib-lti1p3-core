@@ -45,6 +45,5 @@ class OAuth2AuthorizationServerFactoryTest extends TestCase
         );
 
         $this->assertInstanceOf(AuthorizationServer::class, $subject->create());
-
     }
 }
