@@ -42,7 +42,7 @@ use Throwable;
  */
 class ServiceClient implements ServiceClientInterface
 {
-    private const CACHE_PREFIX = 'scat';
+    private const CACHE_PREFIX = 'lti-service-client-token';
 
     /** @var CacheItemPoolInterface|null */
     private $cache;
@@ -63,7 +63,7 @@ class ServiceClient implements ServiceClientInterface
         Builder $builder = null
     ) {
         $this->cache = $cache;
-        $this->client = $client ?? new Client();;
+        $this->client = $client ?? new Client();
         $this->signer = $signer ?? new Sha256();
         $this->builder = $builder ?? new Builder();
     }
@@ -102,7 +102,7 @@ class ServiceClient implements ServiceClientInterface
     private function getAccessToken(DeploymentInterface $deployment, array $scopes): string
     {
         try {
-            $cacheKey = sprintf('%s_%s', self::CACHE_PREFIX, $deployment->getIdentifier());
+            $cacheKey = sprintf('%s-%s', self::CACHE_PREFIX, $deployment->getIdentifier());
 
             if ($this->cache) {
                 $item = $this->cache->getItem($cacheKey);

@@ -106,7 +106,7 @@ class JwksFetcherTest extends TestCase
     public function testItThrowAnLtiExceptionOnInvalidJwksJsonResponse(): void
     {
         $this->expectException(LtiException::class);
-        $this->expectExceptionMessage('Error during fetching JWK for url http://test.com: json_decode error: Syntax error');
+        $this->expectExceptionMessage('Error during JWK fetching for url http://test.com: json_decode error: Syntax error');
 
         $this->clientMock
             ->expects($this->once())

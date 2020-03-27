@@ -66,7 +66,7 @@ class JwksFetcher implements JwksFetcherInterface
 
         } catch (Throwable $exception) {
             throw new LtiException(
-                sprintf('Error during fetching JWK for url %s: %s', $jwksUrl, $exception->getMessage()),
+                sprintf('Error during JWK fetching for url %s: %s', $jwksUrl, $exception->getMessage()),
                 $exception->getCode(),
                 $exception
             );
