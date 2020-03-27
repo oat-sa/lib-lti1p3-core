@@ -117,8 +117,8 @@ class ServiceClient implements ServiceClientInterface
                     'grant_type' => static::GRANT_TYPE,
                     'client_assertion_type' => static::CLIENT_ASSERTION_TYPE,
                     'client_assertion' => $this->generateCredentials($deployment),
-                    'scope' => implode(' ', $scopes),
-                ],
+                    'scope' => implode(' ', $scopes)
+                ]
             ]);
 
             if ($response->getStatusCode() !== 200) {
