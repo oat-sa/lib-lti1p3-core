@@ -60,38 +60,34 @@ class ServiceClientTest extends TestCase
     {
         $deployment = $this->createTestDeployment();
 
-        $map = [
-            [
-                // inputs
-                'POST',
-                $deployment->getPlatform()->getOAuth2AccessTokenUrl(),
-                [
-                    'json' => [
-                        'grant_type' => ServiceClientInterface::GRANT_TYPE,
-                        'client_assertion_type' => ServiceClientInterface::CLIENT_ASSERTION_TYPE,
-                        'client_assertion' => $this->getTestJwtClientAssertion(),
-                        'scope' => '',
-                    ]
-                ],
-                // output
-                $this->createResponse(json_encode(['access_token'=> 'access_token', 'expires_in' => 3600]))
-            ],
-            [
-                // inputs
-                'GET',
-                'http://example.com',
-                [
-                    'headers' => ['Authentication' => 'Bearer access_token']
-                ],
-                // output
-                $this->createResponse('service response')
-            ]
-        ];
-
         $this->clientMock
             ->expects($this->exactly(2))
             ->method('request')
-            ->will($this->returnValueMap($map));
+            ->withConsecutive(
+                [
+                    'POST',
+                    $deployment->getPlatform()->getOAuth2AccessTokenUrl(),
+                    [
+                        'json' => [
+                            'grant_type' => ServiceClientInterface::GRANT_TYPE,
+                            'client_assertion_type' => ServiceClientInterface::CLIENT_ASSERTION_TYPE,
+                            'client_assertion' => $this->getTestJwtClientAssertion(),
+                            'scope' => ''
+                        ]
+                    ]
+                ],
+                [
+                    'GET',
+                    'http://example.com',
+                    [
+                        'headers' => ['Authentication' => 'Bearer access_token']
+                    ]
+                ]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $this->createResponse(json_encode(['access_token'=> 'access_token', 'expires_in' => 3600])),
+                $this->createResponse('service response')
+            );
 
         $result = $this->subject->request($deployment, 'GET', 'http://example.com');
 
@@ -235,38 +231,34 @@ class ServiceClientTest extends TestCase
 
         $deployment = $this->createTestDeployment();
 
-        $map = [
-            [
-                // inputs
-                'POST',
-                $deployment->getPlatform()->getOAuth2AccessTokenUrl(),
-                [
-                    'json' => [
-                        'grant_type' => ServiceClientInterface::GRANT_TYPE,
-                        'client_assertion_type' => ServiceClientInterface::CLIENT_ASSERTION_TYPE,
-                        'client_assertion' => $this->getTestJwtClientAssertion(),
-                        'scope' => '',
-                    ]
-                ],
-                // output
-                $this->createResponse(json_encode(['access_token'=> 'access_token', 'expires_in' => 3600]))
-            ],
-            [
-                // inputs
-                'GET',
-                'http://example.com',
-                [
-                    'headers' => ['Authentication' => 'Bearer access_token']
-                ],
-                // output
-                'invalid output'
-            ]
-        ];
-
         $this->clientMock
             ->expects($this->exactly(2))
             ->method('request')
-            ->will($this->returnValueMap($map));
+            ->withConsecutive(
+                [
+                    'POST',
+                    $deployment->getPlatform()->getOAuth2AccessTokenUrl(),
+                    [
+                        'json' => [
+                            'grant_type' => ServiceClientInterface::GRANT_TYPE,
+                            'client_assertion_type' => ServiceClientInterface::CLIENT_ASSERTION_TYPE,
+                            'client_assertion' => $this->getTestJwtClientAssertion(),
+                            'scope' => ''
+                        ]
+                    ]
+                ],
+                [
+                    'GET',
+                    'http://example.com',
+                    [
+                        'headers' => ['Authentication' => 'Bearer access_token']
+                    ]
+                ]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $this->createResponse(json_encode(['access_token'=> 'access_token', 'expires_in' => 3600])),
+                'invalid output'
+            );
 
         $this->subject->request($deployment, 'GET', 'http://example.com');
     }
