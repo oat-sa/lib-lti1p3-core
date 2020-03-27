@@ -50,8 +50,6 @@ class ServiceClientTest extends TestCase
 
     protected function setUp(): void
     {
-        Carbon::setTestNow(Carbon::create(2000, 1, 1));
-
         $this->clientMock = $this->createMock(ClientInterface::class);
         $this->cache = new ArrayCachePool();
 
@@ -267,6 +265,8 @@ class ServiceClientTest extends TestCase
 
     private function getTestJwtClientAssertion(): string
     {
+        Carbon::setTestNow(Carbon::create(2000, 1, 1));
+
         return 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6InRvb2xLZXlDaGFpbiJ9.eyJqdGkiOiJkZXBsb3ltZW50SWRlbnRpZmllci05LjQ2NjgxMkUrMTQiLCJpc3MiOiJ0b29sSWRlbnRpZmllciIsInN1YiI6ImRlcGxveW1lbnRDbGllbnRJZCIsImF1ZCI6Imh0dHA6XC9cL3BsYXRmb3JtLmNvbVwvYWNjZXNzLXRva2VuIiwiaWF0Ijo5NDY2ODEyMDAsImV4cCI6OTQ2NjgxODAwfQ.uNMPKI0fMSkWKUAAwcXCKfJGah5Tj-JiS-cgF1Hrbemozkf31TCtxc5u60Dcs_6RjzKigbq06PXXQL_xaNHYvGXeaV0nQF2-m_2DBxhiKD1jApAB8urLdHVBtBG52cM3uiR6-gfJztTDcpuwLYiAqjo-Q1G2VDihWaPRoKveANIrqpm0q1-LDQOagcj8VjOTjSJnl8A7HzcuKSUUhZl7TnY1v7anqLKkS4PAqlHao1xZqnBXVDCvwEoA9SPrm2ne0hA_PcQyPT_1YXqfXWGSKi1WkvJTZWLl1RbdE9Xc-9-a9oBQkhWza0IUCkn_zGWOvJ2isEKRSU0s3OeTGRe6ew';
     }
 }
