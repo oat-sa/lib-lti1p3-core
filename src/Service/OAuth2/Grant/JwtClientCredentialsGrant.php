@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Service\OAuth2\Grant;
 
+use Carbon\Carbon;
 use DateInterval;
 use InvalidArgumentException;
 use Lcobucci\JWT\Parser;
@@ -125,15 +126,18 @@ class JwtClientCredentialsGrant extends AbstractGrant
             throw OAuthServerException::invalidRequest('client_assertion', 'Deployment not found');
         }
 
+        if ($token->isExpired(Carbon::now())) {
+            throw OAuthServerException::invalidRequest('client_assertion', 'Provided JWT is expired');
+        }
+
         $toolKeyChain = $deployment->getToolKeyChain();
 
-        if (
-            // validate timestamps at the moment
-            $token->isExpired()
-            // if public key is set and verification fails
-            || ($toolKeyChain && !$token->verify(new Sha256(), $toolKeyChain->getPublicKey()))
-        ) {
-            throw OAuthServerException::invalidRequest('client_assertion', 'Provided JWT is not valid');
+        if (null === $toolKeyChain) {
+            throw OAuthServerException::invalidRequest('client_assertion', 'Tool Key Chain not found');
+        }
+
+        if (!$token->verify(new Sha256(), $toolKeyChain->getPublicKey())) {
+            throw OAuthServerException::invalidRequest('client_assertion', 'Provided JWT signature is not valid');
         }
 
         return $token->getClaims();
