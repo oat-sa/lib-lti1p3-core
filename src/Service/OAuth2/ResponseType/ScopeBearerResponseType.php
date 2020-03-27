@@ -34,7 +34,7 @@ class ScopeBearerResponseType extends BearerTokenResponse
     protected function getExtraParams(AccessTokenEntityInterface $accessToken): array
     {
         return [
-            'scope' => join(' ', array_map(static function (ScopeEntityInterface $scope) {
+            'scope' => implode(' ', array_map(static function (ScopeEntityInterface $scope) {
                 return $scope->getIdentifier();
             }, $accessToken->getScopes()))
         ];
