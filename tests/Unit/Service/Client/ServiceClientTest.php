@@ -50,8 +50,8 @@ class ServiceClientTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->clientMock = $this->createMock(ClientInterface::class);
         $this->cache = new ArrayCachePool();
+        $this->clientMock = $this->createMock(ClientInterface::class);
 
         $this->subject = new ServiceClient($this->cache, $this->clientMock);
     }
