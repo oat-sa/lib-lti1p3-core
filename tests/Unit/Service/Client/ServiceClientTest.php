@@ -58,8 +58,6 @@ class ServiceClientTest extends TestCase
 
     public function testItCanPerformAServiceCallFromEmptyTokenCache(): void
     {
-        Carbon::setTestNow(Carbon::create(2000, 1, 1));
-
         $deployment = $this->createTestDeployment();
 
         $map = [
@@ -230,9 +228,53 @@ class ServiceClientTest extends TestCase
         $this->subject->request($deployment, 'GET', 'http://example.com');
     }
 
+    public function testItThrowAnLtiExceptionOnPlatformEndpointFailure(): void
+    {
+        $this->expectException(LtiException::class);
+        $this->expectExceptionMessage('Cannot perform request');
+
+        $deployment = $this->createTestDeployment();
+
+        $map = [
+            [
+                // inputs
+                'POST',
+                $deployment->getPlatform()->getOAuth2AccessTokenUrl(),
+                [
+                    'json' => [
+                        'grant_type' => ServiceClientInterface::GRANT_TYPE,
+                        'client_assertion_type' => ServiceClientInterface::CLIENT_ASSERTION_TYPE,
+                        'client_assertion' => $this->getTestJwtClientAssertion(),
+                        'scope' => '',
+                    ]
+                ],
+                // output
+                $this->createResponse(json_encode(['access_token'=> 'access_token', 'expires_in' => 3600]))
+            ],
+            [
+                // inputs
+                'GET',
+                'http://example.com',
+                [
+                    'headers' => ['Authentication' => 'Bearer access_token']
+                ],
+                // output
+                'invalid output'
+            ]
+        ];
+
+        $this->clientMock
+            ->expects($this->exactly(2))
+            ->method('request')
+            ->will($this->returnValueMap($map));
+
+        $this->subject->request($deployment, 'GET', 'http://example.com');
+    }
+
     private function getTestJwtClientAssertion(): string
     {
-        // JWT for Carbon::create(2000, 1, 1)
+        Carbon::setTestNow(Carbon::create(2000, 1, 1));
+
         return 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6InRvb2xLZXlDaGFpbiJ9.eyJqdGkiOiJkZXBsb3ltZW50SWRlbnRpZmllci05LjQ2NjgxMkUrMTQiLCJpc3MiOiJ0b29sSWRlbnRpZmllciIsInN1YiI6ImRlcGxveW1lbnRDbGllbnRJZCIsImF1ZCI6Imh0dHA6XC9cL3BsYXRmb3JtLmNvbVwvYWNjZXNzLXRva2VuIiwiaWF0Ijo5NDY2ODEyMDAsImV4cCI6OTQ2NjgxODAwfQ.uNMPKI0fMSkWKUAAwcXCKfJGah5Tj-JiS-cgF1Hrbemozkf31TCtxc5u60Dcs_6RjzKigbq06PXXQL_xaNHYvGXeaV0nQF2-m_2DBxhiKD1jApAB8urLdHVBtBG52cM3uiR6-gfJztTDcpuwLYiAqjo-Q1G2VDihWaPRoKveANIrqpm0q1-LDQOagcj8VjOTjSJnl8A7HzcuKSUUhZl7TnY1v7anqLKkS4PAqlHao1xZqnBXVDCvwEoA9SPrm2ne0hA_PcQyPT_1YXqfXWGSKi1WkvJTZWLl1RbdE9Xc-9-a9oBQkhWza0IUCkn_zGWOvJ2isEKRSU0s3OeTGRe6ew';
     }
 }
