@@ -63,7 +63,7 @@ class ServiceClient implements ServiceClientInterface
         Builder $builder = null
     ) {
         $this->cache = $cache;
-        $this->client = $client ?? new Client();;
+        $this->client = $client ?? new Client();
         $this->signer = $signer ?? new Sha256();
         $this->builder = $builder ?? new Builder();
     }
