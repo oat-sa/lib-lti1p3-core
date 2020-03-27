@@ -30,7 +30,7 @@ use OAT\Library\Lti1p3Core\Exception\LtiException;
 use RuntimeException;
 use Throwable;
 
-class GuzzleJwksFetcher implements JwksFetcherInterface
+class JwksFetcher implements JwksFetcherInterface
 {
     /** @var ClientInterface */
     private $client;
@@ -66,7 +66,7 @@ class GuzzleJwksFetcher implements JwksFetcherInterface
 
         } catch (Throwable $exception) {
             throw new LtiException(
-                sprintf('Error during fetching JWK for url %s: %s', $jwksUrl, $exception->getMessage()),
+                sprintf('Error during JWK fetching for url %s: %s', $jwksUrl, $exception->getMessage()),
                 $exception->getCode(),
                 $exception
             );

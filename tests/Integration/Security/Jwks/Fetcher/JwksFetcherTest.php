@@ -26,7 +26,7 @@ use GuzzleHttp\ClientInterface;
 use Lcobucci\JWT\Signer\Key;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Security\Jwks\Exporter\JwksExporter;
-use OAT\Library\Lti1p3Core\Security\Jwks\Fetcher\GuzzleJwksFetcher;
+use OAT\Library\Lti1p3Core\Security\Jwks\Fetcher\JwksFetcher;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepository;
 use OAT\Library\Lti1p3Core\Tests\Traits\NetworkTestingTrait;
@@ -34,7 +34,7 @@ use OAT\Library\Lti1p3Core\Tests\Traits\SecurityTestingTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class GuzzleJwksFetcherTest extends TestCase
+class JwksFetcherTest extends TestCase
 {
     use SecurityTestingTrait;
     use NetworkTestingTrait;
@@ -42,7 +42,7 @@ class GuzzleJwksFetcherTest extends TestCase
     /** @var ClientInterface|MockObject */
     private $clientMock;
 
-    /** @var GuzzleJwksFetcher */
+    /** @var JwksFetcher */
     private $subject;
 
     /** @var JwksExporter */
@@ -55,7 +55,7 @@ class GuzzleJwksFetcherTest extends TestCase
     {
         $this->clientMock = $this->createMock(ClientInterface::class);
 
-        $this->subject = new GuzzleJwksFetcher($this->clientMock);
+        $this->subject = new JwksFetcher($this->clientMock);
 
         $this->keyChain = $this->createTestKeyChain();
 
@@ -106,7 +106,7 @@ class GuzzleJwksFetcherTest extends TestCase
     public function testItThrowAnLtiExceptionOnInvalidJwksJsonResponse(): void
     {
         $this->expectException(LtiException::class);
-        $this->expectExceptionMessage('Error during fetching JWK for url http://test.com: json_decode error: Syntax error');
+        $this->expectExceptionMessage('Error during JWK fetching for url http://test.com: json_decode error: Syntax error');
 
         $this->clientMock
             ->expects($this->once())

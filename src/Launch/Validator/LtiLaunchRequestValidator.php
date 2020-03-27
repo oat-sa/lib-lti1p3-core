@@ -34,7 +34,7 @@ use OAT\Library\Lti1p3Core\Message\LtiMessage;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Message;
 use OAT\Library\Lti1p3Core\Message\MessageInterface;
-use OAT\Library\Lti1p3Core\Security\Jwks\Fetcher\GuzzleJwksFetcher;
+use OAT\Library\Lti1p3Core\Security\Jwks\Fetcher\JwksFetcher;
 use OAT\Library\Lti1p3Core\Security\Jwks\Fetcher\JwksFetcherInterface;
 use OAT\Library\Lti1p3Core\Security\Jwt\AssociativeDecoder;
 use OAT\Library\Lti1p3Core\Security\Nonce\Nonce;
@@ -77,7 +77,7 @@ class LtiLaunchRequestValidator
     ) {
         $this->deploymentRepository = $deploymentRepository;
         $this->nonceRepository = $nonceRepository;
-        $this->fetcher = $jwksFetcher ?? new GuzzleJwksFetcher();
+        $this->fetcher = $jwksFetcher ?? new JwksFetcher();
         $this->signer = $signer ?? new Sha256();
         $this->parser = new Parser(new AssociativeDecoder());
     }
