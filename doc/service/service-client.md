@@ -33,6 +33,6 @@ $cache = ...
 $client = new ServiceClient($cache);
 
 /** @var ResponseInterface $response */
-$response = $client->request($deployment, 'GET', 'https://plaotform.com/some-url', [...]);
+$response = $client->request($deployment, 'GET', 'https://platform.com/some-service-url', [...]);
 ```
 **Note**: the client decorates by default a [guzzle](http://docs.guzzlephp.org/en/stable/) client, but you can provide your own by implementing [ServiceClientInterface](../../src/Service/Client/ServiceClientInterface.php)
