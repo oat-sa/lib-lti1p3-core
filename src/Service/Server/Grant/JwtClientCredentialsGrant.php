@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Service\OAuth2\Grant;
+namespace OAT\Library\Lti1p3Core\Service\Server\Grant;
 
 use Carbon\Carbon;
 use DateInterval;

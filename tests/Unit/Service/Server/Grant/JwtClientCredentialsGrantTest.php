@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Tests\Unit\Service\OAuth2\Grant;
+namespace OAT\Library\Lti1p3Core\Tests\Unit\Service\Server\Grant;
 
 use Carbon\Carbon;
 use DateInterval;
@@ -38,7 +38,7 @@ use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
 use League\OAuth2\Server\ResponseTypes\ResponseTypeInterface;
 use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
-use OAT\Library\Lti1p3Core\Service\OAuth2\Grant\JwtClientCredentialsGrant;
+use OAT\Library\Lti1p3Core\Service\Server\Grant\JwtClientCredentialsGrant;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
 use OAT\Library\Lti1p3Core\Tests\Traits\NetworkTestingTrait;
 use PHPUnit\Framework\TestCase;
