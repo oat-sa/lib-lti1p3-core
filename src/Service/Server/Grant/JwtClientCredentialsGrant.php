@@ -39,6 +39,9 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class JwtClientCredentialsGrant extends AbstractGrant
 {
+    public const GRANT_TYPE = 'client_credentials';
+    public const CLIENT_ASSERTION_TYPE = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer';
+
     /** @var DateInterval */
     protected $refreshTokenTTL;
 
@@ -61,7 +64,7 @@ class JwtClientCredentialsGrant extends AbstractGrant
 
     public function getIdentifier(): string
     {
-        return 'client_credentials';
+        return 'client_jwt_credentials';
     }
 
     public function canRespondToAccessTokenRequest(ServerRequestInterface $request): bool
@@ -70,10 +73,10 @@ class JwtClientCredentialsGrant extends AbstractGrant
 
         return
             array_key_exists('grant_type', $body)
-            && $body['grant_type'] === $this->getIdentifier()
+            && $body['grant_type'] === static::GRANT_TYPE
             && array_key_exists('client_assertion', $body)
             && array_key_exists('client_assertion_type', $body)
-            && $body['client_assertion_type'] === 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer';
+            && $body['client_assertion_type'] === static::CLIENT_ASSERTION_TYPE;
     }
 
     public function respondToAccessTokenRequest(
@@ -85,6 +88,8 @@ class JwtClientCredentialsGrant extends AbstractGrant
 
         // Validate request
         $jws = $this->validateAssertion($request);
+
+        // Validate scopes
         $scopes = $this->validateScopes($body['scope'] ?? null);
 
         $client = $this->clientRepository->getClientEntity($jws['iss']);

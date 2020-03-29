@@ -91,9 +91,9 @@ class JwtClientCredentialsGrantTest extends TestCase
         $this->assertInstanceOf(AbstractGrant::class, $this->subject);
     }
 
-    public function testItHasCorrectIdentifier(): void
+    public function testIdentifier(): void
     {
-        $this->assertEquals('client_credentials', $this->subject->getIdentifier());
+        $this->assertEquals('client_jwt_credentials', $this->subject->getIdentifier());
     }
 
     public function testItCanCheckRequestParametersCorrectly(): void

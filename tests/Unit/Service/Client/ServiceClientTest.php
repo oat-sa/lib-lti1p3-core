@@ -28,6 +28,7 @@ use GuzzleHttp\ClientInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Service\Client\ServiceClient;
 use OAT\Library\Lti1p3Core\Service\Client\ServiceClientInterface;
+use OAT\Library\Lti1p3Core\Service\Server\Grant\JwtClientCredentialsGrant;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
 use OAT\Library\Lti1p3Core\Tests\Traits\NetworkTestingTrait;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -70,7 +71,7 @@ class ServiceClientTest extends TestCase
                     [
                         'json' => [
                             'grant_type' => ServiceClientInterface::GRANT_TYPE,
-                            'client_assertion_type' => ServiceClientInterface::CLIENT_ASSERTION_TYPE,
+                            'client_assertion_type' => JwtClientCredentialsGrant::CLIENT_ASSERTION_TYPE,
                             'client_assertion' => $this->getTestJwtClientAssertion(),
                             'scope' => ''
                         ]
@@ -153,7 +154,7 @@ class ServiceClientTest extends TestCase
                 [
                     'json' => [
                         'grant_type' => ServiceClientInterface::GRANT_TYPE,
-                        'client_assertion_type' => ServiceClientInterface::CLIENT_ASSERTION_TYPE,
+                        'client_assertion_type' => JwtClientCredentialsGrant::CLIENT_ASSERTION_TYPE,
                         'client_assertion' => $this->getTestJwtClientAssertion(),
                         'scope' => '',
                     ]
@@ -182,7 +183,7 @@ class ServiceClientTest extends TestCase
                 [
                     'json' => [
                         'grant_type' => ServiceClientInterface::GRANT_TYPE,
-                        'client_assertion_type' => ServiceClientInterface::CLIENT_ASSERTION_TYPE,
+                        'client_assertion_type' => JwtClientCredentialsGrant::CLIENT_ASSERTION_TYPE,
                         'client_assertion' => $this->getTestJwtClientAssertion(),
                         'scope' => '',
                     ]
@@ -211,7 +212,7 @@ class ServiceClientTest extends TestCase
                 [
                     'json' => [
                         'grant_type' => ServiceClientInterface::GRANT_TYPE,
-                        'client_assertion_type' => ServiceClientInterface::CLIENT_ASSERTION_TYPE,
+                        'client_assertion_type' => JwtClientCredentialsGrant::CLIENT_ASSERTION_TYPE,
                         'client_assertion' => $this->getTestJwtClientAssertion(),
                         'scope' => '',
                     ]
@@ -241,7 +242,7 @@ class ServiceClientTest extends TestCase
                     [
                         'json' => [
                             'grant_type' => ServiceClientInterface::GRANT_TYPE,
-                            'client_assertion_type' => ServiceClientInterface::CLIENT_ASSERTION_TYPE,
+                            'client_assertion_type' => JwtClientCredentialsGrant::CLIENT_ASSERTION_TYPE,
                             'client_assertion' => $this->getTestJwtClientAssertion(),
                             'scope' => ''
                         ]
