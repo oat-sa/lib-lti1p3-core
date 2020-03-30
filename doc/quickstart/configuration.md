@@ -2,7 +2,14 @@
 
 > How to provide configuration step by step, to be able to use the library as a tool, or a platform, or both.
 
-## Configure keys
+## Table of contents
+
+- [Configure security keys](#configure-security-keys)
+- [Configure a platform](#configure-a-platform)
+- [Configure a tool](#configure-a-tool)
+- [Configure a deployment](#configure-a-deployment)
+
+## Configure security keys
 
 Whether you act as platform, tool or both, you need to provide security keys to be able to sign the messages that will be exchanged during LTI interactions.
 

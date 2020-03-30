@@ -20,14 +20,14 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Tests\Unit\Service\OAuth2\ResponseType;
+namespace OAT\Library\Lti1p3Core\Tests\Unit\Service\Server\ResponseType;
 
 use Carbon\Carbon;
 use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
 use League\OAuth2\Server\Entities\ScopeEntityInterface;
 use League\OAuth2\Server\ResponseTypes\BearerTokenResponse;
 use Nyholm\Psr7\Response;
-use OAT\Library\Lti1p3Core\Service\OAuth2\ResponseType\ScopeBearerResponseType;
+use OAT\Library\Lti1p3Core\Service\Server\ResponseType\ScopeBearerResponseType;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 

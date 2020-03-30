@@ -31,7 +31,6 @@ use Psr\Http\Message\ResponseInterface;
 interface ServiceClientInterface
 {
     public const GRANT_TYPE = 'client_credentials';
-    public const CLIENT_ASSERTION_TYPE = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer';
 
     public function request(
         DeploymentInterface $deployment,

@@ -2,6 +2,13 @@
 
 > How to perform a [OIDC LTI launch](https://www.imsglobal.org/spec/security/v1p0#openid_connect_launch_flow) for a [LTI resource link](http://www.imsglobal.org/spec/lti/v1p3#resource-link-0).
 
+## Table of contents
+
+- [Platform side: OIDC launch request generation](#platform-side-oidc-launch-request-generation)
+- [Tool side: OIDC login initiation](#tool-side-oidc-login-initiation)
+- [Platform side: OIDC authentication](#platform-side-oidc-authentication)
+- [Tool side: validating the launch after OIDC](#tool-side-validating-the-launch-after-oidc)
+
 ## Platform side: OIDC launch request generation
 
 You can find below required steps to generate a OIDC LTI launch request, needed only if you're acting as a platform.
@@ -90,7 +97,7 @@ You can find below required steps to initiate an OIDC login, needed only if you'
 
 As a tool, you'll receive an HTTP request containing the [OIDC launch request login initiation](https://www.imsglobal.org/spec/security/v1p0#step-2-authentication-request).
 
-You can use the [LtiLaunchRequestValidator](../../src/Security/Oidc/Endpoint/OidcLoginInitiator.php) to handle this:
+You can use the [OidcLoginInitiator](../../src/Security/Oidc/Endpoint/OidcLoginInitiator.php) to handle this:
 - it requires a deployment repository implementation [as explained here](../quickstart/interfaces.md)
 - it expect a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface) to handle
 - and it will output a [OidcAuthenticationRequest](../../src/Security/Oidc/Request/OidcAuthenticationRequest.php) to be sent back to the platform.

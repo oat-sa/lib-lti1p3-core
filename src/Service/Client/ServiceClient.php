@@ -31,6 +31,7 @@ use Lcobucci\JWT\Signer\Rsa\Sha256;
 use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Message\MessageInterface;
+use OAT\Library\Lti1p3Core\Service\Server\Grant\JwtClientCredentialsGrant;
 use Psr\Cache\CacheException;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -115,7 +116,7 @@ class ServiceClient implements ServiceClientInterface
             $response = $this->client->request('POST', $deployment->getPlatform()->getOAuth2AccessTokenUrl(), [
                 'json' => [
                     'grant_type' => static::GRANT_TYPE,
-                    'client_assertion_type' => static::CLIENT_ASSERTION_TYPE,
+                    'client_assertion_type' => JwtClientCredentialsGrant::CLIENT_ASSERTION_TYPE,
                     'client_assertion' => $this->generateCredentials($deployment),
                     'scope' => implode(' ', $scopes)
                 ]
