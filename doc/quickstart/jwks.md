@@ -4,6 +4,11 @@
 
 **Note**: The algorithm `RSSHA256` is used by default, library wide.
 
+## Table of contents
+
+- [Exporting a JWK from a key chain](#exporting-a-jwk-from-a-key-chain)
+- [Create a JWKS endpoint from multiple key chains](#create-a-jwks-endpoint-from-multiple-key-chains)
+
 ## Exporting a JWK from a key chain
 
 Considering you have for example on your side this key chain:

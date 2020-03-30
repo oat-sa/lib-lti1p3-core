@@ -2,6 +2,11 @@
 
 > How to use the [ServiceClient](../../src/Service/Client/ServiceClient.php) to perform authenticated LTI service calls.
 
+## Table of contents
+
+- [Features](#features)
+- [CUsage](#usage)
+
 ## Features
 
 You may need to perform [authenticated service calls](https://www.imsglobal.org/spec/security/v1p0#securing_web_services) from your tool to a platform (ex: LTI Advantage Services)

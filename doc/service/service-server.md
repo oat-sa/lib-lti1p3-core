@@ -2,6 +2,12 @@
 
 > Documentation about how to create an authorization server with JWT token as client credentials
 
+## Table of contents
+
+- [Preparing required repository](#preparing-required-repository)
+- [Create an authorization server](#create-an-authorization-server)
+- [Generate access tokens](#generate-access-tokens)
+
 ## Preparing required repository
 
 For this feature, you need to provide first:
@@ -10,7 +16,7 @@ For this feature, you need to provide first:
 - a [ClientRepositoryInterface](https://github.com/thephpleague/oauth2-server/blob/master/src/Repositories/ClientRepositoryInterface.php) implementation (to retrieve your clients)
 - a [ScopeRepositoryInterface](https://github.com/thephpleague/oauth2-server/blob/master/src/Repositories/ScopeRepositoryInterface.php) implementation (to retrieve your scopes)
 
-## Using a factory to create authorization server
+## Create an authorization server
 
 This library provides the factory [OAuth2AuthorizationServerFactory](../../src/Service/OAuth2/Factory/OAuth2AuthorizationServerFactory.php) that allows you to create [AuthorizationServer](https://github.com/thephpleague/oauth2-server/blob/master/src/AuthorizationServer.php) with a custom grant [JwtClientCredentialsGrant](../../src/Service/OAuth2/Grant/JwtClientCredentialsGrant.php) and response type [ScopeBearerResponseType](../../src/Service/OAuth2/ResponseType/ScopeBearerResponseType.php).  
 
@@ -54,7 +60,7 @@ $factory = new OAuth2AuthorizationServerFactory(
 $authorizationServer = $factory->create();
 ```
 
-## Using the OAuth2AccessTokenGenerator to generate tokens
+## Generate access tokens
 
 This library provides [OAuth2AccessTokenGenerator](../../src/Service/OAuth2/OAuth2AccessTokenGenerator.php) that allows you to generate an access token.
 

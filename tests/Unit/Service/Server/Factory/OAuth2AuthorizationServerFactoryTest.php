@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Tests\Unit\Service\OAuth2\Factory;
+namespace OAT\Library\Lti1p3Core\Tests\Unit\Server\OAuth2\Factory;
 
 use League\OAuth2\Server\AuthorizationServer;
 use League\OAuth2\Server\CryptKey;
@@ -28,7 +28,7 @@ use League\OAuth2\Server\Repositories\AccessTokenRepositoryInterface;
 use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
 use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
 use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
-use OAT\Library\Lti1p3Core\Service\OAuth2\Factory\OAuth2AuthorizationServerFactory;
+use OAT\Library\Lti1p3Core\Service\Server\Factory\OAuth2AuthorizationServerFactory;
 use PHPUnit\Framework\TestCase;
 
 class OAuth2AuthorizationServerFactoryTest extends TestCase

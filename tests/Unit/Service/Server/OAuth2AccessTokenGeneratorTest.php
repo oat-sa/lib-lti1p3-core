@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Tests\Unit\Service\OAuth2;
+namespace OAT\Library\Lti1p3Core\Tests\Unit\Service\Server;
 
 use League\OAuth2\Server\AuthorizationServer;
-use OAT\Library\Lti1p3Core\Service\OAuth2\OAuth2AccessTokenGenerator;
+use OAT\Library\Lti1p3Core\Service\Server\OAuth2AccessTokenGenerator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;

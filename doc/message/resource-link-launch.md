@@ -2,6 +2,11 @@
 
 > How to perform a [LTI launch](http://www.imsglobal.org/spec/lti/v1p3#lti-launch-0) for a [LTI resource link](http://www.imsglobal.org/spec/lti/v1p3#resource-link-0) as a platform, and validate it as a tool.
 
+## Table of contents
+
+- [Platform side](#platform-side)
+- [Tool side](#tool-side)
+
 ## Platform side
 
 You can find below required steps to generate a LTI launch request, needed only if you're acting as a platform.
