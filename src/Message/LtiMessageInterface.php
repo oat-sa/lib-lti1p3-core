@@ -51,6 +51,9 @@ interface LtiMessageInterface extends MessageInterface
     public const CLAIM_LTI_TARGET_LINK_URI = 'https://purl.imsglobal.org/spec/lti/claim/target_link_uri';
     public const CLAIM_LTI_RESOURCE_LINK = 'https://purl.imsglobal.org/spec/lti/claim/resource_link';
 
+    // LTI AGS claim
+    public const CLAIM_LTI_AGS = 'https://purl.imsglobal.org/spec/lti-ags/claim/endpoint';
+
     public function getMessageType(): string;
 
     public function getVersion(): string;
