@@ -43,10 +43,10 @@ class AgsClaim implements MessageClaimInterface
         return LtiMessageInterface::CLAIM_LTI_AGS;
     }
 
-    public function __construct(array $scopes, string $lineItemsCollectionUrl, string $lineItemUrl = null)
+    public function __construct(array $scopes, string $lineItemsContainerUrl, string $lineItemUrl = null)
     {
         $this->scopes = $scopes;
-        $this->lineItemsContainerUrl = $lineItemsCollectionUrl;
+        $this->lineItemsContainerUrl = $lineItemsContainerUrl;
         $this->lineItemUrl = $lineItemUrl;
     }
 
