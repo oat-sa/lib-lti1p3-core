@@ -33,7 +33,7 @@ class AgsClaimTest extends TestCase
 
     public function setUp(): void
     {
-        $this->subject = new AgsClaim(['scope1, scope2'], 'lineItemsCollectionUrl', 'lineItemUrl');
+        $this->subject = new AgsClaim(['scope1, scope2'], 'lineItemsContainerUrl', 'lineItemUrl');
     }
 
     public function testGetClaimName(): void
@@ -44,7 +44,7 @@ class AgsClaimTest extends TestCase
     public function testGetters(): void
     {
         $this->assertEquals(['scope1, scope2'], $this->subject->getScopes());
-        $this->assertEquals('lineItemsCollectionUrl', $this->subject->getLineItemsCollectionUrl());
+        $this->assertEquals('lineItemsContainerUrl', $this->subject->getLineItemsContainerUrl());
         $this->assertEquals('lineItemUrl', $this->subject->getLineItemUrl());
     }
 
@@ -53,7 +53,7 @@ class AgsClaimTest extends TestCase
         $this->assertEquals(
             [
                 'scope' => ['scope1, scope2'],
-                'lineitems' => 'lineItemsCollectionUrl',
+                'lineitems' => 'lineItemsContainerUrl',
                 'lineitem' => 'lineItemUrl'
             ],
             $this->subject->normalize()
@@ -64,13 +64,13 @@ class AgsClaimTest extends TestCase
     {
         $denormalisation = AgsClaim::denormalize([
             'scope' => ['scope1, scope2'],
-            'lineitems' => 'lineItemsCollectionUrl',
+            'lineitems' => 'lineItemsContainerUrl',
             'lineitem' => 'lineItemUrl'
         ]);
 
         $this->assertInstanceOf(AgsClaim::class, $denormalisation);
         $this->assertEquals(['scope1, scope2'], $denormalisation->getScopes());
-        $this->assertEquals('lineItemsCollectionUrl', $denormalisation->getLineItemsCollectionUrl());
+        $this->assertEquals('lineItemsContainerUrl', $denormalisation->getLineItemsContainerUrl());
         $this->assertEquals('lineItemUrl', $denormalisation->getLineItemUrl());
     }
 }

@@ -33,7 +33,7 @@ class AgsClaim implements MessageClaimInterface
     private $scopes;
 
     /** @var string */
-    private $lineItemsCollectionUrl;
+    private $lineItemsContainerUrl;
 
     /** @var string|null */
     private $lineItemUrl;
@@ -46,7 +46,7 @@ class AgsClaim implements MessageClaimInterface
     public function __construct(array $scopes, string $lineItemsCollectionUrl, string $lineItemUrl = null)
     {
         $this->scopes = $scopes;
-        $this->lineItemsCollectionUrl = $lineItemsCollectionUrl;
+        $this->lineItemsContainerUrl = $lineItemsCollectionUrl;
         $this->lineItemUrl = $lineItemUrl;
     }
 
@@ -55,9 +55,9 @@ class AgsClaim implements MessageClaimInterface
         return $this->scopes;
     }
 
-    public function getLineItemsCollectionUrl(): string
+    public function getLineItemsContainerUrl(): string
     {
-        return $this->lineItemsCollectionUrl;
+        return $this->lineItemsContainerUrl;
     }
 
     public function getLineItemUrl(): ?string
@@ -69,7 +69,7 @@ class AgsClaim implements MessageClaimInterface
     {
         return array_filter([
             'scope' => $this->scopes,
-            'lineitems' => $this->lineItemsCollectionUrl,
+            'lineitems' => $this->lineItemsContainerUrl,
             'lineitem' => $this->lineItemUrl
         ]);
     }
