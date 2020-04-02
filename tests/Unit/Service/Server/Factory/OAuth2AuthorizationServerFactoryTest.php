@@ -27,7 +27,7 @@ use League\OAuth2\Server\CryptKey;
 use League\OAuth2\Server\Repositories\AccessTokenRepositoryInterface;
 use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
 use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
-use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Service\Server\Factory\OAuth2AuthorizationServerFactory;
 use PHPUnit\Framework\TestCase;
 
@@ -39,7 +39,7 @@ class OAuth2AuthorizationServerFactoryTest extends TestCase
             $this->createMock(AccessTokenRepositoryInterface::class),
             $this->createMock(ClientRepositoryInterface::class),
             $this->createMock(ScopeRepositoryInterface::class),
-            $this->createMock(DeploymentRepositoryInterface::class),
+            $this->createMock(RegistrationRepositoryInterface::class),
             $this->createMock(CryptKey::class),
             'encryption key'
         );

@@ -27,8 +27,8 @@ use Exception;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Signer\Hmac\Sha384;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
-use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
-use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Launch\Builder\LtiLaunchRequestBuilder;
 use OAT\Library\Lti1p3Core\Launch\Builder\OidcLaunchRequestBuilder;
@@ -52,13 +52,13 @@ class LtiLaunchRequestValidatorTest extends TestCase
     public function testValidationSuccessOnAnonymousLtiLaunchRequest(): void
     {
         $subject = new LtiLaunchRequestValidator(
-            $this->createTestDeploymentRepository(),
+            $this->createTestRegistrationRepository(),
             $this->createTestNonceRepository()
         );
 
         $launchRequest = (new LtiLaunchRequestBuilder())->buildResourceLinkLtiLaunchRequest(
             $this->createTestResourceLink(),
-            $this->createTestDeployment()
+            $this->createTestRegistration()
         );
 
         $result = $subject->validate($this->createServerRequest('GET', $launchRequest->toUrl()));
@@ -88,13 +88,13 @@ class LtiLaunchRequestValidatorTest extends TestCase
     public function testValidationSuccessOnUserLtiLaunchRequest(): void
     {
         $subject = new LtiLaunchRequestValidator(
-            $this->createTestDeploymentRepository(),
+            $this->createTestRegistrationRepository(),
             $this->createTestNonceRepository()
         );
 
         $launchRequest = (new LtiLaunchRequestBuilder())->buildUserResourceLinkLtiLaunchRequest(
             $this->createTestResourceLink(),
-            $this->createTestDeployment(),
+            $this->createTestRegistration(),
             $this->createTestUserIdentity()
         );
 
@@ -127,22 +127,22 @@ class LtiLaunchRequestValidatorTest extends TestCase
 
     public function testValidationSuccessOnAnonymousOidcLaunchRequest(): void
     {
-        $deploymentRepository = $this->createTestDeploymentRepository();
+        $registrationRepository = $this->createTestRegistrationRepository();
 
         $subject = new LtiLaunchRequestValidator(
-            $deploymentRepository,
+            $registrationRepository,
             $this->createTestNonceRepository()
         );
 
-        $oidcLoginInitiator = new OidcLoginInitiator($deploymentRepository);
+        $oidcLoginInitiator = new OidcLoginInitiator($registrationRepository);
         $oidcLoginAuthenticator = new OidcLoginAuthenticator(
-            $deploymentRepository,
+            $registrationRepository,
             $this->createTestUserAuthenticator(true, true)
         );
 
         $oidcLaunchRequest = (new OidcLaunchRequestBuilder())->buildResourceLinkOidcLaunchRequest(
             $this->createTestResourceLink(),
-            $this->createTestDeployment(),
+            $this->createTestRegistration(),
             'loginHint'
         );
 
@@ -182,19 +182,19 @@ class LtiLaunchRequestValidatorTest extends TestCase
 
     public function testValidationSuccessOnOidcLaunchRequest(): void
     {
-        $deploymentRepository = $this->createTestDeploymentRepository();
+        $registrationRepository = $this->createTestRegistrationRepository();
 
         $subject = new LtiLaunchRequestValidator(
-            $deploymentRepository,
+            $registrationRepository,
             $this->createTestNonceRepository()
         );
 
-        $oidcLoginInitiator = new OidcLoginInitiator($deploymentRepository);
-        $oidcLoginAuthenticator = new OidcLoginAuthenticator($deploymentRepository, $this->createTestUserAuthenticator());
+        $oidcLoginInitiator = new OidcLoginInitiator($registrationRepository);
+        $oidcLoginAuthenticator = new OidcLoginAuthenticator($registrationRepository, $this->createTestUserAuthenticator());
 
         $oidcLaunchRequest = (new OidcLaunchRequestBuilder())->buildResourceLinkOidcLaunchRequest(
             $this->createTestResourceLink(),
-            $this->createTestDeployment(),
+            $this->createTestRegistration(),
             'loginHint'
         );
 
@@ -239,7 +239,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
     {
         $keyChain = $this->createTestKeyChain('platformKeyChain');
 
-        $deployment = $this->createTestDeploymentWithJwksPlatform();
+        $registration = $this->createTestRegistrationWithJwksPlatform();
 
         $jwksFetcherMock = $this->createMock(JwksFetcherInterface::class);
         $jwksFetcherMock
@@ -248,17 +248,17 @@ class LtiLaunchRequestValidatorTest extends TestCase
             ->with('http://platform.com/jwks', 'platformKeyChain')
             ->willReturn($keyChain->getPublicKey());
 
-        $deploymentRepository = $this->createTestDeploymentRepository([$deployment]);
+        $registrationRepository = $this->createTestRegistrationRepository([$registration]);
 
         $subject = new LtiLaunchRequestValidator(
-            $deploymentRepository,
+            $registrationRepository,
             $this->createTestNonceRepository(),
             $jwksFetcherMock
         );
 
         $launchRequest = (new LtiLaunchRequestBuilder())->buildResourceLinkLtiLaunchRequest(
             $this->createTestResourceLink(),
-            $this->createTestDeployment()
+            $this->createTestRegistration()
         );
 
         $result = $subject->validate($this->createServerRequest('GET', $launchRequest->toUrl()));
@@ -270,7 +270,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
     public function testValidationFailureOnInvalidIdTokenSignature(): void
     {
         $subject = new LtiLaunchRequestValidator(
-            $this->createTestDeploymentRepository(),
+            $this->createTestRegistrationRepository(),
             $this->createTestNonceRepository(),
             null,
             new Sha384()
@@ -278,7 +278,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
 
         $launchRequest = (new LtiLaunchRequestBuilder())->buildResourceLinkLtiLaunchRequest(
             $this->createTestResourceLink(),
-            $this->createTestDeployment()
+            $this->createTestRegistration()
         );
 
         $result = $subject->validate($this->createServerRequest('GET', $launchRequest->toUrl()));
@@ -295,13 +295,13 @@ class LtiLaunchRequestValidatorTest extends TestCase
         Carbon::setTestNow($now->subSeconds(MessageInterface::TTL + 1));
 
         $subject = new LtiLaunchRequestValidator(
-            $this->createTestDeploymentRepository(),
+            $this->createTestRegistrationRepository(),
             $this->createTestNonceRepository()
         );
 
         $launchRequest = (new LtiLaunchRequestBuilder())->buildResourceLinkLtiLaunchRequest(
             $this->createTestResourceLink(),
-            $this->createTestDeployment()
+            $this->createTestRegistration()
         );
 
         Carbon::setTestNow();
@@ -316,13 +316,13 @@ class LtiLaunchRequestValidatorTest extends TestCase
     public function testValidationFailureOnAlreadyUsedNonce(): void
     {
         $subject = new LtiLaunchRequestValidator(
-            $this->createTestDeploymentRepository(),
+            $this->createTestRegistrationRepository(),
             $this->createTestNonceRepository(true)
         );
 
         $launchRequest = (new LtiLaunchRequestBuilder())->buildResourceLinkLtiLaunchRequest(
             $this->createTestResourceLink(),
-            $this->createTestDeployment()
+            $this->createTestRegistration()
         );
 
         $result = $subject->validate($this->createServerRequest('GET', $launchRequest->toUrl()));
@@ -332,49 +332,6 @@ class LtiLaunchRequestValidatorTest extends TestCase
         $this->assertEquals(['JWT id_token nonce already used'], $result->getFailures());
     }
 
-    public function testValidationFailureOnInvalidIssuer(): void
-    {
-        $invalidPlatform = $this->createTestPlatform('platformIdentifier', 'platformName', 'invalidAudience');
-        $invalidDeployment = $this->createTestDeployment('deploymentIdentifier', 'deploymentClientId', $invalidPlatform);
-
-        $subject = new LtiLaunchRequestValidator(
-            $this->createTestDeploymentRepository(),
-            $this->createTestNonceRepository()
-        );
-
-        $launchRequest = (new LtiLaunchRequestBuilder())->buildResourceLinkLtiLaunchRequest(
-            $this->createTestResourceLink(),
-            $invalidDeployment
-        );
-
-        $result = $subject->validate($this->createServerRequest('GET', $launchRequest->toUrl()));
-
-        $this->assertInstanceOf(LtiLaunchRequestValidationResult::class, $result);
-        $this->assertTrue($result->hasFailures());
-        $this->assertEquals(['JWT id_token iss claim does not match platform audience'], $result->getFailures());
-    }
-
-    public function testValidationFailureOnInvalidAudience(): void
-    {
-        $invalidDeployment = $this->createTestDeployment('deploymentIdentifier', 'invalidClientId');
-
-        $subject = new LtiLaunchRequestValidator(
-            $this->createTestDeploymentRepository(),
-            $this->createTestNonceRepository()
-        );
-
-        $launchRequest = (new LtiLaunchRequestBuilder())->buildResourceLinkLtiLaunchRequest(
-            $this->createTestResourceLink(),
-            $invalidDeployment
-        );
-
-        $result = $subject->validate($this->createServerRequest('GET', $launchRequest->toUrl()));
-
-        $this->assertInstanceOf(LtiLaunchRequestValidationResult::class, $result);
-        $this->assertTrue($result->hasFailures());
-        $this->assertEquals(['JWT id_token aud claim does not match tool oauth2 client id'], $result->getFailures());
-    }
-
     public function testValidationFailureOnIMissingToolKeyChain(): void
     {
         $this->expectException(LtiException::class);
@@ -382,16 +339,17 @@ class LtiLaunchRequestValidatorTest extends TestCase
 
         $state = (new Builder())->getToken(new Sha256(), $this->createTestKeyChain()->getPrivateKey())->__toString();
 
-        $deployment = $this->createTestDeploymentWithoutToolKeyChain();
+        $registration = $this->createTestRegistrationWithoutToolKeyChain();
 
         $subject = new LtiLaunchRequestValidator(
-            $this->createTestDeploymentRepository([$deployment]),
+            $this->createTestRegistrationRepository([$registration]),
             $this->createTestNonceRepository()
         );
 
         $launchRequest = (new LtiLaunchRequestBuilder())->buildResourceLinkLtiLaunchRequest(
             $this->createTestResourceLink(),
-            $deployment,
+            $registration,
+            $registration->getDefaultDeploymentId(),
             [],
             [],
             $state
@@ -405,13 +363,14 @@ class LtiLaunchRequestValidatorTest extends TestCase
         $state = (new Builder())->getToken(new Sha384(), $this->createTestKeyChain()->getPrivateKey())->__toString();
 
         $subject = new LtiLaunchRequestValidator(
-            $this->createTestDeploymentRepository(),
+            $this->createTestRegistrationRepository(),
             $this->createTestNonceRepository()
         );
 
         $launchRequest = (new LtiLaunchRequestBuilder())->buildResourceLinkLtiLaunchRequest(
             $this->createTestResourceLink(),
-            $this->createTestDeployment(),
+            $this->createTestRegistration(),
+            null,
             [],
             [],
             $state
@@ -438,13 +397,14 @@ class LtiLaunchRequestValidatorTest extends TestCase
         Carbon::setTestNow();
 
         $subject = new LtiLaunchRequestValidator(
-            $this->createTestDeploymentRepository(),
+            $this->createTestRegistrationRepository(),
             $this->createTestNonceRepository()
         );
 
         $launchRequest = (new LtiLaunchRequestBuilder())->buildResourceLinkLtiLaunchRequest(
             $this->createTestResourceLink(),
-            $this->createTestDeployment(),
+            $this->createTestRegistration(),
+            null,
             [],
             [],
             $state
@@ -457,19 +417,19 @@ class LtiLaunchRequestValidatorTest extends TestCase
         $this->assertEquals(['JWT OIDC state is expired'], $result->getFailures());
     }
 
-    public function testItThrowAnLtiExceptionOnNotFoundDeployment(): void
+    public function testItThrowAnLtiExceptionOnNotFoundRegistration(): void
     {
         $this->expectException(LtiException::class);
-        $this->expectExceptionMessage('No deployment found with id deploymentIdentifier');
+        $this->expectExceptionMessage('no matching registration found');
 
         $subject = new LtiLaunchRequestValidator(
-            $this->createTestDeploymentRepository([$this->createMock(DeploymentInterface::class)]),
+            $this->createTestRegistrationRepository([$this->createMock(RegistrationInterface::class)]),
             $this->createTestNonceRepository()
         );
 
         $launchRequest = (new LtiLaunchRequestBuilder())->buildResourceLinkLtiLaunchRequest(
             $this->createTestResourceLink(),
-            $this->createTestDeployment()
+            $this->createTestRegistration()
         );
 
         $subject->validate($this->createServerRequest('GET', $launchRequest->toUrl()));
@@ -480,20 +440,19 @@ class LtiLaunchRequestValidatorTest extends TestCase
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage('LTI message validation failed: custom error');
 
-        $deployment = $this->createTestDeployment();
+        $registration = $this->createTestRegistration();
 
-        $deploymentRepositoryMock = $this->createMock(DeploymentRepositoryInterface::class);
-        $deploymentRepositoryMock
+        $registrationRepositoryMock = $this->createMock(RegistrationRepositoryInterface::class);
+        $registrationRepositoryMock
             ->expects($this->once())
-            ->method('find')
-            ->with($deployment->getIdentifier())
+            ->method('findByPlatformIssuer')
             ->willThrowException(new Exception('custom error'));
 
-        $subject = new LtiLaunchRequestValidator($deploymentRepositoryMock, $this->createTestNonceRepository());
+        $subject = new LtiLaunchRequestValidator($registrationRepositoryMock, $this->createTestNonceRepository());
 
         $launchRequest = (new LtiLaunchRequestBuilder())->buildResourceLinkLtiLaunchRequest(
             $this->createTestResourceLink(),
-            $deployment
+            $registration
         );
 
         $subject->validate($this->createServerRequest('GET', $launchRequest->toUrl()));

@@ -43,6 +43,7 @@ interface MessageInterface
     public const CLAIM_IAT = 'iat';
 
     // OIDC claims
+    public const CLAIM_REGISTRATION_ID = 'registration_id';
     public const CLAIM_NONCE = 'nonce';
     public const CLAIM_PARAMETERS = 'parameters';
 

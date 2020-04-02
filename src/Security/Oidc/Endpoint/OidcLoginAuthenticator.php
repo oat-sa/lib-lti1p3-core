@@ -25,7 +25,8 @@ namespace OAT\Library\Lti1p3Core\Security\Oidc\Endpoint;
 use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\Signer;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
-use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
+use OAT\Library\Lti1p3Core\Message\MessageInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Launch\Builder\LtiLaunchRequestBuilder;
 use OAT\Library\Lti1p3Core\Launch\Request\LtiLaunchRequest;
@@ -42,7 +43,7 @@ use Throwable;
  */
 class OidcLoginAuthenticator
 {
-    /** @var DeploymentRepositoryInterface */
+    /** @var RegistrationRepositoryInterface */
     private $repository;
 
     /** @var UserAuthenticatorInterface */
@@ -58,7 +59,7 @@ class OidcLoginAuthenticator
     private $parser;
 
     public function __construct(
-        DeploymentRepositoryInterface $repository,
+        RegistrationRepositoryInterface $repository,
         UserAuthenticatorInterface $authenticator,
         LtiLaunchRequestBuilder $requestBuilder = null,
         Signer $signer = null
@@ -81,13 +82,15 @@ class OidcLoginAuthenticator
 
             $originalMessage = new LtiMessage($this->parser->parse($oidcRequest->getLtiMessageHint()));
 
-            $deployment = $this->repository->find($originalMessage->getDeploymentId());
+            $registration = $this->repository->find(
+                $originalMessage->getMandatoryClaim(MessageInterface::CLAIM_REGISTRATION_ID)
+            );
 
-            if (null === $deployment) {
-                throw new LtiException('Invalid message hint deployment id');
+            if (null === $registration) {
+                throw new LtiException('Invalid message hint registration id claim');
             }
 
-            if (!$originalMessage->getToken()->verify($this->signer, $deployment->getPlatformKeyChain()->getPublicKey())) {
+            if (!$originalMessage->getToken()->verify($this->signer, $registration->getPlatformKeyChain()->getPublicKey())) {
                throw new LtiException('Invalid message hint signature');
             }
 
@@ -113,8 +116,9 @@ class OidcLoginAuthenticator
                     ->copyFromMessage($originalMessage)
                     ->buildUserResourceLinkLtiLaunchRequest(
                         $originalResourceLink,
-                        $deployment,
+                        $registration,
                         $authenticationResult->getUserIdentity(),
+                        $originalMessage->getDeploymentId(),
                         $originalMessage->getRoles(),
                         [],
                         $oidcRequest->getState()
@@ -125,7 +129,8 @@ class OidcLoginAuthenticator
                 ->copyFromMessage($originalMessage)
                 ->buildResourceLinkLtiLaunchRequest(
                     $originalResourceLink,
-                    $deployment,
+                    $registration,
+                    $originalMessage->getDeploymentId(),
                     $originalMessage->getRoles(),
                     [],
                     $oidcRequest->getState()

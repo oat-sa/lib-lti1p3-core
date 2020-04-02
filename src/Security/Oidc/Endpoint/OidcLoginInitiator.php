@@ -22,8 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Security\Oidc\Endpoint;
 
-use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
-use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Launch\Request\OidcLaunchRequest;
 use OAT\Library\Lti1p3Core\Message\Builder\MessageBuilder;
@@ -39,7 +39,7 @@ use Throwable;
  */
 class OidcLoginInitiator
 {
-    /** @var DeploymentRepositoryInterface */
+    /** @var RegistrationRepositoryInterface */
     private $repository;
 
     /** @var NonceGeneratorInterface */
@@ -49,7 +49,7 @@ class OidcLoginInitiator
     private $builder;
 
     public function __construct(
-        DeploymentRepositoryInterface $repository,
+        RegistrationRepositoryInterface $repository,
         NonceGeneratorInterface $generator = null,
         MessageBuilder $builder = null
     ) {
@@ -67,23 +67,30 @@ class OidcLoginInitiator
             /** @var OidcLaunchRequest $oidcRequest */
             $oidcRequest = OidcLaunchRequest::fromServerRequest($request);
 
-            $deployment = $this->findOidcLaunchRequestDeployment($oidcRequest);
+            $registration = $registration = $this->repository->findByPlatformIssuer(
+                $oidcRequest->getIssuer(),
+                $oidcRequest->getClientId()
+            );
+
+            if (null === $registration) {
+                throw new LtiException('Cannot find registration for OIDC request');
+            }
 
             $nonce = $this->generator->generate();
 
             $this->builder
-                ->withClaim(MessageInterface::CLAIM_SUB, $deployment->getIdentifier())
-                ->withClaim(MessageInterface::CLAIM_ISS, $deployment->getTool()->getIdentifier())
-                ->withClaim(MessageInterface::CLAIM_AUD, $deployment->getPlatform()->getAudience())
+                ->withClaim(MessageInterface::CLAIM_SUB, $registration->getIdentifier())
+                ->withClaim(MessageInterface::CLAIM_ISS, $registration->getTool()->getAudience())
+                ->withClaim(MessageInterface::CLAIM_AUD, $registration->getPlatform()->getAudience())
                 ->withClaim(MessageInterface::CLAIM_NONCE, $nonce->getValue())
                 ->withClaim(MessageInterface::CLAIM_PARAMETERS, $oidcRequest->getParameters());
 
-            return new OidcAuthenticationRequest($deployment->getPlatform()->getOidcAuthenticationUrl(), [
+            return new OidcAuthenticationRequest($registration->getPlatform()->getOidcAuthenticationUrl(), [
                 'redirect_uri' => $oidcRequest->getTargetLinkUri(),
-                'client_id' => $deployment->getClientId(),
+                'client_id' => $registration->getClientId(),
                 'login_hint' => $oidcRequest->getLoginHint(),
                 'nonce' => $nonce->getValue(),
-                'state' => $this->builder->getMessage($deployment->getToolKeyChain())->getToken()->__toString(),
+                'state' => $this->builder->getMessage($registration->getToolKeyChain())->getToken()->__toString(),
                 'lti_message_hint' => $oidcRequest->getLtiMessageHint()
             ]);
 
@@ -96,25 +103,5 @@ class OidcLoginInitiator
                 $exception
             );
         }
-    }
-
-    /**
-     * @throws LtiException
-     */
-    private function findOidcLaunchRequestDeployment(OidcLaunchRequest $oidcRequest): DeploymentInterface
-    {
-        $deployment = null;
-
-        if ($oidcRequest->getLtiDeploymentId()) {
-            $deployment = $this->repository->find($oidcRequest->getLtiDeploymentId());
-        } elseif ($oidcRequest->getIssuer()) {
-            $deployment = $this->repository->findByIssuer($oidcRequest->getIssuer(), $oidcRequest->getClientId());
-        }
-
-        if (null === $deployment) {
-            throw new LtiException('Cannot find deployment for OIDC request');
-        }
-
-        return $deployment;
     }
 }

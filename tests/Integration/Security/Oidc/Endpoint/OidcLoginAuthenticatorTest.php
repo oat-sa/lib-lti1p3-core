@@ -24,7 +24,7 @@ namespace OAT\Library\Lti1p3Core\Tests\Integration\Security\Oidc\Endpoint;
 
 use Carbon\Carbon;
 use Lcobucci\JWT\Signer\Hmac\Sha384;
-use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Launch\Builder\OidcLaunchRequestBuilder;
 use OAT\Library\Lti1p3Core\Launch\Request\LtiLaunchRequest;
@@ -43,16 +43,16 @@ class OidcLoginAuthenticatorTest extends TestCase
 
     public function testAuthenticationSuccess(): void
     {
-        $deploymentRepository = $this->createTestDeploymentRepository();
-        $oidcLoginInitiator = new OidcLoginInitiator($deploymentRepository);
-        $subject = new OidcLoginAuthenticator($deploymentRepository, $this->createTestUserAuthenticator());
+        $registrationRepository = $this->createTestRegistrationRepository();
+        $oidcLoginInitiator = new OidcLoginInitiator($registrationRepository);
+        $subject = new OidcLoginAuthenticator($registrationRepository, $this->createTestUserAuthenticator());
 
         $resourceLink = $this->createTestResourceLink();
-        $deployment = $this->createTestDeployment();
+        $registration = $this->createTestRegistration();
 
         $oidcLaunchRequest = (new OidcLaunchRequestBuilder())->buildResourceLinkOidcLaunchRequest(
             $resourceLink,
-            $deployment,
+            $registration,
             'loginHint'
         );
 
@@ -70,11 +70,11 @@ class OidcLoginAuthenticatorTest extends TestCase
 
         $this->assertEquals($resourceLink->getUrl(), $result->getUrl());
 
-        $this->assertTrue($this->verifyJwt($idToken, $deployment->getPlatformKeyChain()->getPublicKey()));
+        $this->assertTrue($this->verifyJwt($idToken, $registration->getPlatformKeyChain()->getPublicKey()));
 
         $this->assertTrue($this->verifyJwt(
             $this->parseJwt($result->getOidcState()),
-            $deployment->getToolKeyChain()->getPublicKey()
+            $registration->getToolKeyChain()->getPublicKey()
         ));
 
         $ltiMessage = new LtiMessage($idToken);
@@ -83,16 +83,16 @@ class OidcLoginAuthenticatorTest extends TestCase
 
     public function testAnonymousAuthenticationSuccess(): void
     {
-        $deploymentRepository = $this->createTestDeploymentRepository();
-        $oidcLoginInitiator = new OidcLoginInitiator($deploymentRepository);
-        $subject = new OidcLoginAuthenticator($deploymentRepository, $this->createTestUserAuthenticator(true, true));
+        $registrationRepository = $this->createTestRegistrationRepository();
+        $oidcLoginInitiator = new OidcLoginInitiator($registrationRepository);
+        $subject = new OidcLoginAuthenticator($registrationRepository, $this->createTestUserAuthenticator(true, true));
 
         $resourceLink = $this->createTestResourceLink();
-        $deployment = $this->createTestDeployment();
+        $registration = $this->createTestRegistration();
 
         $oidcLaunchRequest = (new OidcLaunchRequestBuilder())->buildResourceLinkOidcLaunchRequest(
             $resourceLink,
-            $deployment,
+            $registration,
             'loginHint'
         );
 
@@ -110,11 +110,11 @@ class OidcLoginAuthenticatorTest extends TestCase
 
         $this->assertEquals($resourceLink->getUrl(), $result->getUrl());
 
-        $this->assertTrue($this->verifyJwt($idToken, $deployment->getPlatformKeyChain()->getPublicKey()));
+        $this->assertTrue($this->verifyJwt($idToken, $registration->getPlatformKeyChain()->getPublicKey()));
 
         $this->assertTrue($this->verifyJwt(
             $this->parseJwt($result->getOidcState()),
-            $deployment->getToolKeyChain()->getPublicKey()
+            $registration->getToolKeyChain()->getPublicKey()
         ));
 
         $ltiMessage = new LtiMessage($idToken);
@@ -126,13 +126,13 @@ class OidcLoginAuthenticatorTest extends TestCase
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage('User authentication failure');
 
-        $deploymentRepository = $this->createTestDeploymentRepository();
-        $oidcLoginInitiator = new OidcLoginInitiator($deploymentRepository);
-        $subject = new OidcLoginAuthenticator($deploymentRepository, $this->createTestUserAuthenticator(false));
+        $registrationRepository = $this->createTestRegistrationRepository();
+        $oidcLoginInitiator = new OidcLoginInitiator($registrationRepository);
+        $subject = new OidcLoginAuthenticator($registrationRepository, $this->createTestUserAuthenticator(false));
 
         $oidcLaunchRequest = (new OidcLaunchRequestBuilder())->buildResourceLinkOidcLaunchRequest(
             $this->createTestResourceLink(),
-            $this->createTestDeployment(),
+            $this->createTestRegistration(),
             'loginHint'
         );
 
@@ -145,19 +145,19 @@ class OidcLoginAuthenticatorTest extends TestCase
         );
     }
 
-    public function testFailureOnInvalidMessageHintDeploymentId(): void
+    public function testFailureOnInvalidMessageHintRegistrationId(): void
     {
         $this->expectException(LtiException::class);
-        $this->expectExceptionMessage('Invalid message hint deployment id');
+        $this->expectExceptionMessage('Invalid message hint registration id claim');
 
-        $deploymentRepository = $this->createTestDeploymentRepository([$this->createMock(DeploymentInterface::class)]);
-        $oidcLoginInitiator = new OidcLoginInitiator($this->createTestDeploymentRepository());
+        $registrationRepository = $this->createTestRegistrationRepository([$this->createMock(RegistrationInterface::class)]);
+        $oidcLoginInitiator = new OidcLoginInitiator($this->createTestRegistrationRepository());
 
-        $subject = new OidcLoginAuthenticator($deploymentRepository, $this->createTestUserAuthenticator());
+        $subject = new OidcLoginAuthenticator($registrationRepository, $this->createTestUserAuthenticator());
 
         $oidcLaunchRequest = (new OidcLaunchRequestBuilder())->buildResourceLinkOidcLaunchRequest(
             $this->createTestResourceLink(),
-            $this->createTestDeployment(),
+            $this->createTestRegistration(),
             'loginHint'
         );
 
@@ -175,11 +175,11 @@ class OidcLoginAuthenticatorTest extends TestCase
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage('Invalid message hint signature');
 
-        $deploymentRepository = $this->createTestDeploymentRepository();
-        $oidcLoginInitiator = new OidcLoginInitiator($deploymentRepository);
+        $registrationRepository = $this->createTestRegistrationRepository();
+        $oidcLoginInitiator = new OidcLoginInitiator($registrationRepository);
 
         $subject = new OidcLoginAuthenticator(
-            $deploymentRepository,
+            $registrationRepository,
             $this->createTestUserAuthenticator(),
             null,
             new Sha384()
@@ -187,7 +187,7 @@ class OidcLoginAuthenticatorTest extends TestCase
 
         $oidcLaunchRequest = (new OidcLaunchRequestBuilder())->buildResourceLinkOidcLaunchRequest(
             $this->createTestResourceLink(),
-            $this->createTestDeployment(),
+            $this->createTestRegistration(),
             'loginHint'
         );
 
@@ -208,14 +208,14 @@ class OidcLoginAuthenticatorTest extends TestCase
         $now = Carbon::now();
 
         Carbon::setTestNow($now->subSeconds(MessageInterface::TTL + 1));
-        $deploymentRepository = $this->createTestDeploymentRepository();
-        $oidcLoginInitiator = new OidcLoginInitiator($deploymentRepository);
+        $registrationRepository = $this->createTestRegistrationRepository();
+        $oidcLoginInitiator = new OidcLoginInitiator($registrationRepository);
 
-        $subject = new OidcLoginAuthenticator($deploymentRepository, $this->createTestUserAuthenticator(false));
+        $subject = new OidcLoginAuthenticator($registrationRepository, $this->createTestUserAuthenticator(false));
 
         $oidcLaunchRequest = (new OidcLaunchRequestBuilder())->buildResourceLinkOidcLaunchRequest(
             $this->createTestResourceLink(),
-            $this->createTestDeployment(),
+            $this->createTestRegistration(),
             'loginHint'
         );
 
@@ -235,7 +235,7 @@ class OidcLoginAuthenticatorTest extends TestCase
         $this->expectException(LtiException::class);
 
         $subject = new OidcLoginAuthenticator(
-            $this->createTestDeploymentRepository(),
+            $this->createTestRegistrationRepository(),
             $this->createTestUserAuthenticator()
         );
 

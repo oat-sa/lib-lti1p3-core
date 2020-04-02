@@ -22,13 +22,13 @@ To use it, you can simply do by example:
 ```php
 <?php
 
-use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Service\Client\ServiceClient;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
 // Get related deployment of the launch
-/** @var DeploymentRepositoryInterface $repository */
+/** @var RegistrationRepositoryInterface $repository */
 $deployment = $repository->find(...);
 
 // Optional but HIGHLY RECOMMENDED cache for access tokens

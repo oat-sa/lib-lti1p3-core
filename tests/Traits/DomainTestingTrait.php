@@ -22,9 +22,9 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Traits;
 
-use OAT\Library\Lti1p3Core\Deployment\Deployment;
-use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
-use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
+use OAT\Library\Lti1p3Core\Registration\Registration;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Link\ResourceLink\ResourceLink;
 use OAT\Library\Lti1p3Core\Platform\Platform;
 use OAT\Library\Lti1p3Core\Platform\PlatformInterface;
@@ -63,11 +63,12 @@ trait DomainTestingTrait
     private function createTestTool(
         string $identifier = 'toolIdentifier',
         string $name = 'toolName',
+        string $audience = 'platformAudience',
         string $oidcLoginInitiationUrl = 'http://tool.com/oidc-init',
         string $launchUrl = 'http://tool.com/launch',
         string $deepLaunchUrl = 'http://tool.com/deep-launch'
     ): Tool {
-        return new Tool($identifier, $name, $oidcLoginInitiationUrl, $launchUrl, $deepLaunchUrl);
+        return new Tool($identifier, $name, $audience, $oidcLoginInitiationUrl, $launchUrl, $deepLaunchUrl);
     }
 
     private function createTestResourceLink(
@@ -79,21 +80,23 @@ trait DomainTestingTrait
         return new ResourceLink($identifier, $url, $title, $description);
     }
 
-    private function createTestDeployment(
-        string $identifier = 'deploymentIdentifier',
-        string $clientId = 'deploymentClientId',
+    private function createTestRegistration(
+        string $identifier = 'registrationIdentifier',
+        string $clientId = 'registrationClientId',
         PlatformInterface $platform = null,
         ToolInterface $tool = null,
+        array $deploymentIds = ['deploymentIdentifier'],
         KeyChainInterface $platformKeyChain = null,
         KeyChainInterface $toolKeyChain = null,
         string $platformJwksUrl = null,
         string $toolJwksUrl = null
-    ): Deployment {
-        return new Deployment(
+    ): Registration {
+        return new Registration(
             $identifier,
             $clientId,
             $platform ?? $this->createTestPlatform(),
             $tool ?? $this->createTestTool(),
+            $deploymentIds,
             $platformKeyChain ?? $this->createTestKeyChain('platformKeyChain'),
             $toolKeyChain ?? $this->createTestKeyChain('toolKeyChain'),
             $platformJwksUrl,
@@ -101,16 +104,17 @@ trait DomainTestingTrait
         );
     }
 
-    private function createTestDeploymentWithJwksPlatform(
-        string $identifier = 'deploymentIdentifier',
-        string $clientId = 'deploymentClientId',
+    private function createTestRegistrationWithJwksPlatform(
+        string $identifier = 'registrationIdentifier',
+        string $clientId = 'registrationClientId',
         string $platformJwksUrl = 'http://platform.com/jwks'
-    ): Deployment {
-        return new Deployment(
+    ): Registration {
+        return new Registration(
             $identifier,
             $clientId,
             $platform ?? $this->createTestPlatform(),
             $tool ?? $this->createTestTool(),
+            ['deploymentIdentifier'],
             null,
             $toolKeyChain ?? $this->createTestKeyChain('toolKeyChain'),
             $platformJwksUrl,
@@ -118,16 +122,17 @@ trait DomainTestingTrait
         );
     }
 
-    private function createTestDeploymentWithoutToolKeyChain(
-        string $identifier = 'deploymentIdentifier',
-        string $clientId = 'deploymentClientId',
+    private function createTestRegistrationWithoutToolKeyChain(
+        string $identifier = 'registrationIdentifier',
+        string $clientId = 'registrationClientId',
         KeyChainInterface $platformKeyChain = null
-    ): Deployment {
-        return new Deployment(
+    ): Registration {
+        return new Registration(
             $identifier,
             $clientId,
             $platform ?? $this->createTestPlatform(),
             $tool ?? $this->createTestTool(),
+            ['deploymentIdentifier'],
             $platformKeyChain ?? $this->createTestKeyChain('platformKeyChain'),
             null,
             null,
@@ -135,40 +140,57 @@ trait DomainTestingTrait
         );
     }
 
-    private function createTestDeploymentRepository(array $deployments = []): DeploymentRepositoryInterface
+    private function createTestRegistrationRepository(array $registrations = []): RegistrationRepositoryInterface
     {
-        $deployments = !empty($deployments)
-            ? $deployments
-            : [$this->createTestDeployment()];
+        $registrations = !empty($registrations)
+            ? $registrations
+            : [$this->createTestRegistration()];
 
-        return new class ($deployments) implements DeploymentRepositoryInterface
+        return new class ($registrations) implements RegistrationRepositoryInterface
         {
-            /** @var DeploymentInterface[] */
-            private $deployments;
+            /** @var RegistrationInterface[] */
+            private $registrations;
 
-            /** @param DeploymentInterface[] $deployments */
-            public function __construct(array $deployments)
+            /** @param RegistrationInterface[] $registrations */
+            public function __construct(array $registrations)
             {
-                foreach ($deployments as $deployment) {
-                    $this->deployments[$deployment->getIdentifier()] = $deployment;
+                foreach ($registrations as $registration) {
+                    $this->registrations[$registration->getIdentifier()] = $registration;
                 }
             }
 
-            public function find(string $identifier): ?DeploymentInterface
+            public function find(string $identifier): ?RegistrationInterface
             {
-                return $this->deployments[$identifier] ?? null;
+                return $this->registrations[$identifier] ?? null;
             }
 
-            public function findByIssuer(string $issuer, string $clientId = null): ?DeploymentInterface
+            public function findByPlatformIssuer(string $issuer, string $clientId = null): ?RegistrationInterface
             {
-                foreach ($this->deployments as $deployment) {
-                    if ($deployment->getPlatform()->getAudience() === $issuer) {
+                foreach ($this->registrations as $registration) {
+                    if ($registration->getPlatform()->getAudience() === $issuer) {
                         if (null !== $clientId) {
-                            if ($deployment->getClientId() === $clientId) {
-                                return $deployment;
+                            if ($registration->getClientId() === $clientId) {
+                                return $registration;
                             }
                         } else {
-                            return $deployment;
+                            return $registration;
+                        }
+                    }
+                }
+
+                return null;
+            }
+
+            public function findByToolIssuer(string $issuer, string $clientId = null): ?RegistrationInterface
+            {
+                foreach ($this->registrations as $registration) {
+                    if ($registration->getTool()->getAudience() === $issuer) {
+                        if (null !== $clientId) {
+                            if ($registration->getClientId() === $clientId) {
+                                return $registration;
+                            }
+                        } else {
+                            return $registration;
                         }
                     }
                 }

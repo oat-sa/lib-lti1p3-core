@@ -27,7 +27,7 @@ use League\OAuth2\Server\CryptKey;
 use League\OAuth2\Server\Repositories\AccessTokenRepositoryInterface;
 use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
 use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
-use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Service\Server\Grant\JwtClientCredentialsGrant;
 use OAT\Library\Lti1p3Core\Service\Server\ResponseType\ScopeBearerResponseType;
 
@@ -42,7 +42,7 @@ class OAuth2AuthorizationServerFactory
     /** @var ScopeRepositoryInterface */
     private $scopeRepository;
 
-    /** @var DeploymentRepositoryInterface */
+    /** @var RegistrationRepositoryInterface */
     private $deploymentRepository;
 
     /** @var CryptKey */
@@ -55,7 +55,7 @@ class OAuth2AuthorizationServerFactory
         AccessTokenRepositoryInterface $accessTokenRepository,
         ClientRepositoryInterface $clientRepository,
         ScopeRepositoryInterface $scopeRepository,
-        DeploymentRepositoryInterface $deploymentRepository,
+        RegistrationRepositoryInterface $deploymentRepository,
         CryptKey $privateKey,
         string $encryptionKey
     ) {

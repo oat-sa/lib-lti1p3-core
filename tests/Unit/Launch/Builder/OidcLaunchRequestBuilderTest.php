@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Launch\Builder;
 
-use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Launch\Builder\OidcLaunchRequestBuilder;
 use OAT\Library\Lti1p3Core\Launch\Request\OidcLaunchRequest;
@@ -46,12 +46,13 @@ class OidcLaunchRequestBuilderTest extends TestCase
     public function testBuildUserResourceLinkLtiLaunchRequest(): void
     {
         $resourceLink = $this->createTestResourceLink();
-        $deployment = $this->createTestDeployment();
+        $registration = $this->createTestRegistration();
 
         $result = $this->subject->buildResourceLinkOidcLaunchRequest(
             $resourceLink,
-            $deployment,
+            $registration,
             'loginHint',
+            $registration->getDefaultDeploymentId(),
             [
                 'Learner'
             ],
@@ -62,14 +63,14 @@ class OidcLaunchRequestBuilderTest extends TestCase
         );
 
         $this->assertInstanceOf(OidcLaunchRequest::class, $result);
-        $this->assertEquals($deployment->getPlatform()->getAudience(), $result->getIssuer());
+        $this->assertEquals($registration->getPlatform()->getAudience(), $result->getIssuer());
         $this->assertEquals('loginHint', $result->getLoginHint());
         $this->assertEquals($resourceLink->getUrl(), $result->getTargetLinkUri());
-        $this->assertEquals($deployment->getIdentifier(), $result->getLtiDeploymentId());
-        $this->assertEquals($deployment->getClientId(), $result->getClientId());
+        $this->assertEquals($registration->getClientId(), $result->getClientId());
 
         $ltiMessage = new LtiMessage($this->parseJwt($result->getLtiMessageHint()));
 
+        $this->assertEquals($registration->getDefaultDeploymentId(), $ltiMessage->getDeploymentId());
         $this->assertEquals(['Learner'], $ltiMessage->getRoles());
         $this->assertEquals('id', $ltiMessage->getContext()->getId());
         $this->assertEquals('bbb', $ltiMessage->getClaim('aaa'));
@@ -84,26 +85,15 @@ class OidcLaunchRequestBuilderTest extends TestCase
 
         $this->subject->buildResourceLinkOidcLaunchRequest(
             $this->createTestResourceLink(),
-            $this->createTestDeployment(
+            $this->createTestRegistration(
                 'id',
                 'clientId',
                 $this->createTestPlatform(),
                 $this->createTestTool(),
+                ['deploymentIdentifier'],
                 $invalidKeyChain,
                 $invalidKeyChain
             ),
-            'loginHint'
-        );
-    }
-
-    public function testBuildResourceLinkLtiLaunchRequestGenericFailure(): void
-    {
-        $this->expectException(LtiException::class);
-        $this->expectExceptionMessage('Cannot create OIDC launch request');
-
-        $this->subject->buildResourceLinkOidcLaunchRequest(
-            $this->createTestResourceLink(),
-            $this->createMock(DeploymentInterface::class),
             'loginHint'
         );
     }

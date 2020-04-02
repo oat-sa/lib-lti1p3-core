@@ -26,8 +26,8 @@ use Carbon\Carbon;
 use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\Signer;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
-use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
-use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Launch\Request\LtiLaunchRequest;
 use OAT\Library\Lti1p3Core\Message\LtiMessage;
@@ -48,8 +48,8 @@ use Throwable;
  */
 class LtiLaunchRequestValidator
 {
-    /** @var DeploymentRepositoryInterface */
-    private $deploymentRepository;
+    /** @var RegistrationRepositoryInterface */
+    private $registrationRepository;
 
     /** @var NonceRepositoryInterface */
     private $nonceRepository;
@@ -70,12 +70,12 @@ class LtiLaunchRequestValidator
     private $failures = [];
 
     public function __construct(
-        DeploymentRepositoryInterface $deploymentRepository,
+        RegistrationRepositoryInterface $registrationRepository,
         NonceRepositoryInterface $nonceRepository,
         JwksFetcherInterface $jwksFetcher = null,
         Signer $signer = null
     ) {
-        $this->deploymentRepository = $deploymentRepository;
+        $this->registrationRepository = $registrationRepository;
         $this->nonceRepository = $nonceRepository;
         $this->fetcher = $jwksFetcher ?? new JwksFetcher();
         $this->signer = $signer ?? new Sha256();
@@ -99,19 +99,22 @@ class LtiLaunchRequestValidator
                 ? new Message($this->parser->parse($launchRequest->getOidcState()))
                 : null;
 
-            $deployment = $this->deploymentRepository->find($ltiMessage->getDeploymentId());
+            $registration = $this->registrationRepository->findByPlatformIssuer(
+                $ltiMessage->getMandatoryClaim(MessageInterface::CLAIM_ISS),
+                $ltiMessage->getMandatoryClaim(MessageInterface::CLAIM_AUD)
+            );
 
-            if (null === $deployment) {
-                throw new LtiException(sprintf('No deployment found with id %s', $ltiMessage->getDeploymentId()));
+            if (null === $registration) {
+                throw new LtiException('no matching registration found');
             }
 
             $this
-                ->validateMessageSignature($deployment, $ltiMessage)
+                ->validateMessageSignature($registration, $ltiMessage)
                 ->validateMessageExpiry($ltiMessage)
                 ->validateMessageNonce($ltiMessage)
-                ->validateMessageIssuer($deployment, $ltiMessage)
-                ->validateMessageAudience($deployment, $ltiMessage)
-                ->validateStateSignature($deployment, $oidcState)
+                ->validateMessageIssuer($registration, $ltiMessage)
+                ->validateMessageAudience($registration, $ltiMessage)
+                ->validateStateSignature($registration, $oidcState)
                 ->validateStateExpiry($oidcState);
 
             return new LtiLaunchRequestValidationResult($ltiMessage, $this->successes, $this->failures);
@@ -130,15 +133,15 @@ class LtiLaunchRequestValidator
     /**
      * @throws LtiException
      */
-    private function validateMessageSignature(DeploymentInterface $deployment, LtiMessageInterface $ltiMessage): self
+    private function validateMessageSignature(RegistrationInterface $registration, LtiMessageInterface $ltiMessage): self
     {
-        if (null === $deployment->getPlatformKeyChain()) {
+        if (null === $registration->getPlatformKeyChain()) {
             $key = $this->fetcher->fetchKey(
-                $deployment->getPlatformJwksUrl(),
+                $registration->getPlatformJwksUrl(),
                 $ltiMessage->getToken()->getHeader(MessageInterface::HEADER_KID)
             );
         } else {
-            $key = $deployment->getPlatformKeyChain()->getPublicKey();
+            $key = $registration->getPlatformKeyChain()->getPublicKey();
         }
 
         if (!$ltiMessage->getToken()->verify($this->signer, $key)) {
@@ -184,9 +187,9 @@ class LtiLaunchRequestValidator
         return $this;
     }
 
-    private function validateMessageIssuer(DeploymentInterface $deployment, LtiMessageInterface $ltiMessage): self
+    private function validateMessageIssuer(RegistrationInterface $registration, LtiMessageInterface $ltiMessage): self
     {
-        if ($deployment->getPlatform()->getAudience() !== $ltiMessage->getMandatoryClaim(MessageInterface::CLAIM_ISS)) {
+        if ($registration->getPlatform()->getAudience() !== $ltiMessage->getMandatoryClaim(MessageInterface::CLAIM_ISS)) {
             $this->addFailure('JWT id_token iss claim does not match platform audience');
         } else {
             $this->addSuccess('JWT id_token iss claim matches platform audience');
@@ -195,9 +198,9 @@ class LtiLaunchRequestValidator
         return $this;
     }
 
-    private function validateMessageAudience(DeploymentInterface $deployment, LtiMessageInterface $ltiMessage): self
+    private function validateMessageAudience(RegistrationInterface $registration, LtiMessageInterface $ltiMessage): self
     {
-        if ($deployment->getClientId() !== $ltiMessage->getMandatoryClaim(MessageInterface::CLAIM_AUD)) {
+        if ($registration->getClientId() !== $ltiMessage->getMandatoryClaim(MessageInterface::CLAIM_AUD)) {
             $this->addFailure('JWT id_token aud claim does not match tool oauth2 client id');
         } else {
             $this->addSuccess('JWT id_token aud claim matches tool oauth2 client id');
@@ -209,14 +212,14 @@ class LtiLaunchRequestValidator
     /**
      * @throws LtiException
      */
-    private function validateStateSignature(DeploymentInterface $deployment, MessageInterface $oidcState = null): self
+    private function validateStateSignature(RegistrationInterface $registration, MessageInterface $oidcState = null): self
     {
         if (null !== $oidcState) {
-            if (null === $deployment->getToolKeyChain()) {
+            if (null === $registration->getToolKeyChain()) {
                 throw new LtiException('Tool key chain not configured');
             }
 
-            if (!$oidcState->getToken()->verify($this->signer, $deployment->getToolKeyChain()->getPublicKey())) {
+            if (!$oidcState->getToken()->verify($this->signer, $registration->getToolKeyChain()->getPublicKey())) {
                 $this->addFailure('JWT OIDC state signature validation failure');
             } else {
                 $this->addSuccess('JWT OIDC state signature validation success');

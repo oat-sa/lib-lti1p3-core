@@ -23,7 +23,7 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Launch\Builder;
 
 use Lcobucci\JWT\Claim;
-use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Launch\Request\LtiLaunchRequest;
 use OAT\Library\Lti1p3Core\Link\ResourceLink\ResourceLinkInterface;
@@ -63,8 +63,9 @@ class LtiLaunchRequestBuilder
      */
     public function buildUserResourceLinkLtiLaunchRequest(
         ResourceLinkInterface $resourceLink,
-        DeploymentInterface $deployment,
+        RegistrationInterface $registration,
         UserIdentityInterface $userIdentity,
+        string $deploymentId = null,
         array $roles = [],
         array $optionalClaims = [],
         string $state = null
@@ -72,7 +73,8 @@ class LtiLaunchRequestBuilder
 
         return $this->buildResourceLinkLtiLaunchRequest(
             $resourceLink,
-            $deployment,
+            $registration,
+            $deploymentId,
             $roles,
             array_merge($optionalClaims, $userIdentity->normalize()),
             $state
@@ -84,7 +86,8 @@ class LtiLaunchRequestBuilder
      */
     public function buildResourceLinkLtiLaunchRequest(
         ResourceLinkInterface $resourceLink,
-        DeploymentInterface $deployment,
+        RegistrationInterface $registration,
+        string $deploymentId = null,
         array $roles = [],
         array $optionalClaims = [],
         string $state = null
@@ -96,7 +99,7 @@ class LtiLaunchRequestBuilder
             'description' => $resourceLink->getDescription(),
         ]);
 
-        $targetLinkUri = $resourceLink->getUrl() ?? $deployment->getTool()->getLaunchUrl();
+        $targetLinkUri = $resourceLink->getUrl() ?? $registration->getTool()->getLaunchUrl();
 
         $this->messageBuilder
             ->withClaim(LtiMessageInterface::CLAIM_LTI_MESSAGE_TYPE, $resourceLink->getType())
@@ -104,23 +107,40 @@ class LtiLaunchRequestBuilder
             ->withClaim(LtiMessageInterface::CLAIM_LTI_ROLES, $roles)
             ->withClaim($resourceLinkClaim);
 
-        return $this->buildLtiLaunchRequest($deployment, $targetLinkUri, $optionalClaims, $state);
+        return $this->buildLtiLaunchRequest($registration, $targetLinkUri, $deploymentId, $optionalClaims, $state);
     }
 
     /**
      * @throws LtiException
      */
     protected function buildLtiLaunchRequest(
-        DeploymentInterface $deployment,
+        RegistrationInterface $registration,
         string $url,
+        string $deploymentId = null,
         array $optionalClaims = [],
         string $state = null
     ): LtiLaunchRequest {
         try {
+            if (null !== $deploymentId) {
+                if (!$registration->hasDeploymentId($deploymentId)) {
+                    throw new LtiException(sprintf(
+                        'invalid deployment id %s for registration %s',
+                        $deploymentId,
+                        $registration->getIdentifier()
+                    ));
+                }
+            } else {
+                $deploymentId = $registration->getDefaultDeploymentId();
+
+                if (null === $deploymentId) {
+                    throw new LtiException('mandatory deployment id is missing');
+                }
+            }
+
             $this->messageBuilder
-                ->withClaim(LtiMessageInterface::CLAIM_ISS, $deployment->getPlatform()->getAudience())
-                ->withClaim(LtiMessageInterface::CLAIM_AUD, $deployment->getClientId())
-                ->withClaim(LtiMessageInterface::CLAIM_LTI_DEPLOYMENT_ID, $deployment->getIdentifier());
+                ->withClaim(LtiMessageInterface::CLAIM_ISS, $registration->getPlatform()->getAudience())
+                ->withClaim(LtiMessageInterface::CLAIM_AUD, $registration->getClientId())
+                ->withClaim(LtiMessageInterface::CLAIM_LTI_DEPLOYMENT_ID, $deploymentId);
 
             foreach ($optionalClaims as $claimName => $claim) {
                 if ($claim instanceof MessageClaimInterface) {
@@ -131,7 +151,7 @@ class LtiLaunchRequestBuilder
             }
 
             $idToken = $this->messageBuilder
-                ->getLtiMessage($deployment->getPlatformKeyChain())
+                ->getLtiMessage($registration->getPlatformKeyChain())
                 ->getToken();
 
             return new LtiLaunchRequest($url, [

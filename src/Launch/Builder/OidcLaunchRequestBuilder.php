@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Launch\Builder;
 
-use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Launch\Request\OidcLaunchRequest;
 use OAT\Library\Lti1p3Core\Link\ResourceLink\ResourceLinkInterface;
@@ -50,8 +50,9 @@ class OidcLaunchRequestBuilder
      */
     public function buildResourceLinkOidcLaunchRequest(
         ResourceLinkInterface $resourceLink,
-        DeploymentInterface $deployment,
+        RegistrationInterface $registration,
         string $loginHint,
+        string $deploymentId = null,
         array $roles = [],
         array $optionalClaims = []
     ): OidcLaunchRequest {
@@ -62,11 +63,28 @@ class OidcLaunchRequestBuilder
                 'description' => $resourceLink->getDescription(),
             ]);
 
-            $targetLinkUri = $resourceLink->getUrl() ?? $deployment->getTool()->getLaunchUrl();
+            if (null !== $deploymentId) {
+                if (!$registration->hasDeploymentId($deploymentId)) {
+                    throw new LtiException(sprintf(
+                       'invalid deployment id %s for registration %s',
+                       $deploymentId,
+                       $registration->getIdentifier()
+                   ));
+                }
+            } else {
+                $deploymentId = $registration->getDefaultDeploymentId();
+
+                if (null === $deploymentId) {
+                    throw new LtiException('mandatory deployment id is missing');
+                }
+            }
+
+            $targetLinkUri = $resourceLink->getUrl() ?? $registration->getTool()->getLaunchUrl();
 
             $this->messageBuilder
+                ->withClaim(LtiMessageInterface::CLAIM_REGISTRATION_ID, $registration->getIdentifier())
                 ->withClaim(LtiMessageInterface::CLAIM_LTI_MESSAGE_TYPE, $resourceLink->getType())
-                ->withClaim(LtiMessageInterface::CLAIM_LTI_DEPLOYMENT_ID, $deployment->getIdentifier())
+                ->withClaim(LtiMessageInterface::CLAIM_LTI_DEPLOYMENT_ID, $deploymentId)
                 ->withClaim(LtiMessageInterface::CLAIM_LTI_TARGET_LINK_URI, $targetLinkUri)
                 ->withClaim(LtiMessageInterface::CLAIM_LTI_ROLES, $roles)
                 ->withClaim($resourceLinkClaim);
@@ -80,16 +98,16 @@ class OidcLaunchRequestBuilder
             }
 
             $ltiMessageHintToken = $this->messageBuilder
-                ->getMessage($deployment->getPlatformKeyChain())
+                ->getMessage($registration->getPlatformKeyChain())
                 ->getToken();
 
-            return new OidcLaunchRequest($deployment->getTool()->getOidcLoginInitiationUrl(), [
-                'iss' => $deployment->getPlatform()->getAudience(),
+            return new OidcLaunchRequest($registration->getTool()->getOidcLoginInitiationUrl(), [
+                'iss' => $registration->getPlatform()->getAudience(),
                 'login_hint' => $loginHint,
                 'target_link_uri' => $targetLinkUri,
                 'lti_message_hint' => $ltiMessageHintToken->__toString(),
-                'lti_deployment_id' => $deployment->getIdentifier(),
-                'client_id' => $deployment->getClientId(),
+                'lti_deployment_id' => $deploymentId,
+                'client_id' => $registration->getClientId(),
             ]);
 
         } catch (LtiException $exception) {

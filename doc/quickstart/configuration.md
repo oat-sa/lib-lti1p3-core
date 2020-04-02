@@ -88,9 +88,9 @@ By example:
 ```php
 <?php
 
-use OAT\Library\Lti1p3Core\Deployment\Deployment;
+use OAT\Library\Lti1p3Core\Registration\Registration;
 
-$deployment = new Deployment(
+$deployment = new Registration(
     'deploymentIdentifier',  // [required] identifier
     'deploymentClientId',    // [required] client id
     $platform,               // [required] (PlatformInterface) platform 

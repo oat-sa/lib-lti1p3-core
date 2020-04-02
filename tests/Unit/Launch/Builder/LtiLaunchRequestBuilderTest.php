@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Launch\Builder;
 
-use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Launch\Builder\LtiLaunchRequestBuilder;
 use OAT\Library\Lti1p3Core\Launch\Request\LtiLaunchRequest;
@@ -46,10 +46,13 @@ class LtiLaunchRequestBuilderTest extends TestCase
 
     public function testBuildUserResourceLinkLtiLaunchRequest(): void
     {
+        $registration = $this->createTestRegistration();
+
         $result = $this->subject->buildUserResourceLinkLtiLaunchRequest(
             $this->createTestResourceLink(),
-            $this->createTestDeployment(),
+            $registration,
             $this->createTestUserIdentity(),
+            $registration->getDefaultDeploymentId(),
             [
                 'Learner'
             ],
@@ -66,6 +69,7 @@ class LtiLaunchRequestBuilderTest extends TestCase
         $ltiMessage = new LtiMessage($this->parseJwt($result->getLtiMessage()));
 
         $this->assertEquals(LtiMessageInterface::LTI_VERSION, $ltiMessage->getVersion());
+        $this->assertEquals( $registration->getDefaultDeploymentId(), $ltiMessage->getDeploymentId());
         $this->assertEquals(['Learner'], $ltiMessage->getRoles());
         $this->assertEquals('id', $ltiMessage->getContext()->getId());
         $this->assertEquals('bbb', $ltiMessage->getClaim('aaa'));
@@ -80,25 +84,15 @@ class LtiLaunchRequestBuilderTest extends TestCase
 
         $this->subject->buildResourceLinkLtiLaunchRequest(
             $this->createTestResourceLink(),
-            $this->createTestDeployment(
+            $this->createTestRegistration(
                 'id',
                 'clientId',
                 $this->createTestPlatform(),
                 $this->createTestTool(),
+                ['deploymentId'],
                 $invalidKeyChain,
                 $invalidKeyChain
             )
-        );
-    }
-
-    public function testBuildResourceLinkLtiLaunchRequestGenericFailure(): void
-    {
-        $this->expectException(LtiException::class);
-        $this->expectExceptionMessage('Cannot create LTI launch request');
-
-        $this->subject->buildResourceLinkLtiLaunchRequest(
-            $this->createTestResourceLink(),
-            $this->createMock(DeploymentInterface::class)
         );
     }
 }

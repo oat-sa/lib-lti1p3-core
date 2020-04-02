@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Service\Client;
 
-use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -33,7 +33,7 @@ interface ServiceClientInterface
     public const GRANT_TYPE = 'client_credentials';
 
     public function request(
-        DeploymentInterface $deployment,
+        RegistrationInterface $registration,
         string $method,
         string $uri,
         array $options = [],

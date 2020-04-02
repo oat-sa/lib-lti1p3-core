@@ -28,11 +28,11 @@ use League\OAuth2\Server\CryptKey;
 use League\OAuth2\Server\Repositories\AccessTokenRepositoryInterface;
 use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
 use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
-use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Service\OAuth2\Factory\OAuth2AuthorizationServerFactory;
 
 // prepare the required repository
-/** @var DeploymentRepositoryInterface $deploymentRepository */
+/** @var RegistrationRepositoryInterface $deploymentRepository */
 $deploymentRepository = ...
 
 /** @var AccessTokenRepositoryInterface $accessTokenRepository */

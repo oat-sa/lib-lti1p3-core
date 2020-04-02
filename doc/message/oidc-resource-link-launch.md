@@ -43,14 +43,14 @@ To do so, you can use the [OidcLaunchRequestBuilder](../../src/Launch/Builder/Oi
 <?php
 
 use OAT\Library\Lti1p3Core\Launch\Builder\OidcLaunchRequestBuilder;
-use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Message\Claim\ContextClaim;
 
 // Create the builder
 $builder = new OidcLaunchRequestBuilder();
 
 // Get related deployment of the launch
-/** @var DeploymentRepositoryInterface $repository */
+/** @var RegistrationRepositoryInterface $repository */
 $deployment = $repository->find(...);
 
 // Create a OIDC launch request
@@ -106,11 +106,11 @@ By example:
 ```php
 <?php
 
-use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Oidc\Endpoint\OidcLoginInitiator;
 use Psr\Http\Message\ServerRequestInterface;
 
-/** @var DeploymentRepositoryInterface $deploymentRepository */
+/** @var RegistrationRepositoryInterface $deploymentRepository */
 $deploymentRepository = ...
 
 /** @var ServerRequestInterface $request */
@@ -144,12 +144,12 @@ By example:
 ```php
 <?php
 
-use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Oidc\Endpoint\OidcLoginAuthenticator;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-/** @var DeploymentRepositoryInterface $deploymentRepository */
+/** @var RegistrationRepositoryInterface $deploymentRepository */
 $deploymentRepository = ...
 
 /** @var UserAuthenticatorInterface $userAuthenticator */
@@ -186,11 +186,11 @@ By example:
 <?php
 
 use OAT\Library\Lti1p3Core\Launch\Validator\LtiLaunchRequestValidator;
-use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepositoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-/** @var DeploymentRepositoryInterface $deploymentRepository */
+/** @var RegistrationRepositoryInterface $deploymentRepository */
 $deploymentRepository = ...
 
 /** @var NonceRepositoryInterface $nonceRepository */
