@@ -7,7 +7,7 @@
 - [Configure security keys](#configure-security-keys)
 - [Configure a platform](#configure-a-platform)
 - [Configure a tool](#configure-a-tool)
-- [Configure a deployment](#configure-a-deployment)
+- [Configure a registration](#configure-a-registration)
 
 ## Configure security keys
 
@@ -69,20 +69,21 @@ By example:
 use OAT\Library\Lti1p3Core\Tool\Tool;
 
 $tool = new Tool(
-    'toolIdentifier',                   // [required] identifier
-    'toolName',                         // [required] name
-    'https://platform.com/oidc-init',   // [optional] OIDC login initiation url
-    'https://platform.com/launch',      // [optional] LTI default ResourceLink launch url
-    'https://platform.com/deep-launch'  // [optional] LTI DeepLink launch url
+    'toolIdentifier',               // [required] identifier
+    'toolName',                     // [required] name
+    'https://tool.com',             // [required] audience
+    'https://tool.com/oidc-init',   // [optional] OIDC login initiation url
+    'https://tool.com/launch',      // [optional] LTI default ResourceLink launch url
+    'https://tool.com/deep-launch'  // [optional] LTI DeepLink launch url
 );
 ```
 **Note**: you can also provide your own implementation of the [ToolInterface](../../src/Tool/ToolInterface.php).
 
-## Configure a deployment
+## Configure a registration
 
-You need then to create a [deployment](http://www.imsglobal.org/spec/lti/v1p3#tool-deployment-0), referencing how the tool is deployed for the platform.
+You need then to create a [registration](http://www.imsglobal.org/spec/lti/v1p3#tool-deployment-0), describing how the tool is made available for the platform.
 
-A same platform instance can deploy several tools (or several times the same tool instance), that is why this bind is handled on deployment level.
+A same platform instance can deploy several tools (or several times the same tool instance), that is why this binding is handled on the deployment ids level.
 
 By example:
 ```php
@@ -90,19 +91,20 @@ By example:
 
 use OAT\Library\Lti1p3Core\Registration\Registration;
 
-$deployment = new Registration(
-    'deploymentIdentifier',  // [required] identifier
-    'deploymentClientId',    // [required] client id
-    $platform,               // [required] (PlatformInterface) platform 
-    $tool,                   // [required] (ToolInterface) tool 
-    $platformKeyChain,       // [optional] (KeyChainInterface) key chain of the platform 
-    $toolKeyChain,           // [optional] (KeyChainInterface) key chain of the tool 
-    $platformJwksUrl,        // [optional] JWKS url of the platform
-    $toolJwksUrl,            // [optional] JWKS url of the tool
+$registration = new Registration(
+    'registrationIdentifier',  // [required] identifier
+    'registrationClientId',    // [required] client id
+    $platform,                 // [required] (PlatformInterface) platform 
+    $tool,                     // [required] (ToolInterface) tool 
+    $deploymentIds,            // [required] (array) deployments ids 
+    $platformKeyChain,         // [optional] (KeyChainInterface) key chain of the platform 
+    $toolKeyChain,             // [optional] (KeyChainInterface) key chain of the tool 
+    $platformJwksUrl,          // [optional] JWKS url of the platform
+    $toolJwksUrl,              // [optional] JWKS url of the tool
 );
 ```
 **Notes**:
-- you can also provide your own implementation of the [DeploymentInterface](../../src/Deployment/DeploymentInterface.php)
+- you can also provide your own implementation of the [RegistrationInterface](../../src/Registration/RegistrationInterface.php)
 - depending on the side you act (platform or tool), you need to configure what is relevant regarding the keys and the JWKS urls
 - for signature verification, the library will try first to use first the configured key chain if given, and fallback on a JWKS call to avoid performances issues
-- since you should be in control of the way you give your configuration (from YML files, array, database, etc), you have to provide your own implementation of the [DeploymentRepositoryInterface](../../src/Deployment/DeploymentRepositoryInterface.php)
+- since you should be in control of the way you retrieve your registrations configuration (from YML files, array, database, etc), you have to provide your own implementation of the [RegistrationRepositoryInterface](../../src/Registration/RegistrationRepositoryInterface.php) to fit your needs

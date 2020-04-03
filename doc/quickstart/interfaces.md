@@ -11,13 +11,13 @@
 
 This section present the mandatory interfaces from the library to be implemented to use provided services.
 
-### Deployment repository interface
+### Registration repository interface
 
 **Required by**:
 - [Message](../../src/Message)
 - [Service](../../src/Service)
 
-In order to be able to retrieve your deployments from your configuration storage, you need to provide an implementation of the [DeploymentRepositoryInterface](../../src/Deployment/DeploymentRepositoryInterface.php).
+In order to be able to retrieve your registrations from your configuration storage, you need to provide an implementation of the [RegistrationRepositoryInterface](../../src/Registration/RegistrationRepositoryInterface.php).
 
 By example:
 ```php
@@ -26,20 +26,25 @@ By example:
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 
-$deploymentRepository = new class implements RegistrationRepositoryInterface
+$registrationRepository = new class implements RegistrationRepositoryInterface
 {
    public function find(string $identifier): ?RegistrationInterface
    {
-       // TODO: Implement find() method to find a deployment by identifier, or null if not found.
+       // TODO: Implement find() method to find a registration by identifier, or null if not found.
    }
 
-   public function findByIssuer(string $issuer, string $clientId = null): ?RegistrationInterface
+   public function findByPlatformIssuer(string $issuer, string $clientId = null): ?RegistrationInterface
    {
-        // TODO: Implement findByIssuer() method to find a deployment by issuer, and client id if provided.
+        // TODO: Implement findByPlatformIssuer() method to find a registration by platform issuer, and client id if provided.
+   }
+
+   public function findByToolIssuer(string $issuer, string $clientId = null): ?RegistrationInterface
+   {
+        // TODO: Implement findByToolIssuer() method to find a registration by tool issuer, and client id if provided.
    }
 };
 ```
-**Note**: you can find a simple implementation example of this interface in the method `createTestDeploymentRepository()` of the [DomainTestingTrait](../../tests/Traits/DomainTestingTrait.php).
+**Note**: you can find a simple implementation example of this interface in the method `createTestRegistrationRepository()` of the [DomainTestingTrait](../../tests/Traits/DomainTestingTrait.php).
 
 ### Nonce repository interface
 
@@ -149,7 +154,7 @@ use Psr\Http\Message\ResponseInterface;
 
 $client = new class implements ServiceClientInterface
 {
-    public function request(RegistrationInterface $deployment, string $method, string $uri, array $options = [], array $scopes = []) : ResponseInterface
+    public function request(RegistrationInterface $registration, string $method, string $uri, array $options = [], array $scopes = []) : ResponseInterface
     {
         // TODO: Implement request() method to manage authenticated calls to services.
     }

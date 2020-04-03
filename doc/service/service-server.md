@@ -11,7 +11,7 @@
 ## Preparing required repository
 
 For this feature, you need to provide first:
-- a [DeploymentRepositoryInterface](../../src/Domain/Deployment/DeploymentRepositoryInterface.php) implementation (to retrieve your deployments configurations)
+- a [RegistrationRepositoryInterface](../../src/Registration/RegistrationRepositoryInterface.php) implementation (to retrieve your registrations configurations)
 - a [AccessTokenRepositoryInterface](https://github.com/thephpleague/oauth2-server/blob/master/src/Repositories/AccessTokenRepositoryInterface.php) implementation (to store the created access tokens)
 - a [ClientRepositoryInterface](https://github.com/thephpleague/oauth2-server/blob/master/src/Repositories/ClientRepositoryInterface.php) implementation (to retrieve your clients)
 - a [ScopeRepositoryInterface](https://github.com/thephpleague/oauth2-server/blob/master/src/Repositories/ScopeRepositoryInterface.php) implementation (to retrieve your scopes)
@@ -32,8 +32,8 @@ use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Service\OAuth2\Factory\OAuth2AuthorizationServerFactory;
 
 // prepare the required repository
-/** @var RegistrationRepositoryInterface $deploymentRepository */
-$deploymentRepository = ...
+/** @var RegistrationRepositoryInterface $regitrationRepository */
+$regitrationRepository = ...
 
 /** @var AccessTokenRepositoryInterface $accessTokenRepository */
 $accessTokenRepository = ...
@@ -48,7 +48,7 @@ $scopeRepository = ...
 $privateKey = ...
 
 $factory = new OAuth2AuthorizationServerFactory(
-    $deploymentRepository,
+    $regitrationRepository,
     $accessTokenRepository,
     $clientRepository,
     $scopeRepository,
