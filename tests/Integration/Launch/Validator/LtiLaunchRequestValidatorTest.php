@@ -71,8 +71,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
                 'JWT id_token signature validation success',
                 'JWT id_token is not expired',
                 'JWT id_token nonce is valid',
-                'JWT id_token iss claim matches platform audience',
-                'JWT id_token aud claim matches tool oauth2 client id'
+                'JWT id_token deployment_id claim valid for this registration'
             ],
             $result->getSuccesses()
         );
@@ -108,8 +107,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
                 'JWT id_token signature validation success',
                 'JWT id_token is not expired',
                 'JWT id_token nonce is valid',
-                'JWT id_token iss claim matches platform audience',
-                'JWT id_token aud claim matches tool oauth2 client id'
+                'JWT id_token deployment_id claim valid for this registration'
             ],
             $result->getSuccesses()
         );
@@ -164,8 +162,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
                 'JWT id_token signature validation success',
                 'JWT id_token is not expired',
                 'JWT id_token nonce is valid',
-                'JWT id_token iss claim matches platform audience',
-                'JWT id_token aud claim matches tool oauth2 client id',
+                'JWT id_token deployment_id claim valid for this registration',
                 'JWT OIDC state signature validation success',
                 'JWT OIDC state is not expired'
             ],
@@ -216,8 +213,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
                 'JWT id_token signature validation success',
                 'JWT id_token is not expired',
                 'JWT id_token nonce is valid',
-                'JWT id_token iss claim matches platform audience',
-                'JWT id_token aud claim matches tool oauth2 client id',
+                'JWT id_token deployment_id claim valid for this registration',
                 'JWT OIDC state signature validation success',
                 'JWT OIDC state is not expired'
             ],
@@ -288,6 +284,33 @@ class LtiLaunchRequestValidatorTest extends TestCase
         $this->assertEquals(['JWT id_token signature validation failure'], $result->getFailures());
     }
 
+    public function testValidationFailureOnInvalidDeploymentId(): void
+    {
+        $invalidRegistration = $this->createTestRegistration(
+            'registrationIdentifier',
+            'registrationClientId',
+            $this->createTestPlatform(),
+            $this->createTestTool(),
+            ['invalid']
+        );
+
+        $subject = new LtiLaunchRequestValidator(
+            $this->createTestRegistrationRepository([$invalidRegistration]),
+            $this->createTestNonceRepository()
+        );
+
+        $launchRequest = (new LtiLaunchRequestBuilder())->buildResourceLinkLtiLaunchRequest(
+            $this->createTestResourceLink(),
+            $this->createTestRegistration()
+        );
+
+        $result = $subject->validate($this->createServerRequest('GET', $launchRequest->toUrl()));
+
+        $this->assertInstanceOf(LtiLaunchRequestValidationResult::class, $result);
+        $this->assertTrue($result->hasFailures());
+        $this->assertEquals(['JWT id_token deployment_id claim not valid for this registration'], $result->getFailures());
+    }
+
     public function testValidationFailureOnExpiredIdToken(): void
     {
         $now = Carbon::now();
@@ -330,32 +353,6 @@ class LtiLaunchRequestValidatorTest extends TestCase
         $this->assertInstanceOf(LtiLaunchRequestValidationResult::class, $result);
         $this->assertTrue($result->hasFailures());
         $this->assertEquals(['JWT id_token nonce already used'], $result->getFailures());
-    }
-
-    public function testValidationFailureOnIMissingToolKeyChain(): void
-    {
-        $this->expectException(LtiException::class);
-        $this->expectExceptionMessage('Tool key chain not configured');
-
-        $state = (new Builder())->getToken(new Sha256(), $this->createTestKeyChain()->getPrivateKey())->__toString();
-
-        $registration = $this->createTestRegistrationWithoutToolKeyChain();
-
-        $subject = new LtiLaunchRequestValidator(
-            $this->createTestRegistrationRepository([$registration]),
-            $this->createTestNonceRepository()
-        );
-
-        $launchRequest = (new LtiLaunchRequestBuilder())->buildResourceLinkLtiLaunchRequest(
-            $this->createTestResourceLink(),
-            $registration,
-            $registration->getDefaultDeploymentId(),
-            [],
-            [],
-            $state
-        );
-
-        $subject->validate($this->createServerRequest('GET', $launchRequest->toUrl()));
     }
 
     public function testValidationFailureOnInvalidOidcStateSignature(): void
@@ -430,6 +427,32 @@ class LtiLaunchRequestValidatorTest extends TestCase
         $launchRequest = (new LtiLaunchRequestBuilder())->buildResourceLinkLtiLaunchRequest(
             $this->createTestResourceLink(),
             $this->createTestRegistration()
+        );
+
+        $subject->validate($this->createServerRequest('GET', $launchRequest->toUrl()));
+    }
+
+    public function testItThrowAnLtiExceptionOnIMissingToolKeyChain(): void
+    {
+        $this->expectException(LtiException::class);
+        $this->expectExceptionMessage('Tool key chain not configured');
+
+        $state = (new Builder())->getToken(new Sha256(), $this->createTestKeyChain()->getPrivateKey())->__toString();
+
+        $registration = $this->createTestRegistrationWithoutToolKeyChain();
+
+        $subject = new LtiLaunchRequestValidator(
+            $this->createTestRegistrationRepository([$registration]),
+            $this->createTestNonceRepository()
+        );
+
+        $launchRequest = (new LtiLaunchRequestBuilder())->buildResourceLinkLtiLaunchRequest(
+            $this->createTestResourceLink(),
+            $registration,
+            $registration->getDefaultDeploymentId(),
+            [],
+            [],
+            $state
         );
 
         $subject->validate($this->createServerRequest('GET', $launchRequest->toUrl()));

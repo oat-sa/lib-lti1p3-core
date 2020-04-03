@@ -26,8 +26,6 @@ use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Launch\Request\OidcLaunchRequest;
 use OAT\Library\Lti1p3Core\Link\ResourceLink\ResourceLinkInterface;
-use OAT\Library\Lti1p3Core\Message\Builder\MessageBuilder;
-use OAT\Library\Lti1p3Core\Message\Claim\MessageClaimInterface;
 use OAT\Library\Lti1p3Core\Message\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use Throwable;
@@ -35,16 +33,8 @@ use Throwable;
 /**
  * @see https://www.imsglobal.org/spec/security/v1p0/#step-1-third-party-initiated-login
  */
-class OidcLaunchRequestBuilder
+class OidcLaunchRequestBuilder extends AbstractLaunchRequestBuilder
 {
-    /** @var MessageBuilder */
-    private $messageBuilder;
-
-    public function __construct(MessageBuilder $messageBuilder = null)
-    {
-        $this->messageBuilder = $messageBuilder ?? new MessageBuilder();
-    }
-
     /**
      * @throws LtiException
      */
@@ -63,21 +53,7 @@ class OidcLaunchRequestBuilder
                 'description' => $resourceLink->getDescription(),
             ]);
 
-            if (null !== $deploymentId) {
-                if (!$registration->hasDeploymentId($deploymentId)) {
-                    throw new LtiException(sprintf(
-                       'invalid deployment id %s for registration %s',
-                       $deploymentId,
-                       $registration->getIdentifier()
-                   ));
-                }
-            } else {
-                $deploymentId = $registration->getDefaultDeploymentId();
-
-                if (null === $deploymentId) {
-                    throw new LtiException('mandatory deployment id is missing');
-                }
-            }
+            $deploymentId = $this->resolveDeploymentId($registration, $deploymentId);
 
             $targetLinkUri = $resourceLink->getUrl() ?? $registration->getTool()->getLaunchUrl();
 
@@ -89,13 +65,7 @@ class OidcLaunchRequestBuilder
                 ->withClaim(LtiMessageInterface::CLAIM_LTI_ROLES, $roles)
                 ->withClaim($resourceLinkClaim);
 
-            foreach ($optionalClaims as $claimName => $claim) {
-                if ($claim instanceof MessageClaimInterface) {
-                    $this->messageBuilder->withClaim($claim);
-                } else {
-                    $this->messageBuilder->withClaim($claimName, $claim);
-                }
-            }
+            $this->applyOptionalClaims($optionalClaims);
 
             $ltiMessageHintToken = $this->messageBuilder
                 ->getMessage($registration->getPlatformKeyChain())
@@ -113,11 +83,7 @@ class OidcLaunchRequestBuilder
         } catch (LtiException $exception) {
             throw $exception;
         } catch (Throwable $exception) {
-            throw new LtiException(
-                sprintf('Cannot create OIDC launch request: %s', $exception->getMessage()),
-                $exception->getCode(),
-                $exception
-            );
+            $this->convertAndThrowException($exception);
         }
     }
 }

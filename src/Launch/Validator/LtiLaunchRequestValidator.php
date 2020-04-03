@@ -112,8 +112,7 @@ class LtiLaunchRequestValidator
                 ->validateMessageSignature($registration, $ltiMessage)
                 ->validateMessageExpiry($ltiMessage)
                 ->validateMessageNonce($ltiMessage)
-                ->validateMessageIssuer($registration, $ltiMessage)
-                ->validateMessageAudience($registration, $ltiMessage)
+                ->validateMessageDeploymentId($registration, $ltiMessage)
                 ->validateStateSignature($registration, $oidcState)
                 ->validateStateExpiry($oidcState);
 
@@ -187,23 +186,12 @@ class LtiLaunchRequestValidator
         return $this;
     }
 
-    private function validateMessageIssuer(RegistrationInterface $registration, LtiMessageInterface $ltiMessage): self
+    private function validateMessageDeploymentId(RegistrationInterface $registration, LtiMessageInterface $ltiMessage): self
     {
-        if ($registration->getPlatform()->getAudience() !== $ltiMessage->getMandatoryClaim(MessageInterface::CLAIM_ISS)) {
-            $this->addFailure('JWT id_token iss claim does not match platform audience');
+        if (!$registration->hasDeploymentId($ltiMessage->getDeploymentId())) {
+            $this->addFailure('JWT id_token deployment_id claim not valid for this registration');
         } else {
-            $this->addSuccess('JWT id_token iss claim matches platform audience');
-        }
-
-        return $this;
-    }
-
-    private function validateMessageAudience(RegistrationInterface $registration, LtiMessageInterface $ltiMessage): self
-    {
-        if ($registration->getClientId() !== $ltiMessage->getMandatoryClaim(MessageInterface::CLAIM_AUD)) {
-            $this->addFailure('JWT id_token aud claim does not match tool oauth2 client id');
-        } else {
-            $this->addSuccess('JWT id_token aud claim matches tool oauth2 client id');
+            $this->addSuccess('JWT id_token deployment_id claim valid for this registration');
         }
 
         return $this;
