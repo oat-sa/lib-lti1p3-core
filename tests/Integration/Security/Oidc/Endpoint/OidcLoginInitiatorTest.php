@@ -23,7 +23,7 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Integration\Security\Oidc\Endpoint;
 
 use Exception;
-use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Launch\Builder\OidcLaunchRequestBuilder;
 use OAT\Library\Lti1p3Core\Launch\Request\OidcLaunchRequest;
@@ -43,17 +43,17 @@ class OidcLoginInitiatorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->subject = new OidcLoginInitiator($this->createTestDeploymentRepository());
+        $this->subject = new OidcLoginInitiator($this->createTestRegistrationRepository());
     }
 
     public function testInitiationSuccess(): void
     {
         $resourceLink = $this->createTestResourceLink();
-        $deployment = $this->createTestDeployment();
+        $registration = $this->createTestRegistration();
 
         $oidcLaunchRequest = (new OidcLaunchRequestBuilder())->buildResourceLinkOidcLaunchRequest(
             $resourceLink,
-            $deployment,
+            $registration,
             'loginHint'
         );
 
@@ -61,18 +61,18 @@ class OidcLoginInitiatorTest extends TestCase
 
         $this->assertInstanceOf(OidcAuthenticationRequest::class, $result);
 
-        $this->assertEquals($deployment->getPlatform()->getOidcAuthenticationUrl(), $result->getUrl());
+        $this->assertEquals($registration->getPlatform()->getOidcAuthenticationUrl(), $result->getUrl());
         $this->assertEquals($resourceLink->getUrl(), $result->getRedirectUri());
-        $this->assertEquals($deployment->getClientId(), $result->getClientId());
+        $this->assertEquals($registration->getClientId(), $result->getClientId());
         $this->assertEquals('loginHint', $result->getLoginHint());
 
         $this->assertTrue($this->verifyJwt(
             $this->parseJwt($result->getLtiMessageHint()),
-            $deployment->getPlatformKeyChain()->getPublicKey()
+            $registration->getPlatformKeyChain()->getPublicKey()
         ));
         $this->assertTrue($this->verifyJwt(
             $this->parseJwt($result->getState()),
-            $deployment->getToolKeyChain()->getPublicKey()
+            $registration->getToolKeyChain()->getPublicKey()
         ));
     }
 
@@ -86,25 +86,14 @@ class OidcLoginInitiatorTest extends TestCase
         $this->subject->initiate($this->createServerRequest('GET', $oidcLaunchRequest->toUrl()));
     }
 
-    public function testInitiationFailureOnNotFoundDeploymentById(): void
+    public function testInitiationFailureOnNotFoundRegistrationById(): void
     {
         $this->expectException(LtiException::class);
-        $this->expectExceptionMessage('Cannot find deployment for OIDC request');
-
-        $oidcLaunchRequest = new OidcLaunchRequest('invalid', [
-            'lti_deployment_id' => 'invalid'
-        ]);
-
-        $this->subject->initiate($this->createServerRequest('GET', $oidcLaunchRequest->toUrl()));
-    }
-
-    public function testInitiationFailureOnNotFoundDeploymentByIssuer(): void
-    {
-        $this->expectException(LtiException::class);
-        $this->expectExceptionMessage('Cannot find deployment for OIDC request');
+        $this->expectExceptionMessage('Cannot find registration for OIDC request');
 
         $oidcLaunchRequest = new OidcLaunchRequest('invalid', [
             'iss' => 'invalid',
+            'client_id' => 'invalid'
         ]);
 
         $this->subject->initiate($this->createServerRequest('GET', $oidcLaunchRequest->toUrl()));
@@ -115,17 +104,18 @@ class OidcLoginInitiatorTest extends TestCase
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage('OIDC login initiation failed: generic error');
 
-        $repositoryMock = $this->createMock(DeploymentRepositoryInterface::class);
+        $repositoryMock = $this->createMock(RegistrationRepositoryInterface::class);
         $repositoryMock
             ->expects($this->once())
-            ->method('find')
-            ->with('invalid')
+            ->method('findByPlatformIssuer')
+            ->with('invalid', 'invalid')
             ->willThrowException(new Exception('generic error'));
 
         $subject = new OidcLoginInitiator($repositoryMock);
 
         $oidcLaunchRequest = new OidcLaunchRequest('invalid', [
-            'lti_deployment_id' => 'invalid'
+            'iss' => 'invalid',
+            'client_id' => 'invalid'
         ]);
 
         $subject->initiate($this->createServerRequest('GET', $oidcLaunchRequest->toUrl()));

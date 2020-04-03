@@ -22,14 +22,14 @@ To use it, you can simply do by example:
 ```php
 <?php
 
-use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Service\Client\ServiceClient;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
-// Get related deployment of the launch
-/** @var DeploymentRepositoryInterface $repository */
-$deployment = $repository->find(...);
+// Get related registration of the launch
+/** @var RegistrationRepositoryInterface $registrationRepository */
+$registration = $registrationRepository->find(...);
 
 // Optional but HIGHLY RECOMMENDED cache for access tokens
 /** @var CacheItemPoolInterface $cache */
@@ -38,6 +38,6 @@ $cache = ...
 $client = new ServiceClient($cache);
 
 /** @var ResponseInterface $response */
-$response = $client->request($deployment, 'GET', 'https://platform.com/some-service-url', [...]);
+$response = $client->request($registration, 'GET', 'https://platform.com/some-service-url', [...]);
 ```
 **Note**: the client decorates by default a [guzzle](http://docs.guzzlephp.org/en/stable/) client, but you can provide your own by implementing [ServiceClientInterface](../../src/Service/Client/ServiceClientInterface.php)

@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Deployment;
+namespace OAT\Library\Lti1p3Core\Registration;
 
 use OAT\Library\Lti1p3Core\Platform\PlatformInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
@@ -29,7 +29,7 @@ use OAT\Library\Lti1p3Core\Tool\ToolInterface;
 /**
  * @see http://www.imsglobal.org/spec/lti/v1p3/#tool-deployment-0
  */
-interface DeploymentInterface
+interface RegistrationInterface
 {
     public function getIdentifier(): string;
 
@@ -38,6 +38,12 @@ interface DeploymentInterface
     public function getPlatform(): PlatformInterface;
 
     public function getTool(): ToolInterface;
+
+    public function getDeploymentIds(): array;
+
+    public function hasDeploymentId(string $deploymentId): bool;
+
+    public function getDefaultDeploymentId(): ?string;
 
     public function getPlatformKeyChain(): ?KeyChainInterface;
 

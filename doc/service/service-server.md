@@ -11,7 +11,7 @@
 ## Preparing required repository
 
 For this feature, you need to provide first:
-- a [DeploymentRepositoryInterface](../../src/Domain/Deployment/DeploymentRepositoryInterface.php) implementation (to retrieve your deployments configurations)
+- a [RegistrationRepositoryInterface](../../src/Registration/RegistrationRepositoryInterface.php) implementation (to retrieve your registrations configurations)
 - a [AccessTokenRepositoryInterface](https://github.com/thephpleague/oauth2-server/blob/master/src/Repositories/AccessTokenRepositoryInterface.php) implementation (to store the created access tokens)
 - a [ClientRepositoryInterface](https://github.com/thephpleague/oauth2-server/blob/master/src/Repositories/ClientRepositoryInterface.php) implementation (to retrieve your clients)
 - a [ScopeRepositoryInterface](https://github.com/thephpleague/oauth2-server/blob/master/src/Repositories/ScopeRepositoryInterface.php) implementation (to retrieve your scopes)
@@ -28,13 +28,10 @@ use League\OAuth2\Server\CryptKey;
 use League\OAuth2\Server\Repositories\AccessTokenRepositoryInterface;
 use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
 use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
-use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
-use OAT\Library\Lti1p3Core\Service\OAuth2\Factory\OAuth2AuthorizationServerFactory;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
+use OAT\Library\Lti1p3Core\Service\Server\Factory\OAuth2AuthorizationServerFactory;
 
-// prepare the required repository
-/** @var DeploymentRepositoryInterface $deploymentRepository */
-$deploymentRepository = ...
-
+// prepare the required repositories
 /** @var AccessTokenRepositoryInterface $accessTokenRepository */
 $accessTokenRepository = ...
 
@@ -44,14 +41,17 @@ $clientRepository = ...
 /** @var ScopeRepositoryInterface $scopeRepository */
 $scopeRepository = ...
 
+/** @var RegistrationRepositoryInterface $registrationRepository */
+$registrationRepository = ...
+
 /** @var CryptKey $privateKey */
 $privateKey = ...
 
 $factory = new OAuth2AuthorizationServerFactory(
-    $deploymentRepository,
     $accessTokenRepository,
     $clientRepository,
     $scopeRepository,
+    $registrationRepository,
     $privateKey,
     'encrypted key'
 );

@@ -34,7 +34,7 @@ use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
 use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
 use League\OAuth2\Server\RequestEvent;
 use League\OAuth2\Server\ResponseTypes\ResponseTypeInterface;
-use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class JwtClientCredentialsGrant extends AbstractGrant
@@ -54,12 +54,12 @@ class JwtClientCredentialsGrant extends AbstractGrant
     /** @var ScopeRepositoryInterface */
     protected $scopeRepository;
 
-    /** @var DeploymentRepositoryInterface */
-    private $deploymentRepository;
+    /** @var RegistrationRepositoryInterface */
+    private $registrationRepository;
 
-    public function __construct(DeploymentRepositoryInterface $deploymentRepository)
+    public function __construct(RegistrationRepositoryInterface $registrationRepository)
     {
-        $this->deploymentRepository = $deploymentRepository;
+        $this->registrationRepository = $registrationRepository;
     }
 
     public function getIdentifier(): string
@@ -124,18 +124,18 @@ class JwtClientCredentialsGrant extends AbstractGrant
             throw OAuthServerException::invalidRequest('client_assertion', 'Invalid JWT token provided');
         }
 
-        // looking for deployment
-        $deployment = $this->deploymentRepository->findByIssuer($token->getClaim('iss'), $token->getClaim('sub'));
+        // looking for registration
+        $registration = $this->registrationRepository->findByToolIssuer($token->getClaim('iss'), $token->getClaim('sub'));
 
-        if (null === $deployment) {
-            throw OAuthServerException::invalidRequest('client_assertion', 'Deployment not found');
+        if (null === $registration) {
+            throw OAuthServerException::invalidRequest('client_assertion', 'Registration not found');
         }
 
         if ($token->isExpired(Carbon::now())) {
             throw OAuthServerException::invalidRequest('client_assertion', 'Provided JWT is expired');
         }
 
-        $toolKeyChain = $deployment->getToolKeyChain();
+        $toolKeyChain = $registration->getToolKeyChain();
 
         if (null === $toolKeyChain) {
             throw OAuthServerException::invalidRequest('client_assertion', 'Tool Key Chain not found');

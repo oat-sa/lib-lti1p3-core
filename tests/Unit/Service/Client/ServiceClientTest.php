@@ -59,7 +59,7 @@ class ServiceClientTest extends TestCase
 
     public function testItCanPerformAServiceCallFromEmptyTokenCache(): void
     {
-        $deployment = $this->createTestDeployment();
+        $registration = $this->createTestRegistration();
 
         $this->clientMock
             ->expects($this->exactly(2))
@@ -67,7 +67,7 @@ class ServiceClientTest extends TestCase
             ->withConsecutive(
                 [
                     'POST',
-                    $deployment->getPlatform()->getOAuth2AccessTokenUrl(),
+                    $registration->getPlatform()->getOAuth2AccessTokenUrl(),
                     [
                         'json' => [
                             'grant_type' => ServiceClientInterface::GRANT_TYPE,
@@ -90,21 +90,21 @@ class ServiceClientTest extends TestCase
                 $this->createResponse('service response')
             );
 
-        $result = $this->subject->request($deployment, 'GET', 'http://example.com');
+        $result = $this->subject->request($registration, 'GET', 'http://example.com');
 
         $this->assertInstanceOf(ResponseInterface::class, $result);
         $this->assertEquals('service response', $result->getBody()->__toString());
 
-        $cacheKey = sprintf('lti-service-client-token-' . $deployment->getIdentifier());
+        $cacheKey = sprintf('lti-service-client-token-' . $registration->getIdentifier());
         $this->assertTrue($this->cache->hasItem($cacheKey));
         $this->assertEquals('access_token', $this->cache->getItem($cacheKey)->get());
     }
 
     public function testItCanPerformAServiceCallFromPopulatedTokenCache(): void
     {
-        $deployment = $this->createTestDeployment();
+        $registration = $this->createTestRegistration();
 
-        $cacheKey = sprintf('lti-service-client-token-' . $deployment->getIdentifier());
+        $cacheKey = sprintf('lti-service-client-token-' . $registration->getIdentifier());
         $cacheItem = $this->cache->getItem($cacheKey)->set('cached_access_token');
         $this->cache->save($cacheItem);
 
@@ -122,7 +122,7 @@ class ServiceClientTest extends TestCase
                 $this->createResponse('service response')
             );
 
-        $result = $this->subject->request($deployment, 'GET', 'http://example.com');
+        $result = $this->subject->request($registration, 'GET', 'http://example.com');
 
         $this->assertInstanceOf(ResponseInterface::class, $result);
         $this->assertEquals('service response', $result->getBody()->__toString());
@@ -133,9 +133,9 @@ class ServiceClientTest extends TestCase
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage('Cannot generate credentials: Tool key chain is not configured');
 
-        $deployment = $this->createTestDeploymentWithoutToolKeyChain();
+        $registration = $this->createTestRegistrationWithoutToolKeyChain();
 
-        $this->subject->request($deployment, 'GET', 'http://example.com');
+        $this->subject->request($registration, 'GET', 'http://example.com');
     }
 
     public function testItThrowAnLtiExceptionOnInvalidAccessTokenResponseCode(): void
@@ -143,14 +143,14 @@ class ServiceClientTest extends TestCase
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage('Cannot get access token: invalid response http status code');
 
-        $deployment = $this->createTestDeployment();
+        $registration = $this->createTestRegistration();
 
         $this->clientMock
             ->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
-                $deployment->getPlatform()->getOAuth2AccessTokenUrl(),
+                $registration->getPlatform()->getOAuth2AccessTokenUrl(),
                 [
                     'json' => [
                         'grant_type' => ServiceClientInterface::GRANT_TYPE,
@@ -164,7 +164,7 @@ class ServiceClientTest extends TestCase
                 $this->createResponse('invalid service response', 500)
             );
 
-        $this->subject->request($deployment, 'GET', 'http://example.com');
+        $this->subject->request($registration, 'GET', 'http://example.com');
     }
 
     public function testItThrowAnLtiExceptionOnInvalidAccessTokenResponseBodyFormat(): void
@@ -172,14 +172,14 @@ class ServiceClientTest extends TestCase
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage('Cannot get access token: json_decode error: Syntax error');
 
-        $deployment = $this->createTestDeployment();
+        $registration = $this->createTestRegistration();
 
         $this->clientMock
             ->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
-                $deployment->getPlatform()->getOAuth2AccessTokenUrl(),
+                $registration->getPlatform()->getOAuth2AccessTokenUrl(),
                 [
                     'json' => [
                         'grant_type' => ServiceClientInterface::GRANT_TYPE,
@@ -193,7 +193,7 @@ class ServiceClientTest extends TestCase
                 $this->createResponse('invalid')
             );
 
-        $this->subject->request($deployment, 'GET', 'http://example.com');
+        $this->subject->request($registration, 'GET', 'http://example.com');
     }
 
     public function testItThrowAnLtiExceptionOnInvalidAccessTokenResponseBodyContent(): void
@@ -201,14 +201,14 @@ class ServiceClientTest extends TestCase
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage('Cannot get access token: invalid response body');
 
-        $deployment = $this->createTestDeployment();
+        $registration = $this->createTestRegistration();
 
         $this->clientMock
             ->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
-                $deployment->getPlatform()->getOAuth2AccessTokenUrl(),
+                $registration->getPlatform()->getOAuth2AccessTokenUrl(),
                 [
                     'json' => [
                         'grant_type' => ServiceClientInterface::GRANT_TYPE,
@@ -222,7 +222,7 @@ class ServiceClientTest extends TestCase
                 $this->createResponse('{}')
             );
 
-        $this->subject->request($deployment, 'GET', 'http://example.com');
+        $this->subject->request($registration, 'GET', 'http://example.com');
     }
 
     public function testItThrowAnLtiExceptionOnPlatformEndpointFailure(): void
@@ -230,7 +230,7 @@ class ServiceClientTest extends TestCase
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage('Cannot perform request');
 
-        $deployment = $this->createTestDeployment();
+        $registration = $this->createTestRegistration();
 
         $this->clientMock
             ->expects($this->exactly(2))
@@ -238,7 +238,7 @@ class ServiceClientTest extends TestCase
             ->withConsecutive(
                 [
                     'POST',
-                    $deployment->getPlatform()->getOAuth2AccessTokenUrl(),
+                    $registration->getPlatform()->getOAuth2AccessTokenUrl(),
                     [
                         'json' => [
                             'grant_type' => ServiceClientInterface::GRANT_TYPE,
@@ -261,13 +261,13 @@ class ServiceClientTest extends TestCase
                 'invalid output'
             );
 
-        $this->subject->request($deployment, 'GET', 'http://example.com');
+        $this->subject->request($registration, 'GET', 'http://example.com');
     }
 
     private function getTestJwtClientAssertion(): string
     {
         Carbon::setTestNow(Carbon::create(2000, 1, 1));
 
-        return 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6InRvb2xLZXlDaGFpbiJ9.eyJqdGkiOiJkZXBsb3ltZW50SWRlbnRpZmllci05LjQ2Njg0OEUrMTQiLCJpc3MiOiJ0b29sSWRlbnRpZmllciIsInN1YiI6ImRlcGxveW1lbnRDbGllbnRJZCIsImF1ZCI6Imh0dHA6XC9cL3BsYXRmb3JtLmNvbVwvYWNjZXNzLXRva2VuIiwiaWF0Ijo5NDY2ODQ4MDAsImV4cCI6OTQ2Njg1NDAwfQ.qpcevP_3NMWXRBfZREWRL-4Wf9c_XO8u8AZ40KqV4OClNefkpJM7iYOAkQpsWW6oBqo5-envKCgrvRvAuwqo89I018FenjX34j4gJgRrkYA6EYrzY460Szz_ENj-ORNMaj_H5ucyenr_JlLnlBwsEi96WDLmFizguFTk5oBNVrXhAv0Z6V91U8Jnn6fFurAjFzufKCFXw1Wz3TI6V2iFR7Z2Y7krBqJ1OJqoVBsMyjS6HGvO7KbyrCjyzkAVj6yqDiZeEMrbonWg3nv-QNHNTF4yCdwgkUxHLNy6Hb8Gk9M7099-TtnZFJ0ff7rzCNmtiBkCsSbKvRC8Z73rV-RP2g';
+        return 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6InRvb2xLZXlDaGFpbiJ9.eyJqdGkiOiJyZWdpc3RyYXRpb25JZGVudGlmaWVyLTkuNDY2ODQ4RSsxNCIsImlzcyI6InBsYXRmb3JtQXVkaWVuY2UiLCJzdWIiOiJyZWdpc3RyYXRpb25DbGllbnRJZCIsImF1ZCI6Imh0dHA6XC9cL3BsYXRmb3JtLmNvbVwvYWNjZXNzLXRva2VuIiwiaWF0Ijo5NDY2ODQ4MDAsImV4cCI6OTQ2Njg1NDAwfQ.t5VpD-QctqxVTbfsm9fpMsMaK__3_YMGbWQEY25FpZFqxSf9NxaXgjv62xpfuGTYJIB20BHj4VToVHSK3gA9PAxrXArFKx5NYzLcnQgN3wLn7wulfkP703805xMQ5duAJJTMNZYbKVfFOEPRgay2iVUuN9EnAe7q-SSTSWgzG1FEtqkYMUM-ohDzjWYs0K7BCEpf3MEsNhg3amxoLAhC7MKJj4SNaBw46qTiTew4Nyi_143yO7niPw5KGBqm3KdBUoDDc7ot7OLOvlKKN9252jgkZdTkpalT9b5i3rbdx5npqWsFN_EmbLTdNhwnw_DHs1T0ALG-tDegnEr46-h6iQ';
     }
 }

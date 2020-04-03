@@ -28,7 +28,7 @@ use GuzzleHttp\ClientInterface;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Signer;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
-use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Message\MessageInterface;
 use OAT\Library\Lti1p3Core\Service\Server\Grant\JwtClientCredentialsGrant;
@@ -73,7 +73,7 @@ class ServiceClient implements ServiceClientInterface
      * @throws LtiException
      */
     public function request(
-        DeploymentInterface $deployment,
+        RegistrationInterface $registration,
         string $method,
         string $uri,
         array $options = [],
@@ -81,7 +81,7 @@ class ServiceClient implements ServiceClientInterface
     ): ResponseInterface {
         try {
             $options = array_merge_recursive($options, [
-                'headers' => ['Authentication' => sprintf('Bearer %s', $this->getAccessToken($deployment, $scopes))]
+                'headers' => ['Authentication' => sprintf('Bearer %s', $this->getAccessToken($registration, $scopes))]
             ]);
 
             return $this->client->request($method, $uri, $options);
@@ -100,10 +100,10 @@ class ServiceClient implements ServiceClientInterface
     /**
      * @throws LtiException
      */
-    private function getAccessToken(DeploymentInterface $deployment, array $scopes): string
+    private function getAccessToken(RegistrationInterface $registration, array $scopes): string
     {
         try {
-            $cacheKey = sprintf('%s-%s', self::CACHE_PREFIX, $deployment->getIdentifier());
+            $cacheKey = sprintf('%s-%s', self::CACHE_PREFIX, $registration->getIdentifier());
 
             if ($this->cache) {
                 $item = $this->cache->getItem($cacheKey);
@@ -113,11 +113,11 @@ class ServiceClient implements ServiceClientInterface
                 }
             }
 
-            $response = $this->client->request('POST', $deployment->getPlatform()->getOAuth2AccessTokenUrl(), [
+            $response = $this->client->request('POST', $registration->getPlatform()->getOAuth2AccessTokenUrl(), [
                 'json' => [
                     'grant_type' => static::GRANT_TYPE,
                     'client_assertion_type' => JwtClientCredentialsGrant::CLIENT_ASSERTION_TYPE,
-                    'client_assertion' => $this->generateCredentials($deployment),
+                    'client_assertion' => $this->generateCredentials($registration),
                     'scope' => implode(' ', $scopes)
                 ]
             ]);
@@ -163,24 +163,24 @@ class ServiceClient implements ServiceClientInterface
     /**
      * @throws LtiException
      */
-    private function generateCredentials(DeploymentInterface $deployment): string
+    private function generateCredentials(RegistrationInterface $registration): string
     {
         try {
-            if (null === $deployment->getToolKeyChain()) {
+            if (null === $registration->getToolKeyChain()) {
                 throw new LtiException('Tool key chain is not configured');
             }
 
             $now = Carbon::now();
 
             return $this->builder
-                ->withHeader(MessageInterface::HEADER_KID, $deployment->getToolKeyChain()->getIdentifier())
-                ->identifiedBy(sprintf('%s-%s', $deployment->getIdentifier(), $now->getPreciseTimestamp()))
-                ->issuedBy($deployment->getTool()->getIdentifier())
-                ->relatedTo($deployment->getClientId())
-                ->permittedFor($deployment->getPlatform()->getOAuth2AccessTokenUrl())
+                ->withHeader(MessageInterface::HEADER_KID, $registration->getToolKeyChain()->getIdentifier())
+                ->identifiedBy(sprintf('%s-%s', $registration->getIdentifier(), $now->getPreciseTimestamp()))
+                ->issuedBy($registration->getTool()->getAudience())
+                ->relatedTo($registration->getClientId())
+                ->permittedFor($registration->getPlatform()->getOAuth2AccessTokenUrl())
                 ->issuedAt($now->getTimestamp())
                 ->expiresAt($now->addSeconds(MessageInterface::TTL)->getTimestamp())
-                ->getToken($this->signer, $deployment->getToolKeyChain()->getPrivateKey())
+                ->getToken($this->signer, $registration->getToolKeyChain()->getPrivateKey())
                 ->__toString();
         } catch (Throwable $exception) {
             throw new LtiException(

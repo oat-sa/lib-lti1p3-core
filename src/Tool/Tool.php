@@ -33,6 +33,9 @@ class Tool implements ToolInterface
     /** @var string */
     private $name;
 
+    /** @var string */
+    private $audience;
+
     /** @var string|null */
     private $oidcLoginInitiationUrl;
 
@@ -45,12 +48,14 @@ class Tool implements ToolInterface
     public function __construct(
         string $identifier,
         string $name,
+        string $audience,
         string $oidcLoginInitiationUrl = null,
         string $launchUrl = null,
         string $deepLinkLaunchUrl = null
     ) {
         $this->identifier = $identifier;
         $this->name = $name;
+        $this->audience = $audience;
         $this->oidcLoginInitiationUrl = $oidcLoginInitiationUrl;
         $this->launchUrl = $launchUrl;
         $this->deepLinkLaunchUrl = $deepLinkLaunchUrl;
@@ -64,6 +69,11 @@ class Tool implements ToolInterface
     public function getName(): string
     {
         return $this->name;
+    }
+
+    public function getAudience(): string
+    {
+        return $this->audience;
     }
 
     public function getOidcLoginInitiationUrl(): ?string

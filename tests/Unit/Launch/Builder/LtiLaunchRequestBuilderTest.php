@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Launch\Builder;
 
-use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
+use OAT\Library\Lti1p3Core\Message\Builder\MessageBuilder;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Launch\Builder\LtiLaunchRequestBuilder;
 use OAT\Library\Lti1p3Core\Launch\Request\LtiLaunchRequest;
@@ -31,6 +31,7 @@ use OAT\Library\Lti1p3Core\Message\LtiMessage;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
 use PHPUnit\Framework\TestCase;
+use Exception;
 
 class LtiLaunchRequestBuilderTest extends TestCase
 {
@@ -46,10 +47,13 @@ class LtiLaunchRequestBuilderTest extends TestCase
 
     public function testBuildUserResourceLinkLtiLaunchRequest(): void
     {
+        $registration = $this->createTestRegistration();
+
         $result = $this->subject->buildUserResourceLinkLtiLaunchRequest(
             $this->createTestResourceLink(),
-            $this->createTestDeployment(),
+            $registration,
             $this->createTestUserIdentity(),
+            $registration->getDefaultDeploymentId(),
             [
                 'Learner'
             ],
@@ -66,6 +70,7 @@ class LtiLaunchRequestBuilderTest extends TestCase
         $ltiMessage = new LtiMessage($this->parseJwt($result->getLtiMessage()));
 
         $this->assertEquals(LtiMessageInterface::LTI_VERSION, $ltiMessage->getVersion());
+        $this->assertEquals( $registration->getDefaultDeploymentId(), $ltiMessage->getDeploymentId());
         $this->assertEquals(['Learner'], $ltiMessage->getRoles());
         $this->assertEquals('id', $ltiMessage->getContext()->getId());
         $this->assertEquals('bbb', $ltiMessage->getClaim('aaa'));
@@ -80,25 +85,81 @@ class LtiLaunchRequestBuilderTest extends TestCase
 
         $this->subject->buildResourceLinkLtiLaunchRequest(
             $this->createTestResourceLink(),
-            $this->createTestDeployment(
+            $this->createTestRegistration(
                 'id',
                 'clientId',
                 $this->createTestPlatform(),
                 $this->createTestTool(),
+                ['deploymentIdentifier'],
                 $invalidKeyChain,
                 $invalidKeyChain
             )
         );
     }
 
-    public function testBuildResourceLinkLtiLaunchRequestGenericFailure(): void
+    public function testBuildResourceLinkLtiLaunchRequestFailureOnInvalidDeploymentId(): void
     {
         $this->expectException(LtiException::class);
-        $this->expectExceptionMessage('Cannot create LTI launch request');
+        $this->expectExceptionMessage('Invalid deployment id invalid for registration registrationIdentifier');
 
         $this->subject->buildResourceLinkLtiLaunchRequest(
             $this->createTestResourceLink(),
-            $this->createMock(DeploymentInterface::class)
+            $this->createTestRegistration(),
+            'invalid'
+        );
+    }
+
+    public function testBuildResourceLinkLtiLaunchRequestFailureOnMissingDeploymentId(): void
+    {
+        $this->expectException(LtiException::class);
+        $this->expectExceptionMessage('Mandatory deployment id is missing');
+
+        $this->subject->buildResourceLinkLtiLaunchRequest(
+            $this->createTestResourceLink(),
+            $this->createTestRegistration(
+                'registrationIdentifier',
+                'registrationClientId',
+                $this->createTestPlatform(),
+                $this->createTestTool(),
+                []
+            )
+        );
+    }
+
+    public function testBuildUserResourceLinkLtiLaunchRequestFailureOnGenericError(): void
+    {
+        $this->expectException(LtiException::class);
+        $this->expectExceptionMessage('Cannot create LTI launch request: custom error');
+
+        $messageBuilderMock = $this->createMock(MessageBuilder::class);
+        $messageBuilderMock
+            ->method('withClaim')
+            ->willThrowException(new Exception('custom error'));
+
+        $subject = new LtiLaunchRequestBuilder($messageBuilderMock);
+
+        $subject->buildUserResourceLinkLtiLaunchRequest(
+            $this->createTestResourceLink(),
+            $this->createTestRegistration(),
+            $this->createTestUserIdentity()
+        );
+    }
+
+    public function testBuildResourceLinkLtiLaunchRequestFailureOnGenericError(): void
+    {
+        $this->expectException(LtiException::class);
+        $this->expectExceptionMessage('Cannot create LTI launch request: custom error');
+
+        $messageBuilderMock = $this->createMock(MessageBuilder::class);
+        $messageBuilderMock
+            ->method('withClaim')
+            ->willThrowException(new Exception('custom error'));
+
+        $subject = new LtiLaunchRequestBuilder($messageBuilderMock);
+
+        $subject->buildResourceLinkLtiLaunchRequest(
+            $this->createTestResourceLink(),
+            $this->createTestRegistration()
         );
     }
 }
