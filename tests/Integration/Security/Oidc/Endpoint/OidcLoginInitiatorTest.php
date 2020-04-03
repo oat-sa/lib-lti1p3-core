@@ -49,11 +49,11 @@ class OidcLoginInitiatorTest extends TestCase
     public function testInitiationSuccess(): void
     {
         $resourceLink = $this->createTestResourceLink();
-        $Registration = $this->createTestRegistration();
+        $registration = $this->createTestRegistration();
 
         $oidcLaunchRequest = (new OidcLaunchRequestBuilder())->buildResourceLinkOidcLaunchRequest(
             $resourceLink,
-            $Registration,
+            $registration,
             'loginHint'
         );
 
@@ -61,18 +61,18 @@ class OidcLoginInitiatorTest extends TestCase
 
         $this->assertInstanceOf(OidcAuthenticationRequest::class, $result);
 
-        $this->assertEquals($Registration->getPlatform()->getOidcAuthenticationUrl(), $result->getUrl());
+        $this->assertEquals($registration->getPlatform()->getOidcAuthenticationUrl(), $result->getUrl());
         $this->assertEquals($resourceLink->getUrl(), $result->getRedirectUri());
-        $this->assertEquals($Registration->getClientId(), $result->getClientId());
+        $this->assertEquals($registration->getClientId(), $result->getClientId());
         $this->assertEquals('loginHint', $result->getLoginHint());
 
         $this->assertTrue($this->verifyJwt(
             $this->parseJwt($result->getLtiMessageHint()),
-            $Registration->getPlatformKeyChain()->getPublicKey()
+            $registration->getPlatformKeyChain()->getPublicKey()
         ));
         $this->assertTrue($this->verifyJwt(
             $this->parseJwt($result->getState()),
-            $Registration->getToolKeyChain()->getPublicKey()
+            $registration->getToolKeyChain()->getPublicKey()
         ));
     }
 

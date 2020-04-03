@@ -43,7 +43,7 @@ class OAuth2AuthorizationServerFactory
     private $scopeRepository;
 
     /** @var RegistrationRepositoryInterface */
-    private $deploymentRepository;
+    private $registrationRepository;
 
     /** @var CryptKey */
     private $privateKey;
@@ -55,14 +55,14 @@ class OAuth2AuthorizationServerFactory
         AccessTokenRepositoryInterface $accessTokenRepository,
         ClientRepositoryInterface $clientRepository,
         ScopeRepositoryInterface $scopeRepository,
-        RegistrationRepositoryInterface $deploymentRepository,
+        RegistrationRepositoryInterface $registrationRepository,
         CryptKey $privateKey,
         string $encryptionKey
     ) {
         $this->accessTokenRepository = $accessTokenRepository;
         $this->clientRepository = $clientRepository;
         $this->scopeRepository = $scopeRepository;
-        $this->deploymentRepository = $deploymentRepository;
+        $this->registrationRepository = $registrationRepository;
         $this->privateKey = $privateKey;
         $this->encryptionKey = $encryptionKey;
     }
@@ -78,7 +78,7 @@ class OAuth2AuthorizationServerFactory
             new ScopeBearerResponseType()
         );
 
-        $server->enableGrantType(new JwtClientCredentialsGrant($this->deploymentRepository));
+        $server->enableGrantType(new JwtClientCredentialsGrant($this->registrationRepository));
 
         return $server;
     }
