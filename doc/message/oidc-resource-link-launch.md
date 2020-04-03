@@ -31,33 +31,34 @@ $resourceLink = new ResourceLink(
 );
 ```
 **Notes**:
-- if no resource link url is given, the launch will be done on the default launch url of the deployed tool
-- since the platform can retrieve them from database for example, you can implement your own [ResourceLinkInterface](../../src/Link/ResourceLink/ResourceLinkInterface.php)
+- if no resource link url is given, the launch will be done on the default launch url of the registered tool
+- since the platform should be able to retrieve resource links from database for example (pre fetched), you can implement your own [ResourceLinkInterface](../../src/Link/ResourceLink/ResourceLinkInterface.php)
 
 ### Create a OIDC launch request for the resource link
 
-Once your `ResourceLinkInterface` implementation is ready, you need to launch it to a deployed tool following the [OIDC workflow](https://www.imsglobal.org/spec/security/v1p0#openid_connect_launch_flow), within the context of a deployment.
+Once your `ResourceLinkInterface` implementation is ready, you need to launch it to a registered tool following the [OIDC workflow](https://www.imsglobal.org/spec/security/v1p0#openid_connect_launch_flow), within the context of a registration.
 
 To do so, you can use the [OidcLaunchRequestBuilder](../../src/Launch/Builder/OidcLaunchRequestBuilder.php) to create an OIDC launch request:
 ```php
 <?php
 
 use OAT\Library\Lti1p3Core\Launch\Builder\OidcLaunchRequestBuilder;
-use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Message\Claim\ContextClaim;
 
 // Create the builder
 $builder = new OidcLaunchRequestBuilder();
 
-// Get related deployment of the launch
-/** @var DeploymentRepositoryInterface $repository */
-$deployment = $repository->find(...);
+// Get related registration of the launch
+/** @var RegistrationRepositoryInterface $registrationRepository */
+$registration = $registrationRepository->find(...);
 
 // Create a OIDC launch request
 $launchRequest = $builder->buildResourceLinkOidcLaunchRequest(
     $resourceLink,
-    $deployment,
+    $registration,
     'loginHint', // hint about the user login process that will be done on a later step
+    null,        // will use the registration default deployment id, but you can pass a specific one
     [
         'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner' // role
     ], 
@@ -98,7 +99,7 @@ You can find below required steps to initiate an OIDC login, needed only if you'
 As a tool, you'll receive an HTTP request containing the [OIDC launch request login initiation](https://www.imsglobal.org/spec/security/v1p0#step-2-authentication-request).
 
 You can use the [OidcLoginInitiator](../../src/Security/Oidc/Endpoint/OidcLoginInitiator.php) to handle this:
-- it requires a deployment repository implementation [as explained here](../quickstart/interfaces.md)
+- it requires a registration repository implementation [as explained here](../quickstart/interfaces.md)
 - it expect a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface) to handle
 - and it will output a [OidcAuthenticationRequest](../../src/Security/Oidc/Request/OidcAuthenticationRequest.php) to be sent back to the platform.
 
@@ -106,18 +107,18 @@ By example:
 ```php
 <?php
 
-use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Oidc\Endpoint\OidcLoginInitiator;
 use Psr\Http\Message\ServerRequestInterface;
 
-/** @var DeploymentRepositoryInterface $deploymentRepository */
-$deploymentRepository = ...
+/** @var RegistrationRepositoryInterface $registrationRepository */
+$registrationRepository = ...
 
 /** @var ServerRequestInterface $request */
 $request = ...
 
 // Create the OIDC login initiator
-$initiator = new OidcLoginInitiator($deploymentRepository);
+$initiator = new OidcLoginInitiator($registrationRepository);
 
 // Perform the login initiation (including state generation)
 $oidcAuthenticationRequest = $initiator->initiate($request);
@@ -136,7 +137,7 @@ You can find below required steps to authenticate an OIDC login and performing a
 After the redirection of the tool to the platform, the platform will receive as a HTTP request the [OidcAuthenticationRequest](../../src/Security/Oidc/Request/OidcAuthenticationRequest.php).
 
 It can be handled with the [OidcLoginAuthenticator](../../src/Security/Oidc/Endpoint/OidcLoginAuthenticator.php):
-- it requires a deployment repository and a user authenticator implementation [as explained here](../quickstart/interfaces.md)
+- it requires a registration repository and a user authenticator implementation [as explained here](../quickstart/interfaces.md)
 - it expect a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface) to handle
 - and it will output a [LtiLaunchRequest](../../src/Launch/Request/LtiLaunchRequest.php) to be sent back to the platform.
 
@@ -144,13 +145,13 @@ By example:
 ```php
 <?php
 
-use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Oidc\Endpoint\OidcLoginAuthenticator;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-/** @var DeploymentRepositoryInterface $deploymentRepository */
-$deploymentRepository = ...
+/** @var RegistrationRepositoryInterface $registrationRepository */
+$registrationRepository = ...
 
 /** @var UserAuthenticatorInterface $userAuthenticator */
 $userAuthenticator = ...
@@ -159,7 +160,7 @@ $userAuthenticator = ...
 $request = ...
 
 // Create the OIDC login initiator
-$authenticator = new OidcLoginAuthenticator($deploymentRepository, $userAuthenticator);
+$authenticator = new OidcLoginAuthenticator($registrationRepository, $userAuthenticator);
 
 // Perform the login authentication (delegating to the $userAuthenticator with the hint 'loginHint')
 $launchRequest = $authenticator->authenticate($request);
@@ -177,7 +178,7 @@ You can find below required steps to validate a LTI launch request, needed only 
 As a tool, you'll receive an HTTP request containing the [launch request](http://www.imsglobal.org/spec/lti/v1p3#resource-link-launch-request-message).
 
 The [LtiLaunchRequestValidator](../../src/Launch/Validator/LtiLaunchRequestValidator.php) can be used for this:
-- it requires a deployment repository and a nonce repository implementations [as explained here](../quickstart/interfaces.md)
+- it requires a registration repository and a nonce repository implementations [as explained here](../quickstart/interfaces.md)
 - it expect a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface) to validate
 - and it will output a [LtiLaunchRequestValidationResult](../../src/Launch/Validator/LtiLaunchRequestValidationResult.php) representing the launch validation and the message itself.
 
@@ -186,12 +187,12 @@ By example:
 <?php
 
 use OAT\Library\Lti1p3Core\Launch\Validator\LtiLaunchRequestValidator;
-use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepositoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-/** @var DeploymentRepositoryInterface $deploymentRepository */
-$deploymentRepository = ...
+/** @var RegistrationRepositoryInterface $registrationRepository */
+$registrationRepository = ...
 
 /** @var NonceRepositoryInterface $nonceRepository */
 $nonceRepository = ...
@@ -200,7 +201,7 @@ $nonceRepository = ...
 $request = ...
 
 // Create the validator
-$validator = new LtiLaunchRequestValidator($deploymentRepository, $nonceRepository);
+$validator = new LtiLaunchRequestValidator($registrationRepository, $nonceRepository);
 
 // Perform validation
 $result = $validator->validate($request);

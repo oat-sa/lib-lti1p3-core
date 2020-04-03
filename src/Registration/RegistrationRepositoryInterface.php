@@ -20,11 +20,13 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Deployment;
+namespace OAT\Library\Lti1p3Core\Registration;
 
-interface DeploymentRepositoryInterface
+interface RegistrationRepositoryInterface
 {
-    public function find(string $identifier): ?DeploymentInterface;
+    public function find(string $identifier): ?RegistrationInterface;
 
-    public function findByIssuer(string $issuer, string $clientId = null): ?DeploymentInterface;
+    public function findByPlatformIssuer(string $issuer, string $clientId = null): ?RegistrationInterface;
+
+    public function findByToolIssuer(string $issuer, string $clientId = null): ?RegistrationInterface;
 }

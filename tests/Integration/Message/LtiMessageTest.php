@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Integration\Message;
 
-use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Launch\Builder\LtiLaunchRequestBuilder;
 use OAT\Library\Lti1p3Core\Link\ResourceLink\ResourceLink;
 use OAT\Library\Lti1p3Core\Link\ResourceLink\ResourceLinkInterface;
@@ -47,8 +47,8 @@ class LtiMessageTest extends TestCase
     /** @var ResourceLinkInterface */
     private $resourceLink;
 
-    /** @var DeploymentInterface */
-    private $deployment;
+    /** @var RegistrationInterface */
+    private $registration;
 
     /** @var UserIdentityInterface */
     private $userIdentity;
@@ -61,14 +61,15 @@ class LtiMessageTest extends TestCase
         $this->builder = new LtiLaunchRequestBuilder();
 
         $this->resourceLink = $this->createTestResourceLink();
-        $this->deployment = $this->createTestDeployment();
+        $this->registration = $this->createTestRegistration();
         $this->userIdentity = $this->createTestUserIdentity();
 
         $message = $this->builder
             ->buildUserResourceLinkLtiLaunchRequest(
                 $this->resourceLink,
-                $this->deployment,
+                $this->registration,
                 $this->userIdentity,
+                $this->registration->getDefaultDeploymentId(),
                 [
                     'Learner'
                 ],
@@ -98,7 +99,7 @@ class LtiMessageTest extends TestCase
 
     public function testGetDeploymentId(): void
     {
-        $this->assertEquals($this->deployment->getIdentifier(), $this->subject->getDeploymentId());
+        $this->assertEquals($this->registration->getDefaultDeploymentId(), $this->subject->getDeploymentId());
     }
 
     public function testGetTargetLinkUri(): void

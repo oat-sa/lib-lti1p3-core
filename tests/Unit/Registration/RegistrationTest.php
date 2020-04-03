@@ -22,24 +22,43 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Deployment;
 
+use OAT\Library\Lti1p3Core\Registration\Registration;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
 use PHPUnit\Framework\TestCase;
 
-class DeploymentTest extends TestCase
+class RegistrationTest extends TestCase
 {
     use DomainTestingTrait;
 
     public function testGetters(): void
     {
-        $subject = $this->createTestDeployment();
+        $subject = $this->createTestRegistration();
 
-        $this->assertEquals('deploymentIdentifier', $subject->getIdentifier());
-        $this->assertEquals('deploymentClientId', $subject->getClientId());
+        $this->assertEquals('registrationIdentifier', $subject->getIdentifier());
+        $this->assertEquals('registrationClientId', $subject->getClientId());
         $this->assertEquals($this->createTestPlatform(), $subject->getPlatform());
         $this->assertEquals($this->createTestTool(), $subject->getTool());
+        $this->assertEquals(['deploymentIdentifier'], $subject->getDeploymentIds());
+        $this->assertEquals('deploymentIdentifier', $subject->getDefaultDeploymentId());
+        $this->assertTrue($subject->hasDeploymentId('deploymentIdentifier'));
+        $this->assertFalse($subject->hasDeploymentId('invalid'));
         $this->assertEquals($this->createTestKeyChain('platformKeyChain'), $subject->getPlatformKeyChain());
         $this->assertEquals($this->createTestKeyChain('toolKeyChain'), $subject->getToolKeyChain());
         $this->assertNull($subject->getPlatformJwksUrl());
         $this->assertNull($subject->getToolJwksUrl());
+    }
+
+    public function testWithoutDeploymentIds(): void
+    {
+        $subject = new Registration(
+            'registrationIdentifier',
+            'registrationClientId',
+            $this->createTestPlatform(),
+            $this->createTestTool(),
+            []
+        );
+
+        $this->assertEmpty($subject->getDeploymentIds());
+        $this->assertNull($subject->getDefaultDeploymentId());
     }
 }

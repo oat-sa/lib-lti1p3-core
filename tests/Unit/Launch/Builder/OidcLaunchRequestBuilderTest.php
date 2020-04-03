@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Launch\Builder;
 
-use OAT\Library\Lti1p3Core\Deployment\DeploymentInterface;
+use OAT\Library\Lti1p3Core\Message\Builder\MessageBuilder;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Launch\Builder\OidcLaunchRequestBuilder;
 use OAT\Library\Lti1p3Core\Launch\Request\OidcLaunchRequest;
@@ -30,6 +30,7 @@ use OAT\Library\Lti1p3Core\Message\Claim\ContextClaim;
 use OAT\Library\Lti1p3Core\Message\LtiMessage;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
 use PHPUnit\Framework\TestCase;
+use Exception;
 
 class OidcLaunchRequestBuilderTest extends TestCase
 {
@@ -43,15 +44,16 @@ class OidcLaunchRequestBuilderTest extends TestCase
         $this->subject = new OidcLaunchRequestBuilder();
     }
 
-    public function testBuildUserResourceLinkLtiLaunchRequest(): void
+    public function testBuildOidcResourceLinkLtiLaunchRequest(): void
     {
         $resourceLink = $this->createTestResourceLink();
-        $deployment = $this->createTestDeployment();
+        $registration = $this->createTestRegistration();
 
         $result = $this->subject->buildResourceLinkOidcLaunchRequest(
             $resourceLink,
-            $deployment,
+            $registration,
             'loginHint',
+            $registration->getDefaultDeploymentId(),
             [
                 'Learner'
             ],
@@ -62,20 +64,20 @@ class OidcLaunchRequestBuilderTest extends TestCase
         );
 
         $this->assertInstanceOf(OidcLaunchRequest::class, $result);
-        $this->assertEquals($deployment->getPlatform()->getAudience(), $result->getIssuer());
+        $this->assertEquals($registration->getPlatform()->getAudience(), $result->getIssuer());
         $this->assertEquals('loginHint', $result->getLoginHint());
         $this->assertEquals($resourceLink->getUrl(), $result->getTargetLinkUri());
-        $this->assertEquals($deployment->getIdentifier(), $result->getLtiDeploymentId());
-        $this->assertEquals($deployment->getClientId(), $result->getClientId());
+        $this->assertEquals($registration->getClientId(), $result->getClientId());
 
         $ltiMessage = new LtiMessage($this->parseJwt($result->getLtiMessageHint()));
 
+        $this->assertEquals($registration->getDefaultDeploymentId(), $ltiMessage->getDeploymentId());
         $this->assertEquals(['Learner'], $ltiMessage->getRoles());
         $this->assertEquals('id', $ltiMessage->getContext()->getId());
         $this->assertEquals('bbb', $ltiMessage->getClaim('aaa'));
     }
 
-    public function testBuildResourceLinkLtiLaunchRequestFailureOnLtiException(): void
+    public function testBuildOidcResourceLinkLtiLaunchRequestFailureOnLtiException(): void
     {
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage('Cannot generate message token: It was not possible to parse your key');
@@ -84,11 +86,12 @@ class OidcLaunchRequestBuilderTest extends TestCase
 
         $this->subject->buildResourceLinkOidcLaunchRequest(
             $this->createTestResourceLink(),
-            $this->createTestDeployment(
+            $this->createTestRegistration(
                 'id',
                 'clientId',
                 $this->createTestPlatform(),
                 $this->createTestTool(),
+                ['deploymentIdentifier'],
                 $invalidKeyChain,
                 $invalidKeyChain
             ),
@@ -96,14 +99,52 @@ class OidcLaunchRequestBuilderTest extends TestCase
         );
     }
 
-    public function testBuildResourceLinkLtiLaunchRequestGenericFailure(): void
+    public function testBuildOidcResourceLinkLtiLaunchRequestFailureOnInvalidDeploymentId(): void
     {
         $this->expectException(LtiException::class);
-        $this->expectExceptionMessage('Cannot create OIDC launch request');
+        $this->expectExceptionMessage('Invalid deployment id invalid for registration registrationIdentifier');
 
         $this->subject->buildResourceLinkOidcLaunchRequest(
             $this->createTestResourceLink(),
-            $this->createMock(DeploymentInterface::class),
+            $this->createTestRegistration(),
+            'loginHint',
+            'invalid'
+        );
+    }
+
+    public function testBuildOidcResourceLinkLtiLaunchRequestFailureOnMissingDeploymentId(): void
+    {
+        $this->expectException(LtiException::class);
+        $this->expectExceptionMessage('Mandatory deployment id is missing');
+
+        $this->subject->buildResourceLinkOidcLaunchRequest(
+            $this->createTestResourceLink(),
+            $this->createTestRegistration(
+                'registrationIdentifier',
+                'registrationClientId',
+                $this->createTestPlatform(),
+                $this->createTestTool(),
+                []
+            ),
+            'loginHint'
+        );
+    }
+
+    public function testBuildOidcResourceLinkLtiLaunchRequestFailureGenericError(): void
+    {
+        $this->expectException(LtiException::class);
+        $this->expectExceptionMessage('Cannot create LTI launch request: custom error');
+
+        $messageBuilderMock = $this->createMock(MessageBuilder::class);
+        $messageBuilderMock
+            ->method('withClaim')
+            ->willThrowException(new Exception('custom error'));
+
+        $subject = new OidcLaunchRequestBuilder($messageBuilderMock);
+
+        $subject->buildResourceLinkOidcLaunchRequest(
+            $this->createTestResourceLink(),
+            $this->createTestRegistration(),
             'loginHint'
         );
     }

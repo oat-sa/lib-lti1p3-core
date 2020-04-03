@@ -27,7 +27,7 @@ use League\OAuth2\Server\CryptKey;
 use League\OAuth2\Server\Repositories\AccessTokenRepositoryInterface;
 use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
 use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
-use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Service\Server\Grant\JwtClientCredentialsGrant;
 use OAT\Library\Lti1p3Core\Service\Server\ResponseType\ScopeBearerResponseType;
 
@@ -42,8 +42,8 @@ class OAuth2AuthorizationServerFactory
     /** @var ScopeRepositoryInterface */
     private $scopeRepository;
 
-    /** @var DeploymentRepositoryInterface */
-    private $deploymentRepository;
+    /** @var RegistrationRepositoryInterface */
+    private $registrationRepository;
 
     /** @var CryptKey */
     private $privateKey;
@@ -55,14 +55,14 @@ class OAuth2AuthorizationServerFactory
         AccessTokenRepositoryInterface $accessTokenRepository,
         ClientRepositoryInterface $clientRepository,
         ScopeRepositoryInterface $scopeRepository,
-        DeploymentRepositoryInterface $deploymentRepository,
+        RegistrationRepositoryInterface $registrationRepository,
         CryptKey $privateKey,
         string $encryptionKey
     ) {
         $this->accessTokenRepository = $accessTokenRepository;
         $this->clientRepository = $clientRepository;
         $this->scopeRepository = $scopeRepository;
-        $this->deploymentRepository = $deploymentRepository;
+        $this->registrationRepository = $registrationRepository;
         $this->privateKey = $privateKey;
         $this->encryptionKey = $encryptionKey;
     }
@@ -78,7 +78,7 @@ class OAuth2AuthorizationServerFactory
             new ScopeBearerResponseType()
         );
 
-        $server->enableGrantType(new JwtClientCredentialsGrant($this->deploymentRepository));
+        $server->enableGrantType(new JwtClientCredentialsGrant($this->registrationRepository));
 
         return $server;
     }

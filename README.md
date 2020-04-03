@@ -25,11 +25,11 @@ $ composer require oat-sa/lib-lti1p3-core
 
 You can find below the implementations of the main concepts of the [LTI 1.3 Core](http://www.imsglobal.org/spec/lti/v1p3) specification.
 
-###  Platforms, tools and deployments
+###  Platforms, tools and registrations
 
 - [Platform](src/Platform/PlatformInterface.php): any kind of platform that needs to delegate bits of functionality out to a suite of tools.
 - [Tool](src/Tool/ToolInterface.php): external application or service providing functionality to a platform.
-- [Deployment](src/Deployment/DeploymentInterface.php): defines the scope of contexts under which a tool is made available for a platform.
+- [Registration](src/Registration/RegistrationInterface.php): defines the scope of contexts under which a tool is made available for a platform.
 
 ### Messages
 

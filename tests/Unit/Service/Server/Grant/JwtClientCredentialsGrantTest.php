@@ -36,7 +36,7 @@ use League\OAuth2\Server\Repositories\AccessTokenRepositoryInterface;
 use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
 use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
 use League\OAuth2\Server\ResponseTypes\ResponseTypeInterface;
-use OAT\Library\Lti1p3Core\Deployment\DeploymentRepositoryInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
 use OAT\Library\Lti1p3Core\Service\Server\Grant\JwtClientCredentialsGrant;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
@@ -53,7 +53,7 @@ class JwtClientCredentialsGrantTest extends TestCase
     /** @var JwtClientCredentialsGrant */
     private $subject;
     
-    /** @var DeploymentRepositoryInterface */
+    /** @var RegistrationRepositoryInterface */
     private $deploymentRepository;
 
     /** @var Builder */
@@ -66,14 +66,15 @@ class JwtClientCredentialsGrantTest extends TestCase
     {
         $this->keyChain = $this->createTestKeyChain();
 
-        $this->deploymentRepository = $this->createTestDeploymentRepository([
-            $this->createTestDeployment(),
-            $this->createTestDeploymentWithoutToolKeyChain('deploymentIdentifier2', 'deploymentClientId2'),
-            $this->createTestDeployment(
-                'deploymentIdentifier3',
-                'deploymentClientId3',
+        $this->deploymentRepository = $this->createTestRegistrationRepository([
+            $this->createTestRegistration(),
+            $this->createTestRegistrationWithoutToolKeyChain('registrationIdentifier2', 'registrationClientId2'),
+            $this->createTestRegistration(
+                'registrationIdentifier3',
+                'registrationClientId3',
                 null,
                 null,
+                [],
                 null,
                 $this->createTestKeyChain(
                     'keyChainIdentifier2',
@@ -110,7 +111,10 @@ class JwtClientCredentialsGrantTest extends TestCase
         /** @var ResponseTypeInterface $responseType */
         $responseType = $this->createMock(ResponseTypeInterface::class);
 
-        $this->assertInstanceOf(ResponseTypeInterface::class, $this->subject->respondToAccessTokenRequest($request, $responseType, new DateInterval('PT1H')));
+        $this->assertInstanceOf(
+            ResponseTypeInterface::class,
+            $this->subject->respondToAccessTokenRequest($request, $responseType, new DateInterval('PT1H'))
+        );
     }
 
     public function testItThrowsExceptionOnInvalidToken(): void
@@ -141,7 +145,7 @@ class JwtClientCredentialsGrantTest extends TestCase
     {
         $this->prepareMockClasses();
 
-        $request = $this->createCorrectRequest((string) $this->createJWT('platformAudience', 'deploymentClientId', -1));
+        $request = $this->createCorrectRequest((string) $this->createJWT('platformAudience', 'registrationClientId', -1));
         /** @var ResponseTypeInterface $responseType */
         $responseType = $this->createMock(ResponseTypeInterface::class);
 
@@ -154,7 +158,7 @@ class JwtClientCredentialsGrantTest extends TestCase
     {
         $this->prepareMockClasses();
 
-        $request = $this->createCorrectRequest((string) $this->createJWT('platformAudience', 'deploymentClientId2'));
+        $request = $this->createCorrectRequest((string) $this->createJWT('platformAudience', 'registrationClientId2'));
         /** @var ResponseTypeInterface $responseType */
         $responseType = $this->createMock(ResponseTypeInterface::class);
 
@@ -167,7 +171,7 @@ class JwtClientCredentialsGrantTest extends TestCase
     {
         $this->prepareMockClasses();
 
-        $request = $this->createCorrectRequest((string) $this->createJWT('platformAudience', 'deploymentClientId3'));
+        $request = $this->createCorrectRequest((string) $this->createJWT('platformAudience', 'registrationClientId3'));
         /** @var ResponseTypeInterface $responseType */
         $responseType = $this->createMock(ResponseTypeInterface::class);
 
@@ -210,13 +214,13 @@ class JwtClientCredentialsGrantTest extends TestCase
             ]);
     }
 
-    private function createJWT(string $issuer = 'platformAudience', string $clientId = 'deploymentClientId', int $ttl = 3600): Token
+    private function createJWT(string $issuer = 'platformAudience', string $clientId = 'registrationClientId', int $ttl = 3600): Token
     {
         $now = Carbon::now();
 
         $this->builder
-            ->withClaim('iss', $issuer)
-            ->withClaim('sub', $clientId)
+            ->issuedBy($issuer)
+            ->relatedTo($clientId)
             ->identifiedBy(Uuid::uuid4()->toString())
             ->issuedAt($now->getTimestamp())
             ->expiresAt($now->addSeconds($ttl)->getTimestamp());

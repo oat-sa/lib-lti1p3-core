@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Deployment;
+namespace OAT\Library\Lti1p3Core\Registration;
 
 use OAT\Library\Lti1p3Core\Platform\PlatformInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
@@ -29,7 +29,7 @@ use OAT\Library\Lti1p3Core\Tool\ToolInterface;
 /**
  * @see http://www.imsglobal.org/spec/lti/v1p3/#tool-deployment-0
  */
-class Deployment implements DeploymentInterface
+class Registration implements RegistrationInterface
 {
     /** @var string */
     private $identifier;
@@ -42,6 +42,9 @@ class Deployment implements DeploymentInterface
 
     /** @var ToolInterface */
     private $tool;
+
+    /** @var string[] */
+    private $deploymentIds;
 
     /** @var KeyChainInterface|null */
     private $platformKeyChain;
@@ -60,6 +63,7 @@ class Deployment implements DeploymentInterface
         string $clientId,
         PlatformInterface $platform,
         ToolInterface $tool,
+        array $deploymentIds,
         KeyChainInterface $platformKeyChain = null,
         KeyChainInterface $toolKeyChain = null,
         string $platformJwksUrl = null,
@@ -69,6 +73,7 @@ class Deployment implements DeploymentInterface
         $this->clientId = $clientId;
         $this->platform = $platform;
         $this->tool = $tool;
+        $this->deploymentIds = $deploymentIds;
         $this->platformKeyChain = $platformKeyChain;
         $this->toolKeyChain = $toolKeyChain;
         $this->platformJwksUrl = $platformJwksUrl;
@@ -93,6 +98,25 @@ class Deployment implements DeploymentInterface
     public function getTool(): ToolInterface
     {
         return $this->tool;
+    }
+
+    public function getDeploymentIds(): array
+    {
+        return $this->deploymentIds;
+    }
+
+    public function hasDeploymentId(string $deploymentId): bool
+    {
+        return in_array($deploymentId, $this->deploymentIds);
+    }
+
+    public function getDefaultDeploymentId(): ?string
+    {
+        if (count($this->deploymentIds) >= 1) {
+            return current($this->deploymentIds);
+        }
+
+        return null;
     }
 
     public function getPlatformKeyChain(): ?KeyChainInterface
