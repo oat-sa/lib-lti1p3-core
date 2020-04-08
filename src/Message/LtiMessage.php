@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Message;
 
 use OAT\Library\Lti1p3Core\Exception\LtiException;
+use OAT\Library\Lti1p3Core\Message\Claim\AgsClaim;
 use OAT\Library\Lti1p3Core\Message\Claim\ContextClaim;
 use OAT\Library\Lti1p3Core\Message\Claim\LaunchPresentationClaim;
 use OAT\Library\Lti1p3Core\Message\Claim\LisClaim;
@@ -130,5 +131,10 @@ class LtiMessage extends Message implements LtiMessageInterface
             $this->getClaim('locale'),
             $this->getClaim('picture')
         );
+    }
+
+    public function getAgs(): ?AgsClaim
+    {
+        return $this->getClaim(AgsClaim::class);
     }
 }
