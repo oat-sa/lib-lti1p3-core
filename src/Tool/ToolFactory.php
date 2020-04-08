@@ -31,7 +31,7 @@ class ToolFactory
         string $oidcLoginInitiationUrl = null,
         string $launchUrl = null,
         string $deepLinkLaunchUrl = null
-    ):ToolInterface {
+    ): ToolInterface {
         return new Tool($identifier, $name, $audience, $oidcLoginInitiationUrl, $launchUrl, $deepLinkLaunchUrl);
     }
 }
