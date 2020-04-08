@@ -81,7 +81,7 @@ class LtiMessageTest extends TestCase
                     new PlatformInstanceClaim('guid'),
                     new LaunchPresentationClaim('document_target'),
                     new LisClaim('course_offering_sourcedid'),
-                    new AgsClaim(['scope'], 'url'),
+                    new AgsClaim(['scope'], 'line_items_container_url'),
                     'aaa' => 'bbb'
                 ]
             )->getLtiMessage();
@@ -163,6 +163,6 @@ class LtiMessageTest extends TestCase
     {
         $this->assertInstanceOf(AgsClaim::class, $this->subject->getAgs());
         $this->assertEquals(['scope'], $this->subject->getAgs()->getScopes());
-        $this->assertEquals('url', $this->subject->getAgs()->getLineItemsContainerUrl());
+        $this->assertEquals('line_items_container_url', $this->subject->getAgs()->getLineItemsContainerUrl());
     }
 }
