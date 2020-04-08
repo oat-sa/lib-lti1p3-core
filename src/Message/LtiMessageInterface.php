@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Message;
 
+use OAT\Library\Lti1p3Core\Message\Claim\AgsClaim;
 use OAT\Library\Lti1p3Core\Message\Claim\ContextClaim;
 use OAT\Library\Lti1p3Core\Message\Claim\LaunchPresentationClaim;
 use OAT\Library\Lti1p3Core\Message\Claim\LisClaim;
@@ -79,4 +80,6 @@ interface LtiMessageInterface extends MessageInterface
     public function getLis(): ?LisClaim;
 
     public function getUserIdentity(): ?UserIdentityInterface;
+
+    public function getAgs(): ?AgsClaim;
 }
