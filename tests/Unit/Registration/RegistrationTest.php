@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Tests\Unit\Deployment;
+namespace OAT\Library\Lti1p3Core\Tests\Unit\Registration;
 
 use OAT\Library\Lti1p3Core\Registration\Registration;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;

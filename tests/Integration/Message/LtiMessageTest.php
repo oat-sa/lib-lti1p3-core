@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Integration\Message;
 
+use OAT\Library\Lti1p3Core\Message\Claim\AgsClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Launch\Builder\LtiLaunchRequestBuilder;
 use OAT\Library\Lti1p3Core\Link\ResourceLink\ResourceLink;
@@ -80,6 +81,7 @@ class LtiMessageTest extends TestCase
                     new PlatformInstanceClaim('guid'),
                     new LaunchPresentationClaim('document_target'),
                     new LisClaim('course_offering_sourcedid'),
+                    new AgsClaim(['scope'], 'url'),
                     'aaa' => 'bbb'
                 ]
             )->getLtiMessage();
@@ -155,5 +157,12 @@ class LtiMessageTest extends TestCase
     {
         $this->assertInstanceOf(LisClaim::class, $this->subject->getLis());
         $this->assertEquals('course_offering_sourcedid', $this->subject->getLis()->getCourseOfferingSourcedId());
+    }
+
+    public function testGetAgs(): void
+    {
+        $this->assertInstanceOf(AgsClaim::class, $this->subject->getAgs());
+        $this->assertEquals(['scope'], $this->subject->getAgs()->getScopes());
+        $this->assertEquals('url', $this->subject->getAgs()->getLineItemsContainerUrl());
     }
 }
