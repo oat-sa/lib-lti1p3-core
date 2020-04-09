@@ -76,6 +76,12 @@ class OidcLoginInitiator
                 throw new LtiException('Cannot find registration for OIDC request');
             }
 
+            if (null !== $oidcRequest->getLtiDeploymentId()) {
+                if (!$registration->hasDeploymentId($oidcRequest->getLtiDeploymentId())) {
+                    throw new LtiException('Cannot find deployment for OIDC request');
+                }
+            }
+
             $nonce = $this->generator->generate();
 
             $this->builder
