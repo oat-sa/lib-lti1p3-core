@@ -86,14 +86,30 @@ class OidcLoginInitiatorTest extends TestCase
         $this->subject->initiate($this->createServerRequest('GET', $oidcLaunchRequest->toUrl()));
     }
 
-    public function testInitiationFailureOnNotFoundRegistrationById(): void
+    public function testInitiationFailureOnNotFoundRegistration(): void
     {
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage('Cannot find registration for OIDC request');
 
-        $oidcLaunchRequest = new OidcLaunchRequest('invalid', [
+        $oidcLaunchRequest = new OidcLaunchRequest('http://example.com', [
             'iss' => 'invalid',
             'client_id' => 'invalid'
+        ]);
+
+        $this->subject->initiate($this->createServerRequest('GET', $oidcLaunchRequest->toUrl()));
+    }
+
+    public function testInitiationFailureOnNotFoundDeployment(): void
+    {
+        $this->expectException(LtiException::class);
+        $this->expectExceptionMessage('Cannot find deployment for OIDC request');
+
+        $registration = $this->createTestRegistration();
+
+        $oidcLaunchRequest = new OidcLaunchRequest('http://example.com', [
+            'iss' => $registration->getPlatform()->getAudience(),
+            'client_id' => $registration->getClientId(),
+            'lti_deployment_id' => 'invalid'
         ]);
 
         $this->subject->initiate($this->createServerRequest('GET', $oidcLaunchRequest->toUrl()));
