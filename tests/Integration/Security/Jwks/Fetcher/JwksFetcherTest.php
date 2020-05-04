@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Integration\Security\Jwks\Fetcher;
 
+use Cache\Adapter\PHPArray\ArrayCachePool;
 use GuzzleHttp\ClientInterface;
 use Lcobucci\JWT\Signer\Key;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
@@ -39,6 +40,9 @@ class JwksFetcherTest extends TestCase
     use SecurityTestingTrait;
     use NetworkTestingTrait;
 
+    /** @var ArrayCachePool */
+    private $cache;
+
     /** @var ClientInterface|MockObject */
     private $clientMock;
 
@@ -53,16 +57,18 @@ class JwksFetcherTest extends TestCase
 
     protected function setUp(): void
     {
+        $this->cache = new ArrayCachePool();
+
         $this->clientMock = $this->createMock(ClientInterface::class);
 
-        $this->subject = new JwksFetcher($this->clientMock);
+        $this->subject = new JwksFetcher($this->cache, $this->clientMock);
 
         $this->keyChain = $this->createTestKeyChain();
 
         $this->exporter = new JwksExporter(new KeyChainRepository([$this->keyChain]));
     }
 
-    public function testItCanFetchAJwksExposedKey(): void
+    public function testItCanFetchAJwksExposedKeyAndCacheIt(): void
     {
         $this->clientMock
             ->expects($this->once())
@@ -71,6 +77,32 @@ class JwksFetcherTest extends TestCase
             ->willReturn(
                 $this->createResponse(json_encode($this->exporter->export($this->keyChain->getKeySetName())))
             );
+
+        $key = $this->subject->fetchKey('http://test.com', $this->keyChain->getIdentifier());
+
+        $this->assertInstanceOf(Key::class, $key);
+
+        $expectedDetails = openssl_pkey_get_details(
+            openssl_pkey_get_public($this->keyChain->getPublicKey()->getContent())
+        );
+
+        $jwksDetails = openssl_pkey_get_details(
+            openssl_pkey_get_public($key->getContent())
+        );
+
+        $this->assertEquals($expectedDetails, $jwksDetails);
+
+        $this->assertTrue($this->cache->has('lti1p3-jwks-' . base64_encode('http://test.com')));
+    }
+
+    public function testItCanFetchAJwksKeyFromExistingCache(): void
+    {
+        $this->cache->set(
+            'lti1p3-jwks-' . base64_encode('http://test.com'),
+            $this->exporter->export($this->keyChain->getKeySetName())
+        );
+
+        $this->clientMock->expects($this->never())->method('request');
 
         $key = $this->subject->fetchKey('http://test.com', $this->keyChain->getIdentifier());
 

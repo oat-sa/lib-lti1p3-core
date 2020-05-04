@@ -27,7 +27,7 @@ use Psr\Cache\InvalidArgumentException;
 
 class NonceRepository implements NonceRepositoryInterface
 {
-    private const CACHE_PREFIX = 'lti-nonce';
+    private const CACHE_PREFIX = 'lti1p3-nonce';
 
     /** @var CacheItemPoolInterface */
     private $cache;

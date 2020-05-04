@@ -46,34 +46,6 @@ $registrationRepository = new class implements RegistrationRepositoryInterface
 ```
 **Note**: you can find a simple implementation example of this interface in the method `createTestRegistrationRepository()` of the [DomainTestingTrait](../../tests/Traits/DomainTestingTrait.php).
 
-### Nonce repository interface
-
-**Required by**: [Message](../../src/Message) 
-
-In order to be able to store security nonce the way you want, you need to provide an implementation of the [NonceRepositoryInterface](../../src/Security/Nonce/NonceRepositoryInterface.php).
-
-By example:
-```php
-<?php
-
-use OAT\Library\Lti1p3Core\Security\Nonce\NonceInterface;
-use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepositoryInterface;
-
-$nonceRepository = new class implements NonceRepositoryInterface
-{
-    public function find(string $value) : ?NonceInterface
-    {
-        // TODO: Implement find() method to find a nonce by value, or null if not found.
-    }
-
-    public function save(NonceInterface $nonce) : void
-    {
-        // TODO: Implement save() method to save a nonce (cache, database, etc)
-    }
-};
-```
-**Note**: you can find a simple implementation example of this interface in the method `createTestNonceRepository()` of the [SecurityTestingTrait](../../tests/Traits/SecurityTestingTrait.php).
-
 ### User authenticator interface
 
 **Required by**: [Message](../../src/Message)  
@@ -113,6 +85,34 @@ The following interfaces must be implemented to use the service authentication s
 
 This section present the optional interfaces from the library you can implement, but for which a default implementation is already provided.
 
+### Nonce repository interface
+
+**Default implementation**: [NonceRepository](../../src/Security/Nonce/NonceRepository.php)
+
+In order to be able to store security nonce the way you want, you can provide an implementation of the [NonceRepositoryInterface](../../src/Security/Nonce/NonceRepositoryInterface.php).
+
+By example:
+```php
+<?php
+
+use OAT\Library\Lti1p3Core\Security\Nonce\NonceInterface;
+use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepositoryInterface;
+
+$nonceRepository = new class implements NonceRepositoryInterface
+{
+    public function find(string $value) : ?NonceInterface
+    {
+        // TODO: Implement find() method to find a nonce by value, or null if not found.
+    }
+
+    public function save(NonceInterface $nonce) : void
+    {
+        // TODO: Implement save() method to save a nonce (cache, database, etc)
+    }
+};
+```
+**Note**: the ready to use [NonceRepository](../../src/Security/Nonce/NonceRepository.php) works with a [PSR6 cache](https://www.php-fig.org/psr/psr-6/#cacheitempoolinterface).
+
 ### JWKS fetcher interface
 
 **Default implementation**: [JwksFetcher](../../src/Security/Jwks/Fetcher/JwksFetcher.php)
@@ -135,8 +135,8 @@ $fetcher = new class implements JwksFetcherInterface
 };
 ```
 **Notes**:
-- it is recommended to put in cache the JWKS endpoint responses, to improve performances since they dont change often. Your implementation can then rely on an injected PSR6 cache by example.
-- you can find a ready to use implementation in [JwksFetcher](../../src/Security/Jwks/Fetcher/JwksFetcher.php): you need to provide it a [guzzle](http://docs.guzzlephp.org/en/stable/) client, with enabled [cache middleware](https://github.com/Kevinrob/guzzle-cache-middleware).
+- it is recommended to put in cache the JWKS endpoint responses, to improve performances since they dont change often. Your implementation can then rely on a cache by example.
+- the  ready to use [JwksFetcher](../../src/Security/Jwks/Fetcher/JwksFetcher.php) works with a [PSR6 cache](https://www.php-fig.org/psr/psr-6/#cacheitempoolinterface) and a [guzzle](http://docs.guzzlephp.org/en/stable/) client.
 
 ### Service client interface
 
@@ -161,4 +161,4 @@ $client = new class implements ServiceClientInterface
 };
 ```        
 **Notes**:                                                                                                                                                                                                                                                                            
-- it is recommended to put in cache the service access tokens, to improve performances. Your implementation can then rely on an injected PSR6 cache by example.                                                                                        
+- it is recommended to put in cache the service access tokens, to improve performances. Your implementation can then rely on an injected [PSR6 cache](https://www.php-fig.org/psr/psr-6/#cacheitempoolinterface) by example.                                                                                        

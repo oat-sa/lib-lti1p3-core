@@ -36,7 +36,7 @@ use Throwable;
 
 class JwksFetcher implements JwksFetcherInterface
 {
-    private const CACHE_PREFIX = 'lti-jwks';
+    private const CACHE_PREFIX = 'lti1p3-jwks';
 
     /** @var CacheItemPoolInterface */
     private $cache;
