@@ -43,7 +43,7 @@ use Throwable;
  */
 class ServiceClient implements ServiceClientInterface
 {
-    private const CACHE_PREFIX = 'lti-service-client-token';
+    private const CACHE_PREFIX = 'lti1p3-service-client-token';
 
     /** @var CacheItemPoolInterface|null */
     private $cache;

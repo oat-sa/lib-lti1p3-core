@@ -95,7 +95,7 @@ class ServiceClientTest extends TestCase
         $this->assertInstanceOf(ResponseInterface::class, $result);
         $this->assertEquals('service response', $result->getBody()->__toString());
 
-        $cacheKey = sprintf('lti-service-client-token-' . $registration->getIdentifier());
+        $cacheKey = sprintf('lti1p3-service-client-token-' . $registration->getIdentifier());
         $this->assertTrue($this->cache->hasItem($cacheKey));
         $this->assertEquals('access_token', $this->cache->getItem($cacheKey)->get());
     }
@@ -104,7 +104,7 @@ class ServiceClientTest extends TestCase
     {
         $registration = $this->createTestRegistration();
 
-        $cacheKey = sprintf('lti-service-client-token-' . $registration->getIdentifier());
+        $cacheKey = sprintf('lti1p3-service-client-token-' . $registration->getIdentifier());
         $cacheItem = $this->cache->getItem($cacheKey)->set('cached_access_token');
         $this->cache->save($cacheItem);
 

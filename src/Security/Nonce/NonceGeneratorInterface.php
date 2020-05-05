@@ -24,7 +24,8 @@ namespace OAT\Library\Lti1p3Core\Security\Nonce;
 
 interface NonceGeneratorInterface
 {
-    public const DEFAULT_TTL = 600;
+    // Default TTL (in seconds)
+    public const TTL = 600;
 
     public function generate(int $ttl = null): NonceInterface;
 }

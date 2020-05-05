@@ -20,14 +20,36 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Security\Jwks\Fetcher;
+namespace OAT\Library\Lti1p3Core\Tests\Resource\Logger;
 
-use Lcobucci\JWT\Signer\Key;
+use Psr\Log\AbstractLogger;
 
-interface JwksFetcherInterface
+class TestLogger extends AbstractLogger
 {
-    // Default TTL (in seconds)
-    public const TTL = 86400;
+    /** @var array */
+    private $logs;
 
-    public function fetchKey(string $jwksUrl, string $kId): Key;
+    public function __construct(array $logs = [])
+    {
+        $this->logs = $logs;
+    }
+
+    public function log($level, $message, array $context = array()): void
+    {
+        $this->logs[] = [
+            'level' => $level,
+            'message' => $message
+        ];
+    }
+
+    public function hasLog($level, $message): bool
+    {
+        foreach ($this->logs as $log) {
+            if ($level === $log['level'] && $message === $log['message']) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
