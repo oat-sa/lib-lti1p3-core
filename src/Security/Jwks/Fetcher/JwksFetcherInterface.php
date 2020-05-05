@@ -26,7 +26,7 @@ use Lcobucci\JWT\Signer\Key;
 
 interface JwksFetcherInterface
 {
-    // TTL
+    // Default TTL (in seconds)
     public const TTL = 86400;
 
     public function fetchKey(string $jwksUrl, string $kId): Key;

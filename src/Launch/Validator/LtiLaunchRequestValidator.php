@@ -177,7 +177,7 @@ class LtiLaunchRequestValidator
             }
         } else {
             $this->nonceRepository->save(
-                new Nonce($nonceValue, Carbon::now()->addSeconds(NonceGeneratorInterface::DEFAULT_TTL))
+                new Nonce($nonceValue, Carbon::now()->addSeconds(NonceGeneratorInterface::TTL))
             );
 
             $this->addSuccess('JWT id_token nonce is valid');

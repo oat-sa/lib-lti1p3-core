@@ -33,7 +33,7 @@ class NonceGenerator implements NonceGeneratorInterface
 
     public function __construct(int $ttl = null)
     {
-        $this->ttl = $ttl ?? static::DEFAULT_TTL;
+        $this->ttl = $ttl ?? static::TTL;
     }
 
     /**

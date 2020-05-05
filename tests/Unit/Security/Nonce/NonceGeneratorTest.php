@@ -52,7 +52,7 @@ class NonceGeneratorTest extends TestCase
 
         $nonce = $subject->generate();
 
-        $this->assertEquals($now->addSeconds(NonceGeneratorInterface::DEFAULT_TTL), $nonce->getExpiredAt());
+        $this->assertEquals($now->addSeconds(NonceGeneratorInterface::TTL), $nonce->getExpiredAt());
     }
 
     public function testItGeneratesWithGivenTtl(): void
