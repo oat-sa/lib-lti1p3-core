@@ -136,7 +136,7 @@ $fetcher = new class implements JwksFetcherInterface
 ```
 **Notes**:
 - it is recommended to put in cache the JWKS endpoint responses, to improve performances since they don't change often. Your implementation can then rely on a cache by example.
-- the ready to use [JwksFetcher](../../src/Security/Jwks/Fetcher/JwksFetcher.php) works with a [PSR6 cache](https://www.php-fig.org/psr/psr-6/#cacheitempoolinterface) and a [guzzle](http://docs.guzzlephp.org/en/stable/) client.
+- the ready to use [JwksFetcher](../../src/Security/Jwks/Fetcher/JwksFetcher.php) works with a [guzzle](http://docs.guzzlephp.org/en/stable/) client to request JWKS data, a [PSR6 cache](https://www.php-fig.org/psr/psr-6/#cacheitempoolinterface) to cache them, and a [PSR3 logger](https://www.php-fig.org/psr/psr-3/#3-psrlogloggerinterface) to log this process.
 
 ### Service client interface
 

@@ -68,7 +68,7 @@ class JwksFetcherTest extends TestCase
         $this->exporter = new JwksExporter(new KeyChainRepository([$this->keyChain]));
     }
 
-    public function testItCanFetchAJwksExposedKeyAndCacheIt(): void
+    public function testItCanFetchAJwksFromJwksUrlKeyAndSaveItInCache(): void
     {
         $this->clientMock
             ->expects($this->once())
@@ -119,10 +119,40 @@ class JwksFetcherTest extends TestCase
         $this->assertEquals($expectedDetails, $jwksDetails);
     }
 
-    public function testItThrowAnLtiExceptionOnNoKeyFound(): void
+    public function testItThrowAnLtiExceptionOnMissingKeyFromBothCacheAndJwksUrl(): void
     {
         $this->expectException(LtiException::class);
-        $this->expectExceptionMessage('Could not find key id invalid from url http://test.com');
+        $this->expectExceptionMessage('Could not find key id invalid from cache or url http://test.com');
+
+        $this->clientMock
+            ->expects($this->once())
+            ->method('request')
+            ->with('GET', 'http://test.com', ['headers' => ['Accept' => 'application/json']])
+            ->willReturn($this->createResponse(json_encode([])));
+
+        $this->subject->fetchKey('http://test.com', 'invalid');
+    }
+
+    public function testItThrowAnLtiExceptionOnPemConversionError(): void
+    {
+        $this->expectException(LtiException::class);
+        $this->expectExceptionMessage("Error during JWKS PEM conversion: Illegal string offset 'kid'");
+
+        $this->clientMock
+            ->expects($this->once())
+            ->method('request')
+            ->with('GET', 'http://test.com', ['headers' => ['Accept' => 'application/json']])
+            ->willReturn(
+                $this->createResponse(json_encode(['keys' => ['invalid']]))
+            );
+
+        $this->subject->fetchKey('http://test.com', 'invalid');
+    }
+
+    public function testItThrowAnLtiExceptionOnKeyIdNotFound(): void
+    {
+        $this->expectException(LtiException::class);
+        $this->expectExceptionMessage('Could not find key id invalid from cache or url http://test.com');
 
         $this->clientMock
             ->expects($this->once())
@@ -135,10 +165,10 @@ class JwksFetcherTest extends TestCase
         $this->subject->fetchKey('http://test.com', 'invalid');
     }
 
-    public function testItThrowAnLtiExceptionOnInvalidJwksJsonResponse(): void
+    public function testItThrowAnLtiExceptionOnInvalidJwksUrlResponse(): void
     {
         $this->expectException(LtiException::class);
-        $this->expectExceptionMessage('Error during JWK fetching for url http://test.com: json_decode error: Syntax error');
+        $this->expectExceptionMessage('Cannot fetch JWKS data from url http://test.com: json_decode error: Syntax error');
 
         $this->clientMock
             ->expects($this->once())
