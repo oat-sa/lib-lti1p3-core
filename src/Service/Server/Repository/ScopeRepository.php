@@ -31,7 +31,7 @@ class ScopeRepository implements ScopeRepositoryInterface
     /** @var ScopeEntityInterface[] */
     private $scopes;
 
-    public function __construct(iterable $scopes)
+    public function __construct(iterable $scopes = [])
     {
         foreach ($scopes as $scope) {
             $this->addScope($scope);

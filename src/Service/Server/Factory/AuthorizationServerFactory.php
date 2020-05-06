@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Service\Server\Factory;
 
 use League\OAuth2\Server\AuthorizationServer;
+use League\OAuth2\Server\CryptKey;
 use League\OAuth2\Server\Repositories\AccessTokenRepositoryInterface;
 use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
 use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
@@ -38,6 +39,8 @@ class AuthorizationServerFactory
         string $privateKey,
         string $encryptionKey
     ): AuthorizationServer {
+        $privateKey = new CryptKey($privateKey, null, false);
+
         $server = new AuthorizationServer(
             $clientRepository,
             $accessTokenRepository,
