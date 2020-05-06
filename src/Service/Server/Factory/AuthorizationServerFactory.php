@@ -20,30 +20,36 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Tests\Unit\Server\OAuth2\Factory;
+namespace OAT\Library\Lti1p3Core\Service\Server\Factory;
 
 use League\OAuth2\Server\AuthorizationServer;
 use League\OAuth2\Server\CryptKey;
 use League\OAuth2\Server\Repositories\AccessTokenRepositoryInterface;
 use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
 use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
-use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
-use OAT\Library\Lti1p3Core\Service\Server\Factory\AuthorizationServerFactory;
-use PHPUnit\Framework\TestCase;
+use OAT\Library\Lti1p3Core\Service\Server\Grant\ClientAssertionCredentialsGrant;
+use OAT\Library\Lti1p3Core\Service\Server\ResponseType\ScopedBearerTokenResponse;
 
-class OAuth2AuthorizationServerFactoryTest extends TestCase
+class AuthorizationServerFactory
 {
-    public function testItCanCreateAuthorizationServer(): void
-    {
-        $subject = new AuthorizationServerFactory(
-            $this->createMock(AccessTokenRepositoryInterface::class),
-            $this->createMock(ClientRepositoryInterface::class),
-            $this->createMock(ScopeRepositoryInterface::class),
-            $this->createMock(RegistrationRepositoryInterface::class),
-            $this->createMock(CryptKey::class),
-            'encryption key'
+    public function create(
+        AccessTokenRepositoryInterface $accessTokenRepository,
+        ClientRepositoryInterface $clientRepository,
+        ScopeRepositoryInterface $scopeRepository,
+        CryptKey $privateKey,
+        string $encryptionKey
+    ): AuthorizationServer {
+        $server = new AuthorizationServer(
+            $clientRepository,
+            $accessTokenRepository,
+            $scopeRepository,
+            $privateKey,
+            $encryptionKey,
+            new ScopedBearerTokenResponse()
         );
 
-        $this->assertInstanceOf(AuthorizationServer::class, $subject->create());
+        $server->enableGrantType(new ClientAssertionCredentialsGrant());
+
+        return $server;
     }
 }

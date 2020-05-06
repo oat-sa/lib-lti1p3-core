@@ -166,7 +166,7 @@ trait DomainTestingTrait
 
             public function findByClientId(string $clientId): ?RegistrationInterface
             {
-                foreach ($this->registrations as$registration) {
+                foreach ($this->registrations as $registration) {
                     if ($registration->getClientId() === $clientId) {
                         return $registration;
                     }

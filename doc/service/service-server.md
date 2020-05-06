@@ -29,7 +29,7 @@ use League\OAuth2\Server\Repositories\AccessTokenRepositoryInterface;
 use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
 use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
-use OAT\Library\Lti1p3Core\Service\Server\Factory\OAuth2AuthorizationServerFactory;
+use OAT\Library\Lti1p3Core\Service\Server\Factory\AuthorizationServerFactory;
 
 // prepare the required repositories
 /** @var AccessTokenRepositoryInterface $accessTokenRepository */
@@ -47,7 +47,7 @@ $registrationRepository = ...
 /** @var CryptKey $privateKey */
 $privateKey = ...
 
-$factory = new OAuth2AuthorizationServerFactory(
+$factory = new AuthorizationServerFactory(
     $accessTokenRepository,
     $clientRepository,
     $scopeRepository,

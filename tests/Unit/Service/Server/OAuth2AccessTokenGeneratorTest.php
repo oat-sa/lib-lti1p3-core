@@ -23,7 +23,7 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Service\Server;
 
 use League\OAuth2\Server\AuthorizationServer;
-use OAT\Library\Lti1p3Core\Service\Server\OAuth2AccessTokenGenerator;
+use OAT\Library\Lti1p3Core\Service\Server\AccessTokenRequestHandler;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -43,7 +43,7 @@ class OAuth2AccessTokenGeneratorTest extends TestCase
         $authorizationServer = $this->createMock(AuthorizationServer::class);
         $authorizationServer->method('respondToAccessTokenRequest')->with($request, $response)->willReturn($response);
 
-        $subject = new OAuth2AccessTokenGenerator($authorizationServer);
+        $subject = new AccessTokenRequestHandler($authorizationServer);
 
         $this->assertEquals($response, $subject->generate($request, $response));
     }

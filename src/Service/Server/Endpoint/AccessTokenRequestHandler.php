@@ -20,23 +20,28 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Service\Server\ResponseType;
+namespace OAT\Library\Lti1p3Core\Service\Server\Endpoint;
 
-use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
-use League\OAuth2\Server\Entities\ScopeEntityInterface;
-use League\OAuth2\Server\ResponseTypes\BearerTokenResponse;
+use League\OAuth2\Server\AuthorizationServer;
+use League\OAuth2\Server\Exception\OAuthServerException;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
-class ScopeBearerResponseType extends BearerTokenResponse
+class AccessTokenRequestHandler
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getExtraParams(AccessTokenEntityInterface $accessToken): array
+    /** @var AuthorizationServer */
+    private $authorizationServer;
+
+    public function __construct(AuthorizationServer $authorizationServer)
     {
-        return [
-            'scope' => implode(' ', array_map(static function (ScopeEntityInterface $scope) {
-                return $scope->getIdentifier();
-            }, $accessToken->getScopes()))
-        ];
+        $this->authorizationServer = $authorizationServer;
+    }
+
+    /**
+     * @throws OAuthServerException
+     */
+    public function handle(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    {
+        return $this->authorizationServer->respondToAccessTokenRequest($request, $response);
     }
 }
