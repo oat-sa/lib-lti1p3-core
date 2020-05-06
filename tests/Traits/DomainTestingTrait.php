@@ -164,6 +164,17 @@ trait DomainTestingTrait
                 return $this->registrations[$identifier] ?? null;
             }
 
+            public function findByClientId(string $clientId): ?RegistrationInterface
+            {
+                foreach ($this->registrations as$registration) {
+                    if ($registration->getClientId() === $clientId) {
+                        return $registration;
+                    }
+                }
+
+                return null;
+            }
+
             public function findByPlatformIssuer(string $issuer, string $clientId = null): ?RegistrationInterface
             {
                 foreach ($this->registrations as $registration) {

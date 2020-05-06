@@ -20,15 +20,25 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Registration;
+namespace OAT\Library\Lti1p3Core\Service\Server\Entity;
 
-interface RegistrationRepositoryInterface
+use League\OAuth2\Server\Entities\ScopeEntityInterface;
+use League\OAuth2\Server\Entities\Traits\ScopeTrait;
+
+class Scope implements ScopeEntityInterface
 {
-    public function find(string $identifier): ?RegistrationInterface;
+    use ScopeTrait;
 
-    public function findByClientId(string $clientId): ?RegistrationInterface;
+    /** @var string */
+    private $identifier;
 
-    public function findByPlatformIssuer(string $issuer, string $clientId = null): ?RegistrationInterface;
+    public function __construct(string $identifier)
+    {
+        $this->identifier = $identifier;
+    }
 
-    public function findByToolIssuer(string $issuer, string $clientId = null): ?RegistrationInterface;
+    public function getIdentifier(): string
+    {
+        return $this->identifier;
+    }
 }

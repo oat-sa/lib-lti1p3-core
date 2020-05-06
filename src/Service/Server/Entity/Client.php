@@ -20,15 +20,29 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Registration;
+namespace OAT\Library\Lti1p3Core\Service\Server\Entity;
 
-interface RegistrationRepositoryInterface
+use League\OAuth2\Server\Entities\ClientEntityInterface;
+use League\OAuth2\Server\Entities\Traits\ClientTrait;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
+
+class Client implements ClientEntityInterface
 {
-    public function find(string $identifier): ?RegistrationInterface;
+    use ClientTrait;
 
-    public function findByClientId(string $clientId): ?RegistrationInterface;
+    /** @var RegistrationInterface */
+    private $registration;
 
-    public function findByPlatformIssuer(string $issuer, string $clientId = null): ?RegistrationInterface;
+    public function __construct(RegistrationInterface $registration)
+    {
+        $this->registration = $registration;
+        $this->name = $this->registration->getTool()->getName();
+        $this->redirectUri = $this->registration->getTool()->getLaunchUrl();
+        $this->isConfidential = false;
+    }
 
-    public function findByToolIssuer(string $issuer, string $clientId = null): ?RegistrationInterface;
+    public function getIdentifier(): string
+    {
+        return $this->registration->getClientId();
+    }
 }
