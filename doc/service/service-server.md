@@ -4,11 +4,11 @@
 
 ## Table of contents
 
-- [Preparing the required dependencies](#preparing-the-required-dependencies)
+- [Prepare the required dependencies](#prepare-the-required-dependencies)
 - [Generate an access tokens for a registration](#generate-access-tokens-for-a-registration)
 - [Validate an access token request](#validate-an-access-token-request)
 
-## Preparing the required dependencies
+## Prepare the required dependencies
 
 This library allow you to easily expose a OAuth2 server for a given subscription, to protect your LTI service calls as a platform.
 
