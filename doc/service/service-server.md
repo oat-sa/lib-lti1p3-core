@@ -4,11 +4,11 @@
 
 ## Table of contents
 
-- [Prepare the required dependencies](#prepare-the-required-dependencies)
-- [Generate an access tokens for a registration](#generate-access-tokens-for-a-registration)
-- [Validate an access token request](#validate-an-access-token-request)
+- [Preparation of the required dependencies](#preparation-of-the-required-dependencies)
+- [Generation of an access token response for a registration](#generation-of-an-access-token-response-for-a-registration)
+- [Validation of an access token request](#validation-of-an-access-token-request)
 
-## Prepare the required dependencies
+## Preparation of the required dependencies
 
 This library allow you to easily expose a OAuth2 server for a given subscription, to protect your LTI service calls as a platform.
 
@@ -23,7 +23,7 @@ or you can simply use the available [library repositories](../../src/Service/Ser
 
 Your will also need to provide an encryption key (random string with enough entropy).
 
-## Generate an access token response for a registration
+## Generation of an access token response for a registration
 
 This library provides a ready to use [AccessTokenGenerator](../../src/Service/Server/Generator/AccessTokenResponseGenerator.php) to generate access tokens responses for a registration:
 - it requires a registration repository implementation [as explained here](../quickstart/interfaces.md) to automate signature logic against your platform registration private key
@@ -75,7 +75,7 @@ try {
 }
 ``` 
 
-## Validate an access token request
+## Validation of an access token request
 
 Once a tool has been granted with an access token, it can perform LTI service authenticated calls (with header `Authorization: Bearer <token>`).
 
