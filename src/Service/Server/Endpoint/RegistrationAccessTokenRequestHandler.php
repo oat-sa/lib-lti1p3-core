@@ -22,8 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Service\Server\Endpoint;
 
-use InvalidArgumentException;
-use League\OAuth2\Server\AuthorizationServer;
 use League\OAuth2\Server\Exception\OAuthServerException;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Service\Server\Factory\AuthorizationServerFactory;
@@ -38,7 +36,7 @@ class RegistrationAccessTokenRequestHandler
     /** @var AuthorizationServerFactory */
     private $factory;
 
-    public function __construct(RegistrationRepositoryInterface $repository, AuthorizationServer $factory)
+    public function __construct(RegistrationRepositoryInterface $repository, AuthorizationServerFactory $factory)
     {
         $this->repository = $repository;
         $this->factory = $factory;
