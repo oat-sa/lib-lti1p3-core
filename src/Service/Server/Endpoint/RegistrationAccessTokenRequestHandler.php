@@ -22,26 +22,44 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Service\Server\Endpoint;
 
+use InvalidArgumentException;
 use League\OAuth2\Server\AuthorizationServer;
 use League\OAuth2\Server\Exception\OAuthServerException;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
+use OAT\Library\Lti1p3Core\Service\Server\Factory\AuthorizationServerFactory;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class AccessTokenRequestHandler
+class RegistrationAccessTokenRequestHandler
 {
-    /** @var AuthorizationServer */
-    private $authorizationServer;
+    /** @var RegistrationRepositoryInterface */
+    private $repository;
 
-    public function __construct(AuthorizationServer $authorizationServer)
+    /** @var AuthorizationServerFactory */
+    private $factory;
+
+    public function __construct(RegistrationRepositoryInterface $repository, AuthorizationServer $factory)
     {
-        $this->authorizationServer = $authorizationServer;
+        $this->repository = $repository;
+        $this->factory = $factory;
     }
 
     /**
      * @throws OAuthServerException
      */
-    public function handle(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
-    {
-        return $this->authorizationServer->respondToAccessTokenRequest($request, $response);
+    public function handle(
+        ServerRequestInterface $request,
+        ResponseInterface $response,
+        string $registrationIdentifier
+    ): ResponseInterface {
+        $registration = $this->repository->find($registrationIdentifier);
+
+        if (null === $registration) {
+            throw OAuthServerException::invalidRequest('registrationIdentifier', 'Invalid registration Identifier');
+        }
+
+        return $this->factory
+            ->createForRegistration($registration)
+            ->respondToAccessTokenRequest($request, $response);
     }
 }

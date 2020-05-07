@@ -22,31 +22,60 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Service\Server\Factory;
 
+use InvalidArgumentException;
 use League\OAuth2\Server\AuthorizationServer;
 use League\OAuth2\Server\CryptKey;
 use League\OAuth2\Server\Repositories\AccessTokenRepositoryInterface;
 use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
 use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Service\Server\Grant\ClientAssertionCredentialsGrant;
 use OAT\Library\Lti1p3Core\Service\Server\ResponseType\ScopedBearerTokenResponse;
 
 class AuthorizationServerFactory
 {
-    public function create(
-        AccessTokenRepositoryInterface $accessTokenRepository,
+    /** @var ClientRepositoryInterface */
+    private $clientRepository;
+
+    /** @var AccessTokenRepositoryInterface */
+    private $accessTokenRepository;
+
+    /** @var ScopeRepositoryInterface */
+    private $scopeRepository;
+
+    /** @var string */
+    private $encryptionKey;
+
+    public function __construct(
         ClientRepositoryInterface $clientRepository,
+        AccessTokenRepositoryInterface $accessTokenRepository,
         ScopeRepositoryInterface $scopeRepository,
-        string $privateKey,
         string $encryptionKey
-    ): AuthorizationServer {
-        $privateKey = new CryptKey($privateKey, null, false);
+    ) {
+        $this->clientRepository = $clientRepository;
+        $this->accessTokenRepository = $accessTokenRepository;
+        $this->scopeRepository = $scopeRepository;
+        $this->encryptionKey = $encryptionKey;
+    }
+
+    public function createForRegistration(RegistrationInterface $registration): AuthorizationServer
+    {
+        if (null === $registration->getPlatformKeyChain()) {
+            throw new InvalidArgumentException('Missing platform key chain');
+        }
+
+        $privateKey = new CryptKey(
+            $registration->getPlatformKeyChain()->getPrivateKey()->getContent(),
+            $registration->getPlatformKeyChain()->getPrivateKey()->getPassphrase(),
+            false
+        );
 
         $server = new AuthorizationServer(
-            $clientRepository,
-            $accessTokenRepository,
-            $scopeRepository,
+            $this->clientRepository,
+            $this->accessTokenRepository,
+            $this->scopeRepository,
             $privateKey,
-            $encryptionKey,
+            $this->encryptionKey,
             new ScopedBearerTokenResponse()
         );
 
