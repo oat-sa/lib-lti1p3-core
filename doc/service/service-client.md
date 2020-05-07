@@ -1,6 +1,6 @@
 # LTI service client
 
-> How to use the [ServiceClient](../../src/Service/Client/ServiceClient.php) to perform authenticated LTI service calls.
+> How to use the [ServiceClient](../../src/Service/Client/ServiceClient.php) to perform authenticated LTI service calls as a tool.
 
 ## Table of contents
 
@@ -9,7 +9,7 @@
 
 ## Features
 
-You may need to perform [authenticated service calls](https://www.imsglobal.org/spec/security/v1p0#securing_web_services) from your tool to a platform (ex: LTI Advantage Services)
+You may need to perform [authenticated service calls](https://www.imsglobal.org/spec/security/v1p0#securing_web_services) from your registered tool to a platform (ex: LTI Advantage Services)
 
 To do so, you can use the [ServiceClient](../../src/Service/Client/ServiceClient.php) that permits:
 - to call platform endpoints, returning a [PSR7 response](https://www.php-fig.org/psr/psr-7)

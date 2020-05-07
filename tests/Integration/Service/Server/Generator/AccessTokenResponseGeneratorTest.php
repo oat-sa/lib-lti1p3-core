@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Tests\Integration\Service\Server\Endpoint;
+namespace OAT\Library\Lti1p3Core\Tests\Integration\Service\Server\Generator;
 
 use Cache\Adapter\PHPArray\ArrayCachePool;
 use Carbon\Carbon;
@@ -30,7 +30,7 @@ use Lcobucci\JWT\Signer\Rsa\Sha256;
 use League\OAuth2\Server\Exception\OAuthServerException;
 use OAT\Library\Lti1p3Core\Message\MessageInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
-use OAT\Library\Lti1p3Core\Service\Server\Endpoint\RegistrationAccessTokenRequestHandler;
+use OAT\Library\Lti1p3Core\Service\Server\Generator\AccessTokenResponseGenerator;
 use OAT\Library\Lti1p3Core\Service\Server\Entity\Scope;
 use OAT\Library\Lti1p3Core\Service\Server\Factory\AuthorizationServerFactory;
 use OAT\Library\Lti1p3Core\Service\Server\Grant\ClientAssertionCredentialsGrant;
@@ -42,7 +42,7 @@ use OAT\Library\Lti1p3Core\Tests\Traits\NetworkTestingTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 
-class RegistrationAccessTokenRequestHandlerTest extends TestCase
+class AccessTokenResponseGeneratorTest extends TestCase
 {
     use DomainTestingTrait;
     use NetworkTestingTrait;
@@ -50,7 +50,7 @@ class RegistrationAccessTokenRequestHandlerTest extends TestCase
     /** @var ArrayCachePool */
     private $cache;
 
-    /** @var RegistrationAccessTokenRequestHandler */
+    /** @var AccessTokenResponseGenerator */
     private $subject;
 
     protected function setUp(): void
@@ -66,15 +66,15 @@ class RegistrationAccessTokenRequestHandlerTest extends TestCase
             'encryptionKey'
         );
 
-        $this->subject = new RegistrationAccessTokenRequestHandler($registrationRepository, $factory);
+        $this->subject = new AccessTokenResponseGenerator($registrationRepository, $factory);
     }
 
-    public function testHandle(): void
+    public function testGenerate(): void
     {
         $registration = $this->createTestRegistration();
         $request = $this->createServerRequest('POST', '/example', $this->generateCredentials($registration));
 
-        $result = $this->subject->handle(
+        $result = $this->subject->generate(
             $request,
             $this->createResponse(),
             $registration->getIdentifier()
@@ -95,12 +95,12 @@ class RegistrationAccessTokenRequestHandlerTest extends TestCase
         $this->assertEquals([], $token->getClaim('scopes'));
     }
 
-    public function testHandleWithScopes(): void
+    public function testGenerateWithScopes(): void
     {
         $registration = $this->createTestRegistration();
         $request = $this->createServerRequest('POST', '/example', $this->generateCredentials($registration, ['scope1', 'scope2']));
 
-        $result = $this->subject->handle(
+        $result = $this->subject->generate(
             $request,
             $this->createResponse(),
             $registration->getIdentifier()
@@ -121,7 +121,7 @@ class RegistrationAccessTokenRequestHandlerTest extends TestCase
         $this->assertEquals(['scope1', 'scope2'], $token->getClaim('scopes'));
     }
 
-    public function testHandleWitInvalidCredentials(): void
+    public function testGenerateWitInvalidCredentials(): void
     {
         $this->expectException(OAuthServerException::class);
         $this->expectExceptionMessage('The user credentials were incorrect');
@@ -138,13 +138,13 @@ class RegistrationAccessTokenRequestHandlerTest extends TestCase
             ]
         );
 
-        $result = $this->subject->handle($request, $this->createResponse(), $registration->getIdentifier());
+        $result = $this->subject->generate($request, $this->createResponse(), $registration->getIdentifier());
 
         $this->assertInstanceOf(ResponseInterface::class, $result);
         $this->assertEquals(401 , $result->getStatusCode());
     }
 
-    public function testHandleWitInvalidRegistration(): void
+    public function testGenerateWitInvalidRegistration(): void
     {
         $this->expectException(OAuthServerException::class);
         $this->expectExceptionMessage('Invalid registration identifier');
@@ -152,7 +152,7 @@ class RegistrationAccessTokenRequestHandlerTest extends TestCase
         $registration = $this->createTestRegistration();
         $request = $this->createServerRequest('POST', '/example', $this->generateCredentials($registration, ['scope1', 'scope2']));
 
-        $result = $this->subject->handle(
+        $result = $this->subject->generate(
             $request,
             $this->createResponse(),
             'invalid'

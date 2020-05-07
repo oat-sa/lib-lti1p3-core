@@ -118,7 +118,10 @@ class ClientRepository implements ClientRepositoryInterface
 
         try {
             if (null === $registration->getToolKeyChain()) {
-                $key = $this->fetcher->fetchKey($registration->getToolJwksUrl(), $token->getHeader(MessageInterface::HEADER_KID));
+                $key = $this->fetcher->fetchKey(
+                    $registration->getToolJwksUrl(),
+                    $token->getHeader(MessageInterface::HEADER_KID)
+                );
             } else {
                 $key = $registration->getToolKeyChain()->getPublicKey();
             }

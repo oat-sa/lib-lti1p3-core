@@ -1,91 +1,110 @@
 # OAuth authorization server
 
-> Documentation about how to create an authorization server with JWT token as client credentials
+> How to set up an OAuth2 authorization server endpoint to protect your platforms LTI service endpoints.
 
 ## Table of contents
 
-- [Preparing required repository](#preparing-required-repository)
-- [Create an authorization server](#create-an-authorization-server)
-- [Generate access tokens](#generate-access-tokens)
+- [Preparing the required dependencies](#preparing-the-required-dependencies)
+- [Generate an access tokens for a registration](#generate-access-tokens-for-a-registration)
+- [Validate an access token request](#validate-an-access-token-request)
 
-## Preparing required repository
+## Preparing the required dependencies
 
-For this feature, you need to provide first:
-- a [RegistrationRepositoryInterface](../../src/Registration/RegistrationRepositoryInterface.php) implementation (to retrieve your registrations configurations)
+This library allow you to easily expose a OAuth2 server for a given subscription, to protect your LTI service calls as a platform.
+
+You can reuse this feature in several endpoints of your application to serve several servers for distinct registrations (client id).
+
+The server feature rely on the [PHP League OAuth2 server](https://oauth2.thephpleague.com/), therefore you need to provide:
+- a [ClientRepositoryInterface](https://github.com/thephpleague/oauth2-server/blob/master/src/Repositories/ClientRepositoryInterface.php) implementation (to retrieve and validate your clients)
 - a [AccessTokenRepositoryInterface](https://github.com/thephpleague/oauth2-server/blob/master/src/Repositories/AccessTokenRepositoryInterface.php) implementation (to store the created access tokens)
-- a [ClientRepositoryInterface](https://github.com/thephpleague/oauth2-server/blob/master/src/Repositories/ClientRepositoryInterface.php) implementation (to retrieve your clients)
 - a [ScopeRepositoryInterface](https://github.com/thephpleague/oauth2-server/blob/master/src/Repositories/ScopeRepositoryInterface.php) implementation (to retrieve your scopes)
 
-## Create an authorization server
+or you can simply use the available [library repositories](../../src/Service/Server/Repository) for this.
 
-This library provides the factory [OAuth2AuthorizationServerFactory](../../src/Service/OAuth2/Factory/OAuth2AuthorizationServerFactory.php) that allows you to create [AuthorizationServer](https://github.com/thephpleague/oauth2-server/blob/master/src/AuthorizationServer.php) with a custom grant [JwtClientCredentialsGrant](../../src/Service/OAuth2/Grant/JwtClientCredentialsGrant.php) and response type [ScopeBearerResponseType](../../src/Service/OAuth2/ResponseType/ScopeBearerResponseType.php).  
+Your will also need to provide an encryption key (random string with enough entropy).
 
-An usage example:
+## Generate an access token response for a registration
+
+This library provides a ready to use [AccessTokenGenerator](../../src/Service/Server/Generator/AccessTokenResponseGenerator.php) to generate access tokens responses for a registration:
+- it requires a registration repository implementation [as explained here](../quickstart/interfaces.md) to automate signature logic against your platform registration private key
+- it complies to the `client_credentials` grant type with `client_assertion` to follow [IMS security specifications](https://www.imsglobal.org/spec/security/v1p0/#using-json-web-tokens-with-oauth-2-0-client-credentials-grant)
+- it expects a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface), a [PSR7 ResponseInterface](https://www.php-fig.org/psr/psr-7/#33-psrhttpmessageresponseinterface) and a registration identifier to be easily exposed behind any PSR7 compliant controller
+
+For example, to expose an LTI service server your application endpoint `[POST] /lti/auth/{registrationIdentifier}/token`:
+
 ```php
 <?php
 
-use League\OAuth2\Server\CryptKey;
-use League\OAuth2\Server\Repositories\AccessTokenRepositoryInterface;
-use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
-use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
+use League\OAuth2\Server\Exception\OAuthServerException;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
+use OAT\Library\Lti1p3Core\Service\Server\Generator\AccessTokenResponseGenerator;
 use OAT\Library\Lti1p3Core\Service\Server\Factory\AuthorizationServerFactory;
-
-// prepare the required repositories
-/** @var AccessTokenRepositoryInterface $accessTokenRepository */
-$accessTokenRepository = ...
-
-/** @var ClientRepositoryInterface $clientRepository */
-$clientRepository = ...
-
-/** @var ScopeRepositoryInterface $scopeRepository */
-$scopeRepository = ...
-
-/** @var RegistrationRepositoryInterface $registrationRepository */
-$registrationRepository = ...
-
-/** @var CryptKey $privateKey */
-$privateKey = ...
+use OAT\Library\Lti1p3Core\Service\Server\Repository\AccessTokenRepository;
+use OAT\Library\Lti1p3Core\Service\Server\Repository\ClientRepository;
+use OAT\Library\Lti1p3Core\Service\Server\Repository\ScopeRepository;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 $factory = new AuthorizationServerFactory(
-    $accessTokenRepository,
-    $clientRepository,
-    $scopeRepository,
-    $registrationRepository,
-    $privateKey,
-    'encrypted key'
+    new ClientRepository(...),
+    new AccessTokenRepository(...),
+    new ScopeRepository(...),
+    'superSecretEncryptionKey' // You obviously have to add more entropy, this is an example
 );
 
-// and create an authorization server
-$authorizationServer = $factory->create();
-```
+/** @var RegistrationRepositoryInterface $repository */
+$repository = ...
 
-## Generate access tokens
+$generator = new AccessTokenResponseGenerator($repository, $factory);
 
-This library provides [OAuth2AccessTokenGenerator](../../src/Service/OAuth2/OAuth2AccessTokenGenerator.php) that allows you to generate an access token.
+/** @var ServerRequestInterface $request */
+$request = ...
 
-For using this service you need to provide the server instance created on previous step.
+/** @var ResponseInterface $response */
+$response = ...
 
+try {
+    // Extract registrationIdentifier from request uri parameter
+    $registrationIdentifier = ...
+
+    // Validate, generate and sign access token response, using as the registration platform private key
+    return $generator->generate($request, $response, $registrationIdentifier);
+
+} catch (OAuthServerException $exception) {
+    return $exception->generateHttpResponse($response);
+}
+``` 
+
+## Validate an access token request
+
+Once a tool has been granted with an access token, it can perform LTI service authenticated calls (with header `Authorization: Bearer <token>`).
+
+To be able to protect your platform endpoints, you can use the provided [AccessTokenRequestValidator](../../src/Service/Server/Validator/AccessTokenRequestValidator.php):
+- it requires a registration repository implementation [as explained here](../quickstart/interfaces.md) to automate the token signature checks
+- it expects a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface) to validate
+- and it will output a [AccessTokenRequestValidationResult](../../src/Service/Server/Validator/AccessTokenRequestValidationResult.php) representing the token validation and the token itself.
+
+For example,
 ```php
 <?php
 
-use League\OAuth2\Server\AuthorizationServer;
-use OAT\Library\Lti1p3Core\Service\OAuth2\Factory\OAuth2AuthorizationServerFactory;
-use OAT\Library\Lti1p3Core\Service\OAuth2\OAuth2AccessTokenGenerator;use Psr\Http\Message\ResponseInterface;use Psr\Http\Message\ServerRequestInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
+use OAT\Library\Lti1p3Core\Service\Server\Validator\AccessTokenRequestValidator;
+use Psr\Http\Message\ServerRequestInterface;
 
-// prepare the required authorization server
-/** @var AuthorizationServer $authorizationServer */
-$authorizationServer = (new OAuth2AuthorizationServerFactory(/* ... */))->create();
+/** @var RegistrationRepositoryInterface $repository */
+$repository = ...
 
-// create a generator instance
-$generator = new OAuth2AccessTokenGenerator($authorizationServer);
+$validator = new AccessTokenRequestValidator($repository);
 
-/** @var ServerRequestInterface $psr7Request */
-$psr7Request = ...
+/** @var ServerRequestInterface $request */
+$request = ...
 
-/** @var ResponseInterface $psrResponse */
-$psrResponse = ...
+// Validate access token using as the registration platform public key
+$result = $validator->validate($request);
 
-// and generate an access token
-$accessToken = $generator->generate($psr7Request, $psrResponse);
-``` 
+// Result exploitation
+if (!$result->hasFailures()) {
+    var_dump($result->getToken()->getClaims());
+} 
+```

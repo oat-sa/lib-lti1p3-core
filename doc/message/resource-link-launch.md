@@ -122,7 +122,7 @@ As a tool, you'll receive an HTTP request containing the [launch request](http:/
 
 The [LtiLaunchRequestValidator](../../src/Launch/Validator/LtiLaunchRequestValidator.php) can be used for this:
 - it requires a registration repository and a nonce repository implementations [as explained here](../quickstart/interfaces.md)
-- it expect a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface) to validate
+- it expects a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface) to validate
 - and it will output a [LtiLaunchRequestValidationResult](../../src/Launch/Validator/LtiLaunchRequestValidationResult.php) representing the launch validation and the message itself.
 
 By example:

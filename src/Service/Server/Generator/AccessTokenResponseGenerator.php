@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Service\Server\Endpoint;
+namespace OAT\Library\Lti1p3Core\Service\Server\Generator;
 
 use League\OAuth2\Server\Exception\OAuthServerException;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
@@ -28,7 +28,7 @@ use OAT\Library\Lti1p3Core\Service\Server\Factory\AuthorizationServerFactory;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class RegistrationAccessTokenRequestHandler
+class AccessTokenResponseGenerator
 {
     /** @var RegistrationRepositoryInterface */
     private $repository;
@@ -45,7 +45,7 @@ class RegistrationAccessTokenRequestHandler
     /**
      * @throws OAuthServerException
      */
-    public function handle(
+    public function generate(
         ServerRequestInterface $request,
         ResponseInterface $response,
         string $registrationIdentifier
