@@ -29,12 +29,17 @@ use Lcobucci\JWT\Signer\Rsa\Sha256;
 use League\OAuth2\Server\Exception\OAuthServerException;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Throwable;
 
 class AccessTokenRequestValidator
 {
     /** @var RegistrationRepositoryInterface */
     private $repository;
+
+    /** @var LoggerInterface */
+    private $logger;
 
     /** @var Signer */
     private $signer;
@@ -48,9 +53,13 @@ class AccessTokenRequestValidator
     /** @var string[] */
     private $failures = [];
 
-    public function __construct(RegistrationRepositoryInterface $repository, Signer $signer = null)
-    {
+    public function __construct(
+        RegistrationRepositoryInterface $repository,
+        LoggerInterface $logger = null,
+        Signer $signer = null
+    ) {
         $this->repository = $repository;
+        $this->logger = $logger ?? new NullLogger();
         $this->signer = $signer ?? new Sha256();
         $this->parser = new Parser();
     }
@@ -85,26 +94,26 @@ class AccessTokenRequestValidator
                 $this->addFailure('No registration found for client_id: ' . $clientId);
             } else {
                 $this->addSuccess('Registration found for client_id: ' . $clientId);
-            }
 
-            if (null === $registration->getPlatformKeyChain()) {
-                $this->addFailure('Missing platform key chain for registration: ' . $registration->getIdentifier());
-            } else {
-                $this->addSuccess('Platform key chain found for registration: ' . $registration->getIdentifier());
-            }
+                if (null === $registration->getPlatformKeyChain()) {
+                    $this->addFailure('Missing platform key chain for registration: ' . $registration->getIdentifier());
+                } else {
+                    $this->addSuccess('Platform key chain found for registration: ' . $registration->getIdentifier());
 
-            if (!$token->verify($this->signer, $registration->getPlatformKeyChain()->getPublicKey())) {
-                $this->addFailure('JWT access token signature is invalid');
-            } else {
-                $this->addSuccess('JWT access token signature is valid');
+                    if (!$token->verify($this->signer, $registration->getPlatformKeyChain()->getPublicKey())) {
+                        $this->addFailure('JWT access token signature is invalid');
+                    } else {
+                        $this->addSuccess('JWT access token signature is valid');
+                    }
+                }
             }
 
             return new AccessTokenRequestValidationResult($token, $this->successes, $this->failures);
 
-        } catch (OAuthServerException $exception) {
-            throw $exception;
         } catch (Throwable $exception) {
-            throw OAuthServerException::serverError('Validation error');
+            $this->logger->error('Access token validation error: ' . $exception->getMessage());
+
+            throw OAuthServerException::invalidCredentials();
         }
     }
 

@@ -59,7 +59,7 @@ class ClientRepositoryTest extends TestCase
 
         $registrations = [
             $this->createTestRegistration(),
-            $this->createTestRegistrationWithoutToolKeyChain('invalidRegistration', 'invalidClientId')
+            $this->createTestRegistrationWithoutToolKeyChain('InvalidIdentifier', 'invalidClientId')
         ];
 
         $this->subject = new ClientRepository(
@@ -131,7 +131,7 @@ class ClientRepositoryTest extends TestCase
         $this->assertTrue($this->logger->hasLog(LogLevel::ERROR, 'The client_assertion JWT is expired'));
     }
 
-    public function testValidateClientFailureWithInvalidRegistration(): void
+    public function testValidateClientFailureWithInvalidIdentifier(): void
     {
         $registration = $this->createTestRegistration();
 
@@ -166,7 +166,7 @@ class ClientRepositoryTest extends TestCase
     public function testValidateClientFailureWithJWKSFetchError(): void
     {
         $registration = $this->createTestRegistrationWithoutToolKeyChain(
-            'invalidRegistration',
+            'InvalidIdentifier',
             'invalidClientId'
         );
 
@@ -190,7 +190,7 @@ class ClientRepositoryTest extends TestCase
     public function testValidateClientFailureWithJWKSSignatureError(): void
     {
         $registration = $this->createTestRegistrationWithoutToolKeyChain(
-            'invalidRegistration',
+            'InvalidIdentifier',
             'invalidClientId'
         );
 

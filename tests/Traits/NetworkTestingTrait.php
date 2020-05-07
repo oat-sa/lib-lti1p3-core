@@ -29,11 +29,19 @@ use Psr\Http\Message\ServerRequestInterface;
 
 trait NetworkTestingTrait
 {
-    private function createServerRequest(string $method, $uri, array $params = []): ServerRequestInterface
-    {
+    private function createServerRequest(
+        string $method,
+        string $uri,
+        array $params = [],
+        array $headers = []
+    ): ServerRequestInterface {
         $serverRequest =  (new Psr17Factory())->createServerRequest($method, $uri);
 
         $method = strtoupper($method);
+
+        foreach ($headers as $headerName => $headerValue) {
+            $serverRequest = $serverRequest->withAddedHeader($headerName, $headerValue);
+        }
 
         if ($method === 'GET') {
             return $serverRequest->withQueryParams($params);
