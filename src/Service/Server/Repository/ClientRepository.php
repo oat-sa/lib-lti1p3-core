@@ -75,13 +75,15 @@ class ClientRepository implements ClientRepositoryInterface
     {
         $registration = $this->repository->findByClientId($clientIdentifier);
 
-        return $registration ? new Client($registration) : null;
+        return $registration
+            ? new Client($registration)
+            : null;
     }
 
     public function validateClient($clientIdentifier, $clientSecret, $grantType): bool
     {
         if ($grantType !== ClientAssertionCredentialsGrant::GRANT_IDENTIFIER) {
-            $this->logger->error('Unhandled grant type ' . $grantType);
+            $this->logger->error('Unhandled grant type: ' . $grantType);
 
             return false;
         }
@@ -103,7 +105,7 @@ class ClientRepository implements ClientRepositoryInterface
         $registration = $this->repository->findByClientId($clientIdentifier);
 
         if (null === $registration) {
-            $this->logger->error('Cannot find registration for client_id ' . $clientIdentifier);
+            $this->logger->error('Cannot find registration for client_id: ' . $clientIdentifier);
 
             return false;
         }

@@ -31,7 +31,7 @@ use OAT\Library\Lti1p3Core\Service\Server\ResponseType\ScopedBearerTokenResponse
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class ScopeBearerResponseTypeTest extends TestCase
+class ScopedBearerTokenResponseTest extends TestCase
 {
     /** @var ScopedBearerTokenResponse */
     private $subject;

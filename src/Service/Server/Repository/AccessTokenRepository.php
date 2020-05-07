@@ -24,7 +24,6 @@ namespace OAT\Library\Lti1p3Core\Service\Server\Repository;
 
 use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
-use League\OAuth2\Server\Exception\UniqueTokenIdentifierConstraintViolationException;
 use League\OAuth2\Server\Repositories\AccessTokenRepositoryInterface;
 use OAT\Library\Lti1p3Core\Service\Server\Entity\AccessToken;
 use Psr\Cache\CacheException;
@@ -67,10 +66,6 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
     {
         try {
             $item = $this->cache->getItem($this->getAccessTokenCacheKey($accessTokenEntity->getIdentifier()));
-
-            if ($item->isHit()) {
-                throw UniqueTokenIdentifierConstraintViolationException::create();
-            }
 
             $this->cache->save(
                 $item->set($accessTokenEntity)->expiresAt($accessTokenEntity->getExpiryDateTime())

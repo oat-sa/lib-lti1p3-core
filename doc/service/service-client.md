@@ -5,7 +5,7 @@
 ## Table of contents
 
 - [Features](#features)
-- [CUsage](#usage)
+- [Usage](#usage)
 
 ## Features
 
