@@ -121,7 +121,7 @@ class ClientRepository implements ClientRepositoryInterface
                 $key = $registration->getToolKeyChain()->getPublicKey();
             }
         } catch (Throwable $exception) {
-            $this->logger->error('Cannot find signing public key: ' . $exception->getMessage());
+            $this->logger->error('Cannot find tool public key: ' . $exception->getMessage());
 
             return false;
         }
