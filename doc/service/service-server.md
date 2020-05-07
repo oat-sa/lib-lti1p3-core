@@ -1,4 +1,4 @@
-# OAuth authorization server
+# LTI service server
 
 > How to set up an OAuth2 authorization server endpoint to protect your platforms LTI service endpoints.
 
@@ -67,7 +67,7 @@ try {
     // Extract registrationIdentifier from request uri parameter
     $registrationIdentifier = ...
 
-    // Validate, generate and sign access token response, using as the registration platform private key
+    // Validate assertion, generate and sign access token response, using the registration platform private key
     return $generator->generate($request, $response, $registrationIdentifier);
 
 } catch (OAuthServerException $exception) {
@@ -100,7 +100,7 @@ $validator = new AccessTokenRequestValidator($repository);
 /** @var ServerRequestInterface $request */
 $request = ...
 
-// Validate access token using as the registration platform public key
+// Validate access token using the registration platform public key
 $result = $validator->validate($request);
 
 // Result exploitation
