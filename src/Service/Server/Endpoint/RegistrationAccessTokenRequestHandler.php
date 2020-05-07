@@ -53,7 +53,7 @@ class RegistrationAccessTokenRequestHandler
         $registration = $this->repository->find($registrationIdentifier);
 
         if (null === $registration) {
-            throw OAuthServerException::invalidRequest('registrationIdentifier', 'Invalid registration Identifier');
+            throw new OAuthServerException('Invalid registration Identifier', 11, 'registration_not_found', 404);
         }
 
         return $this->factory
