@@ -77,7 +77,7 @@ class ClientAssertionCredentialsGrant extends ClientCredentialsGrant
                 $clientAssertion
             ];
         } catch (Throwable $exception) {
-            throw OAuthServerException::invalidRequest('client_assertion', 'Invalid client_assertion provided');
+            throw OAuthServerException::invalidCredentials();
         }
     }
 }
