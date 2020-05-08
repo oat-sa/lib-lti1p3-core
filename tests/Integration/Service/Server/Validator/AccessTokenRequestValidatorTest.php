@@ -91,8 +91,8 @@ class AccessTokenRequestValidatorTest extends TestCase
         $result = $this->subject->validate($request);
 
         $this->assertInstanceOf(AccessTokenRequestValidationResult::class, $result);
-        $this->assertFalse($result->hasFailures());
-        $this->assertEmpty($result->getFailures());
+        $this->assertFalse($result->hasError());
+        $this->assertNull($result->getError());
         $this->assertEquals(
             [
                 'JWT access token is not expired',
@@ -107,17 +107,17 @@ class AccessTokenRequestValidatorTest extends TestCase
 
     public function testValidationFailureWithMissingAuthorizationHeader(): void
     {
-        try {
-            $this->subject->validate($this->createServerRequest('GET', '/example', []));
+        $result = $this->subject->validate($this->createServerRequest('GET', '/example', []));
 
-            $this->fail();
-        } catch (Throwable $exception) {
-            $this->assertInstanceOf(OAuthServerException::class, $exception);
-            $this->assertEquals('The user credentials were incorrect.', $exception->getMessage());
-        }
+        $this->assertInstanceOf(AccessTokenRequestValidationResult::class, $result);
+        $this->assertTrue($result->hasError());
+        $this->assertEquals('Missing Authorization header', $result->getError());
 
         $this->assertTrue(
-            $this->logger->hasLog(LogLevel::ERROR, 'Access token validation error: The user credentials were incorrect.')
+            $this->logger->hasLog(
+                LogLevel::ERROR,
+                'Access token validation error: Missing Authorization header'
+            )
         );
     }
 
@@ -140,8 +140,12 @@ class AccessTokenRequestValidatorTest extends TestCase
         $result = $this->subject->validate($request);
 
         $this->assertInstanceOf(AccessTokenRequestValidationResult::class, $result);
-        $this->assertTrue($result->hasFailures());
-        $this->assertEquals(['JWT access token is expired'], $result->getFailures());
+        $this->assertTrue($result->hasError());
+        $this->assertEquals('JWT access token is expired', $result->getError());
+
+        $this->assertTrue(
+            $this->logger->hasLog(LogLevel::ERROR, 'Access token validation error: JWT access token is expired')
+        );
     }
 
     public function testValidationFailureWithInvalidAudience(): void
@@ -158,8 +162,15 @@ class AccessTokenRequestValidatorTest extends TestCase
         $result = $this->subject->validate($request);
 
         $this->assertInstanceOf(AccessTokenRequestValidationResult::class, $result);
-        $this->assertTrue($result->hasFailures());
-        $this->assertEquals(['No registration found for client_id: invalid'], $result->getFailures());
+        $this->assertTrue($result->hasError());
+        $this->assertEquals('No registration found for client_id: invalid', $result->getError());
+
+        $this->assertTrue(
+            $this->logger->hasLog(
+                LogLevel::ERROR,
+                'Access token validation error: No registration found for client_id: invalid'
+            )
+        );
     }
 
     public function testValidationFailureWithInvalidRegistration(): void
@@ -176,8 +187,15 @@ class AccessTokenRequestValidatorTest extends TestCase
         $result = $this->subject->validate($request);
 
         $this->assertInstanceOf(AccessTokenRequestValidationResult::class, $result);
-        $this->assertTrue($result->hasFailures());
-        $this->assertEquals(['Missing platform key chain for registration: missingKeyIdentifier'], $result->getFailures());
+        $this->assertTrue($result->hasError());
+        $this->assertEquals('Missing platform key chain for registration: missingKeyIdentifier', $result->getError());
+
+        $this->assertTrue(
+            $this->logger->hasLog(
+                LogLevel::ERROR,
+                'Access token validation error: Missing platform key chain for registration: missingKeyIdentifier'
+            )
+        );
     }
 
     public function testValidationFailureWithInvalidSignature(): void
@@ -194,8 +212,15 @@ class AccessTokenRequestValidatorTest extends TestCase
         $result = $this->subject->validate($request);
 
         $this->assertInstanceOf(AccessTokenRequestValidationResult::class, $result);
-        $this->assertTrue($result->hasFailures());
-        $this->assertEquals(['JWT access token signature is invalid'], $result->getFailures());
+        $this->assertTrue($result->hasError());
+        $this->assertEquals('JWT access token signature is invalid', $result->getError());
+
+        $this->assertTrue(
+            $this->logger->hasLog(
+                LogLevel::ERROR,
+                'Access token validation error: JWT access token signature is invalid'
+            )
+        );
     }
 
     private function generateCredentials(RegistrationInterface $registration, string $audience = null): string

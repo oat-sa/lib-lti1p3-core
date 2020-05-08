@@ -4,11 +4,11 @@
 
 ## Table of contents
 
-- [Preparation of the required dependencies](#preparation-of-the-required-dependencies)
-- [Generation of an access token response for a registration](#generation-of-an-access-token-response-for-a-registration)
-- [Validation of an access token request](#validation-of-an-access-token-request)
+- [Preparation of required dependencies](#preparation-of-required-dependencies)
+- [Generation of access token response for a registration](#generation-of-access-token-response-for-a-registration)
+- [Validation of access token request](#validation-of-access-token-request)
 
-## Preparation of the required dependencies
+## Preparation of required dependencies
 
 This library allow you to easily expose a OAuth2 server for a given subscription, to protect your LTI service calls as a platform.
 
@@ -23,7 +23,7 @@ or you can simply use the available [library repositories](../../src/Service/Ser
 
 Your will also need to provide an encryption key (random string with enough entropy).
 
-## Generation of an access token response for a registration
+## Generation of access token response for a registration
 
 This library provides a ready to use [AccessTokenGenerator](../../src/Service/Server/Generator/AccessTokenResponseGenerator.php) to generate access tokens responses for a registration:
 - it requires a registration repository implementation [as explained here](../quickstart/interfaces.md) to automate signature logic against your platform registration private key
@@ -75,14 +75,14 @@ try {
 }
 ``` 
 
-## Validation of an access token request
+## Validation of access token request
 
 Once a tool has been granted with an access token, it can perform LTI service authenticated calls (with header `Authorization: Bearer <token>`).
 
 To be able to protect your platform endpoints, you can use the provided [AccessTokenRequestValidator](../../src/Service/Server/Validator/AccessTokenRequestValidator.php):
 - it requires a registration repository implementation [as explained here](../quickstart/interfaces.md) to automate the token signature checks
 - it expects a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface) to validate
-- and it will output a [AccessTokenRequestValidationResult](../../src/Service/Server/Validator/AccessTokenRequestValidationResult.php) representing the token validation and the token itself.
+- it will output a [AccessTokenRequestValidationResult](../../src/Service/Server/Validator/AccessTokenRequestValidationResult.php) representing the token validation, the related registration, the token itself and it's scopes.
 
 For example,
 ```php
@@ -104,7 +104,19 @@ $request = ...
 $result = $validator->validate($request);
 
 // Result exploitation
-if (!$result->hasFailures()) {
-    var_dump($result->getToken()->getClaims());
-} 
+if (!$result->hasError()) {
+    // You have access to related registration (to spare queries)
+    echo $result->getRegistration()->getIdentifier();
+
+    // And to the JWT
+    echo $result->getToken()->getClaims(); 
+
+    // And to the oauth2 scopes
+    echo $result->getScopes();
+
+    // If needed, you can also access the validation successes
+    foreach ($result->getSuccesses() as $success) {
+        echo $success;
+    }
+}
 ```

@@ -24,34 +24,44 @@ namespace OAT\Library\Lti1p3Core\Tests\Unit\Launch\Validator;
 
 use OAT\Library\Lti1p3Core\Launch\Validator\LtiLaunchRequestValidationResult;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use PHPUnit\Framework\TestCase;
 
 class LtiLaunchRequestValidationResultTest extends TestCase
 {
+    public function testGetRegistration(): void
+    {
+        $registrationMock = $this->createMock(RegistrationInterface::class);
+
+        $subject = new LtiLaunchRequestValidationResult($registrationMock);
+
+        $this->assertEquals($registrationMock, $subject->getRegistration());
+    }
+
     public function testGetLtiMessage(): void
     {
         $ltiMessageMock = $this->createMock(LtiMessageInterface::class);
 
-        $subject = new LtiLaunchRequestValidationResult($ltiMessageMock);
+        $subject = new LtiLaunchRequestValidationResult(null, $ltiMessageMock);
 
         $this->assertEquals($ltiMessageMock, $subject->getLtiMessage());
     }
 
     public function testBehavior(): void
     {
-        $subject = new LtiLaunchRequestValidationResult($this->createMock(LtiMessageInterface::class));
+        $subject = new LtiLaunchRequestValidationResult();
 
-        $this->assertFalse($subject->hasFailures());
+        $this->assertFalse($subject->hasError());
 
         $subject->addSuccess('success');
 
-        $this->assertFalse($subject->hasFailures());
+        $this->assertFalse($subject->hasError());
 
-        $subject->addFailure('failure');
+        $subject->setError('error');
 
-        $this->assertTrue($subject->hasFailures());
+        $this->assertTrue($subject->hasError());
 
         $this->assertEquals(['success'], $subject->getSuccesses());
-        $this->assertEquals(['failure'], $subject->getFailures());
+        $this->assertEquals('error', $subject->getError());
     }
 }

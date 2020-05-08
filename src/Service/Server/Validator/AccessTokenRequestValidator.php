@@ -27,6 +27,7 @@ use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\Signer;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use League\OAuth2\Server\Exception\OAuthServerException;
+use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
@@ -50,9 +51,6 @@ class AccessTokenRequestValidator
     /** @var string[] */
     private $successes = [];
 
-    /** @var string[] */
-    private $failures = [];
-
     public function __construct(
         RegistrationRepositoryInterface $repository,
         LoggerInterface $logger = null,
@@ -64,16 +62,13 @@ class AccessTokenRequestValidator
         $this->parser = new Parser();
     }
 
-    /**
-     * @throws OAuthServerException
-     */
     public function validate(ServerRequestInterface $request): AccessTokenRequestValidationResult
     {
         $this->reset();
 
         try {
             if (!$request->hasHeader('Authorization')) {
-                throw OAuthServerException::invalidCredentials();
+                throw new LtiException('Missing Authorization header');
             }
 
             $token = $this->parser->parse(
@@ -81,39 +76,39 @@ class AccessTokenRequestValidator
             );
 
             if ($token->isExpired(Carbon::now())) {
-                $this->addFailure('JWT access token is expired');
-            } else {
-                $this->addSuccess('JWT access token is not expired');
+                throw new LtiException('JWT access token is expired');
             }
+
+            $this->addSuccess('JWT access token is not expired');
 
             $clientId = $token->getClaim('aud');
 
             $registration = $this->repository->findByClientId($clientId);
 
             if (null === $registration) {
-                $this->addFailure('No registration found for client_id: ' . $clientId);
-            } else {
-                $this->addSuccess('Registration found for client_id: ' . $clientId);
-
-                if (null === $registration->getPlatformKeyChain()) {
-                    $this->addFailure('Missing platform key chain for registration: ' . $registration->getIdentifier());
-                } else {
-                    $this->addSuccess('Platform key chain found for registration: ' . $registration->getIdentifier());
-
-                    if (!$token->verify($this->signer, $registration->getPlatformKeyChain()->getPublicKey())) {
-                        $this->addFailure('JWT access token signature is invalid');
-                    } else {
-                        $this->addSuccess('JWT access token signature is valid');
-                    }
-                }
+                throw new LtiException('No registration found for client_id: ' . $clientId);
             }
 
-            return new AccessTokenRequestValidationResult($token, $this->successes, $this->failures);
+            $this->addSuccess('Registration found for client_id: ' . $clientId);
+
+            if (null === $registration->getPlatformKeyChain()) {
+                throw new LtiException('Missing platform key chain for registration: ' . $registration->getIdentifier());
+            }
+
+            $this->addSuccess('Platform key chain found for registration: ' . $registration->getIdentifier());
+
+            if (!$token->verify($this->signer, $registration->getPlatformKeyChain()->getPublicKey())) {
+                throw new LtiException('JWT access token signature is invalid');
+            }
+
+            $this->addSuccess('JWT access token signature is valid');
+
+            return new AccessTokenRequestValidationResult($registration, $token, $this->successes);
 
         } catch (Throwable $exception) {
             $this->logger->error('Access token validation error: ' . $exception->getMessage());
 
-            throw OAuthServerException::invalidCredentials();
+            return new AccessTokenRequestValidationResult(null, null, $this->successes, $exception->getMessage());
         }
     }
 
@@ -124,17 +119,9 @@ class AccessTokenRequestValidator
         return $this;
     }
 
-    private function addFailure(string $message): self
-    {
-        $this->failures[] = $message;
-
-        return $this;
-    }
-
     private function reset(): self
     {
         $this->successes = [];
-        $this->failures = [];
 
         return $this;
     }

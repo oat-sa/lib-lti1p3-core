@@ -23,35 +23,59 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Service\Server\Validator;
 
 use Lcobucci\JWT\Token;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Service\Server\Validator\AccessTokenRequestValidationResult;
 use PHPUnit\Framework\TestCase;
 
 class AccessTokenRequestValidationResultTest extends TestCase
 {
-    public function testGetLtiMessage(): void
+    public function testGetRegistration(): void
+    {
+        $registrationMock = $this->createMock(RegistrationInterface::class);
+
+        $subject = new AccessTokenRequestValidationResult($registrationMock);
+
+        $this->assertEquals($registrationMock, $subject->getRegistration());
+    }
+
+    public function testGetToken(): void
     {
         $tokenMock = $this->createMock(Token::class);
 
-        $subject = new AccessTokenRequestValidationResult($tokenMock);
+        $subject = new AccessTokenRequestValidationResult(null, $tokenMock);
 
         $this->assertEquals($tokenMock, $subject->getToken());
     }
 
+    public function testGetScopes(): void
+    {
+        $tokenMock = $this->createMock(Token::class);
+        $tokenMock
+            ->expects($this->once())
+            ->method('getClaim')
+            ->with('scopes')
+            ->willReturn(['scope1', 'scope2']);
+
+        $subject = new AccessTokenRequestValidationResult(null, $tokenMock);
+
+        $this->assertEquals(['scope1', 'scope2'], $subject->getScopes());
+    }
+
     public function testBehavior(): void
     {
-        $subject = new AccessTokenRequestValidationResult($this->createMock(Token::class));
+        $subject = new AccessTokenRequestValidationResult();
 
-        $this->assertFalse($subject->hasFailures());
+        $this->assertFalse($subject->hasError());
 
         $subject->addSuccess('success');
 
-        $this->assertFalse($subject->hasFailures());
+        $this->assertFalse($subject->hasError());
 
-        $subject->addFailure('failure');
+        $subject->setError('error');
 
-        $this->assertTrue($subject->hasFailures());
+        $this->assertTrue($subject->hasError());
 
         $this->assertEquals(['success'], $subject->getSuccesses());
-        $this->assertEquals(['failure'], $subject->getFailures());
+        $this->assertEquals('error', $subject->getError());
     }
 }

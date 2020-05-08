@@ -23,33 +23,42 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Launch\Validator;
 
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 
 class LtiLaunchRequestValidationResult
 {
-    /** @var LtiMessageInterface */
+    /** @var RegistrationInterface|null */
+    private $registration;
+
+    /** @var LtiMessageInterface|null */
     private $ltiMessage;
 
     /** @var string[] */
     private $successes;
 
-    /** @var string[] */
-    private $failures;
+    /** @var string|null */
+    private $error;
 
-    public function __construct(LtiMessageInterface $ltiMessage, array $successes = [], array $failures = [])
-    {
+    public function __construct(
+        RegistrationInterface $registration = null,
+        LtiMessageInterface $ltiMessage = null,
+        array $successes = [],
+        string $error = null
+    ) {
+        $this->registration = $registration;
         $this->ltiMessage = $ltiMessage;
         $this->successes = $successes;
-        $this->failures = $failures;
+        $this->error = $error;
     }
 
-    public function getLtiMessage(): LtiMessageInterface
+    public function getRegistration(): ?RegistrationInterface
+    {
+        return $this->registration;
+    }
+
+    public function getLtiMessage(): ?LtiMessageInterface
     {
         return $this->ltiMessage;
-    }
-
-    public function hasFailures(): bool
-    {
-        return !empty($this->failures);
     }
 
     public function addSuccess(string $success): self
@@ -64,15 +73,20 @@ class LtiLaunchRequestValidationResult
         return $this->successes;
     }
 
-    public function addFailure(string $failure): self
+    public function hasError(): bool
     {
-        $this->failures[] = $failure;
+        return null !== $this->error;
+    }
+
+    public function setError(string $error): self
+    {
+        $this->error = $error;
 
         return $this;
     }
 
-    public function getFailures(): array
+    public function getError(): ?string
     {
-        return $this->failures;
+        return $this->error;
     }
 }

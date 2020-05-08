@@ -23,33 +23,47 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Service\Server\Validator;
 
 use Lcobucci\JWT\Token;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 
 class AccessTokenRequestValidationResult
 {
-    /** @var Token */
+    /** @var RegistrationInterface|null */
+    private $registration;
+
+    /** @var Token|null */
     private $token;
 
     /** @var string[] */
     private $successes;
 
-    /** @var string[] */
-    private $failures;
+    /** @var string|null */
+    private $error;
 
-    public function __construct(Token $token, array $successes = [], array $failures = [])
-    {
+    public function __construct(
+        RegistrationInterface $registration = null,
+        Token $token = null,
+        array $successes = [],
+        string $error = null
+    ) {
+        $this->registration = $registration;
         $this->token = $token;
         $this->successes = $successes;
-        $this->failures = $failures;
+        $this->error = $error;
     }
 
-    public function getToken(): Token
+    public function getRegistration(): ?RegistrationInterface
+    {
+        return $this->registration;
+    }
+
+    public function getToken(): ?Token
     {
         return $this->token;
     }
 
-    public function hasFailures(): bool
+    public function getScopes(): array
     {
-        return !empty($this->failures);
+        return $this->token->getClaim('scopes', []);
     }
 
     public function addSuccess(string $success): self
@@ -64,15 +78,20 @@ class AccessTokenRequestValidationResult
         return $this->successes;
     }
 
-    public function addFailure(string $failure): self
+    public function hasError(): bool
     {
-        $this->failures[] = $failure;
+        return null !== $this->error;
+    }
+
+    public function setError(string $error): self
+    {
+        $this->error = $error;
 
         return $this;
     }
 
-    public function getFailures(): array
+    public function getError(): ?string
     {
-        return $this->failures;
+        return $this->error;
     }
 }
