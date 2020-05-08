@@ -122,8 +122,8 @@ As a tool, you'll receive an HTTP request containing the [launch request](http:/
 
 The [LtiLaunchRequestValidator](../../src/Launch/Validator/LtiLaunchRequestValidator.php) can be used for this:
 - it requires a registration repository and a nonce repository implementations [as explained here](../quickstart/interfaces.md)
-- it expect a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface) to validate
-- and it will output a [LtiLaunchRequestValidationResult](../../src/Launch/Validator/LtiLaunchRequestValidationResult.php) representing the launch validation and the message itself.
+- it expects a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface) to validate
+- it will output a [LtiLaunchRequestValidationResult](../../src/Launch/Validator/LtiLaunchRequestValidationResult.php) representing the launch validation, the related registration and the message itself.
 
 By example:
 ```php
@@ -150,10 +150,19 @@ $validator = new LtiLaunchRequestValidator($registrationRepository, $nonceReposi
 $result = $validator->validate($request);
 
 // Result exploitation
-if (!$result->hasFailures()) {
+if (!$result->hasError()) {
+    // You have access to related registration (to spare queries)
+    echo $result->getRegistration()->getIdentifier();
+
+    // And to the LTI message components
     echo $result->getLtiMessage()->getVersion();              // '1.3.0'
     echo $result->getLtiMessage()->getContext()->getId();     // 'contextId'
     echo $result->getLtiMessage()->getClaim('myCustomClaim'); // 'myCustomValue'
     echo $result->getLtiMessage()->getUserIdentity();         // same as above $userIdentity 
+    
+    // If needed, you can also access the validation successes
+    foreach ($result->getSuccesses() as $success) {
+        echo $success;
+    }
 } 
 ```

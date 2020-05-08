@@ -20,15 +20,19 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Registration;
+namespace OAT\Library\Lti1p3Core\Tests\Unit\Service\Server\Entity;
 
-interface RegistrationRepositoryInterface
+use OAT\Library\Lti1p3Core\Service\Server\Entity\AccessToken;
+use PHPUnit\Framework\TestCase;
+
+class AccessTokenTest extends TestCase
 {
-    public function find(string $identifier): ?RegistrationInterface;
+    public function testGetIdentifier(): void
+    {
+        $subject = new AccessToken();
 
-    public function findByClientId(string $clientId): ?RegistrationInterface;
+        $subject->setIdentifier('identifier');
 
-    public function findByPlatformIssuer(string $issuer, string $clientId = null): ?RegistrationInterface;
-
-    public function findByToolIssuer(string $issuer, string $clientId = null): ?RegistrationInterface;
+        $this->assertEquals('identifier', $subject->getIdentifier());
+    }
 }

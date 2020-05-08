@@ -20,15 +20,20 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Registration;
+namespace OAT\Library\Lti1p3Core\Tests\Unit\Service\Server\Entity;
 
-interface RegistrationRepositoryInterface
+use OAT\Library\Lti1p3Core\Service\Server\Entity\Scope;
+use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
+use PHPUnit\Framework\TestCase;
+
+class ScopeTest extends TestCase
 {
-    public function find(string $identifier): ?RegistrationInterface;
+    use DomainTestingTrait;
 
-    public function findByClientId(string $clientId): ?RegistrationInterface;
+    public function testGetIdentifier(): void
+    {
+        $subject = new Scope('identifier');
 
-    public function findByPlatformIssuer(string $issuer, string $clientId = null): ?RegistrationInterface;
-
-    public function findByToolIssuer(string $issuer, string $clientId = null): ?RegistrationInterface;
+        $this->assertEquals('identifier', $subject->getIdentifier());
+    }
 }

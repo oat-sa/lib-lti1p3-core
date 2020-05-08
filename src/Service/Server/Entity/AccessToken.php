@@ -20,15 +20,27 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Registration;
+namespace OAT\Library\Lti1p3Core\Service\Server\Entity;
 
-interface RegistrationRepositoryInterface
+use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
+use League\OAuth2\Server\Entities\Traits\AccessTokenTrait;
+use League\OAuth2\Server\Entities\Traits\TokenEntityTrait;
+
+class AccessToken implements AccessTokenEntityInterface
 {
-    public function find(string $identifier): ?RegistrationInterface;
+    use TokenEntityTrait;
+    use AccessTokenTrait;
 
-    public function findByClientId(string $clientId): ?RegistrationInterface;
+    /** @var string */
+    private $identifier;
 
-    public function findByPlatformIssuer(string $issuer, string $clientId = null): ?RegistrationInterface;
+    public function getIdentifier(): string
+    {
+        return $this->identifier;
+    }
 
-    public function findByToolIssuer(string $issuer, string $clientId = null): ?RegistrationInterface;
+    public function setIdentifier($identifier): void
+    {
+        $this->identifier = $identifier;
+    }
 }

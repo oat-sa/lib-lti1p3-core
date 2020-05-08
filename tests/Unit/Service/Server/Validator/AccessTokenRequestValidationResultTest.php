@@ -20,36 +20,50 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Tests\Unit\Launch\Validator;
+namespace OAT\Library\Lti1p3Core\Tests\Unit\Service\Server\Validator;
 
-use OAT\Library\Lti1p3Core\Launch\Validator\LtiLaunchRequestValidationResult;
-use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+use Lcobucci\JWT\Token;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
+use OAT\Library\Lti1p3Core\Service\Server\Validator\AccessTokenRequestValidationResult;
 use PHPUnit\Framework\TestCase;
 
-class LtiLaunchRequestValidationResultTest extends TestCase
+class AccessTokenRequestValidationResultTest extends TestCase
 {
     public function testGetRegistration(): void
     {
         $registrationMock = $this->createMock(RegistrationInterface::class);
 
-        $subject = new LtiLaunchRequestValidationResult($registrationMock);
+        $subject = new AccessTokenRequestValidationResult($registrationMock);
 
         $this->assertEquals($registrationMock, $subject->getRegistration());
     }
 
-    public function testGetLtiMessage(): void
+    public function testGetToken(): void
     {
-        $ltiMessageMock = $this->createMock(LtiMessageInterface::class);
+        $tokenMock = $this->createMock(Token::class);
 
-        $subject = new LtiLaunchRequestValidationResult(null, $ltiMessageMock);
+        $subject = new AccessTokenRequestValidationResult(null, $tokenMock);
 
-        $this->assertEquals($ltiMessageMock, $subject->getLtiMessage());
+        $this->assertEquals($tokenMock, $subject->getToken());
+    }
+
+    public function testGetScopes(): void
+    {
+        $tokenMock = $this->createMock(Token::class);
+        $tokenMock
+            ->expects($this->once())
+            ->method('getClaim')
+            ->with('scopes')
+            ->willReturn(['scope1', 'scope2']);
+
+        $subject = new AccessTokenRequestValidationResult(null, $tokenMock);
+
+        $this->assertEquals(['scope1', 'scope2'], $subject->getScopes());
     }
 
     public function testBehavior(): void
     {
-        $subject = new LtiLaunchRequestValidationResult();
+        $subject = new AccessTokenRequestValidationResult();
 
         $this->assertFalse($subject->hasError());
 

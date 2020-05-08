@@ -27,18 +27,18 @@ use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
 use League\OAuth2\Server\Entities\ScopeEntityInterface;
 use League\OAuth2\Server\ResponseTypes\BearerTokenResponse;
 use Nyholm\Psr7\Response;
-use OAT\Library\Lti1p3Core\Service\Server\ResponseType\ScopeBearerResponseType;
+use OAT\Library\Lti1p3Core\Service\Server\ResponseType\ScopedBearerTokenResponse;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class ScopeBearerResponseTypeTest extends TestCase
+class ScopedBearerTokenResponseTest extends TestCase
 {
-    /** @var ScopeBearerResponseType */
+    /** @var ScopedBearerTokenResponse */
     private $subject;
 
     protected function setUp(): void
     {
-        $this->subject = new ScopeBearerResponseType();
+        $this->subject = new ScopedBearerTokenResponse();
     }
 
     public function testItExtendsBearerTokenResponse(): void
