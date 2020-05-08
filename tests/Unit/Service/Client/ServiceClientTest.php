@@ -28,7 +28,7 @@ use GuzzleHttp\ClientInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Service\Client\ServiceClient;
 use OAT\Library\Lti1p3Core\Service\Client\ServiceClientInterface;
-use OAT\Library\Lti1p3Core\Service\Server\Grant\JwtClientCredentialsGrant;
+use OAT\Library\Lti1p3Core\Service\Server\Grant\ClientAssertionCredentialsGrant;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
 use OAT\Library\Lti1p3Core\Tests\Traits\NetworkTestingTrait;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -71,7 +71,7 @@ class ServiceClientTest extends TestCase
                     [
                         'json' => [
                             'grant_type' => ServiceClientInterface::GRANT_TYPE,
-                            'client_assertion_type' => JwtClientCredentialsGrant::CLIENT_ASSERTION_TYPE,
+                            'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
                             'client_assertion' => $this->getTestJwtClientAssertion(),
                             'scope' => ''
                         ]
@@ -95,7 +95,7 @@ class ServiceClientTest extends TestCase
         $this->assertInstanceOf(ResponseInterface::class, $result);
         $this->assertEquals('service response', $result->getBody()->__toString());
 
-        $cacheKey = sprintf('lti-service-client-token-' . $registration->getIdentifier());
+        $cacheKey = sprintf('lti1p3-service-client-token-' . $registration->getIdentifier());
         $this->assertTrue($this->cache->hasItem($cacheKey));
         $this->assertEquals('access_token', $this->cache->getItem($cacheKey)->get());
     }
@@ -104,7 +104,7 @@ class ServiceClientTest extends TestCase
     {
         $registration = $this->createTestRegistration();
 
-        $cacheKey = sprintf('lti-service-client-token-' . $registration->getIdentifier());
+        $cacheKey = sprintf('lti1p3-service-client-token-' . $registration->getIdentifier());
         $cacheItem = $this->cache->getItem($cacheKey)->set('cached_access_token');
         $this->cache->save($cacheItem);
 
@@ -154,7 +154,7 @@ class ServiceClientTest extends TestCase
                 [
                     'json' => [
                         'grant_type' => ServiceClientInterface::GRANT_TYPE,
-                        'client_assertion_type' => JwtClientCredentialsGrant::CLIENT_ASSERTION_TYPE,
+                        'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
                         'client_assertion' => $this->getTestJwtClientAssertion(),
                         'scope' => '',
                     ]
@@ -183,7 +183,7 @@ class ServiceClientTest extends TestCase
                 [
                     'json' => [
                         'grant_type' => ServiceClientInterface::GRANT_TYPE,
-                        'client_assertion_type' => JwtClientCredentialsGrant::CLIENT_ASSERTION_TYPE,
+                        'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
                         'client_assertion' => $this->getTestJwtClientAssertion(),
                         'scope' => '',
                     ]
@@ -212,7 +212,7 @@ class ServiceClientTest extends TestCase
                 [
                     'json' => [
                         'grant_type' => ServiceClientInterface::GRANT_TYPE,
-                        'client_assertion_type' => JwtClientCredentialsGrant::CLIENT_ASSERTION_TYPE,
+                        'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
                         'client_assertion' => $this->getTestJwtClientAssertion(),
                         'scope' => '',
                     ]
@@ -242,7 +242,7 @@ class ServiceClientTest extends TestCase
                     [
                         'json' => [
                             'grant_type' => ServiceClientInterface::GRANT_TYPE,
-                            'client_assertion_type' => JwtClientCredentialsGrant::CLIENT_ASSERTION_TYPE,
+                            'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
                             'client_assertion' => $this->getTestJwtClientAssertion(),
                             'scope' => ''
                         ]

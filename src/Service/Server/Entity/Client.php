@@ -20,14 +20,29 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Security\Jwks\Fetcher;
+namespace OAT\Library\Lti1p3Core\Service\Server\Entity;
 
-use Lcobucci\JWT\Signer\Key;
+use League\OAuth2\Server\Entities\ClientEntityInterface;
+use League\OAuth2\Server\Entities\Traits\ClientTrait;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 
-interface JwksFetcherInterface
+class Client implements ClientEntityInterface
 {
-    // Default TTL (in seconds)
-    public const TTL = 86400;
+    use ClientTrait;
 
-    public function fetchKey(string $jwksUrl, string $kId): Key;
+    /** @var RegistrationInterface */
+    private $registration;
+
+    public function __construct(RegistrationInterface $registration)
+    {
+        $this->registration = $registration;
+        $this->name = $this->registration->getTool()->getName();
+        $this->redirectUri = $this->registration->getTool()->getLaunchUrl();
+        $this->isConfidential = true;
+    }
+
+    public function getIdentifier(): string
+    {
+        return $this->registration->getClientId();
+    }
 }

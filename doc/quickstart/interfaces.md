@@ -19,7 +19,7 @@ This section present the mandatory interfaces from the library to be implemented
 
 In order to be able to retrieve your registrations from your configuration storage, you need to provide an implementation of the [RegistrationRepositoryInterface](../../src/Registration/RegistrationRepositoryInterface.php).
 
-By example:
+For example:
 ```php
 <?php
 
@@ -31,6 +31,11 @@ $registrationRepository = new class implements RegistrationRepositoryInterface
    public function find(string $identifier): ?RegistrationInterface
    {
        // TODO: Implement find() method to find a registration by identifier, or null if not found.
+   }
+
+   public function findByClientId(string $clientId) : ?RegistrationInterface
+   {
+       // TODO: Implement findByClientId() method to find a registration by client id, or null if not found.
    }
 
    public function findByPlatformIssuer(string $issuer, string $clientId = null): ?RegistrationInterface
@@ -46,13 +51,42 @@ $registrationRepository = new class implements RegistrationRepositoryInterface
 ```
 **Note**: you can find a simple implementation example of this interface in the method `createTestRegistrationRepository()` of the [DomainTestingTrait](../../tests/Traits/DomainTestingTrait.php).
 
+### User authenticator interface
+
+**Required by**: [Message](../../src/Message)  
+
+During the [OIDC authentication handling](https://www.imsglobal.org/spec/security/v1p0#step-3-authentication-response) on the platform side, you need to define how to delegate the user authentication by providing an implementation of the [UserAuthenticatorInterface](../../src/Security/User/UserAuthenticatorInterface.php).
+
+For example:
+```php
+<?php
+
+use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
+use OAT\Library\Lti1p3Core\Security\User\UserAuthenticationResultInterface;
+
+$userAuthenticator = new class implements UserAuthenticatorInterface
+{
+   public function authenticate(string $loginHint): UserAuthenticationResultInterface
+   {
+       // TODO: Implement authenticate() method to perform user authentication (ex: session, LDAP, etc)
+   }
+};
+```
+**Notes**:
+- you can find a simple implementation example of this interface in the method `createTestUserAuthenticator()` of the [SecurityTestingTrait](../../tests/Traits/SecurityTestingTrait.php).
+- you can find a ready to use `UserAuthenticationResultInterface` implementation is available in [UserAuthenticationResult](../../src/Security/User/UserAuthenticationResult.php)
+
+## Optional interfaces
+
+This section present the optional interfaces from the library you can implement, but for which a default implementation is already provided.
+
 ### Nonce repository interface
 
-**Required by**: [Message](../../src/Message) 
+**Default implementation**: [NonceRepository](../../src/Security/Nonce/NonceRepository.php)
 
-In order to be able to store security nonce the way you want, you need to provide an implementation of the [NonceRepositoryInterface](../../src/Security/Nonce/NonceRepositoryInterface.php).
+In order to be able to store security nonce the way you want, you can provide an implementation of the [NonceRepositoryInterface](../../src/Security/Nonce/NonceRepositoryInterface.php).
 
-By example:
+For example:
 ```php
 <?php
 
@@ -72,46 +106,7 @@ $nonceRepository = new class implements NonceRepositoryInterface
     }
 };
 ```
-**Note**: you can find a simple implementation example of this interface in the method `createTestNonceRepository()` of the [SecurityTestingTrait](../../tests/Traits/SecurityTestingTrait.php).
-
-### User authenticator interface
-
-**Required by**: [Message](../../src/Message)  
-
-During the [OIDC authentication handling](https://www.imsglobal.org/spec/security/v1p0#step-3-authentication-response) on the platform side, you need to define how to delegate the user authentication by providing an implementation of the [UserAuthenticatorInterface](../../src/Security/User/UserAuthenticatorInterface.php).
-
-By example:
-```php
-<?php
-
-use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
-use OAT\Library\Lti1p3Core\Security\User\UserAuthenticationResultInterface;
-
-$userAuthenticator = new class implements UserAuthenticatorInterface
-{
-   public function authenticate(string $loginHint): UserAuthenticationResultInterface
-   {
-       // TODO: Implement authenticate() method to perform user authentication (ex: session, LDAP, etc)
-   }
-};
-```
-**Notes**:
-- you can find a simple implementation example of this interface in the method `createTestUserAuthenticator()` of the [SecurityTestingTrait](../../tests/Traits/SecurityTestingTrait.php).
-- you can find a ready to use `UserAuthenticationResultInterface` implementation is available in [UserAuthenticationResult](../../src/Security/User/UserAuthenticationResult.php)
-
-### Service server interfaces
-
-**Required by**: [Service](../../src/Service)  
-
-The following interfaces must be implemented to use the service authentication server.
-
-- [AccessTokenRepositoryInterface](https://github.com/thephpleague/oauth2-server/blob/master/src/Repositories/AccessTokenRepositoryInterface.php) implementation (to store the created access tokens)
-- [ClientRepositoryInterface](https://github.com/thephpleague/oauth2-server/blob/master/src/Repositories/ClientRepositoryInterface.php) implementation (to retrieve your clients)
-- [ScopeRepositoryInterface](https://github.com/thephpleague/oauth2-server/blob/master/src/Repositories/ScopeRepositoryInterface.php) implementation (to retrieve your scopes)
-
-## Optional interfaces
-
-This section present the optional interfaces from the library you can implement, but for which a default implementation is already provided.
+**Note**: the ready to use [NonceRepository](../../src/Security/Nonce/NonceRepository.php) works with a [PSR6 cache](https://www.php-fig.org/psr/psr-6/#cacheitempoolinterface).
 
 ### JWKS fetcher interface
 
@@ -119,7 +114,7 @@ This section present the optional interfaces from the library you can implement,
 
 In order to be able to fetch public keys JWK from configured [JWKS endpoint](https://auth0.com/docs/tokens/concepts/jwks), you need to provide an implementation of the [JwksFetcherInterface](../../src/Security/Jwks/Fetcher/JwksFetcherInterface.php).
 
-By example:
+For example:
 ```php
 <?php
 
@@ -135,8 +130,8 @@ $fetcher = new class implements JwksFetcherInterface
 };
 ```
 **Notes**:
-- it is recommended to put in cache the JWKS endpoint responses, to improve performances since they dont change often. Your implementation can then rely on an injected PSR6 cache by example.
-- you can find a ready to use implementation in [JwksFetcher](../../src/Security/Jwks/Fetcher/JwksFetcher.php): you need to provide it a [guzzle](http://docs.guzzlephp.org/en/stable/) client, with enabled [cache middleware](https://github.com/Kevinrob/guzzle-cache-middleware).
+- it is recommended to put in cache the JWKS endpoint responses, to improve performances since they don't change often. Your implementation can then rely on a cache by example.
+- the ready to use [JwksFetcher](../../src/Security/Jwks/Fetcher/JwksFetcher.php) works with a [guzzle](http://docs.guzzlephp.org/en/stable/) client to request JWKS data, a [PSR6 cache](https://www.php-fig.org/psr/psr-6/#cacheitempoolinterface) to cache them, and a [PSR3 logger](https://www.php-fig.org/psr/psr-3/#3-psrlogloggerinterface) to log this process.
 
 ### Service client interface
 
@@ -144,7 +139,7 @@ $fetcher = new class implements JwksFetcherInterface
 
 In order to send authenticated service calls, an implementation of the [ServiceClientInterface](../../src/Service/Client/ServiceClientInterface.php) can be provided.
 
-By example:
+For example:
 ```php
 <?php
 
@@ -161,4 +156,32 @@ $client = new class implements ServiceClientInterface
 };
 ```        
 **Notes**:                                                                                                                                                                                                                                                                            
-- it is recommended to put in cache the service access tokens, to improve performances. Your implementation can then rely on an injected PSR6 cache by example.                                                                                        
+- it is recommended to put in cache the service access tokens, to improve performances. Your implementation can then rely on an injected [PSR6 cache](https://www.php-fig.org/psr/psr-6/#cacheitempoolinterface) by example.
+
+### Service server client repository interface
+
+**Default implementation**: [ClientRepository](../../src/Service/Server/Repository/ClientRepository.php)  
+
+In order to retrieve and validate clients involved in authenticated service calls, an implementation of the [ClientRepositoryInterface](https://github.com/thephpleague/oauth2-server/blob/master/src/Repositories/ClientRepositoryInterface.php) can be provided.
+
+**Notes**:
+- the default `ClientRepository` injects the `RegistrationRepositoryInterface` to be able to expose your platforms as oauth2 providers and tools as consumers.
+- in case of the consumer tool public key is not given in the registration, it will automatically fallback to a JWKS call.
+
+### Service server access token repository interface
+
+**Default implementation**: [AccessTokenRepository](../../src/Service/Server/Repository/AccessTokenRepository.php)  
+
+In order to store service calls access tokens, an implementation of the [AccessTokenRepositoryInterface](https://github.com/thephpleague/oauth2-server/blob/master/src/Repositories/AccessTokenRepositoryInterface.php) can be provided.
+
+**Note**: the default `AccessTokenRepository` implementation rely on a [PSR6 cache](https://www.php-fig.org/psr/psr-6/#cacheitempoolinterface) to store generated access tokens.
+
+### Service server scope repository interface
+
+**Default implementation**: [ScopeRepository](../../src/Service/Server/Repository/ScopeRepository.php)  
+
+In order to retrieve and enrich scopes during grants, an implementation of the [ScopeRepositoryInterface](https://github.com/thephpleague/oauth2-server/blob/master/src/Repositories/ScopeRepositoryInterface.php) can be provided.
+
+**Notes**:
+- the default `ScopeRepository` will just provide scope given at construction.
+

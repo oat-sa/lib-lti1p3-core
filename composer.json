@@ -13,8 +13,9 @@
         "nesbot/carbon": "^2.31",
         "psr/cache": "^1.0",
         "psr/http-message": "^1.0",
-        "league/oauth2-server": "^8.0",
-        "ramsey/uuid": "^3.9"
+        "league/oauth2-server": "^8.1",
+        "ramsey/uuid": "^3.9",
+        "psr/log": "^1.1"
     },
     "require-dev": {
         "phpunit/phpunit": "7.5.20",

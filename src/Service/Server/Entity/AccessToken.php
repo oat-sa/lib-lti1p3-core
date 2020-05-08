@@ -20,14 +20,27 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Security\Jwks\Fetcher;
+namespace OAT\Library\Lti1p3Core\Service\Server\Entity;
 
-use Lcobucci\JWT\Signer\Key;
+use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
+use League\OAuth2\Server\Entities\Traits\AccessTokenTrait;
+use League\OAuth2\Server\Entities\Traits\TokenEntityTrait;
 
-interface JwksFetcherInterface
+class AccessToken implements AccessTokenEntityInterface
 {
-    // Default TTL (in seconds)
-    public const TTL = 86400;
+    use TokenEntityTrait;
+    use AccessTokenTrait;
 
-    public function fetchKey(string $jwksUrl, string $kId): Key;
+    /** @var string */
+    private $identifier;
+
+    public function getIdentifier(): string
+    {
+        return $this->identifier;
+    }
+
+    public function setIdentifier($identifier): void
+    {
+        $this->identifier = $identifier;
+    }
 }

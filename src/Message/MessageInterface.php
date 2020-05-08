@@ -29,7 +29,7 @@ use Lcobucci\JWT\Token;
  */
 interface MessageInterface
 {
-    // TTL
+    // Default TTL (in seconds)
     public const TTL = 600;
 
     // Headers

@@ -22,63 +22,64 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Service\Server\Factory;
 
+use InvalidArgumentException;
 use League\OAuth2\Server\AuthorizationServer;
 use League\OAuth2\Server\CryptKey;
 use League\OAuth2\Server\Repositories\AccessTokenRepositoryInterface;
 use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
 use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
-use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
-use OAT\Library\Lti1p3Core\Service\Server\Grant\JwtClientCredentialsGrant;
-use OAT\Library\Lti1p3Core\Service\Server\ResponseType\ScopeBearerResponseType;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
+use OAT\Library\Lti1p3Core\Service\Server\Grant\ClientAssertionCredentialsGrant;
+use OAT\Library\Lti1p3Core\Service\Server\ResponseType\ScopedBearerTokenResponse;
 
-class OAuth2AuthorizationServerFactory
+class AuthorizationServerFactory
 {
-    /** @var AccessTokenRepositoryInterface */
-    private $accessTokenRepository;
-
     /** @var ClientRepositoryInterface */
     private $clientRepository;
 
+    /** @var AccessTokenRepositoryInterface */
+    private $accessTokenRepository;
+
     /** @var ScopeRepositoryInterface */
     private $scopeRepository;
-
-    /** @var RegistrationRepositoryInterface */
-    private $registrationRepository;
-
-    /** @var CryptKey */
-    private $privateKey;
 
     /** @var string */
     private $encryptionKey;
 
     public function __construct(
-        AccessTokenRepositoryInterface $accessTokenRepository,
         ClientRepositoryInterface $clientRepository,
+        AccessTokenRepositoryInterface $accessTokenRepository,
         ScopeRepositoryInterface $scopeRepository,
-        RegistrationRepositoryInterface $registrationRepository,
-        CryptKey $privateKey,
         string $encryptionKey
     ) {
-        $this->accessTokenRepository = $accessTokenRepository;
         $this->clientRepository = $clientRepository;
+        $this->accessTokenRepository = $accessTokenRepository;
         $this->scopeRepository = $scopeRepository;
-        $this->registrationRepository = $registrationRepository;
-        $this->privateKey = $privateKey;
         $this->encryptionKey = $encryptionKey;
     }
 
-    public function create(): AuthorizationServer
+    public function createForRegistration(RegistrationInterface $registration): AuthorizationServer
     {
+        if (null === $registration->getPlatformKeyChain()) {
+            throw new InvalidArgumentException('Missing platform key chain');
+        }
+
+        $privateKey = new CryptKey(
+            $registration->getPlatformKeyChain()->getPrivateKey()->getContent(),
+            $registration->getPlatformKeyChain()->getPrivateKey()->getPassphrase(),
+            false
+        );
+
         $server = new AuthorizationServer(
             $this->clientRepository,
             $this->accessTokenRepository,
             $this->scopeRepository,
-            $this->privateKey,
+            $privateKey,
             $this->encryptionKey,
-            new ScopeBearerResponseType()
+            new ScopedBearerTokenResponse()
         );
 
-        $server->enableGrantType(new JwtClientCredentialsGrant($this->registrationRepository));
+        $server->enableGrantType(new ClientAssertionCredentialsGrant());
 
         return $server;
     }

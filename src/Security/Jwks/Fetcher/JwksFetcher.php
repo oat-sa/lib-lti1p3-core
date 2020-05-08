@@ -27,27 +27,77 @@ use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use Lcobucci\JWT\Signer\Key;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
+use Psr\Cache\CacheException;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use RuntimeException;
 use Throwable;
 
 class JwksFetcher implements JwksFetcherInterface
 {
+    private const CACHE_PREFIX = 'lti1p3-jwks';
+
+    /** @var CacheItemPoolInterface */
+    private $cache;
+
     /** @var ClientInterface */
     private $client;
 
     /** @var JWKConverter */
     private $converter;
 
-    public function __construct(ClientInterface $client = null, JWKConverter $converter = null)
-    {
+    /** @var LoggerInterface */
+    private $logger;
+
+    public function __construct(
+        CacheItemPoolInterface $cache = null,
+        ClientInterface $client = null,
+        JWKConverter $converter = null,
+        LoggerInterface $logger = null
+    ) {
+        $this->cache = $cache;
         $this->client = $client ?? new Client();
         $this->converter = $converter ?? new JWKConverter();
+        $this->logger = $logger ?? new NullLogger();
     }
 
     /**
      * @throws LtiException
      */
     public function fetchKey(string $jwksUrl, string $kId): Key
+    {
+        $jwksData = $this->fetchJwksDataFromCache($jwksUrl);
+
+        if (null === $jwksData) {
+            $jwksData = $this->fetchJwksDataFromUrl($jwksUrl);
+
+            if (null !== $jwksData) {
+                $this->saveJwksDataInCache($jwksUrl, $jwksData);
+            }
+        }
+
+        try {
+            foreach ($jwksData['keys'] ?? [] as $data) {
+                if ($data['kid'] === $kId) {
+                    return new Key($this->converter->toPEM($data));
+                }
+            }
+        } catch (Throwable $exception) {
+            throw new LtiException(
+                sprintf('Error during JWKS PEM conversion: %s', $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
+        }
+
+        throw new LtiException(sprintf('Could not find key id %s from cache or url %s', $kId, $jwksUrl));
+    }
+
+    /**
+     * @throws LtiException
+     */
+    private function fetchJwksDataFromUrl(string $jwksUrl): ?array
     {
         try {
             $response = $this->client->request('GET', $jwksUrl, ['headers' => ['Accept' => 'application/json']]);
@@ -58,20 +108,52 @@ class JwksFetcher implements JwksFetcherInterface
                 throw new RuntimeException(sprintf('json_decode error: %s', json_last_error_msg()));
             }
 
-            foreach ($responseData['keys'] as $data) {
-                if ($data['kid'] === $kId) {
-                    return new Key($this->converter->toPEM($data));
-                }
-            }
-
+            return $responseData;
         } catch (Throwable $exception) {
-            throw new LtiException(
-                sprintf('Error during JWK fetching for url %s: %s', $jwksUrl, $exception->getMessage()),
-                $exception->getCode(),
-                $exception
-            );
+            $message = sprintf('Cannot fetch JWKS data from url %s: %s',$jwksUrl, $exception->getMessage());
+
+            $this->logger->error($message);
+
+            throw new LtiException($message,$exception->getCode(), $exception);
+        }
+    }
+
+    private function getJwksDataCacheKey(string $jwksUrl): string
+    {
+        return sprintf('%s-%s', self::CACHE_PREFIX, base64_encode($jwksUrl));
+    }
+
+    private function fetchJwksDataFromCache(string $jwksUrl): ?array
+    {
+        if ($this->cache) {
+            try {
+                $item = $this->cache->getItem($this->getJwksDataCacheKey($jwksUrl));
+
+                if ($item->isHit()) {
+                    return $item->get();
+                }
+
+                return null;
+            } catch (Throwable|CacheException $exception) {
+                $this->logger->error(sprintf('Cannot fetch JWKS data from cache: %s', $exception->getMessage()));
+            }
         }
 
-        throw new LtiException(sprintf('Could not find key id %s from url %s', $kId, $jwksUrl));
+        return null;
+    }
+
+    private function saveJwksDataInCache(string $jwksUrl, array $jwksData): void
+    {
+        if ($this->cache) {
+            try {
+                $item = $this->cache->getItem($this->getJwksDataCacheKey($jwksUrl));
+
+                $this->cache->save(
+                    $item->set($jwksData)->expiresAfter(self::TTL)
+                );
+            } catch (Throwable|CacheException $exception) {
+                $this->logger->error(sprintf('Cannot save JWKS data in cache: %s', $exception->getMessage()));
+            }
+        }
     }
 }

@@ -66,9 +66,6 @@ class LtiLaunchRequestValidator
     /** @var string[] */
     private $successes = [];
 
-    /** @var string[] */
-    private $failures = [];
-
     public function __construct(
         RegistrationRepositoryInterface $registrationRepository,
         NonceRepositoryInterface $nonceRepository,
@@ -82,9 +79,6 @@ class LtiLaunchRequestValidator
         $this->parser = new Parser(new AssociativeDecoder());
     }
 
-    /**
-     * @throws LtiException
-     */
     public function validate(ServerRequestInterface $request): LtiLaunchRequestValidationResult
     {
         $this->reset();
@@ -105,7 +99,7 @@ class LtiLaunchRequestValidator
             );
 
             if (null === $registration) {
-                throw new LtiException('no matching registration found');
+                throw new LtiException('No matching registration found');
             }
 
             $this
@@ -116,16 +110,10 @@ class LtiLaunchRequestValidator
                 ->validateStateSignature($registration, $oidcState)
                 ->validateStateExpiry($oidcState);
 
-            return new LtiLaunchRequestValidationResult($ltiMessage, $this->successes, $this->failures);
+            return new LtiLaunchRequestValidationResult($registration, $ltiMessage, $this->successes);
 
-        } catch (LtiException $exception) {
-            throw $exception;
         } catch (Throwable $exception) {
-            throw new LtiException(
-                sprintf('LTI message validation failed: %s', $exception->getMessage()),
-                $exception->getCode(),
-                $exception
-            );
+            return new LtiLaunchRequestValidationResult(null, null, $this->successes, $exception->getMessage());
         }
     }
 
@@ -144,25 +132,27 @@ class LtiLaunchRequestValidator
         }
 
         if (!$ltiMessage->getToken()->verify($this->signer, $key)) {
-            $this->addFailure('JWT id_token signature validation failure');
-        } else {
-            $this->addSuccess('JWT id_token signature validation success');
+            throw new LtiException('JWT id_token signature validation failure');
         }
 
-        return $this;
+        return $this->addSuccess('JWT id_token signature validation success');
     }
 
+    /**
+     * @throws LtiException
+     */
     private function validateMessageExpiry(LtiMessageInterface $ltiMessage): self
     {
         if ($ltiMessage->getToken()->isExpired()) {
-            $this->addFailure('JWT id_token is expired');
-        } else {
-            $this->addSuccess('JWT id_token is not expired');
+            throw new LtiException('JWT id_token is expired');
         }
 
-        return $this;
+        return $this->addSuccess('JWT id_token is not expired');
     }
 
+    /**
+     * @throws LtiException
+     */
     private function validateMessageNonce(LtiMessageInterface $ltiMessage): self
     {
         $nonceValue = $ltiMessage->getMandatoryClaim(MessageInterface::CLAIM_NONCE);
@@ -171,30 +161,29 @@ class LtiLaunchRequestValidator
 
         if (null !== $nonce) {
             if (!$nonce->isExpired()) {
-                $this->addFailure('JWT id_token nonce already used');
-            } else {
-                $this->addSuccess('JWT id_token nonce already used but expired');
+                throw new LtiException('JWT id_token nonce already used');
             }
+
+            return $this->addSuccess('JWT id_token nonce already used but expired');
         } else {
             $this->nonceRepository->save(
-                new Nonce($nonceValue, Carbon::now()->addSeconds(NonceGeneratorInterface::DEFAULT_TTL))
+                new Nonce($nonceValue, Carbon::now()->addSeconds(NonceGeneratorInterface::TTL))
             );
 
-            $this->addSuccess('JWT id_token nonce is valid');
+            return $this->addSuccess('JWT id_token nonce is valid');
         }
-
-        return $this;
     }
 
+    /**
+     * @throws LtiException
+     */
     private function validateMessageDeploymentId(RegistrationInterface $registration, LtiMessageInterface $ltiMessage): self
     {
         if (!$registration->hasDeploymentId($ltiMessage->getDeploymentId())) {
-            $this->addFailure('JWT id_token deployment_id claim not valid for this registration');
-        } else {
-            $this->addSuccess('JWT id_token deployment_id claim valid for this registration');
+            throw new LtiException('JWT id_token deployment_id claim not valid for this registration');
         }
 
-        return $this;
+        return $this->addSuccess('JWT id_token deployment_id claim valid for this registration');
     }
 
     /**
@@ -208,23 +197,26 @@ class LtiLaunchRequestValidator
             }
 
             if (!$oidcState->getToken()->verify($this->signer, $registration->getToolKeyChain()->getPublicKey())) {
-                $this->addFailure('JWT OIDC state signature validation failure');
-            } else {
-                $this->addSuccess('JWT OIDC state signature validation success');
+                throw new LtiException('JWT OIDC state signature validation failure');
             }
+
+            return $this->addSuccess('JWT OIDC state signature validation success');
         }
 
         return $this;
     }
 
+    /**
+     * @throws LtiException
+     */
     private function validateStateExpiry(MessageInterface $oidcState = null): self
     {
         if (null !== $oidcState) {
             if ($oidcState->getToken()->isExpired()) {
-                $this->addFailure('JWT OIDC state is expired');
-            } else {
-                $this->addSuccess('JWT OIDC state is not expired');
+                throw new LtiException('JWT OIDC state is expired');
             }
+
+            return $this->addSuccess('JWT OIDC state is not expired');
         }
 
         return $this;
@@ -237,17 +229,9 @@ class LtiLaunchRequestValidator
         return $this;
     }
 
-    private function addFailure(string $message): self
-    {
-        $this->failures[] = $message;
-
-        return $this;
-    }
-
     private function reset(): self
     {
         $this->successes = [];
-        $this->failures = [];
 
         return $this;
     }

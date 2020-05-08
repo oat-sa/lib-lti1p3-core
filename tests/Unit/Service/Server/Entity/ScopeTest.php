@@ -20,14 +20,20 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Security\Jwks\Fetcher;
+namespace OAT\Library\Lti1p3Core\Tests\Unit\Service\Server\Entity;
 
-use Lcobucci\JWT\Signer\Key;
+use OAT\Library\Lti1p3Core\Service\Server\Entity\Scope;
+use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
+use PHPUnit\Framework\TestCase;
 
-interface JwksFetcherInterface
+class ScopeTest extends TestCase
 {
-    // Default TTL (in seconds)
-    public const TTL = 86400;
+    use DomainTestingTrait;
 
-    public function fetchKey(string $jwksUrl, string $kId): Key;
+    public function testGetIdentifier(): void
+    {
+        $subject = new Scope('identifier');
+
+        $this->assertEquals('identifier', $subject->getIdentifier());
+    }
 }

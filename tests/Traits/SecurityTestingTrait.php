@@ -93,21 +93,41 @@ trait SecurityTestingTrait
         };
     }
 
-    private function createTestNonceRepository(bool $withNonceFind = false): NonceRepositoryInterface
+    private function createTestNonceRepository(array $nonces = [], bool $withAutomaticFind = false): NonceRepositoryInterface
     {
-        return new class ($withNonceFind) implements NonceRepositoryInterface
-        {
-            /** @var bool */
-            private $withNonceFind;
+        $nonces = !empty($nonces) ? $nonces : [new Nonce('value')];
 
-            public function __construct(bool $withNonceFind)
+        return new class ($nonces, $withAutomaticFind) implements NonceRepositoryInterface
+        {
+            /** @var NonceRepositoryInterface */
+            private $nonces;
+
+            /** @var bool */
+            private $withAutomaticFind;
+
+            public function __construct(array $nonces, bool $withAutomaticFind)
             {
-                $this->withNonceFind = $withNonceFind;
+                foreach ($nonces as $nonce) {
+                    $this->add($nonce);
+                }
+
+                $this->withAutomaticFind = $withAutomaticFind;
+            }
+
+            public function add(NonceInterface $nonce): self
+            {
+                $this->nonces[$nonce->getValue()] = $nonce;
+
+                return $this;
             }
 
             public function find(string $value): ?NonceInterface
             {
-                return $this->withNonceFind ? new Nonce('value') : null;
+                if ($this->withAutomaticFind) {
+                    return current($this->nonces);
+                }
+
+                return $this->nonces[$value] ?? null;
             }
 
             public function save(NonceInterface $nonce): void

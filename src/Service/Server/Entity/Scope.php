@@ -20,14 +20,25 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Security\Jwks\Fetcher;
+namespace OAT\Library\Lti1p3Core\Service\Server\Entity;
 
-use Lcobucci\JWT\Signer\Key;
+use League\OAuth2\Server\Entities\ScopeEntityInterface;
+use League\OAuth2\Server\Entities\Traits\ScopeTrait;
 
-interface JwksFetcherInterface
+class Scope implements ScopeEntityInterface
 {
-    // Default TTL (in seconds)
-    public const TTL = 86400;
+    use ScopeTrait;
 
-    public function fetchKey(string $jwksUrl, string $kId): Key;
+    /** @var string */
+    private $identifier;
+
+    public function __construct(string $identifier)
+    {
+        $this->identifier = $identifier;
+    }
+
+    public function getIdentifier(): string
+    {
+        return $this->identifier;
+    }
 }

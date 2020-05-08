@@ -20,18 +20,18 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Launch\Validator;
+namespace OAT\Library\Lti1p3Core\Service\Server\Validator;
 
-use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+use Lcobucci\JWT\Token;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 
-class LtiLaunchRequestValidationResult
+class AccessTokenRequestValidationResult
 {
     /** @var RegistrationInterface|null */
     private $registration;
 
-    /** @var LtiMessageInterface|null */
-    private $ltiMessage;
+    /** @var Token|null */
+    private $token;
 
     /** @var string[] */
     private $successes;
@@ -41,12 +41,12 @@ class LtiLaunchRequestValidationResult
 
     public function __construct(
         RegistrationInterface $registration = null,
-        LtiMessageInterface $ltiMessage = null,
+        Token $token = null,
         array $successes = [],
         string $error = null
     ) {
         $this->registration = $registration;
-        $this->ltiMessage = $ltiMessage;
+        $this->token = $token;
         $this->successes = $successes;
         $this->error = $error;
     }
@@ -56,9 +56,14 @@ class LtiLaunchRequestValidationResult
         return $this->registration;
     }
 
-    public function getLtiMessage(): ?LtiMessageInterface
+    public function getToken(): ?Token
     {
-        return $this->ltiMessage;
+        return $this->token;
+    }
+
+    public function getScopes(): array
+    {
+        return $this->token->getClaim('scopes', []);
     }
 
     public function addSuccess(string $success): self
