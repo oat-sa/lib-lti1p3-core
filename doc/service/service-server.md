@@ -23,20 +23,20 @@ or you can simply use the available [library repositories](../../src/Service/Ser
 
 Your will also need to provide an encryption key (random string with enough entropy).
 
-## Generation of access token response for a registration
+## Generation of access token response for a key chain
 
 This library provides a ready to use [AccessTokenGenerator](../../src/Service/Server/Generator/AccessTokenResponseGenerator.php) to generate access tokens responses for a registration:
-- it requires a registration repository implementation [as explained here](../quickstart/interfaces.md) to automate signature logic against your platform registration private key
+- it requires a key chain repository implementation [as explained here](../quickstart/interfaces.md) to automate signature logic against a key chain private key
 - it complies to the `client_credentials` grant type with `client_assertion` to follow [IMS security specifications](https://www.imsglobal.org/spec/security/v1p0/#using-json-web-tokens-with-oauth-2-0-client-credentials-grant)
-- it expects a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface), a [PSR7 ResponseInterface](https://www.php-fig.org/psr/psr-7/#33-psrhttpmessageresponseinterface) and a registration identifier to be easily exposed behind any PSR7 compliant controller
+- it expects a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface), a [PSR7 ResponseInterface](https://www.php-fig.org/psr/psr-7/#33-psrhttpmessageresponseinterface) and a key chain identifier to be easily exposed behind any PSR7 compliant controller
 
-For example, to expose an LTI service server your application endpoint `[POST] /lti/auth/{registrationIdentifier}/token`:
+For example, to expose an LTI service server your application endpoint `[POST] /lti/auth/{keyChainIdentifier}/token`:
 
 ```php
 <?php
 
 use League\OAuth2\Server\Exception\OAuthServerException;
-use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
+use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
 use OAT\Library\Lti1p3Core\Service\Server\Generator\AccessTokenResponseGenerator;
 use OAT\Library\Lti1p3Core\Service\Server\Factory\AuthorizationServerFactory;
 use OAT\Library\Lti1p3Core\Service\Server\Repository\AccessTokenRepository;
@@ -52,7 +52,7 @@ $factory = new AuthorizationServerFactory(
     'superSecretEncryptionKey' // You obviously have to add more entropy, this is an example
 );
 
-/** @var RegistrationRepositoryInterface $repository */
+/** @var KeyChainRepositoryInterface $repository */
 $repository = ...
 
 $generator = new AccessTokenResponseGenerator($repository, $factory);
@@ -64,11 +64,11 @@ $request = ...
 $response = ...
 
 try {
-    // Extract registrationIdentifier from request uri parameter
-    $registrationIdentifier = ...
+    // Extract keyChainIdentifier from request uri parameter
+    $keyChainIdentifier = ...
 
-    // Validate assertion, generate and sign access token response, using the registration platform private key
-    return $generator->generate($request, $response, $registrationIdentifier);
+    // Validate assertion, generate and sign access token response, using the key chain private key
+    return $generator->generate($request, $response, $keyChainIdentifier);
 
 } catch (OAuthServerException $exception) {
     return $exception->generateHttpResponse($response);
