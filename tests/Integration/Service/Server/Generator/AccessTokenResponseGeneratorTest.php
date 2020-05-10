@@ -166,7 +166,7 @@ class AccessTokenResponseGeneratorTest extends TestCase
         $result = $this->subject->generate($request, $this->createResponse(), $keyChain->getIdentifier());
 
         $this->assertInstanceOf(ResponseInterface::class, $result);
-        $this->assertEquals(401 , $result->getStatusCode());
+        $this->assertEquals(401, $result->getStatusCode());
     }
 
     public function testGenerateWitInvalidKeyChain(): void
@@ -184,7 +184,7 @@ class AccessTokenResponseGeneratorTest extends TestCase
         );
 
         $this->assertInstanceOf(ResponseInterface::class, $result);
-        $this->assertEquals(401 , $result->getStatusCode());
+        $this->assertEquals(401, $result->getStatusCode());
     }
 
     private function generateCredentials(RegistrationInterface $registration, array $scopes = []): array
