@@ -28,7 +28,7 @@ use League\OAuth2\Server\CryptKey;
 use League\OAuth2\Server\Repositories\AccessTokenRepositoryInterface;
 use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
 use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
-use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
+use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
 use OAT\Library\Lti1p3Core\Service\Server\Grant\ClientAssertionCredentialsGrant;
 use OAT\Library\Lti1p3Core\Service\Server\ResponseType\ScopedBearerTokenResponse;
 
@@ -58,15 +58,15 @@ class AuthorizationServerFactory
         $this->encryptionKey = $encryptionKey;
     }
 
-    public function createForRegistration(RegistrationInterface $registration): AuthorizationServer
+    public function create(KeyChainInterface $keyChain): AuthorizationServer
     {
-        if (null === $registration->getPlatformKeyChain()) {
-            throw new InvalidArgumentException('Missing platform key chain');
+        if (null === $keyChain->getPrivateKey()) {
+            throw new InvalidArgumentException('Missing private key');
         }
 
         $privateKey = new CryptKey(
-            $registration->getPlatformKeyChain()->getPrivateKey()->getContent(),
-            $registration->getPlatformKeyChain()->getPrivateKey()->getPassphrase(),
+            $keyChain->getPrivateKey()->getContent(),
+            $keyChain->getPrivateKey()->getPassphrase(),
             false
         );
 

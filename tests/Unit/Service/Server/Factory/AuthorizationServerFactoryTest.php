@@ -25,6 +25,7 @@ namespace OAT\Library\Lti1p3Core\Tests\Unit\Service\Server\Factory;
 use Cache\Adapter\PHPArray\ArrayCachePool;
 use InvalidArgumentException;
 use League\OAuth2\Server\AuthorizationServer;
+use OAT\Library\Lti1p3Core\Security\Key\KeyChain;
 use OAT\Library\Lti1p3Core\Service\Server\Factory\AuthorizationServerFactory;
 use OAT\Library\Lti1p3Core\Service\Server\Repository\AccessTokenRepository;
 use OAT\Library\Lti1p3Core\Service\Server\Repository\ClientRepository;
@@ -49,18 +50,24 @@ class AuthorizationServerFactoryTest extends TestCase
         );
     }
 
-    public function testCreateForRegistration(): void
+    public function testCreate(): void
     {
-        $result = $this->subject->createForRegistration($this->createTestRegistration());
+        $result = $this->subject->create($this->createTestKeyChain());
 
         $this->assertInstanceOf(AuthorizationServer::class, $result);
     }
 
-    public function testCreateForRegistrationWithMissingPlatformKeyChain(): void
+    public function testCreateForRegistrationWithMissingPrivateKey(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Missing platform key chain');
+        $this->expectExceptionMessage('Missing private key');
 
-        $this->subject->createForRegistration($this->createTestRegistrationWithoutPlatformKeyChain());
+        $invalidKeyChain = new KeyChain(
+            'identifier',
+            'setName',
+            $publicKey ?? getenv('TEST_KEYS_ROOT_DIR') . '/RSA/public.key'
+        );
+
+        $this->subject->create($invalidKeyChain);
     }
 }
