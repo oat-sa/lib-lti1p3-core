@@ -30,6 +30,7 @@ use Lcobucci\JWT\Signer\Rsa\Sha256;
 use League\OAuth2\Server\Exception\OAuthServerException;
 use OAT\Library\Lti1p3Core\Message\MessageInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
+use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
 use OAT\Library\Lti1p3Core\Service\Server\Generator\AccessTokenResponseGenerator;
 use OAT\Library\Lti1p3Core\Service\Server\Entity\Scope;
 use OAT\Library\Lti1p3Core\Service\Server\Factory\AuthorizationServerFactory;
@@ -39,6 +40,7 @@ use OAT\Library\Lti1p3Core\Service\Server\Repository\ClientRepository;
 use OAT\Library\Lti1p3Core\Service\Server\Repository\ScopeRepository;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
 use OAT\Library\Lti1p3Core\Tests\Traits\NetworkTestingTrait;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 
@@ -50,6 +52,9 @@ class AccessTokenResponseGeneratorTest extends TestCase
     /** @var ArrayCachePool */
     private $cache;
 
+    /** @var KeyChainRepositoryInterface|MockObject */
+    private $keyChainRepositoryMock;
+
     /** @var AccessTokenResponseGenerator */
     private $subject;
 
@@ -57,27 +62,34 @@ class AccessTokenResponseGeneratorTest extends TestCase
     {
         $this->cache = new ArrayCachePool();
 
-        $registrationRepository = $this->createTestRegistrationRepository();
+        $this->keyChainRepositoryMock = $this->createMock(KeyChainRepositoryInterface::class);
 
         $factory = new AuthorizationServerFactory(
-            new ClientRepository($registrationRepository),
+            new ClientRepository($this->createTestRegistrationRepository()),
             new AccessTokenRepository($this->cache),
             new ScopeRepository([new Scope('scope1'), new Scope('scope2')]),
             'encryptionKey'
         );
 
-        $this->subject = new AccessTokenResponseGenerator($registrationRepository, $factory);
+        $this->subject = new AccessTokenResponseGenerator($this->keyChainRepositoryMock, $factory);
     }
 
     public function testGenerate(): void
     {
+        $keyChain = $this->createTestKeyChain();
+        $this->keyChainRepositoryMock
+            ->expects($this->once())
+            ->method('find')
+            ->with($keyChain->getIdentifier())
+            ->willReturn($keyChain);
+
         $registration = $this->createTestRegistration();
         $request = $this->createServerRequest('POST', '/example', $this->generateCredentials($registration));
 
         $result = $this->subject->generate(
             $request,
             $this->createResponse(),
-            $registration->getIdentifier()
+            $keyChain->getIdentifier()
         );
 
         $this->assertInstanceOf(ResponseInterface::class, $result);
@@ -97,13 +109,20 @@ class AccessTokenResponseGeneratorTest extends TestCase
 
     public function testGenerateWithScopes(): void
     {
+        $keyChain = $this->createTestKeyChain();
+        $this->keyChainRepositoryMock
+            ->expects($this->once())
+            ->method('find')
+            ->with($keyChain->getIdentifier())
+            ->willReturn($keyChain);
+
         $registration = $this->createTestRegistration();
         $request = $this->createServerRequest('POST', '/example', $this->generateCredentials($registration, ['scope1', 'scope2']));
 
         $result = $this->subject->generate(
             $request,
             $this->createResponse(),
-            $registration->getIdentifier()
+            $keyChain->getIdentifier()
         );
 
         $this->assertInstanceOf(ResponseInterface::class, $result);
@@ -126,7 +145,13 @@ class AccessTokenResponseGeneratorTest extends TestCase
         $this->expectException(OAuthServerException::class);
         $this->expectExceptionMessage('The user credentials were incorrect');
 
-        $registration = $this->createTestRegistration();
+        $keyChain = $this->createTestKeyChain();
+        $this->keyChainRepositoryMock
+            ->expects($this->once())
+            ->method('find')
+            ->with($keyChain->getIdentifier())
+            ->willReturn($keyChain);
+
         $request = $this->createServerRequest(
             'POST',
             '/example',
@@ -138,16 +163,16 @@ class AccessTokenResponseGeneratorTest extends TestCase
             ]
         );
 
-        $result = $this->subject->generate($request, $this->createResponse(), $registration->getIdentifier());
+        $result = $this->subject->generate($request, $this->createResponse(), $keyChain->getIdentifier());
 
         $this->assertInstanceOf(ResponseInterface::class, $result);
-        $this->assertEquals(401 , $result->getStatusCode());
+        $this->assertEquals(401, $result->getStatusCode());
     }
 
-    public function testGenerateWitInvalidRegistration(): void
+    public function testGenerateWitInvalidKeyChain(): void
     {
         $this->expectException(OAuthServerException::class);
-        $this->expectExceptionMessage('Invalid registration identifier');
+        $this->expectExceptionMessage('Invalid key chain identifier');
 
         $registration = $this->createTestRegistration();
         $request = $this->createServerRequest('POST', '/example', $this->generateCredentials($registration, ['scope1', 'scope2']));
@@ -159,7 +184,7 @@ class AccessTokenResponseGeneratorTest extends TestCase
         );
 
         $this->assertInstanceOf(ResponseInterface::class, $result);
-        $this->assertEquals(401 , $result->getStatusCode());
+        $this->assertEquals(401, $result->getStatusCode());
     }
 
     private function generateCredentials(RegistrationInterface $registration, array $scopes = []): array
