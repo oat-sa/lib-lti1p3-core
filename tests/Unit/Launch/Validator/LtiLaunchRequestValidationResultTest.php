@@ -24,6 +24,7 @@ namespace OAT\Library\Lti1p3Core\Tests\Unit\Launch\Validator;
 
 use OAT\Library\Lti1p3Core\Launch\Validator\LtiLaunchRequestValidationResult;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+use OAT\Library\Lti1p3Core\Message\MessageInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -45,6 +46,15 @@ class LtiLaunchRequestValidationResultTest extends TestCase
         $subject = new LtiLaunchRequestValidationResult(null, $ltiMessageMock);
 
         $this->assertEquals($ltiMessageMock, $subject->getLtiMessage());
+    }
+
+    public function testGetOidcState(): void
+    {
+        $oidcStateMock = $this->createMock(MessageInterface::class);
+
+        $subject = new LtiLaunchRequestValidationResult(null, null, $oidcStateMock);
+
+        $this->assertEquals($oidcStateMock, $subject->getOidcState());
     }
 
     public function testBehavior(): void

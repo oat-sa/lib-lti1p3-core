@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+1.2.0
+-----
+
+* Added `getOidcState()` method to `LtiLaunchRequestValidationResult`
+
 1.1.0
 -----
 
