@@ -5,7 +5,7 @@
 ## Table of contents
 
 - [Preparation of required dependencies](#preparation-of-required-dependencies)
-- [Generation of access token response for a registration](#generation-of-access-token-response-for-a-registration)
+- [Generation of access token response for a key chain](#generation-of-access-token-response-for-a-key-chain)
 - [Validation of access token request](#validation-of-access-token-request)
 
 ## Preparation of required dependencies
