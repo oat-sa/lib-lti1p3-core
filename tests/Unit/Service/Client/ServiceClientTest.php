@@ -69,7 +69,7 @@ class ServiceClientTest extends TestCase
                     'POST',
                     $registration->getPlatform()->getOAuth2AccessTokenUrl(),
                     [
-                        'json' => [
+                        'form_params' => [
                             'grant_type' => ServiceClientInterface::GRANT_TYPE,
                             'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
                             'client_assertion' => $this->getTestJwtClientAssertion(),
@@ -152,7 +152,7 @@ class ServiceClientTest extends TestCase
                 'POST',
                 $registration->getPlatform()->getOAuth2AccessTokenUrl(),
                 [
-                    'json' => [
+                    'form_params' => [
                         'grant_type' => ServiceClientInterface::GRANT_TYPE,
                         'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
                         'client_assertion' => $this->getTestJwtClientAssertion(),
@@ -181,7 +181,7 @@ class ServiceClientTest extends TestCase
                 'POST',
                 $registration->getPlatform()->getOAuth2AccessTokenUrl(),
                 [
-                    'json' => [
+                    'form_params' => [
                         'grant_type' => ServiceClientInterface::GRANT_TYPE,
                         'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
                         'client_assertion' => $this->getTestJwtClientAssertion(),
@@ -210,7 +210,7 @@ class ServiceClientTest extends TestCase
                 'POST',
                 $registration->getPlatform()->getOAuth2AccessTokenUrl(),
                 [
-                    'json' => [
+                    'form_params' => [
                         'grant_type' => ServiceClientInterface::GRANT_TYPE,
                         'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
                         'client_assertion' => $this->getTestJwtClientAssertion(),
@@ -240,7 +240,7 @@ class ServiceClientTest extends TestCase
                     'POST',
                     $registration->getPlatform()->getOAuth2AccessTokenUrl(),
                     [
-                        'json' => [
+                        'form_params' => [
                             'grant_type' => ServiceClientInterface::GRANT_TYPE,
                             'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
                             'client_assertion' => $this->getTestJwtClientAssertion(),
