@@ -23,20 +23,20 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Service\Server\Generator;
 
 use League\OAuth2\Server\Exception\OAuthServerException;
-use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
+use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
 use OAT\Library\Lti1p3Core\Service\Server\Factory\AuthorizationServerFactory;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class AccessTokenResponseGenerator
 {
-    /** @var RegistrationRepositoryInterface */
+    /** @var KeyChainRepositoryInterface */
     private $repository;
 
     /** @var AuthorizationServerFactory */
     private $factory;
 
-    public function __construct(RegistrationRepositoryInterface $repository, AuthorizationServerFactory $factory)
+    public function __construct(KeyChainRepositoryInterface $repository, AuthorizationServerFactory $factory)
     {
         $this->repository = $repository;
         $this->factory = $factory;
@@ -48,16 +48,16 @@ class AccessTokenResponseGenerator
     public function generate(
         ServerRequestInterface $request,
         ResponseInterface $response,
-        string $registrationIdentifier
+        string $keyChainIdentifier
     ): ResponseInterface {
-        $registration = $this->repository->find($registrationIdentifier);
+        $keyChain = $this->repository->find($keyChainIdentifier);
 
-        if (null === $registration) {
-            throw new OAuthServerException('Invalid registration identifier', 11, 'registration_not_found', 404);
+        if (null === $keyChain) {
+            throw new OAuthServerException('Invalid key chain identifier', 11, 'key_chain_not_found', 404);
         }
 
         return $this->factory
-            ->createForRegistration($registration)
+            ->create($keyChain)
             ->respondToAccessTokenRequest($request, $response);
     }
 }

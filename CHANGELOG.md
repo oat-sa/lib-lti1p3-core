@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.0.0
+-----
+
+* Updated `AccessTokenResponseGenerator` to generate for a key chain instead of a registration
+
 1.2.0
 -----
 
