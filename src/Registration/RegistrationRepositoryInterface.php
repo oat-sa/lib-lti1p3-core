@@ -26,6 +26,9 @@ interface RegistrationRepositoryInterface
 {
     public function find(string $identifier): ?RegistrationInterface;
 
+    /** @return RegistrationInterface[] */
+    public function findAll(): array;
+
     public function findByClientId(string $clientId): ?RegistrationInterface;
 
     public function findByPlatformIssuer(string $issuer, string $clientId = null): ?RegistrationInterface;
