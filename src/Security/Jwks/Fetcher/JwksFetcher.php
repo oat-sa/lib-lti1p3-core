@@ -114,7 +114,7 @@ class JwksFetcher implements JwksFetcherInterface
 
             $this->logger->error($message);
 
-            throw new LtiException($message,$exception->getCode(), $exception);
+            throw new LtiException($message, $exception->getCode(), $exception);
         }
     }
 

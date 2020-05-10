@@ -110,10 +110,10 @@ class LtiLaunchRequestValidator
                 ->validateStateSignature($registration, $oidcState)
                 ->validateStateExpiry($oidcState);
 
-            return new LtiLaunchRequestValidationResult($registration, $ltiMessage, $this->successes);
+            return new LtiLaunchRequestValidationResult($registration, $ltiMessage, $oidcState, $this->successes);
 
         } catch (Throwable $exception) {
-            return new LtiLaunchRequestValidationResult(null, null, $this->successes, $exception->getMessage());
+            return new LtiLaunchRequestValidationResult(null, null, null, $this->successes, $exception->getMessage());
         }
     }
 
