@@ -33,6 +33,11 @@ $registrationRepository = new class implements RegistrationRepositoryInterface
        // TODO: Implement find() method to find a registration by identifier, or null if not found.
    }
 
+   public function findAll(): array
+   {
+       // TODO: Implement findAll() method to find all available registrations.
+   }
+
    public function findByClientId(string $clientId) : ?RegistrationInterface
    {
        // TODO: Implement findByClientId() method to find a registration by client id, or null if not found.
