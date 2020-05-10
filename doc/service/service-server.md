@@ -25,7 +25,7 @@ Your will also need to provide an encryption key (random string with enough entr
 
 ## Generation of access token response for a key chain
 
-This library provides a ready to use [AccessTokenGenerator](../../src/Service/Server/Generator/AccessTokenResponseGenerator.php) to generate access tokens responses for a registration:
+This library provides a ready to use [AccessTokenGenerator](../../src/Service/Server/Generator/AccessTokenResponseGenerator.php) to generate access tokens responses for a given key chain:
 - it requires a key chain repository implementation [as explained here](../quickstart/interfaces.md) to automate signature logic against a key chain private key
 - it complies to the `client_credentials` grant type with `client_assertion` to follow [IMS security specifications](https://www.imsglobal.org/spec/security/v1p0/#using-json-web-tokens-with-oauth-2-0-client-credentials-grant)
 - it expects a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface), a [PSR7 ResponseInterface](https://www.php-fig.org/psr/psr-7/#33-psrhttpmessageresponseinterface) and a key chain identifier to be easily exposed behind any PSR7 compliant controller
