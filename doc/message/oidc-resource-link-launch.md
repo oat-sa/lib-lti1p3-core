@@ -212,11 +212,15 @@ if (!$result->hasError()) {
     echo $result->getRegistration()->getIdentifier();
 
     // And to the LTI message components
-    echo $result->getLtiMessage()->getVersion();              // '1.3.0'
-    echo $result->getLtiMessage()->getContext()->getId();     // 'contextId'
-    echo $result->getLtiMessage()->getClaim('myCustomClaim'); // 'myCustomValue'
-    echo $result->getLtiMessage()->getUserIdentity();         // given by the platform at OIDC authentication 
+    echo $result->getLtiMessage()->getVersion();               // '1.3.0'
+    echo $result->getLtiMessage()->getContext()->getId();      // 'contextId'
+    echo $result->getLtiMessage()->getClaim('myCustomClaim');  // 'myCustomValue'
+    echo $result->getLtiMessage()->getUserIdentity();          // given by the platform at OIDC authentication 
     
+    // If needed, you can also access the OIDC state components
+    echo $result->getOidcState()->getToken()->__toString();    // state JWT
+    echo $result->getOidcState()->getToken()->getClaim('jti'); // state JWT id
+
     // If needed, you can also access the validation successes
     foreach ($result->getSuccesses() as $success) {
         echo $success;

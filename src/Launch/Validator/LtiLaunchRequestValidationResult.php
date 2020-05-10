@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Launch\Validator;
 
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+use OAT\Library\Lti1p3Core\Message\MessageInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 
 class LtiLaunchRequestValidationResult
@@ -33,6 +34,9 @@ class LtiLaunchRequestValidationResult
     /** @var LtiMessageInterface|null */
     private $ltiMessage;
 
+    /** @var MessageInterface|null */
+    private $oidcState;
+
     /** @var string[] */
     private $successes;
 
@@ -42,11 +46,13 @@ class LtiLaunchRequestValidationResult
     public function __construct(
         RegistrationInterface $registration = null,
         LtiMessageInterface $ltiMessage = null,
+        MessageInterface $oidcState = null,
         array $successes = [],
         string $error = null
     ) {
         $this->registration = $registration;
         $this->ltiMessage = $ltiMessage;
+        $this->oidcState = $oidcState;
         $this->successes = $successes;
         $this->error = $error;
     }
@@ -59,6 +65,11 @@ class LtiLaunchRequestValidationResult
     public function getLtiMessage(): ?LtiMessageInterface
     {
         return $this->ltiMessage;
+    }
+
+    public function getOidcState(): ?MessageInterface
+    {
+        return $this->oidcState;
     }
 
     public function addSuccess(string $success): self
