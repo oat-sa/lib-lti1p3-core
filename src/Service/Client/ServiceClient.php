@@ -81,7 +81,7 @@ class ServiceClient implements ServiceClientInterface
     ): ResponseInterface {
         try {
             $options = array_merge_recursive($options, [
-                'headers' => ['Authentication' => sprintf('Bearer %s', $this->getAccessToken($registration, $scopes))]
+                'headers' => ['Authorization' => sprintf('Bearer %s', $this->getAccessToken($registration, $scopes))]
             ]);
 
             return $this->client->request($method, $uri, $options);
