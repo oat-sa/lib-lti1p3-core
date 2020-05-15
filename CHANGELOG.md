@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.0.1
+-----
+
+* Fixed `ServiceClient` header
+
+
 2.0.0
 -----
 
