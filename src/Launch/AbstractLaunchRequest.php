@@ -91,7 +91,7 @@ abstract class AbstractLaunchRequest implements LaunchRequestInterface
 
     public function toUrl(): string
     {
-        return sprintf('%s?%s', $this->url, http_build_query(array_filter($this->parameters)));
+        return sprintf('%s?%s', $this->url, http_build_query(array_filter($this->getParameters())));
     }
 
     public function toHtmlLink(string $title, array $attributes = []): string
@@ -108,7 +108,7 @@ abstract class AbstractLaunchRequest implements LaunchRequestInterface
     public function toHtmlRedirectForm(bool $autoSubmit = true): string
     {
         $formInputs = [];
-        $formId = sprintf('launch_%s', md5($this->url . implode('-', $this->parameters)));
+        $formId = sprintf('launch_%s', md5($this->url . implode('-', $this->getParameters())));
 
         foreach (array_filter($this->parameters) as $name => $value) {
             $formInputs[] = sprintf('<input type="hidden" name="%s" value="%s"/>', $name, $value);

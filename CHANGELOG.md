@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.0.2
+-----
+
+* Fixed `OidcAuthenticationRequest` parameters exposition
+
 2.0.1
 -----
 

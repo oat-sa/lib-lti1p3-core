@@ -35,6 +35,19 @@ class OidcAuthenticationRequest extends AbstractLaunchRequest
     public const RESPONSE_MODE = 'form_post';
     public const PROMPT = 'none';
 
+    public function getParameters(): array
+    {
+        return array_merge(
+            parent::getParameters(),
+            [
+                'scope' => $this->getScope(),
+                'response_type' => $this->getResponseType(),
+                'response_mode' => $this->getResponseMode(),
+                'prompt' => $this->getPrompt()
+            ]
+        );
+    }
+
     /**
      * @throws LtiException
      */

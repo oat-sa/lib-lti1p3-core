@@ -27,9 +27,12 @@ use PHPUnit\Framework\TestCase;
 
 class OidcAuthenticationRequestTest extends TestCase
 {
-    public function testGetters(): void
+    /** @var OidcAuthenticationRequest */
+    private $subject;
+
+    protected function setUp(): void
     {
-        $subject = new OidcAuthenticationRequest('http://example.com', [
+        $this->subject = new OidcAuthenticationRequest('http://example.com', [
             'redirect_uri' => 'redirect_uri',
             'client_id' => 'client_id',
             'login_hint' => 'login_hint',
@@ -37,17 +40,47 @@ class OidcAuthenticationRequestTest extends TestCase
             'state' => 'state',
             'lti_message_hint' => 'lti_message_hint'
         ]);
+    }
 
-        $this->assertEquals('http://example.com', $subject->getUrl());
-        $this->assertEquals('redirect_uri', $subject->getRedirectUri());
-        $this->assertEquals('client_id', $subject->getClientId());
-        $this->assertEquals('login_hint', $subject->getLoginHint());
-        $this->assertEquals('nonce', $subject->getNonce());
-        $this->assertEquals('state', $subject->getState());
-        $this->assertEquals('lti_message_hint', $subject->getLtiMessageHint());
-        $this->assertEquals(OidcAuthenticationRequest::RESPONSE_MODE, $subject->getResponseMode());
-        $this->assertEquals(OidcAuthenticationRequest::RESPONSE_TYPE, $subject->getResponseType());
-        $this->assertEquals(OidcAuthenticationRequest::SCOPE, $subject->getScope());
-        $this->assertEquals(OidcAuthenticationRequest::PROMPT, $subject->getPrompt());
+    public function testGetters(): void
+    {
+        $this->assertEquals('http://example.com', $this->subject->getUrl());
+        $this->assertEquals('redirect_uri', $this->subject->getRedirectUri());
+        $this->assertEquals('client_id', $this->subject->getClientId());
+        $this->assertEquals('login_hint', $this->subject->getLoginHint());
+        $this->assertEquals('nonce', $this->subject->getNonce());
+        $this->assertEquals('state', $this->subject->getState());
+        $this->assertEquals('lti_message_hint', $this->subject->getLtiMessageHint());
+        $this->assertEquals(OidcAuthenticationRequest::RESPONSE_MODE, $this->subject->getResponseMode());
+        $this->assertEquals(OidcAuthenticationRequest::RESPONSE_TYPE, $this->subject->getResponseType());
+        $this->assertEquals(OidcAuthenticationRequest::SCOPE, $this->subject->getScope());
+        $this->assertEquals(OidcAuthenticationRequest::PROMPT, $this->subject->getPrompt());
+    }
+
+    public function testGetParameters(): void
+    {
+        $this->assertEquals(
+            [
+                'redirect_uri' => 'redirect_uri',
+                'client_id' => 'client_id',
+                'login_hint' => 'login_hint',
+                'nonce' => 'nonce',
+                'state' => 'state',
+                'lti_message_hint' => 'lti_message_hint',
+                'scope' => 'openid',
+                'response_type' => 'id_token',
+                'response_mode' => 'form_post',
+                'prompt' => 'none',
+            ],
+            $this->subject->getParameters()
+        );
+    }
+
+    public function testtoUrl(): void
+    {
+        $this->assertEquals(
+            'http://example.com?redirect_uri=redirect_uri&client_id=client_id&login_hint=login_hint&nonce=nonce&state=state&lti_message_hint=lti_message_hint&scope=openid&response_type=id_token&response_mode=form_post&prompt=none',
+            $this->subject->toUrl()
+        );
     }
 }
