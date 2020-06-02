@@ -51,7 +51,7 @@ class JwksExporter
                 function (KeyChainInterface $keyChain): array {
                     return $this->exporter->export($keyChain);
                 },
-                $this->repository->findByKeySetName($keySetName)
+                array_values($this->repository->findByKeySetName($keySetName))
             )
         ];
     }
