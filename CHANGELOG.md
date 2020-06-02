@@ -4,7 +4,7 @@ CHANGELOG
 2.0.3
 -----
 
-* Fixed `JwksExporter` output structure exposition
+* Fixed `JwksExporter` output structure
 
 2.0.2
 -----
