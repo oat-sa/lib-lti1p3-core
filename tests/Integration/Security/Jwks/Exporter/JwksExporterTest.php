@@ -50,7 +50,7 @@ class JwksExporterTest extends TestCase
         $this->assertEquals(
             [
                 'keys' => [
-                    'keyChainIdentifier1' => [
+                    [
                         'alg' => 'RS256',
                         'kty' => 'RSA',
                         'use' => 'sig',
@@ -58,7 +58,7 @@ class JwksExporterTest extends TestCase
                         'e' => 'AQAB',
                         'kid' => 'keyChainIdentifier1',
                     ],
-                    'keyChainIdentifier3' => [
+                    [
                         'alg' => 'RS256',
                         'kty' => 'RSA',
                         'use' => 'sig',
@@ -74,7 +74,7 @@ class JwksExporterTest extends TestCase
         $this->assertEquals(
             [
                 'keys' => [
-                    'keyChainIdentifier2' => [
+                    [
                         'alg' => 'RS256',
                         'kty' => 'RSA',
                         'use' => 'sig',
