@@ -95,16 +95,16 @@ class ServiceClientTest extends TestCase
         $this->assertInstanceOf(ResponseInterface::class, $result);
         $this->assertEquals('service response', $result->getBody()->__toString());
 
-        $cacheKey = sprintf('lti1p3-service-client-token-' . $registration->getIdentifier());
+        $cacheKey = 'lti1p3-service-client-token-' . sha1($registration->getIdentifier());
         $this->assertTrue($this->cache->hasItem($cacheKey));
         $this->assertEquals('access_token', $this->cache->getItem($cacheKey)->get());
     }
 
-    public function testItCanPerformAServiceCallFromPopulatedTokenCache(): void
+    public function testItCanPerformAServiceCallFromPopulatedTokenCacheWithoutScopes(): void
     {
         $registration = $this->createTestRegistration();
 
-        $cacheKey = sprintf('lti1p3-service-client-token-' . $registration->getIdentifier());
+        $cacheKey = 'lti1p3-service-client-token-' . sha1($registration->getIdentifier());
         $cacheItem = $this->cache->getItem($cacheKey)->set('cached_access_token');
         $this->cache->save($cacheItem);
 
@@ -123,6 +123,36 @@ class ServiceClientTest extends TestCase
             );
 
         $result = $this->subject->request($registration, 'GET', 'http://example.com');
+
+        $this->assertInstanceOf(ResponseInterface::class, $result);
+        $this->assertEquals('service response', $result->getBody()->__toString());
+    }
+
+    public function testItCanPerformAServiceCallFromPopulatedTokenCacheWithScopes(): void
+    {
+        $registration = $this->createTestRegistration();
+
+        $scopes = ['scope1', 'scope2'];
+
+        $cacheKey = 'lti1p3-service-client-token-' . sha1($registration->getIdentifier() . implode('', $scopes));
+        $cacheItem = $this->cache->getItem($cacheKey)->set('cached_access_token');
+        $this->cache->save($cacheItem);
+
+        $this->clientMock
+            ->expects($this->once())
+            ->method('request')
+            ->with(
+                'GET',
+                'http://example.com',
+                [
+                    'headers' => ['Authorization' => 'Bearer cached_access_token']
+                ]
+            )
+            ->willReturn(
+                $this->createResponse('service response')
+            );
+
+        $result = $this->subject->request($registration, 'GET', 'http://example.com', [], $scopes);
 
         $this->assertInstanceOf(ResponseInterface::class, $result);
         $this->assertEquals('service response', $result->getBody()->__toString());

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.0.4
+-----
+
+* Fixed `ServiceClient` access tokens caching scoping
+
 2.0.3
 -----
 
