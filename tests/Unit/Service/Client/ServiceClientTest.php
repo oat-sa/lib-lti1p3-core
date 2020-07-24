@@ -95,7 +95,12 @@ class ServiceClientTest extends TestCase
         $this->assertInstanceOf(ResponseInterface::class, $result);
         $this->assertEquals('service response', $result->getBody()->__toString());
 
-        $cacheKey = 'lti1p3-service-client-token-' . sha1($registration->getIdentifier());
+        $cacheKey = sprintf(
+            '%s-%s-%s',
+            'lti1p3-service-client-token',
+            $registration->getIdentifier(),
+            sha1(implode('', []))
+        );
         $this->assertTrue($this->cache->hasItem($cacheKey));
         $this->assertEquals('access_token', $this->cache->getItem($cacheKey)->get());
     }
@@ -104,7 +109,12 @@ class ServiceClientTest extends TestCase
     {
         $registration = $this->createTestRegistration();
 
-        $cacheKey = 'lti1p3-service-client-token-' . sha1($registration->getIdentifier());
+        $cacheKey = sprintf(
+            '%s-%s-%s',
+            'lti1p3-service-client-token',
+            $registration->getIdentifier(),
+            sha1(implode('', []))
+        );
         $cacheItem = $this->cache->getItem($cacheKey)->set('cached_access_token');
         $this->cache->save($cacheItem);
 
@@ -134,7 +144,12 @@ class ServiceClientTest extends TestCase
 
         $scopes = ['scope1', 'scope2'];
 
-        $cacheKey = 'lti1p3-service-client-token-' . sha1($registration->getIdentifier() . implode('', $scopes));
+        $cacheKey = sprintf(
+            '%s-%s-%s',
+            'lti1p3-service-client-token',
+            $registration->getIdentifier(),
+            sha1(implode('', $scopes))
+        );
         $cacheItem = $this->cache->getItem($cacheKey)->set('cached_access_token');
         $this->cache->save($cacheItem);
 

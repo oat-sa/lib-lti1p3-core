@@ -104,9 +104,10 @@ class ServiceClient implements ServiceClientInterface
     {
         try {
             $cacheKey = sprintf(
-                '%s-%s',
+                '%s-%s-%s',
                 self::CACHE_PREFIX,
-                sha1($registration->getIdentifier() . implode('', $scopes))
+                $registration->getIdentifier(),
+                sha1(implode('', $scopes))
             );
 
             if ($this->cache) {
