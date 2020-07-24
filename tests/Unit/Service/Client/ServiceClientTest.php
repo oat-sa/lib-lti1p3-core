@@ -302,7 +302,7 @@ class ServiceClientTest extends TestCase
         return 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6InRvb2xLZXlDaGFpbiJ9.eyJqdGkiOiJyZWdpc3RyYXRpb25JZGVudGlmaWVyLTkuNDY2ODQ4RSsxNCIsImlzcyI6InBsYXRmb3JtQXVkaWVuY2UiLCJzdWIiOiJyZWdpc3RyYXRpb25DbGllbnRJZCIsImF1ZCI6Imh0dHA6XC9cL3BsYXRmb3JtLmNvbVwvYWNjZXNzLXRva2VuIiwiaWF0Ijo5NDY2ODQ4MDAsImV4cCI6OTQ2Njg1NDAwfQ.t5VpD-QctqxVTbfsm9fpMsMaK__3_YMGbWQEY25FpZFqxSf9NxaXgjv62xpfuGTYJIB20BHj4VToVHSK3gA9PAxrXArFKx5NYzLcnQgN3wLn7wulfkP703805xMQ5duAJJTMNZYbKVfFOEPRgay2iVUuN9EnAe7q-SSTSWgzG1FEtqkYMUM-ohDzjWYs0K7BCEpf3MEsNhg3amxoLAhC7MKJj4SNaBw46qTiTew4Nyi_143yO7niPw5KGBqm3KdBUoDDc7ot7OLOvlKKN9252jgkZdTkpalT9b5i3rbdx5npqWsFN_EmbLTdNhwnw_DHs1T0ALG-tDegnEr46-h6iQ';
     }
 
-    private function generateAccessTokenCacheKey(RegistrationInterface $registration, array $scopes = []):string
+    private function generateAccessTokenCacheKey(RegistrationInterface $registration, array $scopes = []): string
     {
         return sprintf(
             '%s-%s-%s',
