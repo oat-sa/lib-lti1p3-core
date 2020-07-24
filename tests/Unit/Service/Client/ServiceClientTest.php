@@ -26,6 +26,7 @@ use Cache\Adapter\PHPArray\ArrayCachePool;
 use Carbon\Carbon;
 use GuzzleHttp\ClientInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Service\Client\ServiceClient;
 use OAT\Library\Lti1p3Core\Service\Client\ServiceClientInterface;
 use OAT\Library\Lti1p3Core\Service\Server\Grant\ClientAssertionCredentialsGrant;
@@ -95,12 +96,7 @@ class ServiceClientTest extends TestCase
         $this->assertInstanceOf(ResponseInterface::class, $result);
         $this->assertEquals('service response', $result->getBody()->__toString());
 
-        $cacheKey = sprintf(
-            '%s-%s-%s',
-            'lti1p3-service-client-token',
-            $registration->getIdentifier(),
-            sha1(implode('', []))
-        );
+        $cacheKey = $this->generateAccessTokenCacheKey($registration);
         $this->assertTrue($this->cache->hasItem($cacheKey));
         $this->assertEquals('access_token', $this->cache->getItem($cacheKey)->get());
     }
@@ -109,12 +105,7 @@ class ServiceClientTest extends TestCase
     {
         $registration = $this->createTestRegistration();
 
-        $cacheKey = sprintf(
-            '%s-%s-%s',
-            'lti1p3-service-client-token',
-            $registration->getIdentifier(),
-            sha1(implode('', []))
-        );
+        $cacheKey = $this->generateAccessTokenCacheKey($registration);
         $cacheItem = $this->cache->getItem($cacheKey)->set('cached_access_token');
         $this->cache->save($cacheItem);
 
@@ -144,12 +135,7 @@ class ServiceClientTest extends TestCase
 
         $scopes = ['scope1', 'scope2'];
 
-        $cacheKey = sprintf(
-            '%s-%s-%s',
-            'lti1p3-service-client-token',
-            $registration->getIdentifier(),
-            sha1(implode('', $scopes))
-        );
+        $cacheKey = $this->generateAccessTokenCacheKey($registration, $scopes);
         $cacheItem = $this->cache->getItem($cacheKey)->set('cached_access_token');
         $this->cache->save($cacheItem);
 
@@ -314,5 +300,15 @@ class ServiceClientTest extends TestCase
         Carbon::setTestNow(Carbon::create(2000, 1, 1));
 
         return 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6InRvb2xLZXlDaGFpbiJ9.eyJqdGkiOiJyZWdpc3RyYXRpb25JZGVudGlmaWVyLTkuNDY2ODQ4RSsxNCIsImlzcyI6InBsYXRmb3JtQXVkaWVuY2UiLCJzdWIiOiJyZWdpc3RyYXRpb25DbGllbnRJZCIsImF1ZCI6Imh0dHA6XC9cL3BsYXRmb3JtLmNvbVwvYWNjZXNzLXRva2VuIiwiaWF0Ijo5NDY2ODQ4MDAsImV4cCI6OTQ2Njg1NDAwfQ.t5VpD-QctqxVTbfsm9fpMsMaK__3_YMGbWQEY25FpZFqxSf9NxaXgjv62xpfuGTYJIB20BHj4VToVHSK3gA9PAxrXArFKx5NYzLcnQgN3wLn7wulfkP703805xMQ5duAJJTMNZYbKVfFOEPRgay2iVUuN9EnAe7q-SSTSWgzG1FEtqkYMUM-ohDzjWYs0K7BCEpf3MEsNhg3amxoLAhC7MKJj4SNaBw46qTiTew4Nyi_143yO7niPw5KGBqm3KdBUoDDc7ot7OLOvlKKN9252jgkZdTkpalT9b5i3rbdx5npqWsFN_EmbLTdNhwnw_DHs1T0ALG-tDegnEr46-h6iQ';
+    }
+
+    private function generateAccessTokenCacheKey(RegistrationInterface $registration, array $scopes = []):string
+    {
+        return sprintf(
+            '%s-%s-%s',
+            'lti1p3-service-client-token',
+            $registration->getIdentifier(),
+            sha1(implode('', $scopes))
+        );
     }
 }
