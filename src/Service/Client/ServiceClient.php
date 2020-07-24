@@ -103,7 +103,12 @@ class ServiceClient implements ServiceClientInterface
     private function getAccessToken(RegistrationInterface $registration, array $scopes): string
     {
         try {
-            $cacheKey = sprintf('%s-%s', self::CACHE_PREFIX, $registration->getIdentifier());
+            $cacheKey = sprintf(
+                '%s-%s-%s',
+                self::CACHE_PREFIX,
+                $registration->getIdentifier(),
+                sha1(implode('', $scopes))
+            );
 
             if ($this->cache) {
                 $item = $this->cache->getItem($cacheKey);
