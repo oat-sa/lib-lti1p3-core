@@ -103,18 +103,96 @@ class LtiLaunchRequestValidator
             }
 
             $this
-                ->validateMessageSignature($registration, $ltiMessage)
                 ->validateMessageExpiry($ltiMessage)
+                ->validateMessageKid($ltiMessage)
+                ->validateMessageVersion($ltiMessage)
+                ->validateMessageType($ltiMessage)
+                ->validateMessageRoles($ltiMessage)
+                ->validateMessageResourceLinkId($ltiMessage)
+                ->validateMessageUserIdentifier($ltiMessage)
+                ->validateMessageSignature($registration, $ltiMessage)
                 ->validateMessageNonce($ltiMessage)
                 ->validateMessageDeploymentId($registration, $ltiMessage)
-                ->validateStateSignature($registration, $oidcState)
-                ->validateStateExpiry($oidcState);
+                ->validateStateExpiry($oidcState)
+                ->validateStateSignature($registration, $oidcState);
 
             return new LtiLaunchRequestValidationResult($registration, $ltiMessage, $oidcState, $this->successes);
 
         } catch (Throwable $exception) {
             return new LtiLaunchRequestValidationResult(null, null, null, $this->successes, $exception->getMessage());
         }
+    }
+
+    /**
+     * @throws LtiException
+     */
+    private function validateMessageKid(LtiMessageInterface $ltiMessage): self
+    {
+        if (!$ltiMessage->getToken()->hasHeader(LtiMessageInterface::HEADER_KID)) {
+            throw new LtiException('JWT id_token kid header is missing');
+        }
+
+        return $this->addSuccess('JWT id_token kid header is provided');
+    }
+
+    /**
+     * @throws LtiException
+     */
+    private function validateMessageVersion(LtiMessageInterface $ltiMessage): self
+    {
+        if ($ltiMessage->getVersion() !== LtiMessageInterface::LTI_VERSION) {
+            throw new LtiException('JWT id_token version claim is invalid');
+        }
+
+        return $this->addSuccess('JWT id_token version claim is valid');
+    }
+
+    /**
+     * @throws LtiException
+     */
+    private function validateMessageType(LtiMessageInterface $ltiMessage): self
+    {
+        if ($ltiMessage->getMessageType() === '') {
+            throw new LtiException('JWT id_token message_type claim is invalid');
+        }
+
+        return $this->addSuccess('JWT id_token message_type claim is valid');
+    }
+
+    /**
+     * @throws LtiException
+     */
+    private function validateMessageRoles(LtiMessageInterface $ltiMessage): self
+    {
+        if (!is_array($ltiMessage->getRoles())) {
+            throw new LtiException('JWT id_token roles claim is invalid');
+        }
+
+        return $this->addSuccess('JWT id_token roles claim is valid');
+    }
+
+    /**
+     * @throws LtiException
+     */
+    private function validateMessageResourceLinkId(LtiMessageInterface $ltiMessage): self
+    {
+        if ($ltiMessage->getResourceLink()->getId() === '') {
+            throw new LtiException('JWT id_token resource_link id claim is invalid');
+        }
+
+        return $this->addSuccess('JWT id_token resource_link id claim is valid');
+    }
+
+    /**
+     * @throws LtiException
+     */
+    private function validateMessageUserIdentifier(LtiMessageInterface $ltiMessage): self
+    {
+        if ($ltiMessage->getUserIdentity()->getIdentifier() === '') {
+            throw new LtiException('JWT id_token user identifier (sub) claim is invalid');
+        }
+
+        return $this->addSuccess('JWT id_token user identifier (sub) claim is valid');
     }
 
     /**

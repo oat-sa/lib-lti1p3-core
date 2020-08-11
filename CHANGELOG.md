@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.1.0
+-----
+
+* Added LTI version check on launch
+* Fixed JWT validations to test expiry first, to spare useless checks
+
 2.0.4
 -----
 

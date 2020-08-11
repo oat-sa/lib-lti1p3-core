@@ -90,12 +90,12 @@ class OidcLoginAuthenticator
                 throw new LtiException('Invalid message hint registration id claim');
             }
 
-            if (!$originalMessage->getToken()->verify($this->signer, $registration->getPlatformKeyChain()->getPublicKey())) {
-               throw new LtiException('Invalid message hint signature');
-            }
-
             if ($originalMessage->getToken()->isExpired()) {
                 throw new LtiException('Message hint expired');
+            }
+
+            if (!$originalMessage->getToken()->verify($this->signer, $registration->getPlatformKeyChain()->getPublicKey())) {
+               throw new LtiException('Invalid message hint signature');
             }
 
             $originalResourceLink = new ResourceLink(
