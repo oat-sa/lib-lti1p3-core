@@ -1,10 +1,15 @@
 CHANGELOG
 =========
 
+2.2.0
+-----
+
+* Added `UserIdentityFactory`
+
 2.1.0
 -----
 
-* Added additional properties handling to the UserIdentity
+* Added additional properties handling to the `UserIdentity`
 * Added NRPS claim handling
 * Adapted JWT validations to test expiry first, to spare useless checks
 * Adapted tool message validator to match IMS certification requirements
