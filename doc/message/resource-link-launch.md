@@ -71,10 +71,10 @@ You can also create a user launch request by providing to the builder your own [
 ```php
 <?php
 
-use OAT\Library\Lti1p3Core\User\UserIdentity;
+use OAT\Library\Lti1p3Core\User\UserIdentityFactory;
 
 // Provide your user identity
-$userIdentity = new UserIdentity(
+$userIdentity = (new UserIdentityFactory())->create(
     'userIdentifier',
     'userName',
     'user@email.com'
@@ -91,6 +91,7 @@ $launchRequest = $builder->buildUserResourceLinkLtiLaunchRequest(
     ]
 );
 ```
+**Note**: you can use the provided [UserIdentityFactory](../../src/User/UserIdentityFactory.php) to help user identities creation.
 
 As a result of the build, you get a [LtiLaunchRequest](../../src/Launch/Request/LtiLaunchRequest.php) instance that can be used in several ways:
 ```php
