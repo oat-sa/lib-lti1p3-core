@@ -45,9 +45,10 @@ trait DomainTestingTrait
         string $familyName = 'userFamilyName',
         string $middleName = 'userMiddleName',
         string $locale = 'userLocale',
-        string $picture = 'userPicture'
+        string $picture = 'userPicture',
+        array $additionalProperties = []
     ): UserIdentity {
-        return new UserIdentity($identifier, $name, $email, $givenName, $familyName, $middleName, $locale, $picture);
+        return new UserIdentity($identifier, $name, $email, $givenName, $familyName, $middleName, $locale, $picture, $additionalProperties);
     }
 
     private function createTestPlatform(

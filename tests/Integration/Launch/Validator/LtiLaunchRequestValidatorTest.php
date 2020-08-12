@@ -27,9 +27,10 @@ use Exception;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Signer\Hmac\Sha384;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
+use OAT\Library\Lti1p3Core\Link\ResourceLink\ResourceLinkInterface;
+use OAT\Library\Lti1p3Core\Message\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
-use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Launch\Builder\LtiLaunchRequestBuilder;
 use OAT\Library\Lti1p3Core\Launch\Builder\OidcLaunchRequestBuilder;
 use OAT\Library\Lti1p3Core\Launch\Validator\LtiLaunchRequestValidationResult;
@@ -40,9 +41,6 @@ use OAT\Library\Lti1p3Core\Message\MessageInterface;
 use OAT\Library\Lti1p3Core\Security\Jwks\Fetcher\JwksFetcherInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\Nonce;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceGeneratorInterface;
-use OAT\Library\Lti1p3Core\Security\Nonce\NonceInterface;
-use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepository;
-use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Oidc\Endpoint\OidcLoginAuthenticator;
 use OAT\Library\Lti1p3Core\Security\Oidc\Endpoint\OidcLoginInitiator;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
@@ -75,10 +73,16 @@ class LtiLaunchRequestValidatorTest extends TestCase
         $this->assertNull($result->getError());
         $this->assertEquals(
             [
-                'JWT id_token signature validation success',
                 'JWT id_token is not expired',
+                'JWT id_token kid header is provided',
+                'JWT id_token version claim is valid',
+                'JWT id_token message_type claim is valid',
+                'JWT id_token roles claim is valid',
+                'JWT id_token resource_link id claim is valid',
+                'JWT id_token user identifier (sub) claim is valid',
+                'JWT id_token signature validation success',
                 'JWT id_token nonce is valid',
-                'JWT id_token deployment_id claim valid for this registration'
+                'JWT id_token deployment_id claim valid for this registration',
             ],
             $result->getSuccesses()
         );
@@ -115,10 +119,16 @@ class LtiLaunchRequestValidatorTest extends TestCase
         $this->assertNull($result->getError());
         $this->assertEquals(
             [
-                'JWT id_token signature validation success',
                 'JWT id_token is not expired',
+                'JWT id_token kid header is provided',
+                'JWT id_token version claim is valid',
+                'JWT id_token message_type claim is valid',
+                'JWT id_token roles claim is valid',
+                'JWT id_token resource_link id claim is valid',
+                'JWT id_token user identifier (sub) claim is valid',
+                'JWT id_token signature validation success',
                 'JWT id_token nonce is valid',
-                'JWT id_token deployment_id claim valid for this registration'
+                'JWT id_token deployment_id claim valid for this registration',
             ],
             $result->getSuccesses()
         );
@@ -173,12 +183,18 @@ class LtiLaunchRequestValidatorTest extends TestCase
         $this->assertNull($result->getError());
         $this->assertEquals(
             [
-                'JWT id_token signature validation success',
                 'JWT id_token is not expired',
+                'JWT id_token kid header is provided',
+                'JWT id_token version claim is valid',
+                'JWT id_token message_type claim is valid',
+                'JWT id_token roles claim is valid',
+                'JWT id_token resource_link id claim is valid',
+                'JWT id_token user identifier (sub) claim is valid',
+                'JWT id_token signature validation success',
                 'JWT id_token nonce is valid',
                 'JWT id_token deployment_id claim valid for this registration',
+                'JWT OIDC state is not expired',
                 'JWT OIDC state signature validation success',
-                'JWT OIDC state is not expired'
             ],
             $result->getSuccesses()
         );
@@ -227,12 +243,18 @@ class LtiLaunchRequestValidatorTest extends TestCase
         $this->assertNull($result->getError());
         $this->assertEquals(
             [
-                'JWT id_token signature validation success',
                 'JWT id_token is not expired',
+                'JWT id_token kid header is provided',
+                'JWT id_token version claim is valid',
+                'JWT id_token message_type claim is valid',
+                'JWT id_token roles claim is valid',
+                'JWT id_token resource_link id claim is valid',
+                'JWT id_token user identifier (sub) claim is valid',
+                'JWT id_token signature validation success',
                 'JWT id_token nonce is valid',
                 'JWT id_token deployment_id claim valid for this registration',
+                'JWT OIDC state is not expired',
                 'JWT OIDC state signature validation success',
-                'JWT OIDC state is not expired'
             ],
             $result->getSuccesses()
         );
@@ -272,10 +294,16 @@ class LtiLaunchRequestValidatorTest extends TestCase
         $this->assertNull($result->getError());
         $this->assertEquals(
             [
-                'JWT id_token signature validation success',
                 'JWT id_token is not expired',
+                'JWT id_token kid header is provided',
+                'JWT id_token version claim is valid',
+                'JWT id_token message_type claim is valid',
+                'JWT id_token roles claim is valid',
+                'JWT id_token resource_link id claim is valid',
+                'JWT id_token user identifier (sub) claim is valid',
+                'JWT id_token signature validation success',
                 'JWT id_token nonce already used but expired',
-                'JWT id_token deployment_id claim valid for this registration'
+                'JWT id_token deployment_id claim valid for this registration',
             ],
             $result->getSuccesses()
         );
@@ -403,6 +431,174 @@ class LtiLaunchRequestValidatorTest extends TestCase
         $this->assertInstanceOf(LtiLaunchRequestValidationResult::class, $result);
         $this->assertTrue($result->hasError());
         $this->assertEquals('JWT id_token nonce already used', $result->getError());
+    }
+
+    public function testValidationFailureOnMissingKid(): void
+    {
+        $subject = new LtiLaunchRequestValidator(
+            $this->createTestRegistrationRepository(),
+            $this->createTestNonceRepository()
+        );
+
+        $registration = $this->createTestRegistration();
+
+        $token = (new Builder())
+            ->withClaim(MessageInterface::CLAIM_ISS, $registration->getPlatform()->getAudience())
+            ->withClaim(MessageInterface::CLAIM_AUD, $registration->getClientId())
+            ->getToken();
+
+        $result = $subject->validate($this->createServerRequest(
+            'GET',
+            sprintf('http://tool.com/launch?id_token=%s', $token->__toString())
+        ));
+
+        $this->assertInstanceOf(LtiLaunchRequestValidationResult::class, $result);
+        $this->assertTrue($result->hasError());
+        $this->assertEquals('JWT id_token kid header is missing', $result->getError());
+    }
+
+    public function testValidationFailureOnInvalidVersion(): void
+    {
+        $subject = new LtiLaunchRequestValidator(
+            $this->createTestRegistrationRepository(),
+            $this->createTestNonceRepository()
+        );
+
+        $registration = $this->createTestRegistration();
+
+        $token = (new Builder())
+            ->withHeader(MessageInterface::HEADER_KID, 'kid')
+            ->withClaim(MessageInterface::CLAIM_ISS, $registration->getPlatform()->getAudience())
+            ->withClaim(MessageInterface::CLAIM_AUD, $registration->getClientId())
+            ->withClaim(LtiMessageInterface::CLAIM_LTI_VERSION, 'invalid')
+            ->getToken();
+
+        $result = $subject->validate($this->createServerRequest(
+            'GET',
+            sprintf('http://tool.com/launch?id_token=%s', $token->__toString())
+        ));
+
+        $this->assertInstanceOf(LtiLaunchRequestValidationResult::class, $result);
+        $this->assertTrue($result->hasError());
+        $this->assertEquals('JWT id_token version claim is invalid', $result->getError());
+    }
+
+    public function testValidationFailureOnInvalidMessageType(): void
+    {
+        $subject = new LtiLaunchRequestValidator(
+            $this->createTestRegistrationRepository(),
+            $this->createTestNonceRepository()
+        );
+
+        $registration = $this->createTestRegistration();
+
+        $token = (new Builder())
+            ->withHeader(MessageInterface::HEADER_KID, 'kid')
+            ->withClaim(MessageInterface::CLAIM_ISS, $registration->getPlatform()->getAudience())
+            ->withClaim(MessageInterface::CLAIM_AUD, $registration->getClientId())
+            ->withClaim(LtiMessageInterface::CLAIM_LTI_VERSION, LtiMessageInterface::LTI_VERSION)
+            ->withClaim(LtiMessageInterface::CLAIM_LTI_MESSAGE_TYPE, '')
+            ->getToken();
+
+        $result = $subject->validate($this->createServerRequest(
+            'GET',
+            sprintf('http://tool.com/launch?id_token=%s', $token->__toString())
+        ));
+
+        $this->assertInstanceOf(LtiLaunchRequestValidationResult::class, $result);
+        $this->assertTrue($result->hasError());
+        $this->assertEquals('JWT id_token message_type claim is invalid', $result->getError());
+    }
+
+    public function testValidationFailureOnInvalidRoles(): void
+    {
+        $subject = new LtiLaunchRequestValidator(
+            $this->createTestRegistrationRepository(),
+            $this->createTestNonceRepository()
+        );
+
+        $registration = $this->createTestRegistration();
+
+        $token = (new Builder())
+            ->withHeader(MessageInterface::HEADER_KID, 'kid')
+            ->withClaim(MessageInterface::CLAIM_ISS, $registration->getPlatform()->getAudience())
+            ->withClaim(MessageInterface::CLAIM_AUD, $registration->getClientId())
+            ->withClaim(LtiMessageInterface::CLAIM_LTI_VERSION, LtiMessageInterface::LTI_VERSION)
+            ->withClaim(LtiMessageInterface::CLAIM_LTI_MESSAGE_TYPE, ResourceLinkInterface::TYPE)
+            ->withClaim(LtiMessageInterface::CLAIM_LTI_ROLES, '')
+            ->getToken();
+
+        $result = $subject->validate($this->createServerRequest(
+            'GET',
+            sprintf('http://tool.com/launch?id_token=%s', $token->__toString())
+        ));
+
+        $this->assertInstanceOf(LtiLaunchRequestValidationResult::class, $result);
+        $this->assertTrue($result->hasError());
+        $this->assertEquals('JWT id_token roles claim is invalid', $result->getError());
+    }
+
+    public function testValidationFailureOnInvalidResourceLinkId(): void
+    {
+        $subject = new LtiLaunchRequestValidator(
+            $this->createTestRegistrationRepository(),
+            $this->createTestNonceRepository()
+        );
+
+        $registration = $this->createTestRegistration();
+
+        $token = (new Builder())
+            ->withHeader(MessageInterface::HEADER_KID, 'kid')
+            ->withClaim(MessageInterface::CLAIM_ISS, $registration->getPlatform()->getAudience())
+            ->withClaim(MessageInterface::CLAIM_AUD, $registration->getClientId())
+            ->withClaim(LtiMessageInterface::CLAIM_LTI_VERSION, LtiMessageInterface::LTI_VERSION)
+            ->withClaim(LtiMessageInterface::CLAIM_LTI_MESSAGE_TYPE, ResourceLinkInterface::TYPE)
+            ->withClaim(LtiMessageInterface::CLAIM_LTI_RESOURCE_LINK, ['id' => ''])
+            ->withClaim(LtiMessageInterface::CLAIM_LTI_DEPLOYMENT_ID, $registration->getDefaultDeploymentId())
+            ->withClaim(LtiMessageInterface::CLAIM_NONCE, 'nonce')
+            ->withClaim(LtiMessageInterface::CLAIM_LTI_ROLES, [])
+            ->getToken(new Sha256(), $registration->getPlatformKeyChain()->getPrivateKey());
+
+        $result = $subject->validate($this->createServerRequest(
+            'GET',
+            sprintf('http://tool.com/launch?id_token=%s', $token->__toString())
+        ));
+
+        $this->assertInstanceOf(LtiLaunchRequestValidationResult::class, $result);
+        $this->assertTrue($result->hasError());
+        $this->assertEquals('JWT id_token resource_link id claim is invalid', $result->getError());
+    }
+
+    public function testValidationFailureOnInvalidUserIdentifier(): void
+    {
+        $subject = new LtiLaunchRequestValidator(
+            $this->createTestRegistrationRepository(),
+            $this->createTestNonceRepository()
+        );
+
+        $registration = $this->createTestRegistration();
+
+        $token = (new Builder())
+            ->withHeader(MessageInterface::HEADER_KID, 'kid')
+            ->withClaim(MessageInterface::CLAIM_ISS, $registration->getPlatform()->getAudience())
+            ->withClaim(MessageInterface::CLAIM_AUD, $registration->getClientId())
+            ->withClaim(LtiMessageInterface::CLAIM_LTI_VERSION, LtiMessageInterface::LTI_VERSION)
+            ->withClaim(LtiMessageInterface::CLAIM_LTI_MESSAGE_TYPE, ResourceLinkInterface::TYPE)
+            ->withClaim(LtiMessageInterface::CLAIM_LTI_RESOURCE_LINK, (new ResourceLinkClaim('identifier'))->normalize())
+            ->withClaim(LtiMessageInterface::CLAIM_LTI_DEPLOYMENT_ID, $registration->getDefaultDeploymentId())
+            ->withClaim(LtiMessageInterface::CLAIM_NONCE, 'nonce')
+            ->withClaim(LtiMessageInterface::CLAIM_LTI_ROLES, [])
+            ->withClaim(LtiMessageInterface::CLAIM_SUB, '')
+            ->getToken(new Sha256(), $registration->getPlatformKeyChain()->getPrivateKey());
+
+        $result = $subject->validate($this->createServerRequest(
+            'GET',
+            sprintf('http://tool.com/launch?id_token=%s', $token->__toString())
+        ));
+
+        $this->assertInstanceOf(LtiLaunchRequestValidationResult::class, $result);
+        $this->assertTrue($result->hasError());
+        $this->assertEquals('JWT id_token user identifier (sub) claim is invalid', $result->getError());
     }
 
     public function testValidationFailureOnInvalidOidcStateSignature(): void
