@@ -1,17 +1,12 @@
 CHANGELOG
 =========
 
-2.2.0
------
-
-* Added additional properties handling to the UserIdentity
-* Adapted tool message validator to match IMS certification requirements
-
 2.1.0
 -----
 
-* Added LTI version check on launch
+* Added additional properties handling to the UserIdentity
 * Fixed JWT validations to test expiry first, to spare useless checks
+* Adapted tool message validator to match IMS certification requirements
 
 2.0.4
 -----
