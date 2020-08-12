@@ -42,5 +42,9 @@ interface UserIdentityInterface
 
     public function getPicture(): ?string;
 
+    public function getAdditionalProperties(): array;
+
+    public function getAdditionalProperty(string $propertyName, string $default = null): ?string;
+
     public function normalize(): array;
 }

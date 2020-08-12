@@ -50,6 +50,9 @@ class UserIdentity implements UserIdentityInterface
     /** @var string|null */
     private $picture;
 
+    /** @var string[] */
+    private $additionalProperties;
+
     public function __construct(
         string $identifier,
         string $name = null,
@@ -58,7 +61,8 @@ class UserIdentity implements UserIdentityInterface
         string $familyName = null,
         string $middleName = null,
         string $locale = null,
-        string $picture = null
+        string $picture = null,
+        array $additionalProperties = []
     ) {
         $this->identifier = $identifier;
         $this->name = $name;
@@ -68,6 +72,7 @@ class UserIdentity implements UserIdentityInterface
         $this->middleName = $middleName;
         $this->locale = $locale;
         $this->picture = $picture;
+        $this->additionalProperties = $additionalProperties;
     }
 
     public function getIdentifier(): string
@@ -110,6 +115,16 @@ class UserIdentity implements UserIdentityInterface
         return $this->picture;
     }
 
+    public function getAdditionalProperties(): array
+    {
+        return $this->additionalProperties;
+    }
+
+    public function getAdditionalProperty(string $propertyName, ?string $default = null): ?string
+    {
+        return $this->additionalProperties[$propertyName] ?? $default;
+    }
+
     public function normalize(): array
     {
         return array_filter([
@@ -121,6 +136,6 @@ class UserIdentity implements UserIdentityInterface
             'middle_name' => $this->getMiddleName(),
             'locale' => $this->getLocale(),
             'picture' => $this->getPicture(),
-        ]);
+        ] + $this->additionalProperties);
     }
 }
