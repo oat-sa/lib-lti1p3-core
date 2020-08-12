@@ -55,6 +55,9 @@ interface LtiMessageInterface extends MessageInterface
     // LTI AGS claim
     public const CLAIM_LTI_AGS = 'https://purl.imsglobal.org/spec/lti-ags/claim/endpoint';
 
+    // LTI NRPS claim
+    public const CLAIM_LTI_NRPS = 'https://purl.imsglobal.org/spec/lti-nrps/claim/namesroleservice';
+
     public function getMessageType(): string;
 
     public function getVersion(): string;

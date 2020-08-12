@@ -5,7 +5,8 @@ CHANGELOG
 -----
 
 * Added additional properties handling to the UserIdentity
-* Fixed JWT validations to test expiry first, to spare useless checks
+* Added NRPS claim handling
+* Adapted JWT validations to test expiry first, to spare useless checks
 * Adapted tool message validator to match IMS certification requirements
 
 2.0.4
