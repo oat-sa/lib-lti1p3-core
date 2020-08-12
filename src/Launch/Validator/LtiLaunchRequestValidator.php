@@ -164,7 +164,7 @@ class LtiLaunchRequestValidator
      */
     private function validateMessageRoles(LtiMessageInterface $ltiMessage): self
     {
-        if (!is_array($ltiMessage->getRoles())) {
+        if (!is_array($ltiMessage->getToken()->getClaim(LtiMessageInterface::CLAIM_LTI_ROLES))) {
             throw new LtiException('JWT id_token roles claim is invalid');
         }
 
@@ -188,7 +188,7 @@ class LtiLaunchRequestValidator
      */
     private function validateMessageUserIdentifier(LtiMessageInterface $ltiMessage): self
     {
-        if ($ltiMessage->getUserIdentity()->getIdentifier() === '') {
+        if ($ltiMessage->getUserIdentity() && $ltiMessage->getUserIdentity()->getIdentifier() === '') {
             throw new LtiException('JWT id_token user identifier (sub) claim is invalid');
         }
 

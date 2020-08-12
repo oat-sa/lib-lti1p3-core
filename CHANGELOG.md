@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.2.0
+-----
+
+* Added additional properties handling to the UserIdentity
+* Adapted tool message validator to match IMS certification requirements
+
 2.1.0
 -----
 
