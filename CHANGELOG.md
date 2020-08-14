@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.3.0
+-----
+
+* Added `UserIdentityFactoryInterface`
+* Added NRPS claim getter on `LtiMessageInterface`
+
 2.2.0
 -----
 

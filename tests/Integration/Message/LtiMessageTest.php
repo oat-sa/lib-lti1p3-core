@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Integration\Message;
 
 use OAT\Library\Lti1p3Core\Message\Claim\AgsClaim;
+use OAT\Library\Lti1p3Core\Message\Claim\NrpsClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Launch\Builder\LtiLaunchRequestBuilder;
 use OAT\Library\Lti1p3Core\Link\ResourceLink\ResourceLink;
@@ -82,6 +83,7 @@ class LtiMessageTest extends TestCase
                     new LaunchPresentationClaim('document_target'),
                     new LisClaim('course_offering_sourcedid'),
                     new AgsClaim(['scope'], 'line_items_container_url'),
+                    new NrpsClaim('context_membership_url', ['1.0', '2.0']),
                     'aaa' => 'bbb'
                 ]
             )->getLtiMessage();
@@ -164,5 +166,12 @@ class LtiMessageTest extends TestCase
         $this->assertInstanceOf(AgsClaim::class, $this->subject->getAgs());
         $this->assertEquals(['scope'], $this->subject->getAgs()->getScopes());
         $this->assertEquals('line_items_container_url', $this->subject->getAgs()->getLineItemsContainerUrl());
+    }
+
+    public function testGetNrps(): void
+    {
+        $this->assertInstanceOf(NrpsClaim::class, $this->subject->getNrps());
+        $this->assertEquals('context_membership_url', $this->subject->getNrps()->getContextMembershipsUrl());
+        $this->assertEquals(['1.0', '2.0'], $this->subject->getNrps()->getServiceVersions());
     }
 }

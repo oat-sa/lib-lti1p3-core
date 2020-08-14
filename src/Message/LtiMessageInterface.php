@@ -26,6 +26,7 @@ use OAT\Library\Lti1p3Core\Message\Claim\AgsClaim;
 use OAT\Library\Lti1p3Core\Message\Claim\ContextClaim;
 use OAT\Library\Lti1p3Core\Message\Claim\LaunchPresentationClaim;
 use OAT\Library\Lti1p3Core\Message\Claim\LisClaim;
+use OAT\Library\Lti1p3Core\Message\Claim\NrpsClaim;
 use OAT\Library\Lti1p3Core\Message\Claim\PlatformInstanceClaim;
 use OAT\Library\Lti1p3Core\Message\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\User\UserIdentityInterface;
@@ -85,4 +86,6 @@ interface LtiMessageInterface extends MessageInterface
     public function getUserIdentity(): ?UserIdentityInterface;
 
     public function getAgs(): ?AgsClaim;
+
+    public function getNrps(): ?NrpsClaim;
 }
