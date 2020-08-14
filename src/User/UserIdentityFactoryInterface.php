@@ -21,7 +21,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\User;
 
-class UserIdentityFactory implements UserIdentityFactoryInterface
+interface UserIdentityFactoryInterface
 {
     public function create(
         string $identifier,
@@ -33,17 +33,5 @@ class UserIdentityFactory implements UserIdentityFactoryInterface
         string $locale = null,
         string $picture = null,
         array $additionalProperties = []
-    ): UserIdentityInterface {
-        return new UserIdentity(
-            $identifier,
-            $name,
-            $email,
-            $givenName,
-            $familyName,
-            $middleName,
-            $locale,
-            $picture,
-            $additionalProperties
-        );
-    }
+    ): UserIdentityInterface;
 }
