@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.4.0
+-----
+
+* Added Basic Outcome claim handling
+
 2.3.0
 -----
 

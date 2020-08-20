@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Integration\Message;
 
 use OAT\Library\Lti1p3Core\Message\Claim\AgsClaim;
+use OAT\Library\Lti1p3Core\Message\Claim\BasicOutcomeClaim;
 use OAT\Library\Lti1p3Core\Message\Claim\NrpsClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Launch\Builder\LtiLaunchRequestBuilder;
@@ -84,6 +85,7 @@ class LtiMessageTest extends TestCase
                     new LisClaim('course_offering_sourcedid'),
                     new AgsClaim(['scope'], 'line_items_container_url'),
                     new NrpsClaim('context_membership_url', ['1.0', '2.0']),
+                    new BasicOutcomeClaim('id', 'url'),
                     'aaa' => 'bbb'
                 ]
             )->getLtiMessage();
@@ -173,5 +175,12 @@ class LtiMessageTest extends TestCase
         $this->assertInstanceOf(NrpsClaim::class, $this->subject->getNrps());
         $this->assertEquals('context_membership_url', $this->subject->getNrps()->getContextMembershipsUrl());
         $this->assertEquals(['1.0', '2.0'], $this->subject->getNrps()->getServiceVersions());
+    }
+
+    public function testGetBasicOutcome(): void
+    {
+        $this->assertInstanceOf(BasicOutcomeClaim::class, $this->subject->getBasicOutcome());
+        $this->assertEquals('id', $this->subject->getBasicOutcome()->getLisResultSourcedId());
+        $this->assertEquals('url', $this->subject->getBasicOutcome()->getLisOutcomeServiceUrl());
     }
 }

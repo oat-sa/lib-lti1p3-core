@@ -24,6 +24,7 @@ namespace OAT\Library\Lti1p3Core\Message;
 
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Message\Claim\AgsClaim;
+use OAT\Library\Lti1p3Core\Message\Claim\BasicOutcomeClaim;
 use OAT\Library\Lti1p3Core\Message\Claim\ContextClaim;
 use OAT\Library\Lti1p3Core\Message\Claim\LaunchPresentationClaim;
 use OAT\Library\Lti1p3Core\Message\Claim\LisClaim;
@@ -142,5 +143,10 @@ class LtiMessage extends Message implements LtiMessageInterface
     public function getNrps(): ?NrpsClaim
     {
         return $this->getClaim(NrpsClaim::class);
+    }
+
+    public function getBasicOutcome(): ?BasicOutcomeClaim
+    {
+        return $this->getClaim(BasicOutcomeClaim::class);
     }
 }
