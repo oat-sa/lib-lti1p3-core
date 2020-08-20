@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Message;
 
 use OAT\Library\Lti1p3Core\Message\Claim\AgsClaim;
+use OAT\Library\Lti1p3Core\Message\Claim\BasicOutcomeClaim;
 use OAT\Library\Lti1p3Core\Message\Claim\ContextClaim;
 use OAT\Library\Lti1p3Core\Message\Claim\LaunchPresentationClaim;
 use OAT\Library\Lti1p3Core\Message\Claim\LisClaim;
@@ -59,6 +60,9 @@ interface LtiMessageInterface extends MessageInterface
     // LTI NRPS claim
     public const CLAIM_LTI_NRPS = 'https://purl.imsglobal.org/spec/lti-nrps/claim/namesroleservice';
 
+    // LTI Basic Outcome claim
+    public const CLAIM_LTI_BASIC_OUTCOME = 'https://purl.imsglobal.org/spec/lti-bo/claim/basicoutcome';
+
     public function getMessageType(): string;
 
     public function getVersion(): string;
@@ -88,4 +92,6 @@ interface LtiMessageInterface extends MessageInterface
     public function getAgs(): ?AgsClaim;
 
     public function getNrps(): ?NrpsClaim;
+
+    public function getBasicOutcome(): ?BasicOutcomeClaim;
 }
