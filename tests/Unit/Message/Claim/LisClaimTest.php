@@ -22,18 +22,18 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Message\Claim;
 
-use OAT\Library\Lti1p3Core\Message\Claim\LisClaim;
-use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+use OAT\Library\Lti1p3Core\Token\Claim\LisTokenClaim;
+use OAT\Library\Lti1p3Core\Token\LtiMessageTokenInterface;
 use PHPUnit\Framework\TestCase;
 
 class LisClaimTest extends TestCase
 {
-    /** @var LisClaim */
+    /** @var LisTokenClaim */
     private $subject;
 
     public function setUp(): void
     {
-        $this->subject = new LisClaim(
+        $this->subject = new LisTokenClaim(
             'course_offering_sourcedid',
             'course_section_sourcedid',
             'outcome_service_url',
@@ -44,7 +44,7 @@ class LisClaimTest extends TestCase
 
     public function testGetClaimName(): void
     {
-        $this->assertEquals(LtiMessageInterface::CLAIM_LTI_LIS, $this->subject::getClaimName());
+        $this->assertEquals(LtiMessageTokenInterface::CLAIM_LTI_LIS, $this->subject::getClaimName());
     }
 
     public function testGetters(): void
@@ -72,7 +72,7 @@ class LisClaimTest extends TestCase
 
     public function testDenormalisation(): void
     {
-        $denormalisation = LisClaim::denormalize([
+        $denormalisation = LisTokenClaim::denormalize([
             'course_offering_sourcedid' => 'course_offering_sourcedid',
             'course_section_sourcedid' => 'course_section_sourcedid',
             'outcome_service_url' => 'outcome_service_url',
@@ -80,7 +80,7 @@ class LisClaimTest extends TestCase
             'result_sourcedid' => 'result_sourcedid'
         ]);
 
-        $this->assertInstanceOf(LisClaim::class, $denormalisation);
+        $this->assertInstanceOf(LisTokenClaim::class, $denormalisation);
         $this->assertEquals('course_offering_sourcedid', $denormalisation->getCourseOfferingSourcedId());
         $this->assertEquals('course_section_sourcedid', $denormalisation->getCourseSectionSourcedId());
         $this->assertEquals('outcome_service_url', $denormalisation->getOutcomeServiceUrl());

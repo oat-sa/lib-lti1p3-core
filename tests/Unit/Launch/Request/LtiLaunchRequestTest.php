@@ -23,7 +23,7 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Launch\Request;
 
 use OAT\Library\Lti1p3Core\Exception\LtiException;
-use OAT\Library\Lti1p3Core\Launch\Request\LtiLaunchRequest;
+use OAT\Library\Lti1p3Core\Launch\Request\LtiMessage;
 use OAT\Library\Lti1p3Core\Tests\Traits\NetworkTestingTrait;
 use PHPUnit\Framework\TestCase;
 
@@ -31,12 +31,12 @@ class LtiLaunchRequestTest extends TestCase
 {
     use NetworkTestingTrait;
 
-    /** @var LtiLaunchRequest */
+    /** @var LtiMessage */
     private $subject;
 
     public function setUp(): void
     {
-        $this->subject = new LtiLaunchRequest('http://example.com', [
+        $this->subject = new LtiMessage('http://example.com', [
             'id_token' => 'id_token',
             'state' => 'state'
         ]);
@@ -84,9 +84,9 @@ class LtiLaunchRequestTest extends TestCase
     {
         $request = $this->createServerRequest('GET', 'http://example.com?id_token=id_token&state=state');
 
-        $subject = LtiLaunchRequest::fromServerRequest($request);
+        $subject = LtiMessage::fromServerRequest($request);
 
-        $this->assertInstanceOf(LtiLaunchRequest::class, $subject);
+        $this->assertInstanceOf(LtiMessage::class, $subject);
         $this->assertEquals('http://example.com?id_token=id_token&state=state', $subject->getUrl());
         $this->assertEquals('id_token', $subject->getLtiMessage());
         $this->assertEquals('state', $subject->getOidcState());
@@ -99,9 +99,9 @@ class LtiLaunchRequestTest extends TestCase
             'state' => 'state'
         ]);
 
-        $subject = LtiLaunchRequest::fromServerRequest($request);
+        $subject = LtiMessage::fromServerRequest($request);
 
-        $this->assertInstanceOf(LtiLaunchRequest::class, $subject);
+        $this->assertInstanceOf(LtiMessage::class, $subject);
         $this->assertEquals('http://example.com', $subject->getUrl());
         $this->assertEquals('id_token', $subject->getLtiMessage());
         $this->assertEquals('state', $subject->getOidcState());
@@ -114,7 +114,7 @@ class LtiLaunchRequestTest extends TestCase
 
         $request = $this->createServerRequest('PUT', 'http://example.com');
 
-        LtiLaunchRequest::fromServerRequest($request);
+        LtiMessage::fromServerRequest($request);
     }
 
     public function testToUrl(): void

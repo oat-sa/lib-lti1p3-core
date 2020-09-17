@@ -19,9 +19,9 @@ First of all, you need to create a [ResourceLink](../../src/Link/ResourceLink/Re
 ```php
 <?php
 
-use OAT\Library\Lti1p3Core\Link\ResourceLink\ResourceLink;
+use OAT\Library\Lti1p3Core\Link\ResourceLink\LtiResourceLink;
 
-$resourceLink = new ResourceLink(
+$resourceLink = new LtiResourceLink(
     'resourceLinkIdentifier',  // [required] identifier
     'resourceLinkUrl',         // [optional] url of the resource on the tool
     'title',                   // [optional] title
@@ -42,7 +42,7 @@ To do so, you can use the [LtiLaunchRequestBuilder](../../src/Launch/Builder/Lti
 
 use OAT\Library\Lti1p3Core\Launch\Builder\LtiLaunchRequestBuilder;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
-use OAT\Library\Lti1p3Core\Message\Claim\ContextClaim;
+use OAT\Library\Lti1p3Core\Token\Claim\ContextTokenClaim;
 
 // Create the builder
 $builder = new LtiLaunchRequestBuilder();
@@ -60,7 +60,7 @@ $launchRequest = $builder->buildResourceLinkLtiLaunchRequest(
         'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner' // role
     ], 
     [
-        new ContextClaim('contextId'),     // LTI claim representing the context 
+        new ContextTokenClaim('contextId'),     // LTI claim representing the context 
         'myCustomClaim' => 'myCustomValue' // custom claim
     ]
 );
@@ -93,13 +93,13 @@ $launchRequest = $builder->buildUserResourceLinkLtiLaunchRequest(
 ```
 **Note**: you can use the provided [UserIdentityFactory](../../src/User/UserIdentityFactory.php) to help user identities creation.
 
-As a result of the build, you get a [LtiLaunchRequest](../../src/Launch/Request/LtiLaunchRequest.php) instance that can be used in several ways:
+As a result of the build, you get a [LtiLaunchRequest](../../src/Message/Launch/Request/LtiMessage.php) instance that can be used in several ways:
 ```php
 <?php
 
-use OAT\Library\Lti1p3Core\Launch\Request\LtiLaunchRequest;
+use OAT\Library\Lti1p3Core\Launch\Request\LtiMessage;
 
-/** @var LtiLaunchRequest $launchRequest */
+/** @var LtiMessage $launchRequest */
 
 // Main properties you can use as you want to offer the launch to the platform users
 echo $launchRequest->getUrl();        // url of the launch
@@ -130,7 +130,7 @@ By example:
 ```php
 <?php
 
-use OAT\Library\Lti1p3Core\Launch\Validator\LtiLaunchRequestValidator;
+use OAT\Library\Lti1p3Core\Launch\Validator\LtiResourceLinkLaunchRequestValidator;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepositoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -145,7 +145,7 @@ $nonceRepository = ...
 $request = ...
 
 // Create the validator
-$validator = new LtiLaunchRequestValidator($registrationRepository, $nonceRepository);
+$validator = new LtiResourceLinkLaunchRequestValidator($registrationRepository, $nonceRepository);
 
 // Perform validation
 $result = $validator->validate($request);

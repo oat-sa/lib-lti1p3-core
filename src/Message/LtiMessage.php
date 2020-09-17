@@ -23,130 +23,106 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Message;
 
 use OAT\Library\Lti1p3Core\Exception\LtiException;
-use OAT\Library\Lti1p3Core\Message\Claim\AgsClaim;
-use OAT\Library\Lti1p3Core\Message\Claim\BasicOutcomeClaim;
-use OAT\Library\Lti1p3Core\Message\Claim\ContextClaim;
-use OAT\Library\Lti1p3Core\Message\Claim\LaunchPresentationClaim;
-use OAT\Library\Lti1p3Core\Message\Claim\LisClaim;
-use OAT\Library\Lti1p3Core\Message\Claim\NrpsClaim;
-use OAT\Library\Lti1p3Core\Message\Claim\PlatformInstanceClaim;
-use OAT\Library\Lti1p3Core\Message\Claim\ResourceLinkClaim;
-use OAT\Library\Lti1p3Core\User\UserIdentity;
-use OAT\Library\Lti1p3Core\User\UserIdentityInterface;
+use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * @see http://www.imsglobal.org/spec/lti/v1p3/#lti-message-general-details
  */
-class LtiMessage extends Message implements LtiMessageInterface
+class LtiMessage implements LtiMessageInterface
 {
-    /**
-     * @throws LtiException
-     */
-    public function getMessageType(): string
+    /** @var string */
+    private $url;
+
+    /** @var array */
+    private $parameters;
+
+    public function __construct(string $url, array $parameters = [])
     {
-        return $this->getMandatoryClaim(static::CLAIM_LTI_MESSAGE_TYPE);
+        $this->url = $url;
+        $this->parameters = $parameters;
+    }
+
+    public function getUrl(): string
+    {
+        return $this->url;
+    }
+
+    public function getParameters(): array
+    {
+        return $this->parameters;
     }
 
     /**
-     * @throws LtiException
+     * @throws LtiExceptionInterface
      */
-    public function getVersion(): string
+    public function getMandatoryParameter(string $parameterName): string
     {
-        return $this->getMandatoryClaim(static::CLAIM_LTI_VERSION);
-    }
-
-    /**
-     * @throws LtiException
-     */
-    public function getDeploymentId(): string
-    {
-        return $this->getMandatoryClaim(static::CLAIM_LTI_DEPLOYMENT_ID);
-    }
-
-    /**
-     * @throws LtiException
-     */
-    public function getTargetLinkUri(): string
-    {
-        return $this->getMandatoryClaim(static::CLAIM_LTI_TARGET_LINK_URI);
-    }
-
-    /**
-     * @throws LtiException
-     */
-    public function getResourceLink(): ResourceLinkClaim
-    {
-        return $this->getMandatoryClaim(ResourceLinkClaim::class);
-    }
-
-    /**
-     * @throws LtiException
-     */
-    public function getRoles(): array
-    {
-        return $this->getMandatoryClaim(static::CLAIM_LTI_ROLES);
-    }
-
-    public function getRoleScopeMentor(): array
-    {
-        return $this->getClaim(static::CLAIM_LTI_ROLE_SCOPE_MENTOR, []);
-    }
-
-    public function getCustom(): array
-    {
-        return $this->getClaim(static::CLAIM_LTI_CUSTOM, []);
-    }
-
-    public function getContext(): ?ContextClaim
-    {
-        return $this->getClaim(ContextClaim::class);
-    }
-
-    public function getPlatformInstance(): ?PlatformInstanceClaim
-    {
-        return $this->getClaim(PlatformInstanceClaim::class);
-    }
-
-    public function getLaunchPresentation(): ?LaunchPresentationClaim
-    {
-        return $this->getClaim(LaunchPresentationClaim::class);
-    }
-
-    public function getLis(): ?LisClaim
-    {
-        return $this->getClaim(LisClaim::class);
-    }
-
-    public function getUserIdentity(): ?UserIdentityInterface
-    {
-        if (null === $this->getClaim('sub')) {
-            return null;
+        if (!isset($this->parameters[$parameterName])) {
+            throw new LtiException(sprintf('Mandatory parameter %s cannot be found', $parameterName));
         }
 
-        return new UserIdentity(
-            (string)$this->getClaim('sub'),
-            $this->getClaim('name'),
-            $this->getClaim('email'),
-            $this->getClaim('given_name'),
-            $this->getClaim('family_name'),
-            $this->getClaim('middle_name'),
-            $this->getClaim('locale'),
-            $this->getClaim('picture')
+        return $this->parameters[$parameterName];
+    }
+
+    public function getParameter(string $parameterName, string $default = null): ?string
+    {
+        return $this->parameters[$parameterName] ?? $default;
+    }
+
+    /**
+     * @throws LtiException
+     */
+    public static function fromServerRequest(ServerRequestInterface $request): LtiMessageInterface
+    {
+        $method = strtoupper($request->getMethod());
+
+        if ($method === 'GET') {
+            parse_str($request->getUri()->getQuery(), $parameters);
+
+            return new static($request->getUri()->__toString(), $parameters);
+        }
+
+        if ($method === 'POST') {
+            return new static($request->getUri()->__toString(), $request->getParsedBody());
+        }
+
+        throw new LtiException(sprintf('Unsupported request method %s', $method));
+    }
+
+    public function toUrl(): string
+    {
+        return sprintf('%s?%s', $this->url, http_build_query(array_filter($this->getParameters())));
+    }
+
+    public function toHtmlLink(string $title, array $attributes = []): string
+    {
+        $htmlAttributes = [];
+
+        foreach ($attributes as $name => $value) {
+            $htmlAttributes[] = sprintf('%s="%s"', $name, $value);
+        }
+
+        return sprintf('<a href="%s" %s>%s</a>', $this->toUrl(), implode(' ', $htmlAttributes), $title);
+    }
+
+    public function toHtmlRedirectForm(bool $autoSubmit = true): string
+    {
+        $formInputs = [];
+        $formId = sprintf('launch_%s', md5($this->url . implode('-', $this->getParameters())));
+
+        foreach (array_filter($this->parameters) as $name => $value) {
+            $formInputs[] = sprintf('<input type="hidden" name="%s" value="%s"/>', $name, $value);
+        }
+
+        $autoSubmitScript = sprintf('<script>document.getElementById("%s").submit();</script>', $formId);
+
+        return sprintf(
+            '<form id="%s" action="%s" method="POST">%s</form>%s',
+            $formId,
+            $this->url,
+            implode('', $formInputs),
+            $autoSubmit ? $autoSubmitScript : ''
         );
-    }
-
-    public function getAgs(): ?AgsClaim
-    {
-        return $this->getClaim(AgsClaim::class);
-    }
-
-    public function getNrps(): ?NrpsClaim
-    {
-        return $this->getClaim(NrpsClaim::class);
-    }
-
-    public function getBasicOutcome(): ?BasicOutcomeClaim
-    {
-        return $this->getClaim(BasicOutcomeClaim::class);
     }
 }

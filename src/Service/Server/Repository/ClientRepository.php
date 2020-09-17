@@ -28,7 +28,7 @@ use Lcobucci\JWT\Signer;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
-use OAT\Library\Lti1p3Core\Message\MessageInterface;
+use OAT\Library\Lti1p3Core\Message\Token\MessageTokenInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Jwks\Fetcher\JwksFetcher;
 use OAT\Library\Lti1p3Core\Security\Jwks\Fetcher\JwksFetcherInterface;
@@ -120,7 +120,7 @@ class ClientRepository implements ClientRepositoryInterface
             if (null === $registration->getToolKeyChain()) {
                 $key = $this->fetcher->fetchKey(
                     $registration->getToolJwksUrl(),
-                    $token->getHeader(MessageInterface::HEADER_KID)
+                    $token->getHeader(MessageTokenInterface::HEADER_KID)
                 );
             } else {
                 $key = $registration->getToolKeyChain()->getPublicKey();

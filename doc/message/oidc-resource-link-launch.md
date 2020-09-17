@@ -21,9 +21,9 @@ First of all, you need to create a [ResourceLink](../../src/Link/ResourceLink/Re
 ```php
 <?php
 
-use OAT\Library\Lti1p3Core\Link\ResourceLink\ResourceLink;
+use OAT\Library\Lti1p3Core\Link\ResourceLink\LtiResourceLink;
 
-$resourceLink = new ResourceLink(
+$resourceLink = new LtiResourceLink(
     'resourceLinkIdentifier',  // [required] identifier
     'resourceLinkUrl',         // [optional] url of the resource on the tool
     'title',                   // [optional] title
@@ -44,7 +44,7 @@ To do so, you can use the [OidcLaunchRequestBuilder](../../src/Launch/Builder/Oi
 
 use OAT\Library\Lti1p3Core\Launch\Builder\OidcLaunchRequestBuilder;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
-use OAT\Library\Lti1p3Core\Message\Claim\ContextClaim;
+use OAT\Library\Lti1p3Core\Token\Claim\ContextTokenClaim;
 
 // Create the builder
 $builder = new OidcLaunchRequestBuilder();
@@ -63,20 +63,20 @@ $launchRequest = $builder->buildResourceLinkOidcLaunchRequest(
         'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner' // role
     ], 
     [
-        new ContextClaim('contextId'),     // LTI claim representing the context 
+        new ContextTokenClaim('contextId'),     // LTI claim representing the context 
         'myCustomClaim' => 'myCustomValue' // custom claim
     ]
 );
 ```
 **Note**: like the `ContextClaim` class, any claim that implement the [MessageClaimInterface](../../src/Message/Claim/MessageClaimInterface.php) will be automatically normalized and added to the message's claims.
 
-As a result of the build, you get a [OidcLaunchRequest](../../src/Launch/Request/OidcLaunchRequest.php) instance that can be used in several ways:
+As a result of the build, you get a [OidcLaunchRequest](../../src/Message/Launch/Request/OidcMessage.php) instance that can be used in several ways:
 ```php
 <?php
 
-use OAT\Library\Lti1p3Core\Launch\Request\OidcLaunchRequest;
+use OAT\Library\Lti1p3Core\Launch\Request\OidcMessage;
 
-/** @var OidcLaunchRequest $launchRequest */
+/** @var OidcMessage $launchRequest */
 
 // Main properties you can use as you want to offer the launch to the platform users
 echo $launchRequest->getUrl();             // url of the launch
@@ -98,7 +98,7 @@ You can find below required steps to initiate an OIDC login, needed only if you'
 
 As a tool, you'll receive an HTTP request containing the [OIDC launch request login initiation](https://www.imsglobal.org/spec/security/v1p0#step-2-authentication-request).
 
-You can use the [OidcLoginInitiator](../../src/Security/Oidc/Endpoint/OidcLoginInitiator.php) to handle this:
+You can use the [OidcLoginInitiator](../../src/Security/Oidc/OidcInitiator.php) to handle this:
 - it requires a registration repository implementation [as explained here](../quickstart/interfaces.md)
 - it expect a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface) to handle
 - and it will output a [OidcAuthenticationRequest](../../src/Security/Oidc/Request/OidcAuthenticationRequest.php) to be sent back to the platform.
@@ -136,17 +136,17 @@ You can find below required steps to authenticate an OIDC login and performing a
 
 After the redirection of the tool to the platform, the platform will receive as a HTTP request the [OidcAuthenticationRequest](../../src/Security/Oidc/Request/OidcAuthenticationRequest.php).
 
-It can be handled with the [OidcLoginAuthenticator](../../src/Security/Oidc/Endpoint/OidcLoginAuthenticator.php):
+It can be handled with the [OidcLoginAuthenticator](../../src/Security/Oidc/OidcAuthenticator.php):
 - it requires a registration repository and a user authenticator implementation [as explained here](../quickstart/interfaces.md)
 - it expect a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface) to handle
-- and it will output a [LtiLaunchRequest](../../src/Launch/Request/LtiLaunchRequest.php) to be sent back to the platform.
+- and it will output a [LtiLaunchRequest](../../src/Message/Launch/Request/LtiMessage.php) to be sent back to the platform.
 
 By example:
 ```php
 <?php
 
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
-use OAT\Library\Lti1p3Core\Security\Oidc\Endpoint\OidcLoginAuthenticator;
+use OAT\Library\Lti1p3Core\Security\Oidc\Endpoint\OidcAuthenticator;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -160,7 +160,7 @@ $userAuthenticator = ...
 $request = ...
 
 // Create the OIDC login initiator
-$authenticator = new OidcLoginAuthenticator($registrationRepository, $userAuthenticator);
+$authenticator = new OidcAuthenticator($registrationRepository, $userAuthenticator);
 
 // Perform the login authentication (delegating to the $userAuthenticator with the hint 'loginHint')
 $launchRequest = $authenticator->authenticate($request);
@@ -186,7 +186,7 @@ By example:
 ```php
 <?php
 
-use OAT\Library\Lti1p3Core\Launch\Validator\LtiLaunchRequestValidator;
+use OAT\Library\Lti1p3Core\Launch\Validator\LtiResourceLinkLaunchRequestValidator;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepositoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -201,7 +201,7 @@ $nonceRepository = ...
 $request = ...
 
 // Create the validator
-$validator = new LtiLaunchRequestValidator($registrationRepository, $nonceRepository);
+$validator = new LtiResourceLinkLaunchRequestValidator($registrationRepository, $nonceRepository);
 
 // Perform validation
 $result = $validator->validate($request);

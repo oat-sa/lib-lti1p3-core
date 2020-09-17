@@ -27,7 +27,7 @@ use Exception;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Signer\Key;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
-use OAT\Library\Lti1p3Core\Message\MessageInterface;
+use OAT\Library\Lti1p3Core\Token\MessageInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Security\Jwks\Fetcher\JwksFetcherInterface;
 use OAT\Library\Lti1p3Core\Service\Server\Entity\Client;

@@ -22,18 +22,18 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Message\Claim;
 
-use OAT\Library\Lti1p3Core\Message\Claim\PlatformInstanceClaim;
-use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+use OAT\Library\Lti1p3Core\Token\Claim\PlatformInstanceTokenClaim;
+use OAT\Library\Lti1p3Core\Token\LtiMessageTokenInterface;
 use PHPUnit\Framework\TestCase;
 
 class PlatformInstanceClaimTest extends TestCase
 {
-    /** @var PlatformInstanceClaim */
+    /** @var PlatformInstanceTokenClaim */
     private $subject;
 
     public function setUp(): void
     {
-        $this->subject = new PlatformInstanceClaim(
+        $this->subject = new PlatformInstanceTokenClaim(
             'guid',
             'contact_email',
             'description',
@@ -46,7 +46,7 @@ class PlatformInstanceClaimTest extends TestCase
 
     public function testGetClaimName(): void
     {
-        $this->assertEquals(LtiMessageInterface::CLAIM_LTI_TOOL_PLATFORM, $this->subject::getClaimName());
+        $this->assertEquals(LtiMessageTokenInterface::CLAIM_LTI_TOOL_PLATFORM, $this->subject::getClaimName());
     }
 
     public function testGetters(): void
@@ -78,7 +78,7 @@ class PlatformInstanceClaimTest extends TestCase
 
     public function testDenormalisation(): void
     {
-        $denormalisation = PlatformInstanceClaim::denormalize([
+        $denormalisation = PlatformInstanceTokenClaim::denormalize([
             'guid' => 'guid',
             'contact_email' => 'contact_email',
             'description' => 'description',
@@ -88,7 +88,7 @@ class PlatformInstanceClaimTest extends TestCase
             'version' => 'version'
         ]);
 
-        $this->assertInstanceOf(PlatformInstanceClaim::class, $denormalisation);
+        $this->assertInstanceOf(PlatformInstanceTokenClaim::class, $denormalisation);
         $this->assertEquals('guid', $denormalisation->getGuid());
         $this->assertEquals('contact_email', $denormalisation->getContactEmail());
         $this->assertEquals('description', $denormalisation->getDescription());

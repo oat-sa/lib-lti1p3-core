@@ -22,20 +22,20 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Integration\Message;
 
-use OAT\Library\Lti1p3Core\Message\Claim\AgsClaim;
-use OAT\Library\Lti1p3Core\Message\Claim\BasicOutcomeClaim;
-use OAT\Library\Lti1p3Core\Message\Claim\NrpsClaim;
+use OAT\Library\Lti1p3Core\Token\Claim\AgsClaim;
+use OAT\Library\Lti1p3Core\Token\Claim\BasicOutcomeTokenClaim;
+use OAT\Library\Lti1p3Core\Token\Claim\NrpsTokenClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Launch\Builder\LtiLaunchRequestBuilder;
-use OAT\Library\Lti1p3Core\Link\ResourceLink\ResourceLink;
+use OAT\Library\Lti1p3Core\Link\ResourceLink\LtiResourceLink;
 use OAT\Library\Lti1p3Core\Link\ResourceLink\ResourceLinkInterface;
-use OAT\Library\Lti1p3Core\Message\Claim\ContextClaim;
-use OAT\Library\Lti1p3Core\Message\Claim\LaunchPresentationClaim;
-use OAT\Library\Lti1p3Core\Message\Claim\LisClaim;
-use OAT\Library\Lti1p3Core\Message\Claim\PlatformInstanceClaim;
-use OAT\Library\Lti1p3Core\Message\Claim\ResourceLinkClaim;
-use OAT\Library\Lti1p3Core\Message\LtiMessage;
-use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+use OAT\Library\Lti1p3Core\Token\Claim\ContextTokenClaim;
+use OAT\Library\Lti1p3Core\Token\Claim\LaunchPresentationTokenClaim;
+use OAT\Library\Lti1p3Core\Token\Claim\LisTokenClaim;
+use OAT\Library\Lti1p3Core\Token\Claim\PlatformInstanceTokenClaim;
+use OAT\Library\Lti1p3Core\Token\Claim\ResourceLinkTokenClaim;
+use OAT\Library\Lti1p3Core\Token\LtiMessageToken;
+use OAT\Library\Lti1p3Core\Token\LtiMessageTokenInterface;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
 use OAT\Library\Lti1p3Core\User\UserIdentityInterface;
 use PHPUnit\Framework\TestCase;
@@ -56,7 +56,7 @@ class LtiMessageTest extends TestCase
     /** @var UserIdentityInterface */
     private $userIdentity;
 
-    /** @var LtiMessage */
+    /** @var LtiMessageToken */
     private $subject;
 
     protected function setUp(): void
@@ -77,30 +77,30 @@ class LtiMessageTest extends TestCase
                     'Learner'
                 ],
                 [
-                    LtiMessageInterface::CLAIM_LTI_ROLE_SCOPE_MENTOR => ['mentor'],
-                    LtiMessageInterface::CLAIM_LTI_CUSTOM => ['custom'],
-                    new ContextClaim('id'),
-                    new PlatformInstanceClaim('guid'),
-                    new LaunchPresentationClaim('document_target'),
-                    new LisClaim('course_offering_sourcedid'),
+                    LtiMessageTokenInterface::CLAIM_LTI_ROLE_SCOPE_MENTOR => ['mentor'],
+                    LtiMessageTokenInterface::CLAIM_LTI_CUSTOM => ['custom'],
+                    new ContextTokenClaim('id'),
+                    new PlatformInstanceTokenClaim('guid'),
+                    new LaunchPresentationTokenClaim('document_target'),
+                    new LisTokenClaim('course_offering_sourcedid'),
                     new AgsClaim(['scope'], 'line_items_container_url'),
-                    new NrpsClaim('context_membership_url', ['1.0', '2.0']),
-                    new BasicOutcomeClaim('id', 'url'),
+                    new NrpsTokenClaim('context_membership_url', ['1.0', '2.0']),
+                    new BasicOutcomeTokenClaim('id', 'url'),
                     'aaa' => 'bbb'
                 ]
             )->getLtiMessage();
 
-        $this->subject = new LtiMessage($this->parseJwt($message));
+        $this->subject = new LtiMessageToken($this->parseJwt($message));
     }
 
     public function testGetMessageType(): void
     {
-        $this->assertEquals(ResourceLink::TYPE, $this->subject->getMessageType());
+        $this->assertEquals(LtiResourceLink::TYPE, $this->subject->getMessageType());
     }
 
     public function testGetVersion(): void
     {
-        $this->assertEquals(LtiMessageInterface::LTI_VERSION, $this->subject->getVersion());
+        $this->assertEquals(LtiMessageTokenInterface::LTI_VERSION, $this->subject->getVersion());
     }
 
     public function testGetDeploymentId(): void
@@ -115,7 +115,7 @@ class LtiMessageTest extends TestCase
 
     public function testGetResourceLink(): void
     {
-        $claim = ResourceLinkClaim::denormalize([
+        $claim = ResourceLinkTokenClaim::denormalize([
             'id' => $this->resourceLink->getIdentifier(),
             'title' => $this->resourceLink->getTitle(),
             'description' => $this->resourceLink->getDescription()
@@ -141,25 +141,25 @@ class LtiMessageTest extends TestCase
 
     public function testGetContext(): void
     {
-        $this->assertInstanceOf(ContextClaim::class, $this->subject->getContext());
+        $this->assertInstanceOf(ContextTokenClaim::class, $this->subject->getContext());
         $this->assertEquals('id', $this->subject->getContext()->getId());
     }
 
     public function testGetPlatformInstance(): void
     {
-        $this->assertInstanceOf(PlatformInstanceClaim::class, $this->subject->getPlatformInstance());
+        $this->assertInstanceOf(PlatformInstanceTokenClaim::class, $this->subject->getPlatformInstance());
         $this->assertEquals('guid', $this->subject->getPlatformInstance()->getGuid());
     }
 
     public function testGetLaunchPresentation(): void
     {
-        $this->assertInstanceOf(LaunchPresentationClaim::class, $this->subject->getLaunchPresentation());
+        $this->assertInstanceOf(LaunchPresentationTokenClaim::class, $this->subject->getLaunchPresentation());
         $this->assertEquals('document_target', $this->subject->getLaunchPresentation()->getDocumentTarget());
     }
 
     public function testGetLis(): void
     {
-        $this->assertInstanceOf(LisClaim::class, $this->subject->getLis());
+        $this->assertInstanceOf(LisTokenClaim::class, $this->subject->getLis());
         $this->assertEquals('course_offering_sourcedid', $this->subject->getLis()->getCourseOfferingSourcedId());
     }
 
@@ -172,14 +172,14 @@ class LtiMessageTest extends TestCase
 
     public function testGetNrps(): void
     {
-        $this->assertInstanceOf(NrpsClaim::class, $this->subject->getNrps());
+        $this->assertInstanceOf(NrpsTokenClaim::class, $this->subject->getNrps());
         $this->assertEquals('context_membership_url', $this->subject->getNrps()->getContextMembershipsUrl());
         $this->assertEquals(['1.0', '2.0'], $this->subject->getNrps()->getServiceVersions());
     }
 
     public function testGetBasicOutcome(): void
     {
-        $this->assertInstanceOf(BasicOutcomeClaim::class, $this->subject->getBasicOutcome());
+        $this->assertInstanceOf(BasicOutcomeTokenClaim::class, $this->subject->getBasicOutcome());
         $this->assertEquals('id', $this->subject->getBasicOutcome()->getLisResultSourcedId());
         $this->assertEquals('url', $this->subject->getBasicOutcome()->getLisOutcomeServiceUrl());
     }

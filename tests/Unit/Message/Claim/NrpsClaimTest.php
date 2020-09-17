@@ -22,23 +22,23 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Message\Claim;
 
-use OAT\Library\Lti1p3Core\Message\Claim\NrpsClaim;
-use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+use OAT\Library\Lti1p3Core\Token\Claim\NrpsTokenClaim;
+use OAT\Library\Lti1p3Core\Token\LtiMessageTokenInterface;
 use PHPUnit\Framework\TestCase;
 
 class NrpsClaimTest extends TestCase
 {
-    /** @var NrpsClaim */
+    /** @var NrpsTokenClaim */
     private $subject;
 
     public function setUp(): void
     {
-        $this->subject = new NrpsClaim('contextMembershipsUrl', ['1.0', '2.0']);
+        $this->subject = new NrpsTokenClaim('contextMembershipsUrl', ['1.0', '2.0']);
     }
 
     public function testGetClaimName(): void
     {
-        $this->assertEquals(LtiMessageInterface::CLAIM_LTI_NRPS, $this->subject::getClaimName());
+        $this->assertEquals(LtiMessageTokenInterface::CLAIM_LTI_NRPS, $this->subject::getClaimName());
     }
 
     public function testGetters(): void
@@ -60,12 +60,12 @@ class NrpsClaimTest extends TestCase
 
     public function testDenormalisation(): void
     {
-        $denormalisation = NrpsClaim::denormalize([
+        $denormalisation = NrpsTokenClaim::denormalize([
             'context_memberships_url' => 'contextMembershipsUrl',
             'service_versions' => ['1.0', '2.0']
         ]);
 
-        $this->assertInstanceOf(NrpsClaim::class, $denormalisation);
+        $this->assertInstanceOf(NrpsTokenClaim::class, $denormalisation);
         $this->assertEquals('contextMembershipsUrl', $this->subject->getContextMembershipsUrl());
         $this->assertEquals(['1.0', '2.0'], $this->subject->getServiceVersions());
     }

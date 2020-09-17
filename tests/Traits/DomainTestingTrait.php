@@ -25,7 +25,7 @@ namespace OAT\Library\Lti1p3Core\Tests\Traits;
 use OAT\Library\Lti1p3Core\Registration\Registration;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
-use OAT\Library\Lti1p3Core\Link\ResourceLink\ResourceLink;
+use OAT\Library\Lti1p3Core\Link\ResourceLink\LtiResourceLink;
 use OAT\Library\Lti1p3Core\Platform\Platform;
 use OAT\Library\Lti1p3Core\Platform\PlatformInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
@@ -77,8 +77,8 @@ trait DomainTestingTrait
         string $url = 'http://tool.com/resource-link',
         string $title = 'resourceLinkTitle',
         string $description = 'resourceLinkDescription'
-    ): ResourceLink {
-        return new ResourceLink($identifier, $url, $title, $description);
+    ): LtiResourceLink {
+        return new LtiResourceLink($identifier, $url, $title, $description);
     }
 
     private function createTestRegistration(

@@ -22,23 +22,23 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Message\Claim;
 
-use OAT\Library\Lti1p3Core\Message\Claim\ContextClaim;
-use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+use OAT\Library\Lti1p3Core\Token\Claim\ContextTokenClaim;
+use OAT\Library\Lti1p3Core\Token\LtiMessageTokenInterface;
 use PHPUnit\Framework\TestCase;
 
 class ContextClaimTest extends TestCase
 {
-    /** @var ContextClaim */
+    /** @var ContextTokenClaim */
     private $subject;
 
     public function setUp(): void
     {
-        $this->subject = new ContextClaim('id', ['type'], 'label', 'title');
+        $this->subject = new ContextTokenClaim('id', ['type'], 'label', 'title');
     }
 
     public function testGetClaimName(): void
     {
-        $this->assertEquals(LtiMessageInterface::CLAIM_LTI_CONTEXT, $this->subject::getClaimName());
+        $this->assertEquals(LtiMessageTokenInterface::CLAIM_LTI_CONTEXT, $this->subject::getClaimName());
     }
 
     public function testGetters(): void
@@ -64,14 +64,14 @@ class ContextClaimTest extends TestCase
 
     public function testDenormalisation(): void
     {
-        $denormalisation = ContextClaim::denormalize([
+        $denormalisation = ContextTokenClaim::denormalize([
             'id' => 'id',
             'type' => ['type'],
             'label' => 'label',
             'title' => 'title'
         ]);
 
-        $this->assertInstanceOf(ContextClaim::class, $denormalisation);
+        $this->assertInstanceOf(ContextTokenClaim::class, $denormalisation);
         $this->assertEquals('id', $denormalisation->getId());
         $this->assertEquals(['type'], $denormalisation->getTypes());
         $this->assertEquals('label', $denormalisation->getLabel());

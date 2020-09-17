@@ -24,8 +24,8 @@ namespace OAT\Library\Lti1p3Core\Tests\Integration\Message;
 
 use Lcobucci\JWT\Builder;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
-use OAT\Library\Lti1p3Core\Message\Claim\ResourceLinkClaim;
-use OAT\Library\Lti1p3Core\Message\Message;
+use OAT\Library\Lti1p3Core\Token\Claim\ResourceLinkTokenClaim;
+use OAT\Library\Lti1p3Core\Token\Message;
 use PHPUnit\Framework\TestCase;
 
 class MessageTest extends TestCase
@@ -60,15 +60,15 @@ class MessageTest extends TestCase
 
     public function testGetMandatoryClaimSuccessWithMessageClaimInterface(): void
     {
-        $claim = new ResourceLinkClaim('id', 'title', 'description');
+        $claim = new ResourceLinkTokenClaim('id', 'title', 'description');
 
         $token = $this->builder
-            ->withClaim(ResourceLinkClaim::getClaimName(), $claim->normalize())
+            ->withClaim(ResourceLinkTokenClaim::getClaimName(), $claim->normalize())
             ->getToken();
 
         $subject = new Message($token);
 
-        $this->assertEquals($claim, $subject->getMandatoryClaim(ResourceLinkClaim::class));
+        $this->assertEquals($claim, $subject->getMandatoryClaim(ResourceLinkTokenClaim::class));
     }
 
     public function testGetMandatoryClaimFailureOnMissingClaim(): void
@@ -105,15 +105,15 @@ class MessageTest extends TestCase
 
     public function testGetClaimSuccessWithMessageClaimInterface(): void
     {
-        $claim = new ResourceLinkClaim('id', 'title', 'description');
+        $claim = new ResourceLinkTokenClaim('id', 'title', 'description');
 
         $token = $this->builder
-            ->withClaim(ResourceLinkClaim::getClaimName(), $claim->normalize())
+            ->withClaim(ResourceLinkTokenClaim::getClaimName(), $claim->normalize())
             ->getToken();
 
         $subject = new Message($token);
 
-        $this->assertEquals($claim, $subject->getClaim(ResourceLinkClaim::class));
+        $this->assertEquals($claim, $subject->getClaim(ResourceLinkTokenClaim::class));
     }
 
     public function testGetClaimSuccessWithMissingMessageClaimInterfaceAndGivenDefaultValue(): void
@@ -122,6 +122,6 @@ class MessageTest extends TestCase
 
         $subject = new Message($token);
 
-        $this->assertEquals('claimValue', $subject->getClaim(ResourceLinkClaim::class, 'claimValue'));
+        $this->assertEquals('claimValue', $subject->getClaim(ResourceLinkTokenClaim::class, 'claimValue'));
     }
 }

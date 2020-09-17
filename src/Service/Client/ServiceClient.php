@@ -30,7 +30,7 @@ use Lcobucci\JWT\Signer;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
-use OAT\Library\Lti1p3Core\Message\MessageInterface;
+use OAT\Library\Lti1p3Core\Message\Token\MessageTokenInterface;
 use OAT\Library\Lti1p3Core\Service\Server\Grant\ClientAssertionCredentialsGrant;
 use Psr\Cache\CacheException;
 use Psr\Cache\CacheItemPoolInterface;
@@ -178,13 +178,13 @@ class ServiceClient implements ServiceClientInterface
             $now = Carbon::now();
 
             return $this->builder
-                ->withHeader(MessageInterface::HEADER_KID, $registration->getToolKeyChain()->getIdentifier())
+                ->withHeader(MessageTokenInterface::HEADER_KID, $registration->getToolKeyChain()->getIdentifier())
                 ->identifiedBy(sprintf('%s-%s', $registration->getIdentifier(), $now->getPreciseTimestamp()))
                 ->issuedBy($registration->getTool()->getAudience())
                 ->relatedTo($registration->getClientId())
                 ->permittedFor($registration->getPlatform()->getOAuth2AccessTokenUrl())
                 ->issuedAt($now->getTimestamp())
-                ->expiresAt($now->addSeconds(MessageInterface::TTL)->getTimestamp())
+                ->expiresAt($now->addSeconds(MessageTokenInterface::TTL)->getTimestamp())
                 ->getToken($this->signer, $registration->getToolKeyChain()->getPrivateKey())
                 ->__toString();
         } catch (Throwable $exception) {

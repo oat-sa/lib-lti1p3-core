@@ -22,12 +22,12 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Launch\Builder;
 
-use OAT\Library\Lti1p3Core\Message\Builder\MessageBuilder;
+use OAT\Library\Lti1p3Core\Token\Builder\MessageTokenBuilder;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Launch\Builder\OidcLaunchRequestBuilder;
-use OAT\Library\Lti1p3Core\Launch\Request\OidcLaunchRequest;
-use OAT\Library\Lti1p3Core\Message\Claim\ContextClaim;
-use OAT\Library\Lti1p3Core\Message\LtiMessage;
+use OAT\Library\Lti1p3Core\Launch\Request\OidcMessage;
+use OAT\Library\Lti1p3Core\Token\Claim\ContextTokenClaim;
+use OAT\Library\Lti1p3Core\Token\LtiMessageToken;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
 use PHPUnit\Framework\TestCase;
 use Exception;
@@ -58,18 +58,18 @@ class OidcLaunchRequestBuilderTest extends TestCase
                 'Learner'
             ],
             [
-                new ContextClaim('id'),
+                new ContextTokenClaim('id'),
                 'aaa' => 'bbb'
             ]
         );
 
-        $this->assertInstanceOf(OidcLaunchRequest::class, $result);
+        $this->assertInstanceOf(OidcMessage::class, $result);
         $this->assertEquals($registration->getPlatform()->getAudience(), $result->getIssuer());
         $this->assertEquals('loginHint', $result->getLoginHint());
         $this->assertEquals($resourceLink->getUrl(), $result->getTargetLinkUri());
         $this->assertEquals($registration->getClientId(), $result->getClientId());
 
-        $ltiMessage = new LtiMessage($this->parseJwt($result->getLtiMessageHint()));
+        $ltiMessage = new LtiMessageToken($this->parseJwt($result->getLtiMessageHint()));
 
         $this->assertEquals($registration->getDefaultDeploymentId(), $ltiMessage->getDeploymentId());
         $this->assertEquals(['Learner'], $ltiMessage->getRoles());
@@ -135,7 +135,7 @@ class OidcLaunchRequestBuilderTest extends TestCase
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage('Cannot create LTI launch request: custom error');
 
-        $messageBuilderMock = $this->createMock(MessageBuilder::class);
+        $messageBuilderMock = $this->createMock(MessageTokenBuilder::class);
         $messageBuilderMock
             ->method('withClaim')
             ->willThrowException(new Exception('custom error'));

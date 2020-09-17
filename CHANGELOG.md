@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.0.0
+-----
+
+* Added `JwksServer` to automate JWKS endpoints
+
 2.4.0
 -----
 

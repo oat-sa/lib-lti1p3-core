@@ -22,9 +22,9 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Launch\Validator;
 
-use OAT\Library\Lti1p3Core\Launch\Validator\LtiLaunchRequestValidationResult;
-use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
-use OAT\Library\Lti1p3Core\Message\MessageInterface;
+use OAT\Library\Lti1p3Core\Launch\Validator\LtiResourceLinkLaunchRequestValidationResult;
+use OAT\Library\Lti1p3Core\Token\LtiMessageTokenInterface;
+use OAT\Library\Lti1p3Core\Token\MessageInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -34,16 +34,16 @@ class LtiLaunchRequestValidationResultTest extends TestCase
     {
         $registrationMock = $this->createMock(RegistrationInterface::class);
 
-        $subject = new LtiLaunchRequestValidationResult($registrationMock);
+        $subject = new LtiResourceLinkLaunchRequestValidationResult($registrationMock);
 
         $this->assertEquals($registrationMock, $subject->getRegistration());
     }
 
     public function testGetLtiMessage(): void
     {
-        $ltiMessageMock = $this->createMock(LtiMessageInterface::class);
+        $ltiMessageMock = $this->createMock(LtiMessageTokenInterface::class);
 
-        $subject = new LtiLaunchRequestValidationResult(null, $ltiMessageMock);
+        $subject = new LtiResourceLinkLaunchRequestValidationResult(null, $ltiMessageMock);
 
         $this->assertEquals($ltiMessageMock, $subject->getLtiMessage());
     }
@@ -52,14 +52,14 @@ class LtiLaunchRequestValidationResultTest extends TestCase
     {
         $oidcStateMock = $this->createMock(MessageInterface::class);
 
-        $subject = new LtiLaunchRequestValidationResult(null, null, $oidcStateMock);
+        $subject = new LtiResourceLinkLaunchRequestValidationResult(null, null, $oidcStateMock);
 
         $this->assertEquals($oidcStateMock, $subject->getOidcState());
     }
 
     public function testBehavior(): void
     {
-        $subject = new LtiLaunchRequestValidationResult();
+        $subject = new LtiResourceLinkLaunchRequestValidationResult();
 
         $this->assertFalse($subject->hasError());
 

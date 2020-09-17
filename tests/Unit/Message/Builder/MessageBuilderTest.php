@@ -23,10 +23,10 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Message\Builder;
 
 use OAT\Library\Lti1p3Core\Exception\LtiException;
-use OAT\Library\Lti1p3Core\Message\Builder\MessageBuilder;
-use OAT\Library\Lti1p3Core\Message\Claim\ResourceLinkClaim;
-use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
-use OAT\Library\Lti1p3Core\Message\MessageInterface;
+use OAT\Library\Lti1p3Core\Token\Builder\MessageTokenBuilder;
+use OAT\Library\Lti1p3Core\Token\Claim\ResourceLinkTokenClaim;
+use OAT\Library\Lti1p3Core\Token\LtiMessageTokenInterface;
+use OAT\Library\Lti1p3Core\Token\MessageInterface;
 use OAT\Library\Lti1p3Core\Tests\Traits\SecurityTestingTrait;
 use PHPUnit\Framework\TestCase;
 
@@ -34,12 +34,12 @@ class MessageBuilderTest extends TestCase
 {
     use SecurityTestingTrait;
 
-    /** @var MessageBuilder */
+    /** @var MessageTokenBuilder */
     private $subject;
 
     public function setUp(): void
     {
-        $this->subject = new MessageBuilder();
+        $this->subject = new MessageTokenBuilder();
     }
 
     public function testItCanGenerateAMessageWithRegularClaim(): void
@@ -54,14 +54,14 @@ class MessageBuilderTest extends TestCase
 
     public function testItCanGenerateAMessageWithMessageClaimInterface(): void
     {
-        $claim = new ResourceLinkClaim('id');
+        $claim = new ResourceLinkTokenClaim('id');
 
         $message = $this->subject
             ->withClaim($claim)
             ->getMessage($this->createTestKeyChain());
 
         $this->assertInstanceOf(MessageInterface::class, $message);
-        $this->assertEquals($claim, $message->getClaim(ResourceLinkClaim::class));
+        $this->assertEquals($claim, $message->getClaim(ResourceLinkTokenClaim::class));
     }
 
     public function testItCanGenerateAnLtiMessageWithRegularClaim(): void
@@ -70,20 +70,20 @@ class MessageBuilderTest extends TestCase
             ->withClaim('a', 'b')
             ->getLtiMessage($this->createTestKeyChain());
 
-        $this->assertInstanceOf(LtiMessageInterface::class, $message);
+        $this->assertInstanceOf(LtiMessageTokenInterface::class, $message);
         $this->assertEquals('b', $message->getClaim('a'));
     }
 
     public function testItCanGenerateAnLtiMessageWithMessageClaimInterface(): void
     {
-        $claim = new ResourceLinkClaim('id');
+        $claim = new ResourceLinkTokenClaim('id');
 
         $message = $this->subject
             ->withClaim($claim)
             ->getLtiMessage($this->createTestKeyChain());
 
-        $this->assertInstanceOf(LtiMessageInterface::class, $message);
-        $this->assertEquals($claim, $message->getClaim(ResourceLinkClaim::class));
+        $this->assertInstanceOf(LtiMessageTokenInterface::class, $message);
+        $this->assertEquals($claim, $message->getClaim(ResourceLinkTokenClaim::class));
     }
 
     public function testItThrowsAnLtiExceptionOnFailure(): void

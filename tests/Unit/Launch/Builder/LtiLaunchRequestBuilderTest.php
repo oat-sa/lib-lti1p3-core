@@ -22,13 +22,13 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Launch\Builder;
 
-use OAT\Library\Lti1p3Core\Message\Builder\MessageBuilder;
+use OAT\Library\Lti1p3Core\Token\Builder\MessageTokenBuilder;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Launch\Builder\LtiLaunchRequestBuilder;
-use OAT\Library\Lti1p3Core\Launch\Request\LtiLaunchRequest;
-use OAT\Library\Lti1p3Core\Message\Claim\ContextClaim;
-use OAT\Library\Lti1p3Core\Message\LtiMessage;
-use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+use OAT\Library\Lti1p3Core\Launch\Request\LtiMessage;
+use OAT\Library\Lti1p3Core\Token\Claim\ContextTokenClaim;
+use OAT\Library\Lti1p3Core\Token\LtiMessageToken;
+use OAT\Library\Lti1p3Core\Token\LtiMessageTokenInterface;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
 use PHPUnit\Framework\TestCase;
 use Exception;
@@ -58,18 +58,18 @@ class LtiLaunchRequestBuilderTest extends TestCase
                 'Learner'
             ],
             [
-                new ContextClaim('id'),
+                new ContextTokenClaim('id'),
                 'aaa' => 'bbb'
             ],
             'state'
         );
 
-        $this->assertInstanceOf(LtiLaunchRequest::class, $result);
+        $this->assertInstanceOf(LtiMessage::class, $result);
         $this->assertEquals('state', $result->getOidcState());
 
-        $ltiMessage = new LtiMessage($this->parseJwt($result->getLtiMessage()));
+        $ltiMessage = new LtiMessageToken($this->parseJwt($result->getLtiMessage()));
 
-        $this->assertEquals(LtiMessageInterface::LTI_VERSION, $ltiMessage->getVersion());
+        $this->assertEquals(LtiMessageTokenInterface::LTI_VERSION, $ltiMessage->getVersion());
         $this->assertEquals( $registration->getDefaultDeploymentId(), $ltiMessage->getDeploymentId());
         $this->assertEquals(['Learner'], $ltiMessage->getRoles());
         $this->assertEquals('id', $ltiMessage->getContext()->getId());
@@ -131,7 +131,7 @@ class LtiLaunchRequestBuilderTest extends TestCase
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage('Cannot create LTI launch request: custom error');
 
-        $messageBuilderMock = $this->createMock(MessageBuilder::class);
+        $messageBuilderMock = $this->createMock(MessageTokenBuilder::class);
         $messageBuilderMock
             ->method('withClaim')
             ->willThrowException(new Exception('custom error'));
@@ -150,7 +150,7 @@ class LtiLaunchRequestBuilderTest extends TestCase
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage('Cannot create LTI launch request: custom error');
 
-        $messageBuilderMock = $this->createMock(MessageBuilder::class);
+        $messageBuilderMock = $this->createMock(MessageTokenBuilder::class);
         $messageBuilderMock
             ->method('withClaim')
             ->willThrowException(new Exception('custom error'));

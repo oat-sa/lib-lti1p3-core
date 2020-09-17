@@ -26,7 +26,7 @@ use Exception;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Launch\Builder\OidcLaunchRequestBuilder;
-use OAT\Library\Lti1p3Core\Launch\Request\OidcLaunchRequest;
+use OAT\Library\Lti1p3Core\Launch\Request\OidcMessage;
 use OAT\Library\Lti1p3Core\Security\Oidc\Endpoint\OidcLoginInitiator;
 use OAT\Library\Lti1p3Core\Security\Oidc\Request\OidcAuthenticationRequest;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
@@ -81,7 +81,7 @@ class OidcLoginInitiatorTest extends TestCase
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage('Mandatory parameter iss cannot be found');
 
-        $oidcLaunchRequest = new OidcLaunchRequest('invalid');
+        $oidcLaunchRequest = new OidcMessage('invalid');
 
         $this->subject->initiate($this->createServerRequest('GET', $oidcLaunchRequest->toUrl()));
     }
@@ -91,7 +91,7 @@ class OidcLoginInitiatorTest extends TestCase
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage('Cannot find registration for OIDC request');
 
-        $oidcLaunchRequest = new OidcLaunchRequest('http://example.com', [
+        $oidcLaunchRequest = new OidcMessage('http://example.com', [
             'iss' => 'invalid',
             'client_id' => 'invalid'
         ]);
@@ -106,7 +106,7 @@ class OidcLoginInitiatorTest extends TestCase
 
         $registration = $this->createTestRegistration();
 
-        $oidcLaunchRequest = new OidcLaunchRequest('http://example.com', [
+        $oidcLaunchRequest = new OidcMessage('http://example.com', [
             'iss' => $registration->getPlatform()->getAudience(),
             'client_id' => $registration->getClientId(),
             'lti_deployment_id' => 'invalid'
@@ -129,7 +129,7 @@ class OidcLoginInitiatorTest extends TestCase
 
         $subject = new OidcLoginInitiator($repositoryMock);
 
-        $oidcLaunchRequest = new OidcLaunchRequest('invalid', [
+        $oidcLaunchRequest = new OidcMessage('invalid', [
             'iss' => 'invalid',
             'client_id' => 'invalid'
         ]);

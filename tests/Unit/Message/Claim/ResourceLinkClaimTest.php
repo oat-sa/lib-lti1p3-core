@@ -22,23 +22,23 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Message\Claim;
 
-use OAT\Library\Lti1p3Core\Message\Claim\ResourceLinkClaim;
-use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+use OAT\Library\Lti1p3Core\Token\Claim\ResourceLinkTokenClaim;
+use OAT\Library\Lti1p3Core\Token\LtiMessageTokenInterface;
 use PHPUnit\Framework\TestCase;
 
 class ResourceLinkClaimTest extends TestCase
 {
-    /** @var ResourceLinkClaim */
+    /** @var ResourceLinkTokenClaim */
     private $subject;
 
     public function setUp(): void
     {
-        $this->subject = new ResourceLinkClaim('id', 'title', 'description');
+        $this->subject = new ResourceLinkTokenClaim('id', 'title', 'description');
     }
 
     public function testGetClaimName(): void
     {
-        $this->assertEquals(LtiMessageInterface::CLAIM_LTI_RESOURCE_LINK, $this->subject::getClaimName());
+        $this->assertEquals(LtiMessageTokenInterface::CLAIM_LTI_RESOURCE_LINK, $this->subject::getClaimName());
     }
 
     public function testGetters(): void
@@ -62,13 +62,13 @@ class ResourceLinkClaimTest extends TestCase
 
     public function testDenormalisation(): void
     {
-        $denormalisation = ResourceLinkClaim::denormalize([
+        $denormalisation = ResourceLinkTokenClaim::denormalize([
             'id' => 'id',
             'title' => 'title',
             'description' => 'description'
         ]);
 
-        $this->assertInstanceOf(ResourceLinkClaim::class, $denormalisation);
+        $this->assertInstanceOf(ResourceLinkTokenClaim::class, $denormalisation);
         $this->assertEquals('id', $denormalisation->getId());
         $this->assertEquals('title', $denormalisation->getTitle());
         $this->assertEquals('description', $denormalisation->getDescription());

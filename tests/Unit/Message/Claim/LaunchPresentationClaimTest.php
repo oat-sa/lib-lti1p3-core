@@ -22,23 +22,23 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Message\Claim;
 
-use OAT\Library\Lti1p3Core\Message\Claim\LaunchPresentationClaim;
-use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+use OAT\Library\Lti1p3Core\Token\Claim\LaunchPresentationTokenClaim;
+use OAT\Library\Lti1p3Core\Token\LtiMessageTokenInterface;
 use PHPUnit\Framework\TestCase;
 
 class LaunchPresentationClaimTest extends TestCase
 {
-    /** @var LaunchPresentationClaim */
+    /** @var LaunchPresentationTokenClaim */
     private $subject;
 
     public function setUp(): void
     {
-        $this->subject = new LaunchPresentationClaim('documentTarget', 'height', 'width', 'returnUrl', 'locale');
+        $this->subject = new LaunchPresentationTokenClaim('documentTarget', 'height', 'width', 'returnUrl', 'locale');
     }
 
     public function testGetClaimName(): void
     {
-        $this->assertEquals(LtiMessageInterface::CLAIM_LTI_LAUNCH_PRESENTATION, $this->subject::getClaimName());
+        $this->assertEquals(LtiMessageTokenInterface::CLAIM_LTI_LAUNCH_PRESENTATION, $this->subject::getClaimName());
     }
 
     public function testGetters(): void
@@ -66,7 +66,7 @@ class LaunchPresentationClaimTest extends TestCase
 
     public function testDenormalisation(): void
     {
-        $denormalisation = LaunchPresentationClaim::denormalize([
+        $denormalisation = LaunchPresentationTokenClaim::denormalize([
             'document_target' => 'documentTarget',
             'height' => 'height',
             'width' => 'width',
@@ -74,7 +74,7 @@ class LaunchPresentationClaimTest extends TestCase
             'locale' => 'locale'
         ]);
 
-        $this->assertInstanceOf(LaunchPresentationClaim::class, $denormalisation);
+        $this->assertInstanceOf(LaunchPresentationTokenClaim::class, $denormalisation);
         $this->assertEquals('documentTarget', $denormalisation->getDocumentTarget());
         $this->assertEquals('height', $denormalisation->getHeight());
         $this->assertEquals('width', $denormalisation->getWidth());

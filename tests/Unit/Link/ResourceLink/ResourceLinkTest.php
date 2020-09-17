@@ -22,18 +22,18 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Link\ResourceLink;
 
-use OAT\Library\Lti1p3Core\Link\ResourceLink\ResourceLink;
+use OAT\Library\Lti1p3Core\Link\ResourceLink\LtiResourceLink;
 use OAT\Library\Lti1p3Core\Link\ResourceLink\ResourceLinkInterface;
 use PHPUnit\Framework\TestCase;
 
 class ResourceLinkTest extends TestCase
 {
-    /** @var ResourceLink */
+    /** @var LtiResourceLink */
     private $subject;
 
     public function setUp(): void
     {
-        $this->subject = new ResourceLink('identifier', 'url', 'title', 'description');
+        $this->subject = new LtiResourceLink('identifier', 'url', 'title', 'description');
     }
 
     public function testGetIdentifier(): void

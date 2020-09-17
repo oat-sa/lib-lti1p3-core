@@ -22,17 +22,17 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Launch\Request;
 
-use OAT\Library\Lti1p3Core\Launch\Request\OidcLaunchRequest;
+use OAT\Library\Lti1p3Core\Launch\Request\OidcMessage;
 use PHPUnit\Framework\TestCase;
 
 class OidcLaunchRequestTest extends TestCase
 {
-    /** @var OidcLaunchRequest */
+    /** @var OidcMessage */
     private $subject;
 
     public function setUp(): void
     {
-        $this->subject = new OidcLaunchRequest('http://example.com', [
+        $this->subject = new OidcMessage('http://example.com', [
             'iss' => 'iss',
             'login_hint' => 'login_hint',
             'target_link_uri' => 'target_link_uri',
