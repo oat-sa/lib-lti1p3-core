@@ -93,6 +93,8 @@ class OidcInitiator
                 ->withClaim(LtiMessageTokenInterface::CLAIM_NONCE, $nonce->getValue())
                 ->withClaim(LtiMessageTokenInterface::CLAIM_PARAMETERS, $oidcRequest->getParameters());
 
+            $stateToken = $this->builder->buildMessageToken($registration->getToolKeyChain());
+
             return new LtiMessage(
                 $registration->getPlatform()->getOidcAuthenticationUrl(),
                 [
@@ -100,7 +102,7 @@ class OidcInitiator
                     'client_id' => $registration->getClientId(),
                     'login_hint' => $oidcRequest->getMandatoryParameter('login_hint'),
                     'nonce' => $nonce->getValue(),
-                    'state' => $this->builder->buildMessageToken($registration->getToolKeyChain())->getToken()->__toString(),
+                    'state' => $stateToken->getToken()->__toString(),
                     'lti_message_hint' => $oidcRequest->getParameter('lti_message_hint'),
                     'scope' => 'openid',
                     'response_type' => 'id_token',
@@ -113,7 +115,7 @@ class OidcInitiator
             throw $exception;
         } catch (Throwable $exception) {
             throw new LtiException(
-                sprintf('OIDC login initiation failed: %s', $exception->getMessage()),
+                sprintf('OIDC initiation failed: %s', $exception->getMessage()),
                 $exception->getCode(),
                 $exception
             );

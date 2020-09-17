@@ -128,7 +128,7 @@ class OidcAuthenticator
             throw $exception;
         } catch (Throwable $exception) {
             throw new LtiException(
-                sprintf('OIDC login authentication failed: %s', $exception->getMessage()),
+                sprintf('OIDC authentication failed: %s', $exception->getMessage()),
                 $exception->getCode(),
                 $exception
             );
