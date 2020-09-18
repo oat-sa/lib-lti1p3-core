@@ -106,7 +106,10 @@ class OidcAuthenticator
                 throw new LtiException('User authentication failure');
             }
 
-            $this->builder->withMessageTokenClaims($originalMessageToken);
+            $this->builder
+                ->withMessageTokenClaims($originalMessageToken)
+                ->withClaim(LtiMessageTokenInterface::CLAIM_ISS, $registration->getPlatform()->getAudience())
+                ->withClaim(LtiMessageTokenInterface::CLAIM_AUD, $registration->getClientId());
 
             if (!$authenticationResult->isAnonymous()) {
                 foreach ($authenticationResult->getUserIdentity()->normalize() as $claimName => $claimValue) {
