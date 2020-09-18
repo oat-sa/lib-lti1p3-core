@@ -71,6 +71,7 @@ class LtiResourceLinkLaunchRequestBuilder
             $targetLinkUri = $ltiResourceLink->getUrl() ?? $registration->getTool()->getLaunchUrl();
 
             $this->builder
+                ->withClaim(LtiMessageTokenInterface::CLAIM_LTI_VERSION, LtiMessageInterface::LTI_VERSION)
                 ->withClaim(LtiMessageTokenInterface::CLAIM_LTI_MESSAGE_TYPE, LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST)
                 ->withClaim(LtiMessageTokenInterface::CLAIM_LTI_DEPLOYMENT_ID, $deploymentId)
                 ->withClaim(LtiMessageTokenInterface::CLAIM_LTI_TARGET_LINK_URI, $targetLinkUri)

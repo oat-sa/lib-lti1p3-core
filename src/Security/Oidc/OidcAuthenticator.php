@@ -108,6 +108,8 @@ class OidcAuthenticator
 
             $this->builder
                 ->withMessageTokenClaims($originalMessageToken)
+                ->withClaim(LtiMessageTokenInterface::CLAIM_LTI_VERSION, LtiMessageInterface::LTI_VERSION)
+                ->withClaim(LtiMessageTokenInterface::CLAIM_LTI_MESSAGE_TYPE, LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST)
                 ->withClaim(LtiMessageTokenInterface::CLAIM_ISS, $registration->getPlatform()->getAudience())
                 ->withClaim(LtiMessageTokenInterface::CLAIM_AUD, $registration->getClientId());
 
