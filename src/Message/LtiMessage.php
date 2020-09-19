@@ -71,7 +71,7 @@ class LtiMessage implements LtiMessageInterface
     }
 
     /**
-     * @throws LtiException
+     * @throws LtiExceptionInterface
      */
     public static function fromServerRequest(ServerRequestInterface $request): LtiMessageInterface
     {

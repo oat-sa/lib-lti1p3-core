@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Message\Payload;
 
-use OAT\Library\Lti1p3Core\Exception\LtiException;
+use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\AgsClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\BasicOutcomeClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
@@ -40,7 +40,7 @@ use OAT\Library\Lti1p3Core\User\UserIdentityInterface;
 class LtiMessagePayload extends MessagePayload implements LtiMessagePayloadInterface
 {
     /**
-     * @throws LtiException
+     * @throws LtiExceptionInterface
      */
     public function getMessageType(): string
     {
@@ -48,7 +48,7 @@ class LtiMessagePayload extends MessagePayload implements LtiMessagePayloadInter
     }
 
     /**
-     * @throws LtiException
+     * @throws LtiExceptionInterface
      */
     public function getVersion(): string
     {
@@ -56,7 +56,7 @@ class LtiMessagePayload extends MessagePayload implements LtiMessagePayloadInter
     }
 
     /**
-     * @throws LtiException
+     * @throws LtiExceptionInterface
      */
     public function getDeploymentId(): string
     {
@@ -64,7 +64,7 @@ class LtiMessagePayload extends MessagePayload implements LtiMessagePayloadInter
     }
 
     /**
-     * @throws LtiException
+     * @throws LtiExceptionInterface
      */
     public function getTargetLinkUri(): string
     {
@@ -72,7 +72,7 @@ class LtiMessagePayload extends MessagePayload implements LtiMessagePayloadInter
     }
 
     /**
-     * @throws LtiException
+     * @throws LtiExceptionInterface
      */
     public function getResourceLink(): ResourceLinkClaim
     {
@@ -80,7 +80,7 @@ class LtiMessagePayload extends MessagePayload implements LtiMessagePayloadInter
     }
 
     /**
-     * @throws LtiException
+     * @throws LtiExceptionInterface
      */
     public function getRoles(): array
     {

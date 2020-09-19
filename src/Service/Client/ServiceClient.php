@@ -28,6 +28,7 @@ use GuzzleHttp\ClientInterface;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Signer;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
+use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
@@ -70,7 +71,7 @@ class ServiceClient implements ServiceClientInterface
     }
 
     /**
-     * @throws LtiException
+     * @throws LtiExceptionInterface
      */
     public function request(
         RegistrationInterface $registration,
@@ -86,7 +87,7 @@ class ServiceClient implements ServiceClientInterface
 
             return $this->client->request($method, $uri, $options);
 
-        } catch (LtiException $exception) {
+        } catch (LtiExceptionInterface $exception) {
             throw $exception;
         } catch (Throwable $exception) {
             throw new LtiException(
@@ -98,7 +99,7 @@ class ServiceClient implements ServiceClientInterface
     }
 
     /**
-     * @throws LtiException
+     * @throws LtiExceptionInterface
      */
     private function getAccessToken(RegistrationInterface $registration, array $scopes): string
     {
@@ -154,7 +155,7 @@ class ServiceClient implements ServiceClientInterface
 
             return $accessToken;
 
-        } catch (LtiException $exception) {
+        } catch (LtiExceptionInterface $exception) {
             throw $exception;
         }catch (Throwable|CacheException $exception) {
             throw new LtiException(
@@ -166,7 +167,7 @@ class ServiceClient implements ServiceClientInterface
     }
 
     /**
-     * @throws LtiException
+     * @throws LtiExceptionInterface
      */
     private function generateCredentials(RegistrationInterface $registration): string
     {
