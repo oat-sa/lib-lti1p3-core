@@ -4,12 +4,21 @@
 
 ## Table of contents
 
-- [Platform side: LTI resource link launch request generation](#platform-side-lti-resource-link-launch-request-generation)
-- [Tool side: OIDC flow initiation](#tool-side-oidc-flow-initiation)
-- [Platform side: OIDC flow authentication](#platform-side-oidc-flow-authentication)
-- [Tool side: validating the launch after OIDC flow](#tool-side-validating-the-launch-after-oidc-flow)
+- [OIDC flow](#oidc-flow)
+- [1 - Platform side: LTI resource link launch request generation](#1---platform-side-lti-resource-link-launch-request-generation)
+- [2 - Tool side: OIDC flow initiation](#2---tool-side-oidc-flow-initiation)
+- [3 - Platform side: OIDC flow authentication](#3---platform-side-oidc-flow-authentication)
+- [4 - Tool side: validating the launch after OIDC flow](#4---tool-side-validating-the-launch-after-oidc-flow)
 
-## Platform side: LTI resource link launch request generation
+## OIDC flow
+
+You can find below a copy of the [IMS OIDC flow](https://www.imsglobal.org/spec/security/v1p0/#openid_connect_launch_flow) explication diagram, with steps numbers.
+
+![OIDC flow](../images/oidc-flow.png)
+
+Each step will be detailed below.
+
+## 1 - Platform side: LTI resource link launch request generation
 
 You can find below required steps to generate an LTI resource link launch request (with OIC), needed only if you're acting as a platform.
 
@@ -90,7 +99,7 @@ echo $launchRequest->toHtmlRedirectForm();   // HTML hidden form, with possibili
 
 All you need to do now is to present this launch request to the users, to launch them to the tool.
 
-## Tool side: OIDC flow initiation
+## 2 - Tool side: OIDC flow initiation
 
 You can find below required steps to handle the initiation an OIDC flow, needed only if you're acting as a tool.
 
@@ -156,7 +165,7 @@ $server = new OidcInitiationServer(new OidcInitiator($registrationRepository));
 $response = $server->handle($request);
 ```
 
-## Platform side: OIDC flow authentication
+## 3 - Platform side: OIDC flow authentication
 
 You can find below required steps to provide authentication during the OIDC flow and performing a launch, needed only if you're acting as a platform.
 
@@ -229,7 +238,7 @@ $server = new OidcAuthenticationServer(new OidcAuthenticator($registrationReposi
 $response = $server->handle($request);
 ```
 
-## Tool side: validating the launch after OIDC flow
+## 4 - Tool side: validating the launch after OIDC flow
 
 You can find below required steps to validate an LTI launch request, needed only if you're acting as a tool.
 
