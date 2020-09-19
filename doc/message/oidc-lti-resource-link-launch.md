@@ -5,9 +5,9 @@
 ## Table of contents
 
 - [Platform side: LTI resource link launch request generation](#platform-side-lti-resource-link-launch-request-generation)
-- [Tool side: OIDC login initiation](#tool-side-oidc-login-initiation)
-- [Platform side: OIDC authentication](#platform-side-oidc-authentication)
-- [Tool side: validating the launch after OIDC](#tool-side-validating-the-launch-after-oidc)
+- [Tool side: OIDC flow initiation](#tool-side-oidc-flow-initiation)
+- [Platform side: OIDC flow authentication](#platform-side-oidc-flow-authentication)
+- [Tool side: validating the launch after OIDC flow](#tool-side-validating-the-launch-after-oidc-flow)
 
 ## Platform side: LTI resource link launch request generation
 
