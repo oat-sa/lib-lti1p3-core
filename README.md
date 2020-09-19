@@ -37,7 +37,7 @@ Messages represent integration between platforms and tools intermediated by a us
 
 - [Lti Message](src/Message/LtiMessageInterface.php): reference to an exchange between platforms and tools in message based communications.
 - [Lti Message Payload](src/Message/Payload/LtiMessagePayloadInterface.php): reference to the payload (JWT) of an exchange between platforms and tools in message based communications, containing LTI claims.
-- [Lti Resource Link](src/Message/Content/LtiResourceLinkInterface.php): reference to a resource made available from a tool for a platform.
+- [Lti Resource Link](src/Message/Resource/LtiResourceLinkInterface.php): reference to a resource made available from a tool for a platform.
 - [Lti Launch](src/Message/Launch/Builder/LtiResourceLinkLaunchRequestBuilder.php): refers to the process in which a user interacts with an LTI Resource Link within the platform and is subsequently "launched" into a tool.
 
 ### Services
