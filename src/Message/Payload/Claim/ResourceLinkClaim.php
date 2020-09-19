@@ -20,14 +20,14 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Message\Token\Claim;
+namespace OAT\Library\Lti1p3Core\Message\Payload\Claim;
 
-use OAT\Library\Lti1p3Core\Message\Token\LtiMessageTokenInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 
 /**
  * @see http://www.imsglobal.org/spec/lti/v1p3/#resource-link-claim-0
  */
-class ResourceLinkClaim implements MessageTokenClaimInterface
+class ResourceLinkClaim implements MessagePayloadClaimInterface
 {
     /** @var string */
     private $id;
@@ -40,7 +40,7 @@ class ResourceLinkClaim implements MessageTokenClaimInterface
 
     public static function getClaimName(): string
     {
-        return LtiMessageTokenInterface::CLAIM_LTI_RESOURCE_LINK;
+        return LtiMessagePayloadInterface::CLAIM_LTI_RESOURCE_LINK;
     }
 
     public function __construct(string $id, string $title = null, string $description = null)

@@ -20,14 +20,14 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Message\Token\Claim;
+namespace OAT\Library\Lti1p3Core\Message\Payload\Claim;
 
-use OAT\Library\Lti1p3Core\Message\Token\LtiMessageTokenInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 
 /**
  * @see https://www.imsglobal.org/spec/lti-ags/v2p0#capabilities-in-jwt-messages
  */
-class AgsClaim implements MessageTokenClaimInterface
+class AgsClaim implements MessagePayloadClaimInterface
 {
     /** @var array */
     private $scopes;
@@ -40,7 +40,7 @@ class AgsClaim implements MessageTokenClaimInterface
 
     public static function getClaimName(): string
     {
-        return LtiMessageTokenInterface::CLAIM_LTI_AGS;
+        return LtiMessagePayloadInterface::CLAIM_LTI_AGS;
     }
 
     public function __construct(array $scopes, string $lineItemsContainerUrl, string $lineItemUrl = null)

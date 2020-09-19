@@ -20,36 +20,13 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Message\Token;
+namespace OAT\Library\Lti1p3Core\Message\Payload\Claim;
 
-use Lcobucci\JWT\Token;
-
-/**
- * @see http://www.imsglobal.org/spec/lti/v1p3/#json-web-token-0
- */
-interface MessageTokenInterface
+interface MessagePayloadClaimInterface
 {
-    // Default TTL (in seconds)
-    public const TTL = 600;
+    public static function getClaimName(): string;
 
-    // Headers
-    public const HEADER_KID = 'kid';
+    public static function denormalize(array $claimData);
 
-    // Claims
-    public const CLAIM_ISS = 'iss';
-    public const CLAIM_SUB = 'sub';
-    public const CLAIM_AUD = 'aud';
-    public const CLAIM_EXP = 'exp';
-    public const CLAIM_IAT = 'iat';
-
-    // OIDC claims
-    public const CLAIM_REGISTRATION_ID = 'registration_id';
-    public const CLAIM_NONCE = 'nonce';
-    public const CLAIM_PARAMETERS = 'parameters';
-
-    public function getToken(): Token;
-
-    public function getMandatoryClaim(string $claim);
-
-    public function getClaim(string $claim, $default = null);
+    public function normalize(): array;
 }

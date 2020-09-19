@@ -20,14 +20,14 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Message\Token\Claim;
+namespace OAT\Library\Lti1p3Core\Message\Payload\Claim;
 
-use OAT\Library\Lti1p3Core\Message\Token\LtiMessageTokenInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 
 /**
  * @see http://www.imsglobal.org/spec/lti/v1p3/#context-claim-0
  */
-class ContextClaim implements MessageTokenClaimInterface
+class ContextClaim implements MessagePayloadClaimInterface
 {
     public const TYPE_COURSE_TEMPLATE = 'http://purl.imsglobal.org/vocab/lis/v2/course#CourseTemplate';
     public const TYPE_COURSE_OFFERING = 'http://purl.imsglobal.org/vocab/lis/v2/course#CourseOffering';
@@ -48,7 +48,7 @@ class ContextClaim implements MessageTokenClaimInterface
 
     public static function getClaimName(): string
     {
-        return LtiMessageTokenInterface::CLAIM_LTI_CONTEXT;
+        return LtiMessagePayloadInterface::CLAIM_LTI_CONTEXT;
     }
 
     public function __construct(string $id, array $types = [], string $label = null, string $title = null)

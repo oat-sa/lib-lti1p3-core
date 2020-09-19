@@ -20,24 +20,24 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Message\Token;
+namespace OAT\Library\Lti1p3Core\Message\Payload;
 
 use OAT\Library\Lti1p3Core\Exception\LtiException;
-use OAT\Library\Lti1p3Core\Message\Token\Claim\AgsClaim;
-use OAT\Library\Lti1p3Core\Message\Token\Claim\BasicOutcomeClaim;
-use OAT\Library\Lti1p3Core\Message\Token\Claim\ContextClaim;
-use OAT\Library\Lti1p3Core\Message\Token\Claim\LaunchPresentationClaim;
-use OAT\Library\Lti1p3Core\Message\Token\Claim\LisClaim;
-use OAT\Library\Lti1p3Core\Message\Token\Claim\NrpsClaim;
-use OAT\Library\Lti1p3Core\Message\Token\Claim\PlatformInstanceClaim;
-use OAT\Library\Lti1p3Core\Message\Token\Claim\ResourceLinkClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\AgsClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\BasicOutcomeClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\LaunchPresentationClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\LisClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\NrpsClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\PlatformInstanceClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\User\UserIdentity;
 use OAT\Library\Lti1p3Core\User\UserIdentityInterface;
 
 /**
  * @see http://www.imsglobal.org/spec/lti/v1p3/#lti-message-general-details
  */
-class LtiMessageToken extends MessageToken implements LtiMessageTokenInterface
+class LtiMessagePayload extends MessagePayload implements LtiMessagePayloadInterface
 {
     /**
      * @throws LtiException

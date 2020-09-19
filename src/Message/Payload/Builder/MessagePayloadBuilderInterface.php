@@ -20,16 +20,16 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Message\Token\Builder;
+namespace OAT\Library\Lti1p3Core\Message\Payload\Builder;
 
-use OAT\Library\Lti1p3Core\Message\Token\MessageTokenInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
 
-interface MessageTokenBuilderInterface
+interface MessagePayloadBuilderInterface
 {
-    public function withClaim($claim, $claimValue = null): MessageTokenBuilderInterface;
+    public function withClaim($claim, $claimValue = null): MessagePayloadBuilderInterface;
 
-    public function withMessageTokenClaims(MessageTokenInterface $messageToken): MessageTokenBuilderInterface;
+    public function withMessagePayloadClaims(MessagePayloadInterface $messageToken): MessagePayloadBuilderInterface;
 
-    public function buildMessageToken(KeyChainInterface $keyChain): MessageTokenInterface;
+    public function buildMessagePayload(KeyChainInterface $keyChain): MessagePayloadInterface;
 }

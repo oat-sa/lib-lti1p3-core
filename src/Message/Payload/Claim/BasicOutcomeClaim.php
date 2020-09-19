@@ -20,14 +20,14 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Message\Token\Claim;
+namespace OAT\Library\Lti1p3Core\Message\Payload\Claim;
 
-use OAT\Library\Lti1p3Core\Message\Token\LtiMessageTokenInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 
 /**
  * @see https://www.imsglobal.org/spec/lti-bo/v1p1/#integration-with-lti-1-3
  */
-class BasicOutcomeClaim implements MessageTokenClaimInterface
+class BasicOutcomeClaim implements MessagePayloadClaimInterface
 {
     /** @var string */
     private $lisResultSourcedId;
@@ -43,7 +43,7 @@ class BasicOutcomeClaim implements MessageTokenClaimInterface
 
     public static function getClaimName(): string
     {
-        return LtiMessageTokenInterface::CLAIM_LTI_BASIC_OUTCOME;
+        return LtiMessagePayloadInterface::CLAIM_LTI_BASIC_OUTCOME;
     }
 
     public function getLisResultSourcedId(): string

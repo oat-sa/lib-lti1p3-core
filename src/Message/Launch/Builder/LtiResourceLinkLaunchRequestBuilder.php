@@ -26,11 +26,11 @@ use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\Content\LtiResourceLinkInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessage;
-use OAT\Library\Lti1p3Core\Message\Token\Builder\MessageTokenBuilder;
-use OAT\Library\Lti1p3Core\Message\Token\Builder\MessageTokenBuilderInterface;
-use OAT\Library\Lti1p3Core\Message\Token\Claim\MessageTokenClaimInterface;
-use OAT\Library\Lti1p3Core\Message\Token\Claim\ResourceLinkClaim;
-use OAT\Library\Lti1p3Core\Message\Token\LtiMessageTokenInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilder;
+use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilderInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\MessagePayloadClaimInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use Throwable;
@@ -40,12 +40,12 @@ use Throwable;
  */
 class LtiResourceLinkLaunchRequestBuilder
 {
-    /** @var MessageTokenBuilderInterface */
+    /** @var MessagePayloadBuilderInterface */
     private $builder;
 
-    public function __construct(MessageTokenBuilderInterface $builder = null)
+    public function __construct(MessagePayloadBuilderInterface $builder = null)
     {
-        $this->builder = $builder ?? new MessageTokenBuilder();
+        $this->builder = $builder ?? new MessagePayloadBuilder();
     }
 
     /**
@@ -71,25 +71,23 @@ class LtiResourceLinkLaunchRequestBuilder
             $targetLinkUri = $ltiResourceLink->getUrl() ?? $registration->getTool()->getLaunchUrl();
 
             $this->builder
-                ->withClaim(LtiMessageTokenInterface::CLAIM_LTI_VERSION, LtiMessageInterface::LTI_VERSION)
-                ->withClaim(LtiMessageTokenInterface::CLAIM_LTI_MESSAGE_TYPE, LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST)
-                ->withClaim(LtiMessageTokenInterface::CLAIM_LTI_DEPLOYMENT_ID, $deploymentId)
-                ->withClaim(LtiMessageTokenInterface::CLAIM_LTI_TARGET_LINK_URI, $targetLinkUri)
-                ->withClaim(LtiMessageTokenInterface::CLAIM_LTI_ROLES, $roles)
-                ->withClaim(LtiMessageTokenInterface::CLAIM_REGISTRATION_ID, $registration->getIdentifier())
+                ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_VERSION, LtiMessageInterface::LTI_VERSION)
+                ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_MESSAGE_TYPE, LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST)
+                ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_DEPLOYMENT_ID, $deploymentId)
+                ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_TARGET_LINK_URI, $targetLinkUri)
+                ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_ROLES, $roles)
+                ->withClaim(LtiMessagePayloadInterface::CLAIM_REGISTRATION_ID, $registration->getIdentifier())
                 ->withClaim($resourceLinkClaim);
 
             foreach ($optionalClaims as $claimName => $claim) {
-                if ($claim instanceof MessageTokenClaimInterface) {
+                if ($claim instanceof MessagePayloadClaimInterface) {
                     $this->builder->withClaim($claim);
                 } else {
                     $this->builder->withClaim($claimName, $claim);
                 }
             }
 
-            $ltiMessageHintToken = $this->builder
-                ->buildMessageToken($registration->getPlatformKeyChain())
-                ->getToken();
+            $ltiMessageHintPayload = $this->builder->buildMessagePayload($registration->getPlatformKeyChain());
 
             return new LtiMessage(
                 $registration->getTool()->getOidcLoginInitiationUrl(),
@@ -97,7 +95,7 @@ class LtiResourceLinkLaunchRequestBuilder
                     'iss' => $registration->getPlatform()->getAudience(),
                     'login_hint' => $loginHint,
                     'target_link_uri' => $targetLinkUri,
-                    'lti_message_hint' => $ltiMessageHintToken->__toString(),
+                    'lti_message_hint' => $ltiMessageHintPayload->getToken()->__toString(),
                     'lti_deployment_id' => $deploymentId,
                     'client_id' => $registration->getClientId(),
                 ]

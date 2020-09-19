@@ -20,14 +20,14 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Message\Token\Claim;
+namespace OAT\Library\Lti1p3Core\Message\Payload\Claim;
 
-use OAT\Library\Lti1p3Core\Message\Token\LtiMessageTokenInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 
 /**
  * @see http://www.imsglobal.org/spec/lti/v1p3/#platform-instance-claim-0
  */
-class PlatformInstanceClaim implements MessageTokenClaimInterface
+class PlatformInstanceClaim implements MessagePayloadClaimInterface
 {
     /** @var string */
     private $guid;
@@ -52,7 +52,7 @@ class PlatformInstanceClaim implements MessageTokenClaimInterface
 
     public static function getClaimName(): string
     {
-        return LtiMessageTokenInterface::CLAIM_LTI_TOOL_PLATFORM;
+        return LtiMessagePayloadInterface::CLAIM_LTI_TOOL_PLATFORM;
     }
 
     public function __construct(

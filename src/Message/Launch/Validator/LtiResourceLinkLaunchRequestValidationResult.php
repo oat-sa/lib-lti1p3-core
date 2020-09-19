@@ -22,8 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Message\Launch\Validator;
 
-use OAT\Library\Lti1p3Core\Message\Token\LtiMessageTokenInterface;
-use OAT\Library\Lti1p3Core\Message\Token\MessageTokenInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 
 class LtiResourceLinkLaunchRequestValidationResult
@@ -31,10 +31,10 @@ class LtiResourceLinkLaunchRequestValidationResult
     /** @var RegistrationInterface|null */
     private $registration;
 
-    /** @var LtiMessageTokenInterface|null */
-    private $idToken;
+    /** @var LtiMessagePayloadInterface|null */
+    private $payload;
 
-    /** @var MessageTokenInterface|null */
+    /** @var MessagePayloadInterface|null */
     private $state;
 
     /** @var string[] */
@@ -45,13 +45,13 @@ class LtiResourceLinkLaunchRequestValidationResult
 
     public function __construct(
         RegistrationInterface $registration = null,
-        LtiMessageTokenInterface $idToken = null,
-        MessageTokenInterface $state = null,
+        LtiMessagePayloadInterface $payload = null,
+        MessagePayloadInterface $state = null,
         array $successes = [],
         string $error = null
     ) {
         $this->registration = $registration;
-        $this->idToken = $idToken;
+        $this->payload = $payload;
         $this->state = $state;
         $this->successes = $successes;
         $this->error = $error;
@@ -62,12 +62,12 @@ class LtiResourceLinkLaunchRequestValidationResult
         return $this->registration;
     }
 
-    public function getIdToken(): ?LtiMessageTokenInterface
+    public function getPayload(): ?LtiMessagePayloadInterface
     {
-        return $this->idToken;
+        return $this->payload;
     }
 
-    public function getState(): ?MessageTokenInterface
+    public function getState(): ?MessagePayloadInterface
     {
         return $this->state;
     }

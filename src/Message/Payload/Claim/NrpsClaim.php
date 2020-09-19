@@ -20,14 +20,14 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Message\Token\Claim;
+namespace OAT\Library\Lti1p3Core\Message\Payload\Claim;
 
-use OAT\Library\Lti1p3Core\Message\Token\LtiMessageTokenInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 
 /**
  * @see https://www.imsglobal.org/spec/lti-nrps/v2p0#claim-for-inclusion-in-lti-messages
  */
-class NrpsClaim implements MessageTokenClaimInterface
+class NrpsClaim implements MessagePayloadClaimInterface
 {
     /** @var string */
     private $contextMembershipsUrl;
@@ -43,7 +43,7 @@ class NrpsClaim implements MessageTokenClaimInterface
 
     public static function getClaimName(): string
     {
-        return LtiMessageTokenInterface::CLAIM_LTI_NRPS;
+        return LtiMessagePayloadInterface::CLAIM_LTI_NRPS;
     }
 
     public function getContextMembershipsUrl(): string

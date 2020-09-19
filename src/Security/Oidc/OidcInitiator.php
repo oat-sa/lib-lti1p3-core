@@ -24,9 +24,9 @@ namespace OAT\Library\Lti1p3Core\Security\Oidc;
 
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessage;
-use OAT\Library\Lti1p3Core\Message\Token\Builder\MessageTokenBuilder;
-use OAT\Library\Lti1p3Core\Message\Token\Builder\MessageTokenBuilderInterface;
-use OAT\Library\Lti1p3Core\Message\Token\LtiMessageTokenInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilder;
+use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilderInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
@@ -46,17 +46,17 @@ class OidcInitiator
     /** @var NonceGeneratorInterface */
     private $generator;
 
-    /** @var MessageTokenBuilderInterface */
+    /** @var MessagePayloadBuilderInterface */
     private $builder;
 
     public function __construct(
         RegistrationRepositoryInterface $repository,
         NonceGeneratorInterface $generator = null,
-        MessageTokenBuilderInterface $builder = null
+        MessagePayloadBuilderInterface $builder = null
     ) {
         $this->repository = $repository;
         $this->generator = $generator ?? new NonceGenerator();
-        $this->builder = $builder ?? new MessageTokenBuilder();
+        $this->builder = $builder ?? new MessagePayloadBuilder();
     }
 
     /**
@@ -87,13 +87,13 @@ class OidcInitiator
             $nonce = $this->generator->generate();
 
             $this->builder
-                ->withClaim(LtiMessageTokenInterface::CLAIM_SUB, $registration->getIdentifier())
-                ->withClaim(LtiMessageTokenInterface::CLAIM_ISS, $registration->getTool()->getAudience())
-                ->withClaim(LtiMessageTokenInterface::CLAIM_AUD, $registration->getPlatform()->getAudience())
-                ->withClaim(LtiMessageTokenInterface::CLAIM_NONCE, $nonce->getValue())
-                ->withClaim(LtiMessageTokenInterface::CLAIM_PARAMETERS, $oidcRequest->getParameters());
+                ->withClaim(LtiMessagePayloadInterface::CLAIM_SUB, $registration->getIdentifier())
+                ->withClaim(LtiMessagePayloadInterface::CLAIM_ISS, $registration->getTool()->getAudience())
+                ->withClaim(LtiMessagePayloadInterface::CLAIM_AUD, $registration->getPlatform()->getAudience())
+                ->withClaim(LtiMessagePayloadInterface::CLAIM_NONCE, $nonce->getValue())
+                ->withClaim(LtiMessagePayloadInterface::CLAIM_PARAMETERS, $oidcRequest->getParameters());
 
-            $stateToken = $this->builder->buildMessageToken($registration->getToolKeyChain());
+            $statePayload = $this->builder->buildMessagePayload($registration->getToolKeyChain());
 
             return new LtiMessage(
                 $registration->getPlatform()->getOidcAuthenticationUrl(),
@@ -102,7 +102,7 @@ class OidcInitiator
                     'client_id' => $registration->getClientId(),
                     'login_hint' => $oidcRequest->getMandatoryParameter('login_hint'),
                     'nonce' => $nonce->getValue(),
-                    'state' => $stateToken->getToken()->__toString(),
+                    'state' => $statePayload->getToken()->__toString(),
                     'lti_message_hint' => $oidcRequest->getParameter('lti_message_hint'),
                     'scope' => 'openid',
                     'response_type' => 'id_token',

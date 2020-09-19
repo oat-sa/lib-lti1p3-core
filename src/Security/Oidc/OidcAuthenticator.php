@@ -27,10 +27,10 @@ use Lcobucci\JWT\Signer;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
-use OAT\Library\Lti1p3Core\Message\Token\Builder\MessageTokenBuilder;
-use OAT\Library\Lti1p3Core\Message\Token\Builder\MessageTokenBuilderInterface;
-use OAT\Library\Lti1p3Core\Message\Token\LtiMessageToken;
-use OAT\Library\Lti1p3Core\Message\Token\LtiMessageTokenInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilder;
+use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilderInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayload;
+use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Message\LtiMessage;
@@ -50,7 +50,7 @@ class OidcAuthenticator
     /** @var UserAuthenticatorInterface */
     private $authenticator;
 
-    /** @var MessageTokenBuilderInterface */
+    /** @var MessagePayloadBuilderInterface */
     private $builder;
 
     /** @var Signer */
@@ -62,12 +62,12 @@ class OidcAuthenticator
     public function __construct(
         RegistrationRepositoryInterface $repository,
         UserAuthenticatorInterface $authenticator,
-        MessageTokenBuilderInterface $builder = null,
+        MessagePayloadBuilderInterface $builder = null,
         Signer $signer = null
     ) {
         $this->repository = $repository;
         $this->authenticator = $authenticator;
-        $this->builder = $builder ?? new MessageTokenBuilder();
+        $this->builder = $builder ?? new MessagePayloadBuilder();
         $this->signer = $signer ?? new Sha256();
         $this->parser = new Parser(new AssociativeDecoder());
     }
@@ -80,23 +80,23 @@ class OidcAuthenticator
         try {
             $oidcRequest = LtiMessage::fromServerRequest($request);
 
-            $originalMessageToken = new LtiMessageToken(
+            $originalPayload = new LtiMessagePayload(
                 $this->parser->parse($oidcRequest->getParameter('lti_message_hint'))
             );
 
-            if ($originalMessageToken->getToken()->isExpired()) {
+            if ($originalPayload->getToken()->isExpired()) {
                 throw new LtiException('Message hint expired');
             }
 
             $registration = $this->repository->find(
-                $originalMessageToken->getMandatoryClaim(LtiMessageTokenInterface::CLAIM_REGISTRATION_ID)
+                $originalPayload->getMandatoryClaim(LtiMessagePayloadInterface::CLAIM_REGISTRATION_ID)
             );
 
             if (null === $registration) {
                 throw new LtiException('Invalid message hint registration id claim');
             }
 
-            if (!$originalMessageToken->getToken()->verify($this->signer, $registration->getPlatformKeyChain()->getPublicKey())) {
+            if (!$originalPayload->getToken()->verify($this->signer, $registration->getPlatformKeyChain()->getPublicKey())) {
                throw new LtiException('Invalid message hint signature');
             }
 
@@ -107,11 +107,11 @@ class OidcAuthenticator
             }
 
             $this->builder
-                ->withMessageTokenClaims($originalMessageToken)
-                ->withClaim(LtiMessageTokenInterface::CLAIM_LTI_VERSION, LtiMessageInterface::LTI_VERSION)
-                ->withClaim(LtiMessageTokenInterface::CLAIM_LTI_MESSAGE_TYPE, LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST)
-                ->withClaim(LtiMessageTokenInterface::CLAIM_ISS, $registration->getPlatform()->getAudience())
-                ->withClaim(LtiMessageTokenInterface::CLAIM_AUD, $registration->getClientId());
+                ->withMessagePayloadClaims($originalPayload)
+                ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_VERSION, LtiMessageInterface::LTI_VERSION)
+                ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_MESSAGE_TYPE, LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST)
+                ->withClaim(LtiMessagePayloadInterface::CLAIM_ISS, $registration->getPlatform()->getAudience())
+                ->withClaim(LtiMessagePayloadInterface::CLAIM_AUD, $registration->getClientId());
 
             if (!$authenticationResult->isAnonymous()) {
                 foreach ($authenticationResult->getUserIdentity()->normalize() as $claimName => $claimValue) {
@@ -119,12 +119,12 @@ class OidcAuthenticator
                 }
             }
 
-            $messageToken = $this->builder->buildMessageToken($registration->getPlatformKeyChain());
+            $messagePayload = $this->builder->buildMessagePayload($registration->getPlatformKeyChain());
 
             return new LtiMessage(
-                $originalMessageToken->getMandatoryClaim(LtiMessageTokenInterface::CLAIM_LTI_TARGET_LINK_URI),
+                $originalPayload->getMandatoryClaim(LtiMessagePayloadInterface::CLAIM_LTI_TARGET_LINK_URI),
                 [
-                    'id_token' => $messageToken->getToken()->__toString(),
+                    'id_token' => $messagePayload->getToken()->__toString(),
                     'state' => $oidcRequest->getMandatoryParameter('state')
                 ]
             );

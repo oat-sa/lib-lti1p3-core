@@ -20,14 +20,14 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Message\Token\Claim;
+namespace OAT\Library\Lti1p3Core\Message\Payload\Claim;
 
-use OAT\Library\Lti1p3Core\Message\Token\LtiMessageTokenInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 
 /**
  * @see http://www.imsglobal.org/spec/lti/v1p3/#launch-presentation-claim-0
  */
-class LaunchPresentationClaim implements MessageTokenClaimInterface
+class LaunchPresentationClaim implements MessagePayloadClaimInterface
 {
     /** @var string|null */
     private $documentTarget;
@@ -46,7 +46,7 @@ class LaunchPresentationClaim implements MessageTokenClaimInterface
 
     public static function getClaimName(): string
     {
-        return LtiMessageTokenInterface::CLAIM_LTI_LAUNCH_PRESENTATION;
+        return LtiMessagePayloadInterface::CLAIM_LTI_LAUNCH_PRESENTATION;
     }
 
     public function __construct(

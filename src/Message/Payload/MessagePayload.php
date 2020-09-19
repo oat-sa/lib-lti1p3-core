@@ -20,18 +20,18 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Message\Token;
+namespace OAT\Library\Lti1p3Core\Message\Payload;
 
 use Lcobucci\JWT\Token;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
-use OAT\Library\Lti1p3Core\Message\Token\Claim\MessageTokenClaimInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\MessagePayloadClaimInterface;
 use Throwable;
 
 /**
  * @see http://www.imsglobal.org/spec/lti/v1p3/#json-web-token-0
  */
-class MessageToken implements MessageTokenInterface
+class MessagePayload implements MessagePayloadInterface
 {
     /** @var Token */
     protected $token;
@@ -52,8 +52,8 @@ class MessageToken implements MessageTokenInterface
     public function getMandatoryClaim(string $claim)
     {
         try {
-            if (is_a($claim, MessageTokenClaimInterface::class, true)) {
-                /**  @var MessageTokenClaimInterface $claim */
+            if (is_a($claim, MessagePayloadClaimInterface::class, true)) {
+                /**  @var MessagePayloadClaimInterface $claim */
                 return $claim::denormalize($this->token->getClaim($claim::getClaimName()));
             }
 
@@ -69,8 +69,8 @@ class MessageToken implements MessageTokenInterface
 
     public function getClaim(string $claim, $default = null)
     {
-        if (is_a($claim, MessageTokenClaimInterface::class, true)) {
-            /**  @var MessageTokenClaimInterface $claim */
+        if (is_a($claim, MessagePayloadClaimInterface::class, true)) {
+            /**  @var MessagePayloadClaimInterface $claim */
             return $this->token->hasClaim($claim::getClaimName())
                 ? $claim::denormalize($this->token->getClaim($claim::getClaimName()))
                 : $default;

@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Message\Token\Builder;
+namespace OAT\Library\Lti1p3Core\Message\Payload\Builder;
 
 use Carbon\Carbon;
 use Lcobucci\JWT\Builder;
@@ -29,16 +29,16 @@ use Lcobucci\JWT\Signer;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use Lcobucci\JWT\Token;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
-use OAT\Library\Lti1p3Core\Message\Token\Claim\MessageTokenClaimInterface;
-use OAT\Library\Lti1p3Core\Message\Token\MessageToken;
-use OAT\Library\Lti1p3Core\Message\Token\MessageTokenInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\MessagePayloadClaimInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\MessagePayload;
+use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceGenerator;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceGeneratorInterface;
 use Ramsey\Uuid\Uuid;
 use Throwable;
 
-class MessageTokenBuilder implements MessageTokenBuilderInterface
+class MessagePayloadBuilder implements MessagePayloadBuilderInterface
 {
     /** @var NonceGeneratorInterface */
     private $generator;
@@ -59,10 +59,10 @@ class MessageTokenBuilder implements MessageTokenBuilderInterface
         $this->signer = $signer ?? new Sha256();
     }
 
-    public function withClaim($claim, $claimValue = null): MessageTokenBuilderInterface
+    public function withClaim($claim, $claimValue = null): MessagePayloadBuilderInterface
     {
-        if (is_a($claim, MessageTokenClaimInterface::class, true)) {
-            /**  @var MessageTokenClaimInterface $claim */
+        if (is_a($claim, MessagePayloadClaimInterface::class, true)) {
+            /**  @var MessagePayloadClaimInterface $claim */
             $this->builder->withClaim($claim::getClaimName(), $claim->normalize());
         } else {
             $this->builder->withClaim((string)$claim, $claimValue);
@@ -71,10 +71,10 @@ class MessageTokenBuilder implements MessageTokenBuilderInterface
         return $this;
     }
 
-    public function withMessageTokenClaims(MessageTokenInterface $messageToken): MessageTokenBuilderInterface
+    public function withMessagePayloadClaims(MessagePayloadInterface $payload): MessagePayloadBuilderInterface
     {
         /** @var Claim $claim */
-        foreach ($messageToken->getToken()->getClaims() as $claim) {
+        foreach ($payload->getToken()->getClaims() as $claim) {
             $this->builder->withClaim($claim->getName(), $claim->getValue());
         }
 
@@ -84,9 +84,9 @@ class MessageTokenBuilder implements MessageTokenBuilderInterface
     /**
      * @throws LtiException
      */
-    public function buildMessageToken(KeyChainInterface $keyChain): MessageTokenInterface
+    public function buildMessagePayload(KeyChainInterface $keyChain): MessagePayloadInterface
     {
-        return new MessageToken($this->getToken($keyChain));
+        return new MessagePayload($this->getToken($keyChain));
     }
 
     /**
@@ -98,11 +98,11 @@ class MessageTokenBuilder implements MessageTokenBuilderInterface
             $now = Carbon::now();
 
             $this->builder
-                ->withHeader(MessageTokenInterface::HEADER_KID, $keyChain->getIdentifier())
-                ->withClaim(MessageTokenInterface::CLAIM_NONCE, $this->generator->generate()->getValue())
+                ->withHeader(MessagePayloadInterface::HEADER_KID, $keyChain->getIdentifier())
+                ->withClaim(MessagePayloadInterface::CLAIM_NONCE, $this->generator->generate()->getValue())
                 ->identifiedBy(Uuid::uuid4()->toString())
                 ->issuedAt($now->getTimestamp())
-                ->expiresAt($now->addSeconds(MessageTokenInterface::TTL)->getTimestamp());
+                ->expiresAt($now->addSeconds(MessagePayloadInterface::TTL)->getTimestamp());
 
             return $this->builder->getToken($this->signer, $keyChain->getPrivateKey());
         } catch (Throwable $exception) {
