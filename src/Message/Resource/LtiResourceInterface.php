@@ -20,12 +20,12 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Message\Content;
+namespace OAT\Library\Lti1p3Core\Message\Resource;
 
 /**
  * @see https://www.imsglobal.org/spec/lti-dl/v2p0/#content-item-types
  */
-interface ContentItemInterface
+interface LtiResourceInterface
 {
     public function getType(): string;
 }

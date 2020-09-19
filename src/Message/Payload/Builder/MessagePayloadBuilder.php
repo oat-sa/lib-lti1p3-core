@@ -29,6 +29,7 @@ use Lcobucci\JWT\Signer;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use Lcobucci\JWT\Token;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
+use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\MessagePayloadClaimInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayload;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
@@ -82,7 +83,7 @@ class MessagePayloadBuilder implements MessagePayloadBuilderInterface
     }
 
     /**
-     * @throws LtiException
+     * @throws LtiExceptionInterface
      */
     public function buildMessagePayload(KeyChainInterface $keyChain): MessagePayloadInterface
     {
@@ -90,7 +91,7 @@ class MessagePayloadBuilder implements MessagePayloadBuilderInterface
     }
 
     /**
-     * @throws LtiException
+     * @throws LtiExceptionInterface
      */
     protected function getToken(KeyChainInterface $keyChain): Token
     {

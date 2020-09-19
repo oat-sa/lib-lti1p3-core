@@ -119,12 +119,12 @@ class OidcAuthenticator
                 }
             }
 
-            $messagePayload = $this->builder->buildMessagePayload($registration->getPlatformKeyChain());
+            $payload = $this->builder->buildMessagePayload($registration->getPlatformKeyChain());
 
             return new LtiMessage(
                 $originalPayload->getMandatoryClaim(LtiMessagePayloadInterface::CLAIM_LTI_TARGET_LINK_URI),
                 [
-                    'id_token' => $messagePayload->getToken()->__toString(),
+                    'id_token' => $payload->getToken()->__toString(),
                     'state' => $oidcRequest->getMandatoryParameter('state')
                 ]
             );
