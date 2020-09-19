@@ -51,7 +51,7 @@ class LtiResourceLinkLaunchRequestBuilder
     /**
      * @throws LtiExceptionInterface
      */
-    public function buildResourceLinkLaunchRequest(
+    public function build(
         LtiResourceLinkInterface $ltiResourceLink,
         RegistrationInterface $registration,
         string $loginHint,

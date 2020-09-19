@@ -133,7 +133,7 @@ Now the `$jwksExport` array contains the needed [JWKS properties](https://auth0.
 
 ## Exposing a JWKS endpoint
 
-You can expose the [JwksServer](../../src/Security/Jwks/Server/JwksServer.php) in an application controller to return a ready to use JWKS [PSR7 response](https://www.php-fig.org/psr/psr-7) for a given key set name:
+You can expose the [JwksServer](../../src/Security/Jwks/Server/JwksServer.php) in an application controller to return a ready to use JWKS [PSR7 response](https://www.php-fig.org/psr/psr-7/#33-psrhttpmessageresponseinterface) for a given key set name:
 
 ```php
 <?php

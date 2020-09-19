@@ -59,8 +59,7 @@ You can find below some tutorials, presented by topics.
 
 ### Messages interactions
 
-- how to handle a [LTI resource link launch](doc/message/resource-link-launch.md)
-- how to handle a [LTI resource link launch with OpenId Connect](doc/message/oidc-resource-link-launch.md)
+- how to handle a [LTI resource link launch](doc/message/oidc-lti-resource-link-launch.md) (with [OIDC](https://www.imsglobal.org/spec/security/v1p0/#openid_connect_launch_flow))
 
 ### Services interactions
 
