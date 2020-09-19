@@ -8,7 +8,7 @@ You can find below a copy of the [IMS OIDC flow](https://www.imsglobal.org/spec/
 
 ![OIDC flow](../images/oidc-flow.png)
 
-Each step will be detailed below.
+To handle the OIDC flow for an LTI resource link launch request, each step will be detailed below, from both platform and tool perspectives.
 
 ## Table of contents
 
@@ -19,7 +19,7 @@ Each step will be detailed below.
 
 ## 1 - Platform side: LTI resource link launch request generation
 
-You can find below required steps to generate an LTI resource link launch request (with OIC), needed only if you're acting as a platform.
+You can find below required steps to generate an LTI resource link launch request (with OIDC), needed only if you're acting as a platform.
 
 ### Create the LTI resource link
 
