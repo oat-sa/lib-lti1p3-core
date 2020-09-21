@@ -48,7 +48,7 @@ use Throwable;
 /**
  * @see https://www.imsglobal.org/spec/security/v1p0/#authentication-response-validation
  */
-abstract class AbstractLaunchRequestValidator
+class LaunchRequestValidator
 {
     /** @var RegistrationRepositoryInterface */
     private $registrationRepository;
@@ -113,7 +113,16 @@ abstract class AbstractLaunchRequestValidator
                 ->validateStateExpiry($state)
                 ->validateStateSignature($registration, $state);
 
-            $this->validateSpecifics($registration, $payload, $state);
+            switch ($payload->getMessageType()) {
+                case LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST:
+                    $this->validateLtiResourceLinkLaunchRequestSpecifics($payload);
+                    break;
+                case LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_REQUEST:
+                    $this->validateDeepLinkingRequestSpecifics($payload);
+                    break;
+                default:
+                    throw new LtiException(sprintf('Message type %s not handled', $payload->getMessageType()));
+            }
 
             return new LaunchRequestValidationResult($registration, $payload, $state, $this->successes);
 
@@ -121,12 +130,6 @@ abstract class AbstractLaunchRequestValidator
             return new LaunchRequestValidationResult(null, null, null, $this->successes, $exception->getMessage());
         }
     }
-
-    abstract protected function validateSpecifics(
-        RegistrationInterface $registration,
-        LtiMessagePayloadInterface $payload,
-        MessagePayloadInterface $state
-    ): void;
 
     /**
      * @throws LtiExceptionInterface
@@ -285,14 +288,64 @@ abstract class AbstractLaunchRequestValidator
         return $this->addSuccess('JWT OIDC state is not expired');
     }
 
-    protected function addSuccess(string $message): self
+    /**
+     * @throws LtiExceptionInterface
+     */
+    private function validateLtiResourceLinkLaunchRequestSpecifics(LtiMessagePayloadInterface $payload): self
+    {
+        if ($payload->getMessageType() !== LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST) {
+            throw new LtiException(
+                sprintf(
+                    'JWT id_token message_type must be %s',
+                    LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST
+                )
+            );
+        }
+
+        $this->addSuccess(
+            sprintf('JWT id_token message_type equals %s', LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST)
+        );
+
+        if ($payload->getResourceLink()->getId() === '') {
+            throw new LtiException('JWT id_token resource_link id claim is invalid');
+        }
+
+        return $this->addSuccess('JWT id_token resource_link id claim is valid');
+    }
+
+    /**
+     * @throws LtiExceptionInterface
+     */
+    private function validateDeepLinkingRequestSpecifics(LtiMessagePayloadInterface $payload): self
+    {
+        if ($payload->getMessageType() !== LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_REQUEST) {
+            throw new LtiException(
+                sprintf(
+                    'JWT id_token message_type must be %s',
+                    LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_REQUEST
+                )
+            );
+        }
+
+        $this->addSuccess(
+            sprintf('JWT id_token message_type equals %s', LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_REQUEST)
+        );
+
+        if (null === $payload->getDeepLinkingSettings()) {
+            throw new LtiException('JWT id_token deep_linking_settings id claim is missing');
+        }
+
+        return $this->addSuccess('JWT id_token deep_linking_settings id claim is provided');
+    }
+
+    private function addSuccess(string $message): self
     {
         $this->successes[] = $message;
 
         return $this;
     }
 
-    protected function reset(): self
+    private function reset(): self
     {
         $this->successes = [];
 
