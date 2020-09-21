@@ -20,18 +20,26 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Tool;
+namespace OAT\Library\Lti1p3Core\DeepLink\Settings;
 
-class ToolFactory
+/**
+ * @see https://www.imsglobal.org/spec/lti-dl/v2p0#deep-linking-settings
+ */
+interface DeepLinkingSettingsInterface
 {
-    public function create(
-        string $identifier,
-        string $name,
-        string $audience,
-        string $oidcInitiationUrl,
-        string $launchUrl = null,
-        string $deepLinkingUrl = null
-    ): ToolInterface {
-        return new Tool($identifier, $name, $audience, $oidcInitiationUrl, $launchUrl, $deepLinkingUrl);
-    }
+    public function getDeepLinkReturnUrl(): string;
+
+    public function getAcceptedTypes(): array;
+
+    public function getAcceptedPresentationDocumentTargets(): array;
+
+    public function getAcceptedMediaTypes(): ?string;
+
+    public function shouldAcceptMultiple(): bool;
+
+    public function shouldAutoCreate(): bool;
+
+    public function getTitle(): ?string;
+
+    public function getText(): ?string;
 }

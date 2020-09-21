@@ -26,6 +26,8 @@ use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\AgsClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\BasicOutcomeClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\DeepLinkingContentItems;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\DeepLinkingSettingsClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\LaunchPresentationClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\LisClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\NrpsClaim;
@@ -74,17 +76,14 @@ class LtiMessagePayload extends MessagePayload implements LtiMessagePayloadInter
     /**
      * @throws LtiExceptionInterface
      */
-    public function getResourceLink(): ResourceLinkClaim
-    {
-        return $this->getMandatoryClaim(ResourceLinkClaim::class);
-    }
-
-    /**
-     * @throws LtiExceptionInterface
-     */
     public function getRoles(): array
     {
         return $this->getMandatoryClaim(static::CLAIM_LTI_ROLES);
+    }
+
+    public function getResourceLink(): ResourceLinkClaim
+    {
+        return $this->getClaim(ResourceLinkClaim::class);
     }
 
     public function getRoleScopeMentor(): array
@@ -133,6 +132,41 @@ class LtiMessagePayload extends MessagePayload implements LtiMessagePayloadInter
             $this->getClaim('locale'),
             $this->getClaim('picture')
         );
+    }
+
+    public function getDeepLinkingSettings(): ?DeepLinkingSettingsClaim
+    {
+        return $this->getClaim(DeepLinkingSettingsClaim::class);
+    }
+
+    public function getDeepLinkingContentItems(): ?DeepLinkingContentItems
+    {
+        return $this->getClaim(DeepLinkingContentItems::class);
+    }
+
+    public function getDeepLinkingData(): ?string
+    {
+        return $this->getClaim(static::CLAIM_LTI_DEEP_LINKING_DATA);
+    }
+
+    public function getDeepLinkingMessage(): ?string
+    {
+        return $this->getClaim(static::CLAIM_LTI_DEEP_LINKING_MESSAGE);
+    }
+
+    public function getDeepLinkingLog(): ?string
+    {
+        return $this->getClaim(static::CLAIM_LTI_DEEP_LINKING_LOG);
+    }
+
+    public function getDeepLinkingErrorMessage(): ?string
+    {
+        return $this->getClaim(static::CLAIM_LTI_DEEP_LINKING_ERROR_MESSAGE);
+    }
+
+    public function getDeepLinkingErrorLog(): ?string
+    {
+        return $this->getClaim(static::CLAIM_LTI_DEEP_LINKING_ERROR_LOG);
     }
 
     public function getAgs(): ?AgsClaim

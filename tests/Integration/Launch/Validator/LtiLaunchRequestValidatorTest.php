@@ -33,7 +33,7 @@ use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Launch\Builder\LtiLaunchRequestBuilder;
 use OAT\Library\Lti1p3Core\Launch\Builder\OidcLaunchRequestBuilder;
-use OAT\Library\Lti1p3Core\Launch\Validator\LtiResourceLinkLaunchRequestValidationResult;
+use OAT\Library\Lti1p3Core\Launch\Validator\LaunchRequestValidationResult;
 use OAT\Library\Lti1p3Core\Launch\Validator\LtiResourceLinkLaunchRequestValidator;
 use OAT\Library\Lti1p3Core\Token\Builder\MessageTokenBuilder;
 use OAT\Library\Lti1p3Core\Token\LtiMessageTokenInterface;
@@ -68,7 +68,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
 
         $result = $subject->validate($this->createServerRequest('GET', $launchRequest->toUrl()));
 
-        $this->assertInstanceOf(LtiResourceLinkLaunchRequestValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchRequestValidationResult::class, $result);
         $this->assertFalse($result->hasError());
         $this->assertNull($result->getError());
         $this->assertEquals(
@@ -114,7 +114,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
 
         $result = $subject->validate($this->createServerRequest('GET', $launchRequest->toUrl()));
 
-        $this->assertInstanceOf(LtiResourceLinkLaunchRequestValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchRequestValidationResult::class, $result);
         $this->assertFalse($result->hasError());
         $this->assertNull($result->getError());
         $this->assertEquals(
@@ -178,7 +178,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
 
         $result = $subject->validate($this->createServerRequest('GET', $launchRequest->toUrl()));
 
-        $this->assertInstanceOf(LtiResourceLinkLaunchRequestValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchRequestValidationResult::class, $result);
         $this->assertFalse($result->hasError());
         $this->assertNull($result->getError());
         $this->assertEquals(
@@ -238,7 +238,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
 
         $result = $subject->validate($this->createServerRequest('GET', $launchRequest->toUrl()));
 
-        $this->assertInstanceOf(LtiResourceLinkLaunchRequestValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchRequestValidationResult::class, $result);
         $this->assertFalse($result->hasError());
         $this->assertNull($result->getError());
         $this->assertEquals(
@@ -289,7 +289,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
 
         $result = $subject->validate($this->createServerRequest('GET', $launchRequest->toUrl()));
 
-        $this->assertInstanceOf(LtiResourceLinkLaunchRequestValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchRequestValidationResult::class, $result);
         $this->assertFalse($result->hasError());
         $this->assertNull($result->getError());
         $this->assertEquals(
@@ -337,7 +337,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
 
         $result = $subject->validate($this->createServerRequest('GET', $launchRequest->toUrl()));
 
-        $this->assertInstanceOf(LtiResourceLinkLaunchRequestValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchRequestValidationResult::class, $result);
         $this->assertFalse($result->hasError());
     }
 
@@ -357,7 +357,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
 
         $result = $subject->validate($this->createServerRequest('GET', $launchRequest->toUrl()));
 
-        $this->assertInstanceOf(LtiResourceLinkLaunchRequestValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchRequestValidationResult::class, $result);
         $this->assertTrue($result->hasError());
         $this->assertEquals('JWT id_token signature validation failure', $result->getError());
     }
@@ -384,7 +384,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
 
         $result = $subject->validate($this->createServerRequest('GET', $launchRequest->toUrl()));
 
-        $this->assertInstanceOf(LtiResourceLinkLaunchRequestValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchRequestValidationResult::class, $result);
         $this->assertTrue($result->hasError());
         $this->assertEquals('JWT id_token deployment_id claim not valid for this registration', $result->getError());
     }
@@ -409,7 +409,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
 
         $result = $subject->validate($this->createServerRequest('GET', $launchRequest->toUrl()));
 
-        $this->assertInstanceOf(LtiResourceLinkLaunchRequestValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchRequestValidationResult::class, $result);
         $this->assertTrue($result->hasError());
         $this->assertEquals('JWT id_token is expired', $result->getError());
     }
@@ -428,7 +428,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
 
         $result = $subject->validate($this->createServerRequest('GET', $launchRequest->toUrl()));
 
-        $this->assertInstanceOf(LtiResourceLinkLaunchRequestValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchRequestValidationResult::class, $result);
         $this->assertTrue($result->hasError());
         $this->assertEquals('JWT id_token nonce already used', $result->getError());
     }
@@ -452,7 +452,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
             sprintf('http://tool.com/launch?id_token=%s', $token->__toString())
         ));
 
-        $this->assertInstanceOf(LtiResourceLinkLaunchRequestValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchRequestValidationResult::class, $result);
         $this->assertTrue($result->hasError());
         $this->assertEquals('JWT id_token kid header is missing', $result->getError());
     }
@@ -478,7 +478,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
             sprintf('http://tool.com/launch?id_token=%s', $token->__toString())
         ));
 
-        $this->assertInstanceOf(LtiResourceLinkLaunchRequestValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchRequestValidationResult::class, $result);
         $this->assertTrue($result->hasError());
         $this->assertEquals('JWT id_token version claim is invalid', $result->getError());
     }
@@ -505,7 +505,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
             sprintf('http://tool.com/launch?id_token=%s', $token->__toString())
         ));
 
-        $this->assertInstanceOf(LtiResourceLinkLaunchRequestValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchRequestValidationResult::class, $result);
         $this->assertTrue($result->hasError());
         $this->assertEquals('JWT id_token message_type claim is invalid', $result->getError());
     }
@@ -533,7 +533,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
             sprintf('http://tool.com/launch?id_token=%s', $token->__toString())
         ));
 
-        $this->assertInstanceOf(LtiResourceLinkLaunchRequestValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchRequestValidationResult::class, $result);
         $this->assertTrue($result->hasError());
         $this->assertEquals('JWT id_token roles claim is invalid', $result->getError());
     }
@@ -564,7 +564,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
             sprintf('http://tool.com/launch?id_token=%s', $token->__toString())
         ));
 
-        $this->assertInstanceOf(LtiResourceLinkLaunchRequestValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchRequestValidationResult::class, $result);
         $this->assertTrue($result->hasError());
         $this->assertEquals('JWT id_token resource_link id claim is invalid', $result->getError());
     }
@@ -596,7 +596,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
             sprintf('http://tool.com/launch?id_token=%s', $token->__toString())
         ));
 
-        $this->assertInstanceOf(LtiResourceLinkLaunchRequestValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchRequestValidationResult::class, $result);
         $this->assertTrue($result->hasError());
         $this->assertEquals('JWT id_token user identifier (sub) claim is invalid', $result->getError());
     }
@@ -621,7 +621,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
 
         $result = $subject->validate($this->createServerRequest('GET', $launchRequest->toUrl()));
 
-        $this->assertInstanceOf(LtiResourceLinkLaunchRequestValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchRequestValidationResult::class, $result);
         $this->assertTrue($result->hasError());
         $this->assertEquals('JWT OIDC state signature validation failure', $result->getError());
     }
@@ -655,7 +655,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
 
         $result = $subject->validate($this->createServerRequest('GET', $launchRequest->toUrl()));
 
-        $this->assertInstanceOf(LtiResourceLinkLaunchRequestValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchRequestValidationResult::class, $result);
         $this->assertTrue($result->hasError());
         $this->assertEquals('JWT OIDC state is expired', $result->getError());
     }
@@ -674,7 +674,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
 
         $result = $subject->validate($this->createServerRequest('GET', $launchRequest->toUrl()));
 
-        $this->assertInstanceOf(LtiResourceLinkLaunchRequestValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchRequestValidationResult::class, $result);
         $this->assertTrue($result->hasError());
         $this->assertEquals('No matching registration found', $result->getError());
     }
@@ -701,7 +701,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
 
         $result = $subject->validate($this->createServerRequest('GET', $launchRequest->toUrl()));
 
-        $this->assertInstanceOf(LtiResourceLinkLaunchRequestValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchRequestValidationResult::class, $result);
         $this->assertTrue($result->hasError());
         $this->assertEquals('Tool key chain not configured', $result->getError());
     }
@@ -725,7 +725,7 @@ class LtiLaunchRequestValidatorTest extends TestCase
 
         $result = $subject->validate($this->createServerRequest('GET', $launchRequest->toUrl()));
 
-        $this->assertInstanceOf(LtiResourceLinkLaunchRequestValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchRequestValidationResult::class, $result);
         $this->assertTrue($result->hasError());
         $this->assertEquals('custom error', $result->getError());
     }

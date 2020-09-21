@@ -6,11 +6,11 @@
 
 ## Table of contents
 
-- [Exporting a JWK from a key chain](#exporting-a-jwk-from-a-key-chain)
-- [Exporting a JWKS from multiple key chains](#exporting-a-jwks-from-multiple-key-chains)
-- [Exposing a JWKS endpoint](#exposing-a-jwks-endpoint)
+- [Export a JWK from a key chain](#export-a-jwk-from-a-key-chain)
+- [Export a JWKS from multiple key chains](#export-a-jwks-from-multiple-key-chains)
+- [Provide a JWKS response](#provide-a-jwks-response)
 
-## Exporting a JWK from a key chain
+## Export a JWK from a key chain
 
 Considering you have for example on your side this key chain:
 - public key path: `/home/user/.ssh/id_rsa.pub`
@@ -50,7 +50,7 @@ $jwkExport = (new JwkRS256Exporter())->export($keyChain);
     ```
 - If you want to support other algorithms than RS SHA256, you can implement the [JwkExporterInterface](../../src/Security/Jwks/Exporter/Jwk/JwkExporterInterface.php).
 
-## Exporting a JWKS from multiple key chains
+## Export a JWKS from multiple key chains
 
 Considering you have for example on your side those key chains:
 
@@ -131,9 +131,9 @@ Now the `$jwksExport` array contains the needed [JWKS properties](https://auth0.
 }
 ```
 
-## Exposing a JWKS endpoint
+## Provide a JWKS response
 
-You can expose the [JwksServer](../../src/Security/Jwks/Server/JwksServer.php) in an application controller to return a ready to use JWKS [PSR7 response](https://www.php-fig.org/psr/psr-7/#33-psrhttpmessageresponseinterface) for a given key set name:
+You can expose the [JwksServer](../../src/Security/Jwks/Server/JwksServer.php) in an application controller to provide a ready to use JWKS [PSR7 response](https://www.php-fig.org/psr/psr-7/#33-psrhttpmessageresponseinterface) for a given key set name:
 
 ```php
 <?php
@@ -146,4 +146,4 @@ $jwksServer = new JwksServer(new JwksExporter($keyChainRepository));
 $response = $jwksServer->handle('myKeySetName');
 ```
 
-**Note**: Up to you to provide the logic to retrieve the key set name to expose, generally got from a request uri parameter.
+**Note**: Up to you to provide the logic to retrieve the key set name to expose.

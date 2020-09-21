@@ -46,7 +46,7 @@ $ltiResourceLink = new LtiResourceLink(
 
 Once your `LtiResourceLinkInterface` implementation is ready, you need to launch it to a registered tool following the [OIDC launch workflow](https://www.imsglobal.org/spec/security/v1p0#openid_connect_launch_flow), within the context of a registration.
 
-To do so, you can use the [LtiResourceLinkLaunchRequestBuilder](../../src/Message/Launch/Builder/LtiResourceLinkLaunchRequestBuilder.php) to create an LTI resource link launch request, to start OIDC flow:
+To do so, you can use the [LtiResourceLinkLaunchRequestBuilder](../../src/Launch/Builder/LtiResourceLinkLaunchRequestBuilder.php) to create an LTI resource link launch request, to start OIDC flow:
 ```php
 <?php
 
@@ -245,16 +245,16 @@ You can find below required steps to validate an LTI launch request, needed only
 
 As a tool, you'll receive an HTTP request containing the [LTI resource link launch request](http://www.imsglobal.org/spec/lti/v1p3#resource-link-launch-request-message).
 
-The [LtiResourceLinkLaunchRequestValidator](../../src/Message/Launch/Validator/LtiResourceLinkLaunchRequestValidator.php) can be used for this:
+The [LtiResourceLinkLaunchRequestValidator](../../src/Launch/Validator/LtiResourceLinkLaunchRequestValidator.php) can be used for this:
 - it requires a registration repository and a nonce repository implementations [as explained here](../quickstart/interfaces.md)
 - it expects a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface) to validate
-- it will output a [LtiResourceLinkLaunchRequestValidationResult](../../src/Message/Launch/Validator/LtiResourceLinkLaunchRequestValidationResult.php) representing the launch validation, the related registration and the message payload itself.
+- it will output a [LtiResourceLinkLaunchRequestValidationResult](../../src/Launch/Validator/LaunchRequestValidationResult.php) representing the launch validation, the related registration and the message payload itself.
 
 For example:
 ```php
 <?php
 
-use OAT\Library\Lti1p3Core\Message\Launch\Validator\LtiResourceLinkLaunchRequestValidator;
+use OAT\Library\Lti1p3Core\Message\Launch\Validator\DeepLinkingRequestValidator;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepositoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -269,7 +269,7 @@ $nonceRepository = ...
 $request = ...
 
 // Create the validator
-$validator = new LtiResourceLinkLaunchRequestValidator($registrationRepository, $nonceRepository);
+$validator = new DeepLinkingRequestValidator($registrationRepository, $nonceRepository);
 
 // Perform validation
 $result = $validator->validate($request);

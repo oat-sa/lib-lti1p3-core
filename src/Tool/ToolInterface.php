@@ -33,9 +33,9 @@ interface ToolInterface
 
     public function getAudience(): string;
 
-    public function getOidcLoginInitiationUrl(): ?string;
+    public function getOidcInitiationUrl(): string;
 
     public function getLaunchUrl(): ?string;
 
-    public function getDeepLinkLaunchUrl(): ?string;
+    public function getDeepLinkingUrl(): ?string;
 }

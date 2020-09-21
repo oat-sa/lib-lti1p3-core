@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Message\Launch\Validator;
+namespace OAT\Library\Lti1p3Core\Launch\Validator;
 
 use Carbon\Carbon;
 use Lcobucci\JWT\Parser;
@@ -48,7 +48,7 @@ use Throwable;
 /**
  * @see https://www.imsglobal.org/spec/security/v1p0/#authentication-response-validation
  */
-class LtiResourceLinkLaunchRequestValidator
+abstract class AbstractLaunchRequestValidator
 {
     /** @var RegistrationRepositoryInterface */
     private $registrationRepository;
@@ -81,7 +81,7 @@ class LtiResourceLinkLaunchRequestValidator
         $this->parser = new Parser(new AssociativeDecoder());
     }
 
-    public function validate(ServerRequestInterface $request): LtiResourceLinkLaunchRequestValidationResult
+    public function validate(ServerRequestInterface $request): LaunchRequestValidationResult
     {
         $this->reset();
 
@@ -101,30 +101,37 @@ class LtiResourceLinkLaunchRequestValidator
             }
 
             $this
-                ->validateMessageExpiry($payload)
-                ->validateMessageKid($payload)
-                ->validateMessageVersion($payload)
-                ->validateMessageType($payload)
-                ->validateMessageRoles($payload)
-                ->validateMessageResourceLinkId($payload)
-                ->validateMessageUserIdentifier($payload)
-                ->validateMessageSignature($registration, $payload)
-                ->validateMessageNonce($payload)
-                ->validateMessageDeploymentId($registration, $payload)
+                ->validatePayloadExpiry($payload)
+                ->validatePayloadKid($payload)
+                ->validatePayloadVersion($payload)
+                ->validatePayloadMessageType($payload)
+                ->validatePayloadRoles($payload)
+                ->validatePayloadUserIdentifier($payload)
+                ->validatePayloadSignature($registration, $payload)
+                ->validatePayloadNonce($payload)
+                ->validatePayloadDeploymentId($registration, $payload)
                 ->validateStateExpiry($state)
                 ->validateStateSignature($registration, $state);
 
-            return new LtiResourceLinkLaunchRequestValidationResult($registration, $payload, $state, $this->successes);
+            $this->validateSpecifics($registration, $payload, $state);
+
+            return new LaunchRequestValidationResult($registration, $payload, $state, $this->successes);
 
         } catch (Throwable $exception) {
-            return new LtiResourceLinkLaunchRequestValidationResult(null, null, null, $this->successes, $exception->getMessage());
+            return new LaunchRequestValidationResult(null, null, null, $this->successes, $exception->getMessage());
         }
     }
+
+    abstract protected function validateSpecifics(
+        RegistrationInterface $registration,
+        LtiMessagePayloadInterface $payload,
+        MessagePayloadInterface $state
+    ): void;
 
     /**
      * @throws LtiExceptionInterface
      */
-    private function validateMessageKid(LtiMessagePayloadInterface $payload): self
+    private function validatePayloadKid(LtiMessagePayloadInterface $payload): self
     {
         if (!$payload->getToken()->hasHeader(LtiMessagePayloadInterface::HEADER_KID)) {
             throw new LtiException('JWT id_token kid header is missing');
@@ -136,7 +143,7 @@ class LtiResourceLinkLaunchRequestValidator
     /**
      * @throws LtiExceptionInterface
      */
-    private function validateMessageVersion(LtiMessagePayloadInterface $payload): self
+    private function validatePayloadVersion(LtiMessagePayloadInterface $payload): self
     {
         if ($payload->getVersion() !== LtiMessageInterface::LTI_VERSION) {
             throw new LtiException('JWT id_token version claim is invalid');
@@ -148,19 +155,19 @@ class LtiResourceLinkLaunchRequestValidator
     /**
      * @throws LtiExceptionInterface
      */
-    private function validateMessageType(LtiMessagePayloadInterface $payload): self
+    private function validatePayloadMessageType(LtiMessagePayloadInterface $payload): self
     {
         if ($payload->getMessageType() === '') {
-            throw new LtiException('JWT id_token message_type claim is invalid');
+            throw new LtiException('JWT id_token message_type claim is missing');
         }
 
-        return $this->addSuccess('JWT id_token message_type claim is valid');
+        return $this->addSuccess('JWT id_token message_type claim is provided');
     }
 
     /**
      * @throws LtiExceptionInterface
      */
-    private function validateMessageRoles(LtiMessagePayloadInterface $payload): self
+    private function validatePayloadRoles(LtiMessagePayloadInterface $payload): self
     {
         if (!is_array($payload->getToken()->getClaim(LtiMessagePayloadInterface::CLAIM_LTI_ROLES))) {
             throw new LtiException('JWT id_token roles claim is invalid');
@@ -172,19 +179,7 @@ class LtiResourceLinkLaunchRequestValidator
     /**
      * @throws LtiExceptionInterface
      */
-    private function validateMessageResourceLinkId(LtiMessagePayloadInterface $payload): self
-    {
-        if ($payload->getResourceLink()->getId() === '') {
-            throw new LtiException('JWT id_token resource_link id claim is invalid');
-        }
-
-        return $this->addSuccess('JWT id_token resource_link id claim is valid');
-    }
-
-    /**
-     * @throws LtiExceptionInterface
-     */
-    private function validateMessageUserIdentifier(LtiMessagePayloadInterface $payload): self
+    private function validatePayloadUserIdentifier(LtiMessagePayloadInterface $payload): self
     {
         if ($payload->getUserIdentity() && $payload->getUserIdentity()->getIdentifier() === '') {
             throw new LtiException('JWT id_token user identifier (sub) claim is invalid');
@@ -196,7 +191,7 @@ class LtiResourceLinkLaunchRequestValidator
     /**
      * @throws LtiExceptionInterface
      */
-    private function validateMessageSignature(RegistrationInterface $registration, LtiMessagePayloadInterface $payload): self
+    private function validatePayloadSignature(RegistrationInterface $registration, LtiMessagePayloadInterface $payload): self
     {
         if (null === $registration->getPlatformKeyChain()) {
             $key = $this->fetcher->fetchKey(
@@ -217,7 +212,7 @@ class LtiResourceLinkLaunchRequestValidator
     /**
      * @throws LtiExceptionInterface
      */
-    private function validateMessageExpiry(LtiMessagePayloadInterface $payload): self
+    private function validatePayloadExpiry(LtiMessagePayloadInterface $payload): self
     {
         if ($payload->getToken()->isExpired()) {
             throw new LtiException('JWT id_token is expired');
@@ -229,7 +224,7 @@ class LtiResourceLinkLaunchRequestValidator
     /**
      * @throws LtiExceptionInterface
      */
-    private function validateMessageNonce(LtiMessagePayloadInterface $payload): self
+    private function validatePayloadNonce(LtiMessagePayloadInterface $payload): self
     {
         $nonceValue = $payload->getMandatoryClaim(MessagePayloadInterface::CLAIM_NONCE);
 
@@ -253,7 +248,7 @@ class LtiResourceLinkLaunchRequestValidator
     /**
      * @throws LtiExceptionInterface
      */
-    private function validateMessageDeploymentId(RegistrationInterface $registration, LtiMessagePayloadInterface $payload): self
+    private function validatePayloadDeploymentId(RegistrationInterface $registration, LtiMessagePayloadInterface $payload): self
     {
         if (!$registration->hasDeploymentId($payload->getDeploymentId())) {
             throw new LtiException('JWT id_token deployment_id claim not valid for this registration');
@@ -290,14 +285,14 @@ class LtiResourceLinkLaunchRequestValidator
         return $this->addSuccess('JWT OIDC state is not expired');
     }
 
-    private function addSuccess(string $message): self
+    protected function addSuccess(string $message): self
     {
         $this->successes[] = $message;
 
         return $this;
     }
 
-    private function reset(): self
+    protected function reset(): self
     {
         $this->successes = [];
 

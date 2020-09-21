@@ -25,6 +25,8 @@ namespace OAT\Library\Lti1p3Core\Message\Payload;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\AgsClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\BasicOutcomeClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\DeepLinkingContentItems;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\DeepLinkingSettingsClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\LaunchPresentationClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\LisClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\NrpsClaim;
@@ -51,6 +53,15 @@ interface LtiMessagePayloadInterface extends MessagePayloadInterface
     public const CLAIM_LTI_TARGET_LINK_URI = 'https://purl.imsglobal.org/spec/lti/claim/target_link_uri';
     public const CLAIM_LTI_RESOURCE_LINK = 'https://purl.imsglobal.org/spec/lti/claim/resource_link';
 
+    // LTI Deep Linking claims
+    public const CLAIM_LTI_DEEP_LINKING_SETTINGS = 'https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings';
+    public const CLAIM_LTI_DEEP_LINKING_CONTENT_ITEMS = 'https://purl.imsglobal.org/spec/lti-dl/claim/content_items';
+    public const CLAIM_LTI_DEEP_LINKING_DATA = 'https://purl.imsglobal.org/spec/lti-dl/claim/data';
+    public const CLAIM_LTI_DEEP_LINKING_MESSAGE = 'https://purl.imsglobal.org/spec/lti-dl/claim/msg';
+    public const CLAIM_LTI_DEEP_LINKING_LOG = 'https://purl.imsglobal.org/spec/lti-dl/claim/log';
+    public const CLAIM_LTI_DEEP_LINKING_ERROR_MESSAGE = 'https://purl.imsglobal.org/spec/lti-dl/claim/errormsg';
+    public const CLAIM_LTI_DEEP_LINKING_ERROR_LOG = 'https://purl.imsglobal.org/spec/lti-dl/claim/errorlog';
+
     // LTI AGS claim
     public const CLAIM_LTI_AGS = 'https://purl.imsglobal.org/spec/lti-ags/claim/endpoint';
 
@@ -74,7 +85,7 @@ interface LtiMessagePayloadInterface extends MessagePayloadInterface
 
     public function getCustom(): array;
 
-    public function getResourceLink(): ResourceLinkClaim;
+    public function getResourceLink(): ?ResourceLinkClaim;
 
     public function getContext(): ?ContextClaim;
 
@@ -85,6 +96,20 @@ interface LtiMessagePayloadInterface extends MessagePayloadInterface
     public function getLis(): ?LisClaim;
 
     public function getUserIdentity(): ?UserIdentityInterface;
+
+    public function getDeepLinkingSettings(): ?DeepLinkingSettingsClaim;
+
+    public function getDeepLinkingContentItems(): ?DeepLinkingContentItems;
+
+    public function getDeepLinkingData(): ?string;
+
+    public function getDeepLinkingMessage(): ?string;
+
+    public function getDeepLinkingLog(): ?string;
+
+    public function getDeepLinkingErrorMessage(): ?string;
+
+    public function getDeepLinkingErrorLog(): ?string;
 
     public function getAgs(): ?AgsClaim;
 

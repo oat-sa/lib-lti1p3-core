@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Launch\Validator;
 
-use OAT\Library\Lti1p3Core\Launch\Validator\LtiResourceLinkLaunchRequestValidationResult;
+use OAT\Library\Lti1p3Core\Launch\Validator\LaunchRequestValidationResult;
 use OAT\Library\Lti1p3Core\Token\LtiMessageTokenInterface;
 use OAT\Library\Lti1p3Core\Token\MessageInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
@@ -34,7 +34,7 @@ class LtiLaunchRequestValidationResultTest extends TestCase
     {
         $registrationMock = $this->createMock(RegistrationInterface::class);
 
-        $subject = new LtiResourceLinkLaunchRequestValidationResult($registrationMock);
+        $subject = new LaunchRequestValidationResult($registrationMock);
 
         $this->assertEquals($registrationMock, $subject->getRegistration());
     }
@@ -43,7 +43,7 @@ class LtiLaunchRequestValidationResultTest extends TestCase
     {
         $ltiMessageMock = $this->createMock(LtiMessageTokenInterface::class);
 
-        $subject = new LtiResourceLinkLaunchRequestValidationResult(null, $ltiMessageMock);
+        $subject = new LaunchRequestValidationResult(null, $ltiMessageMock);
 
         $this->assertEquals($ltiMessageMock, $subject->getLtiMessage());
     }
@@ -52,14 +52,14 @@ class LtiLaunchRequestValidationResultTest extends TestCase
     {
         $oidcStateMock = $this->createMock(MessageInterface::class);
 
-        $subject = new LtiResourceLinkLaunchRequestValidationResult(null, null, $oidcStateMock);
+        $subject = new LaunchRequestValidationResult(null, null, $oidcStateMock);
 
         $this->assertEquals($oidcStateMock, $subject->getOidcState());
     }
 
     public function testBehavior(): void
     {
-        $subject = new LtiResourceLinkLaunchRequestValidationResult();
+        $subject = new LaunchRequestValidationResult();
 
         $this->assertFalse($subject->hasError());
 

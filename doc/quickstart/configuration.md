@@ -72,9 +72,9 @@ $tool = new Tool(
     'toolIdentifier',               // [required] identifier
     'toolName',                     // [required] name
     'https://tool.com',             // [required] audience
-    'https://tool.com/oidc-init',   // [optional] OIDC login initiation url
+    'https://tool.com/oidc-init',   // [required] OIDC initiation url
     'https://tool.com/launch',      // [optional] LTI default ResourceLink launch url
-    'https://tool.com/deep-launch'  // [optional] LTI DeepLink launch url
+    'https://tool.com/deep-linking' // [optional] LTI DeepLinking url
 );
 ```
 **Note**: you can also provide your own implementation of the [ToolInterface](../../src/Tool/ToolInterface.php).

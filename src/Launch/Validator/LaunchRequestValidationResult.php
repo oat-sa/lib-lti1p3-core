@@ -20,13 +20,13 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Message\Launch\Validator;
+namespace OAT\Library\Lti1p3Core\Launch\Validator;
 
 use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 
-class LtiResourceLinkLaunchRequestValidationResult
+class LaunchRequestValidationResult
 {
     /** @var RegistrationInterface|null */
     private $registration;
