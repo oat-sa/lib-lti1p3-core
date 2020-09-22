@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Settings;
+namespace OAT\Library\Lti1p3Core\DeepLink\Settings;
 
 use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 
@@ -30,7 +30,7 @@ use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 class DeepLinkingSettings implements DeepLinkingSettingsInterface
 {
     /** @var string */
-    private $deepLinkReturnUrl;
+    private $deepLinkingReturnUrl;
 
     /** @var array */
     private $acceptedTypes;
@@ -54,7 +54,7 @@ class DeepLinkingSettings implements DeepLinkingSettingsInterface
     private $text;
 
     public function __construct(
-        string $deepLinkReturnUrl,
+        string $deepLinkingReturnUrl,
         array $acceptedTypes,
         array $acceptedPresentationDocumentTargets,
         string $acceptedMediaTypes = null,
@@ -63,7 +63,7 @@ class DeepLinkingSettings implements DeepLinkingSettingsInterface
         string $title = null,
         string $text= null
     ) {
-        $this->deepLinkReturnUrl = $deepLinkReturnUrl;
+        $this->deepLinkingReturnUrl = $deepLinkingReturnUrl;
         $this->acceptedTypes = $acceptedTypes;
         $this->acceptedPresentationDocumentTargets = $acceptedPresentationDocumentTargets;
         $this->acceptedMediaTypes = $acceptedMediaTypes;
@@ -73,9 +73,9 @@ class DeepLinkingSettings implements DeepLinkingSettingsInterface
         $this->text = $text;
     }
 
-    public function getDeepLinkReturnUrl(): string
+    public function getDeepLinkingReturnUrl(): string
     {
-        return $this->deepLinkReturnUrl;
+        return $this->deepLinkingReturnUrl;
     }
 
     public function getAcceptedTypes(): array

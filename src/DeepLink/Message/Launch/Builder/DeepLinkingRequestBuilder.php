@@ -20,12 +20,12 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\DeepLink\Launch\Builder;
+namespace OAT\Library\Lti1p3Core\DeepLink\Message\Launch\Builder;
 
 use OAT\Library\Lti1p3Core\DeepLink\Settings\DeepLinkingSettingsInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
-use OAT\Library\Lti1p3Core\Launch\Builder\AbstractLaunchRequestBuilder;
+use OAT\Library\Lti1p3Core\Message\Launch\Builder\AbstractLaunchRequestBuilder;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\DeepLinkingSettingsClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
@@ -50,7 +50,7 @@ class DeepLinkingRequestBuilder extends AbstractLaunchRequestBuilder
         try {
             $this->builder->withClaim(
                 DeepLinkingSettingsClaim::denormalize([
-                    'deep_link_return_url' => $settings->getDeepLinkReturnUrl(),
+                    'deep_link_return_url' => $settings->getDeepLinkingReturnUrl(),
                     'accept_types' => $settings->getAcceptedTypes(),
                     'accept_presentation_document_targets' => $settings->getAcceptedPresentationDocumentTargets(),
                     'accept_media_types' => $settings->getAcceptedMediaTypes(),

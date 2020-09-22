@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Launch\Validator;
+namespace OAT\Library\Lti1p3Core\Message\Launch\Validator;
 
 use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;

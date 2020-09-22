@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Launch\Builder;
+namespace OAT\Library\Lti1p3Core\Message\Launch\Builder;
 
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;

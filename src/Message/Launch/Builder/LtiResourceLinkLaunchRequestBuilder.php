@@ -20,11 +20,11 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Launch\Builder;
+namespace OAT\Library\Lti1p3Core\Message\Launch\Builder;
 
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
-use OAT\Library\Lti1p3Core\Message\Resource\LtiResourceLinkInterface;
+use OAT\Library\Lti1p3Core\Resource\ResourceLink\LtiResourceLinkInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;

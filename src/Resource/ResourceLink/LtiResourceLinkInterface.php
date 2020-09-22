@@ -20,24 +20,20 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\DeepLink\Settings;
+namespace OAT\Library\Lti1p3Core\Resource\ResourceLink;
+
+use OAT\Library\Lti1p3Core\Resource\ResourceInterface;
 
 /**
- * @see https://www.imsglobal.org/spec/lti-dl/v2p0#deep-linking-settings
+ * @see https://www.imsglobal.org/spec/lti-dl/v2p0/#lti-resource-link
  */
-interface DeepLinkingSettingsInterface
+interface LtiResourceLinkInterface extends ResourceInterface
 {
-    public function getDeepLinkingReturnUrl(): string;
+    public const TYPE = 'ltiResourceLink';
 
-    public function getAcceptedTypes(): array;
+    public function getIdentifier(): string;
 
-    public function getAcceptedPresentationDocumentTargets(): array;
-
-    public function getAcceptedMediaTypes(): ?string;
-
-    public function shouldAcceptMultiple(): bool;
-
-    public function shouldAutoCreate(): bool;
+    public function getUrl(): ?string;
 
     public function getTitle(): ?string;
 

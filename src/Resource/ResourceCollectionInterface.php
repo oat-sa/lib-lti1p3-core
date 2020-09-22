@@ -20,12 +20,15 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Message\Resource;
+namespace OAT\Library\Lti1p3Core\Resource;
 
-/**
- * @see https://www.imsglobal.org/spec/lti-dl/v2p0/#content-item-types
- */
-interface LtiResourceInterface
+use Countable;
+use IteratorAggregate;
+use JsonSerializable;
+
+interface ResourceCollectionInterface extends Countable, IteratorAggregate, JsonSerializable
 {
-    public function getType(): string;
+    public function add(ResourceInterface $resource): ResourceCollectionInterface;
+
+    public function getByType(string $type): array;
 }

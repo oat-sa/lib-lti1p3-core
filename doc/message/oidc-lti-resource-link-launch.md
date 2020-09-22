@@ -25,7 +25,7 @@ You can find below required steps to generate an LTI resource link launch reques
 
 A [LTI resource link](http://www.imsglobal.org/spec/lti/v1p3#resource-link-0) represent a resource made available from a tool to a platform.
 
-First of all, you need to create a [LtiResourceLink](../../src/Message/Resource/LtiResourceLink.php) instance:
+First of all, you need to create a [LtiResourceLink](../../src/Resource/LtiResourceLink/LtiResourceLink.php) instance:
 ```php
 <?php
 
@@ -40,13 +40,13 @@ $ltiResourceLink = new LtiResourceLink(
 ```
 **Notes**:
 - if no resource link url is given, the launch will be done on the default launch url of the registered tool
-- since the platform should be able to retrieve resource links from their storage (pre fetched from [deep link](https://www.imsglobal.org/spec/lti-dl/v2p0) for example), you can implement your own [LtiResourceLinkInterface](../../src/Message/Resource/LtiResourceLinkInterface.php)
+- since the platform should be able to retrieve resource links from their storage (pre fetched from [deep link](https://www.imsglobal.org/spec/lti-dl/v2p0) for example), you can implement your own [LtiResourceLinkInterface](../../src/Resource/LtiResourceLink/LtiResourceLinkInterface.php)
 
 ### Create an LTI resource link launch request (OIDC) for the LTI resource link
 
 Once your `LtiResourceLinkInterface` implementation is ready, you need to launch it to a registered tool following the [OIDC launch workflow](https://www.imsglobal.org/spec/security/v1p0#openid_connect_launch_flow), within the context of a registration.
 
-To do so, you can use the [LtiResourceLinkLaunchRequestBuilder](../../src/Launch/Builder/LtiResourceLinkLaunchRequestBuilder.php) to create an LTI resource link launch request, to start OIDC flow:
+To do so, you can use the [LtiResourceLinkLaunchRequestBuilder](../../src/Message/Launch/Builder/LtiResourceLinkLaunchRequestBuilder.php) to create an LTI resource link launch request, to start OIDC flow:
 ```php
 <?php
 
@@ -245,10 +245,10 @@ You can find below required steps to validate an LTI launch request, needed only
 
 As a tool, you'll receive an HTTP request containing the [LTI resource link launch request](http://www.imsglobal.org/spec/lti/v1p3#resource-link-launch-request-message).
 
-The [LtiResourceLinkLaunchRequestValidator](../../src/Launch/Validator/LtiResourceLinkLaunchRequestValidator.php) can be used for this:
+The [LtiResourceLinkLaunchRequestValidator](../../src/Message/Launch/Validator/LtiResourceLinkLaunchRequestValidator.php) can be used for this:
 - it requires a registration repository and a nonce repository implementations [as explained here](../quickstart/interfaces.md)
 - it expects a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface) to validate
-- it will output a [LtiResourceLinkLaunchRequestValidationResult](../../src/Launch/Validator/LaunchRequestValidationResult.php) representing the launch validation, the related registration and the message payload itself.
+- it will output a [LtiResourceLinkLaunchRequestValidationResult](../../src/Message/Launch/Validator/LaunchRequestValidationResult.php) representing the launch validation, the related registration and the message payload itself.
 
 For example:
 ```php

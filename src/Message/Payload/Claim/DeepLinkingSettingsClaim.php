@@ -30,7 +30,7 @@ use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 class DeepLinkingSettingsClaim implements MessagePayloadClaimInterface
 {
     /** @var string */
-    private $deepLinkReturnUrl;
+    private $deepLinkingReturnUrl;
 
     /** @var array */
     private $acceptedTypes;
@@ -57,7 +57,7 @@ class DeepLinkingSettingsClaim implements MessagePayloadClaimInterface
     private $data;
 
     public function __construct(
-        string $deepLinkReturnUrl,
+        string $deepLinkingReturnUrl,
         array $acceptedTypes,
         array $acceptedPresentationDocumentTargets,
         string $acceptedMediaTypes = null,
@@ -67,7 +67,7 @@ class DeepLinkingSettingsClaim implements MessagePayloadClaimInterface
         string $text= null,
         string $data = null
     ) {
-        $this->deepLinkReturnUrl = $deepLinkReturnUrl;
+        $this->deepLinkingReturnUrl = $deepLinkingReturnUrl;
         $this->acceptedTypes = $acceptedTypes;
         $this->acceptedPresentationDocumentTargets = $acceptedPresentationDocumentTargets;
         $this->acceptedMediaTypes = $acceptedMediaTypes;
@@ -78,9 +78,9 @@ class DeepLinkingSettingsClaim implements MessagePayloadClaimInterface
         $this->data = $data;
     }
 
-    public function getDeepLinkReturnUrl(): string
+    public function getDeepLinkingReturnUrl(): string
     {
-        return $this->deepLinkReturnUrl;
+        return $this->deepLinkingReturnUrl;
     }
 
     public function getAcceptedTypes(): array
@@ -131,7 +131,7 @@ class DeepLinkingSettingsClaim implements MessagePayloadClaimInterface
     public function normalize(): array
     {
         return array_filter([
-            'deep_link_return_url' => $this->deepLinkReturnUrl,
+            'deep_link_return_url' => $this->deepLinkingReturnUrl,
             'accept_types' => $this->acceptedTypes,
             'accept_presentation_document_targets' => $this->acceptedPresentationDocumentTargets,
             'accept_media_types' => $this->acceptedMediaTypes,
@@ -145,13 +145,25 @@ class DeepLinkingSettingsClaim implements MessagePayloadClaimInterface
 
     public static function denormalize(array $claimData): DeepLinkingSettingsClaim
     {
+
+        $acceptMultiple = true;
+        $autoCreate = false;
+
+        if (array_key_exists('accept_multiple',$claimData )) {
+            $acceptMultiple = 'true' === $claimData['accept_multiple'];
+        }
+
+        if (array_key_exists('auto_create',$claimData )) {
+            $autoCreate = 'true' === $claimData['auto_create'];
+        }
+
         return new self(
             $claimData['deep_link_return_url'],
             $claimData['accept_types'],
             $claimData['accept_presentation_document_targets'],
             $claimData['accept_media_types'] ?? null,
-            $claimData['accept_multiple'] ?? true,
-            $claimData['auto_create'] ?? false,
+            $acceptMultiple,
+            $autoCreate,
             $claimData['title'] ?? null,
             $claimData['text'] ?? null,
             $claimData['data'] ?? null

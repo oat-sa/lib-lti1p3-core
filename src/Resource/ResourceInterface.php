@@ -20,20 +20,18 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Message\Resource;
+namespace OAT\Library\Lti1p3Core\Resource;
+use JsonSerializable;
 
-/**
- * @see https://www.imsglobal.org/spec/lti-dl/v2p0/#lti-resource-link
- */
-interface LtiResourceLinkInterface extends LtiResourceInterface
+interface ResourceInterface extends JsonSerializable
 {
-    public const TYPE = 'ltiResourceLink';
+    public function getType(): string;
 
-    public function getIdentifier(): string;
+    public function getProperties(): array;
 
-    public function getUrl(): ?string;
+    public function hasProperty(string $propertyName): bool;
 
-    public function getTitle(): ?string;
+    public function getMandatoryProperty(string $propertyName);
 
-    public function getText(): ?string;
+    public function getProperty(string $propertyName, string $default = null);
 }

@@ -41,6 +41,8 @@ interface LtiMessageInterface
 
     public function getParameters(): array;
 
+    public function hasParameter(string $parameterName): bool;
+
     public function getMandatoryParameter(string $parameterName): string;
 
     public function getParameter(string $parameterName, string $default = null): ?string;

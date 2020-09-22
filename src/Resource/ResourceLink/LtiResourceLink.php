@@ -20,55 +20,41 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Message\Resource;
+namespace OAT\Library\Lti1p3Core\Resource\ResourceLink;
+
+use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
+use OAT\Library\Lti1p3Core\Resource\Resource;
 
 /**
  * @see https://www.imsglobal.org/spec/lti-dl/v2p0/#lti-resource-link
  */
-class LtiResourceLink implements LtiResourceLinkInterface
+class LtiResourceLink extends Resource implements LtiResourceLinkInterface
 {
-    /** @var string */
-    private $identifier;
-
-    /** @var string|null */
-    private $url;
-
-    /** @var string|null */
-    private $title;
-
-    /** @var string|null */
-    private $text;
-
-    public function __construct(string $identifier, string $url = null, string $title = null, string $text = null)
+    public function __construct(array $properties = [])
     {
-        $this->identifier = $identifier;
-        $this->url = $url;
-        $this->title = $title;
-        $this->text = $text;
+        parent::__construct(self::TYPE, $properties);
     }
 
+    /**
+     * @throws LtiExceptionInterface
+     */
     public function getIdentifier(): string
     {
-        return $this->identifier;
-    }
-
-    public function getType(): string
-    {
-        return static::TYPE;
+        return $this->getMandatoryProperty('identifier');
     }
 
     public function getUrl(): ?string
     {
-        return $this->url;
+        return $this->getProperty('url');
     }
 
     public function getTitle(): ?string
     {
-        return $this->title;
+        return $this->getProperty('title');
     }
 
     public function getText(): ?string
     {
-        return $this->text;
+        return $this->getProperty('text');
     }
 }

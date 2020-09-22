@@ -53,6 +53,11 @@ class LtiMessage implements LtiMessageInterface
         return $this->parameters;
     }
 
+    public function hasParameter(string $parameterName): bool
+    {
+        return array_key_exists($parameterName, $this->parameters);
+    }
+
     /**
      * @throws LtiExceptionInterface
      */
