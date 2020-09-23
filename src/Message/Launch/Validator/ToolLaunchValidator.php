@@ -47,7 +47,7 @@ class ToolLaunchValidator extends AbstractLaunchValidator
     {
         return [
             LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
-            LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_REQUEST,
+            LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_REQUEST
         ];
     }
 
@@ -79,20 +79,8 @@ class ToolLaunchValidator extends AbstractLaunchValidator
                 ->validatePayloadUserIdentifier($payload)
                 ->validatePayloadSignature($registration, $payload)
                 ->validatePayloadNonce($payload)
-                ->validatePayloadDeploymentId($registration, $payload);
-
-            switch ($payload->getMessageType()) {
-                case LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST:
-                    $this->validateLtiResourceLinkLaunchRequestSpecifics($payload);
-                    break;
-                case LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_REQUEST:
-                    $this->validateDeepLinkingRequestSpecifics($payload);
-                    break;
-                default:
-                    throw new LtiException(sprintf('Launch message type %s not handled', $payload->getMessageType()));
-            }
-
-            $this
+                ->validatePayloadDeploymentId($registration, $payload)
+                ->validateLaunchSpecifics($payload)
                 ->validateStateExpiry($state)
                 ->validateStateSignature($registration, $state);
 
@@ -109,10 +97,10 @@ class ToolLaunchValidator extends AbstractLaunchValidator
     private function validatePayloadKid(LtiMessagePayloadInterface $payload): self
     {
         if (!$payload->getToken()->hasHeader(LtiMessagePayloadInterface::HEADER_KID)) {
-            throw new LtiException('JWT id_token kid header is missing');
+            throw new LtiException('ID token kid header is missing');
         }
 
-        return $this->addSuccess('JWT id_token kid header is provided');
+        return $this->addSuccess('ID token kid header is provided');
     }
 
     /**
@@ -121,10 +109,10 @@ class ToolLaunchValidator extends AbstractLaunchValidator
     private function validatePayloadVersion(LtiMessagePayloadInterface $payload): self
     {
         if ($payload->getVersion() !== LtiMessageInterface::LTI_VERSION) {
-            throw new LtiException('JWT id_token version claim is invalid');
+            throw new LtiException('ID token version claim is invalid');
         }
 
-        return $this->addSuccess('JWT id_token version claim is valid');
+        return $this->addSuccess('ID token version claim is valid');
     }
 
     /**
@@ -133,10 +121,16 @@ class ToolLaunchValidator extends AbstractLaunchValidator
     private function validatePayloadMessageType(LtiMessagePayloadInterface $payload): self
     {
         if ($payload->getMessageType() === '') {
-            throw new LtiException('JWT id_token message_type claim is missing');
+            throw new LtiException('ID token message_type claim is missing');
         }
 
-        return $this->addSuccess('JWT id_token message_type claim is provided');
+        if (!in_array($payload->getMessageType(), $this->getSupportedMessageTypes())) {
+            throw new LtiException(
+                sprintf('ID token message_type claim %s is not supported', $payload->getMessageType())
+            );
+        }
+
+        return $this->addSuccess('ID token message_type claim is valid');
     }
 
     /**
@@ -145,10 +139,10 @@ class ToolLaunchValidator extends AbstractLaunchValidator
     private function validatePayloadRoles(LtiMessagePayloadInterface $payload): self
     {
         if (!is_array($payload->getToken()->getClaim(LtiMessagePayloadInterface::CLAIM_LTI_ROLES))) {
-            throw new LtiException('JWT id_token roles claim is invalid');
+            throw new LtiException('ID token roles claim is invalid');
         }
 
-        return $this->addSuccess('JWT id_token roles claim is valid');
+        return $this->addSuccess('ID token roles claim is valid');
     }
 
     /**
@@ -157,10 +151,10 @@ class ToolLaunchValidator extends AbstractLaunchValidator
     private function validatePayloadUserIdentifier(LtiMessagePayloadInterface $payload): self
     {
         if ($payload->getUserIdentity() && $payload->getUserIdentity()->getIdentifier() === '') {
-            throw new LtiException('JWT id_token user identifier (sub) claim is invalid');
+            throw new LtiException('JID token user identifier (sub) claim is invalid');
         }
 
-        return $this->addSuccess('JWT id_token user identifier (sub) claim is valid');
+        return $this->addSuccess('ID token user identifier (sub) claim is valid');
     }
 
     /**
@@ -178,10 +172,10 @@ class ToolLaunchValidator extends AbstractLaunchValidator
         }
 
         if (!$payload->getToken()->verify($this->signer, $key)) {
-            throw new LtiException('JWT id_token signature validation failure');
+            throw new LtiException('ID token signature validation failure');
         }
 
-        return $this->addSuccess('JWT id_token signature validation success');
+        return $this->addSuccess('ID token signature validation success');
     }
 
     /**
@@ -190,10 +184,10 @@ class ToolLaunchValidator extends AbstractLaunchValidator
     private function validatePayloadExpiry(LtiMessagePayloadInterface $payload): self
     {
         if ($payload->getToken()->isExpired()) {
-            throw new LtiException('JWT id_token is expired');
+            throw new LtiException('ID token is expired');
         }
 
-        return $this->addSuccess('JWT id_token is not expired');
+        return $this->addSuccess('ID token is not expired');
     }
 
     /**
@@ -207,16 +201,16 @@ class ToolLaunchValidator extends AbstractLaunchValidator
 
         if (null !== $nonce) {
             if (!$nonce->isExpired()) {
-                throw new LtiException('JWT id_token nonce already used');
+                throw new LtiException('ID token nonce claim already used');
             }
 
-            return $this->addSuccess('JWT id_token nonce already used but expired');
+            return $this->addSuccess('ID token nonce claim already used but expired');
         } else {
             $this->nonceRepository->save(
                 new Nonce($nonceValue, Carbon::now()->addSeconds(NonceGeneratorInterface::TTL))
             );
 
-            return $this->addSuccess('JWT id_token nonce is valid');
+            return $this->addSuccess('ID token nonce claim is valid');
         }
     }
 
@@ -226,10 +220,34 @@ class ToolLaunchValidator extends AbstractLaunchValidator
     private function validatePayloadDeploymentId(RegistrationInterface $registration, LtiMessagePayloadInterface $payload): self
     {
         if (!$registration->hasDeploymentId($payload->getDeploymentId())) {
-            throw new LtiException('JWT id_token deployment_id claim not valid for this registration');
+            throw new LtiException('ID token deployment_id claim not valid for this registration');
         }
 
-        return $this->addSuccess('JWT id_token deployment_id claim valid for this registration');
+        return $this->addSuccess('ID token deployment_id claim valid for this registration');
+    }
+
+    /**
+     * @throws LtiExceptionInterface
+     */
+    private function validateLaunchSpecifics(LtiMessagePayloadInterface $payload): self
+    {
+        switch ($payload->getMessageType()) {
+            case LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST:
+                if ($payload->getResourceLink()->getId() === '') {
+                    throw new LtiException('ID token resource_link id claim is invalid');
+                }
+
+                return $this->addSuccess('ID token  resource_link id claim is valid');
+                break;
+            case LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_REQUEST:
+                if (null === $payload->getDeepLinkingSettings()) {
+                    throw new LtiException('ID token  deep_linking_settings id claim is invalid');
+                }
+
+                return $this->addSuccess('ID token  deep_linking_settings id claim is valid');
+            default:
+                throw new LtiException(sprintf('Launch message type %s not handled', $payload->getMessageType()));
+        }
     }
 
     /**
@@ -242,10 +260,10 @@ class ToolLaunchValidator extends AbstractLaunchValidator
         }
 
         if (!$state->getToken()->verify($this->signer, $registration->getToolKeyChain()->getPublicKey())) {
-            throw new LtiException('JWT OIDC state signature validation failure');
+            throw new LtiException('State signature validation failure');
         }
 
-        return $this->addSuccess('JWT OIDC state signature validation success');
+        return $this->addSuccess('State signature validation success');
     }
 
     /**
@@ -254,59 +272,9 @@ class ToolLaunchValidator extends AbstractLaunchValidator
     private function validateStateExpiry(MessagePayloadInterface $state): self
     {
         if ($state->getToken()->isExpired()) {
-            throw new LtiException('JWT OIDC state is expired');
+            throw new LtiException('State is expired');
         }
 
-        return $this->addSuccess('JWT OIDC state is not expired');
-    }
-
-    /**
-     * @throws LtiExceptionInterface
-     */
-    private function validateLtiResourceLinkLaunchRequestSpecifics(LtiMessagePayloadInterface $payload): self
-    {
-        if ($payload->getMessageType() !== LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST) {
-            throw new LtiException(
-                sprintf(
-                    'JWT id_token message_type must be %s',
-                    LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST
-                )
-            );
-        }
-
-        $this->addSuccess(
-            sprintf('JWT id_token message_type equals %s', LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST)
-        );
-
-        if ($payload->getResourceLink()->getId() === '') {
-            throw new LtiException('JWT id_token resource_link id claim is invalid');
-        }
-
-        return $this->addSuccess('JWT id_token resource_link id claim is valid');
-    }
-
-    /**
-     * @throws LtiExceptionInterface
-     */
-    private function validateDeepLinkingRequestSpecifics(LtiMessagePayloadInterface $payload): self
-    {
-        if ($payload->getMessageType() !== LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_REQUEST) {
-            throw new LtiException(
-                sprintf(
-                    'JWT id_token message_type must be %s',
-                    LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_REQUEST
-                )
-            );
-        }
-
-        $this->addSuccess(
-            sprintf('JWT id_token message_type equals %s', LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_REQUEST)
-        );
-
-        if (null === $payload->getDeepLinkingSettings()) {
-            throw new LtiException('JWT id_token deep_linking_settings id claim is invalid');
-        }
-
-        return $this->addSuccess('JWT id_token deep_linking_settings id claim is valid');
+        return $this->addSuccess('State is not expired');
     }
 }

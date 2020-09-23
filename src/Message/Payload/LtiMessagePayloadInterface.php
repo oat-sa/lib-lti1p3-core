@@ -39,7 +39,7 @@ use OAT\Library\Lti1p3Core\User\UserIdentityInterface;
  */
 interface LtiMessagePayloadInterface extends MessagePayloadInterface
 {
-    // LTI claims
+    // Core claims
     public const CLAIM_LTI_MESSAGE_TYPE = 'https://purl.imsglobal.org/spec/lti/claim/message_type';
     public const CLAIM_LTI_VERSION = 'https://purl.imsglobal.org/spec/lti/claim/version';
     public const CLAIM_LTI_DEPLOYMENT_ID = 'https://purl.imsglobal.org/spec/lti/claim/deployment_id';
@@ -53,7 +53,7 @@ interface LtiMessagePayloadInterface extends MessagePayloadInterface
     public const CLAIM_LTI_TARGET_LINK_URI = 'https://purl.imsglobal.org/spec/lti/claim/target_link_uri';
     public const CLAIM_LTI_RESOURCE_LINK = 'https://purl.imsglobal.org/spec/lti/claim/resource_link';
 
-    // LTI Deep Linking claims
+    // Deep Linking claims
     public const CLAIM_LTI_DEEP_LINKING_SETTINGS = 'https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings';
     public const CLAIM_LTI_DEEP_LINKING_CONTENT_ITEMS = 'https://purl.imsglobal.org/spec/lti-dl/claim/content_items';
     public const CLAIM_LTI_DEEP_LINKING_DATA = 'https://purl.imsglobal.org/spec/lti-dl/claim/data';
@@ -62,13 +62,13 @@ interface LtiMessagePayloadInterface extends MessagePayloadInterface
     public const CLAIM_LTI_DEEP_LINKING_ERROR_MESSAGE = 'https://purl.imsglobal.org/spec/lti-dl/claim/errormsg';
     public const CLAIM_LTI_DEEP_LINKING_ERROR_LOG = 'https://purl.imsglobal.org/spec/lti-dl/claim/errorlog';
 
-    // LTI AGS claim
+    // AGS claim
     public const CLAIM_LTI_AGS = 'https://purl.imsglobal.org/spec/lti-ags/claim/endpoint';
 
-    // LTI NRPS claim
+    // NRPS claim
     public const CLAIM_LTI_NRPS = 'https://purl.imsglobal.org/spec/lti-nrps/claim/namesroleservice';
 
-    // LTI Basic Outcome claim
+    // Basic Outcome claim
     public const CLAIM_LTI_BASIC_OUTCOME = 'https://purl.imsglobal.org/spec/lti-bo/claim/basicoutcome';
 
     public function getMessageType(): string;

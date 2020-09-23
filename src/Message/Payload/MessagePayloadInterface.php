@@ -41,8 +41,6 @@ interface MessagePayloadInterface
     public const CLAIM_AUD = 'aud';
     public const CLAIM_EXP = 'exp';
     public const CLAIM_IAT = 'iat';
-
-    // OIDC claims
     public const CLAIM_REGISTRATION_ID = 'registration_id';
     public const CLAIM_NONCE = 'nonce';
     public const CLAIM_PARAMETERS = 'parameters';
@@ -52,4 +50,6 @@ interface MessagePayloadInterface
     public function getMandatoryClaim(string $claim);
 
     public function getClaim(string $claim, $default = null);
+
+    public function hasClaim(string $claim): bool;
 }

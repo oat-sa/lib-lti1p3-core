@@ -45,8 +45,7 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
     protected function getSupportedMessageTypes(): array
     {
         return [
-            LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
-            LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_REQUEST,
+            LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE
         ];
     }
 
@@ -114,10 +113,16 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
     private function validatePayloadMessageType(LtiMessagePayloadInterface $payload): self
     {
         if ($payload->getMessageType() === '') {
-            throw new LtiException('JWT message_type claim is missing');
+            throw new LtiException('JWT id_token message_type claim is missing');
         }
 
-        return $this->addSuccess('JWT message_type claim is provided');
+        if (!in_array($payload->getMessageType(), $this->getSupportedMessageTypes())) {
+            throw new LtiException(
+                sprintf('JWT id_token message_type claim %s is not supported', $payload->getMessageType())
+            );
+        }
+
+        return $this->addSuccess('JWT id_token message_type claim is valid');
     }
 
 

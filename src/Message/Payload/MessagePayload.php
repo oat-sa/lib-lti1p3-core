@@ -80,4 +80,14 @@ class MessagePayload implements MessagePayloadInterface
             ? $this->token->getClaim($claim)
             : $default;
     }
+
+    public function hasClaim(string $claim): bool
+    {
+        if (is_a($claim, MessagePayloadClaimInterface::class, true)) {
+            /**  @var MessagePayloadClaimInterface $claim */
+            return $this->token->hasClaim($claim::getClaimName());
+        }
+
+        return $this->token->hasClaim($claim);
+    }
 }
