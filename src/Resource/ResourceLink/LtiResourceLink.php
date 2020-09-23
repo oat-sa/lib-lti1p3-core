@@ -64,7 +64,7 @@ class LtiResourceLink extends Resource implements LtiResourceLinkInterface
         return $this->getProperty('lineItem');
     }
 
-    public function getAvailable(): ?array
+    public function getAvailability(): ?array
     {
         return $this->getProperty('available');
     }

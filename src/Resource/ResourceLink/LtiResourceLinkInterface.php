@@ -43,7 +43,7 @@ interface LtiResourceLinkInterface extends ResourceInterface
 
     public function getLineItem(): ?array;
 
-    public function getAvailable(): ?array;
+    public function getAvailability(): ?array;
 
     public function getSubmission(): ?array;
 }

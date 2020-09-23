@@ -58,7 +58,7 @@ class File extends Resource implements FileInterface
         return $this->getProperty('thumbnail');
     }
 
-    public function getExpiresAt(): ?string
+    public function expiresAt(): ?string
     {
         return $this->getProperty('expiresAt');
     }

@@ -37,5 +37,5 @@ interface FileInterface extends ResourceInterface
 
     public function getThumbnail(): ?array;
 
-    public function getExpiresAt(): ?string;
+    public function expiresAt(): ?string;
 }
