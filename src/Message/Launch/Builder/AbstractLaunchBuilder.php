@@ -48,6 +48,8 @@ abstract class AbstractLaunchBuilder
                 $this->builder->withClaim($claimName, $claim);
             }
         }
+
+        return $this;
     }
 
     /**
