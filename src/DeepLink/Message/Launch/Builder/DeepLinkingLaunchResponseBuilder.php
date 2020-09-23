@@ -67,6 +67,7 @@ class DeepLinkingLaunchResponseBuilder extends ToolLaunchBuilder
                 $deploymentId,
                 $optionalClaims
             );
+
         } catch (LtiExceptionInterface $exception) {
             throw $exception;
         } catch (Throwable $exception) {

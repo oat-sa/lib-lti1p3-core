@@ -42,7 +42,7 @@ use Throwable;
  */
 class PlatformLaunchValidator extends AbstractLaunchValidator
 {
-    protected function getSupportedMessageTypes(): array
+    public function getSupportedMessageTypes(): array
     {
         return [
             LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE
@@ -54,9 +54,9 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
         $this->reset();
 
         try {
-            $launchRequest = LtiMessage::fromServerRequest($request);
+            $message = LtiMessage::fromServerRequest($request);
 
-            $payload = new LtiMessagePayload($this->parser->parse($launchRequest->getMandatoryParameter('JWT')));
+            $payload = new LtiMessagePayload($this->parser->parse($message->getMandatoryParameter('JWT')));
 
             $registration = $this->registrationRepository->findByPlatformIssuer(
                 $payload->getMandatoryClaim(MessagePayloadInterface::CLAIM_AUD),

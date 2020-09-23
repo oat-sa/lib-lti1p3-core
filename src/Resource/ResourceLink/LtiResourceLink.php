@@ -22,7 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Resource\ResourceLink;
 
-use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Resource\Resource;
 
 /**

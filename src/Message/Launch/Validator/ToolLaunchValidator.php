@@ -43,7 +43,7 @@ use Throwable;
  */
 class ToolLaunchValidator extends AbstractLaunchValidator
 {
-    protected function getSupportedMessageTypes(): array
+    public function getSupportedMessageTypes(): array
     {
         return [
             LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
@@ -56,10 +56,10 @@ class ToolLaunchValidator extends AbstractLaunchValidator
         $this->reset();
 
         try {
-            $launchRequest = LtiMessage::fromServerRequest($request);
+            $message = LtiMessage::fromServerRequest($request);
 
-            $payload = new LtiMessagePayload($this->parser->parse($launchRequest->getMandatoryParameter('id_token')));
-            $state = new MessagePayload($this->parser->parse($launchRequest->getMandatoryParameter('state')));
+            $payload = new LtiMessagePayload($this->parser->parse($message->getMandatoryParameter('id_token')));
+            $state = new MessagePayload($this->parser->parse($message->getMandatoryParameter('state')));
 
             $registration = $this->registrationRepository->findByPlatformIssuer(
                 $payload->getMandatoryClaim(MessagePayloadInterface::CLAIM_ISS),

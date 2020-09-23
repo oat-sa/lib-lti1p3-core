@@ -22,8 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\DeepLink\Settings;
 
-use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
-
 /**
  * @see https://www.imsglobal.org/spec/lti-dl/v2p0#deep-linking-settings
  */

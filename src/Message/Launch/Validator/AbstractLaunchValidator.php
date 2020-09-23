@@ -64,7 +64,7 @@ abstract class AbstractLaunchValidator
         $this->parser = new Parser(new AssociativeDecoder());
     }
 
-    abstract protected function getSupportedMessageTypes(): array;
+    abstract public function getSupportedMessageTypes(): array;
 
     protected function addSuccess(string $message): self
     {
