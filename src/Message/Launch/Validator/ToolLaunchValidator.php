@@ -23,10 +23,8 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Message\Launch\Validator;
 
 use Carbon\Carbon;
-use Lcobucci\JWT\Parser;
-use Lcobucci\JWT\Signer;
-use Lcobucci\JWT\Signer\Rsa\Sha256;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
+use OAT\Library\Lti1p3Core\Message\Launch\Validator\Result\LaunchValidationResult;
 use OAT\Library\Lti1p3Core\Message\LtiMessage;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayload;
@@ -34,54 +32,26 @@ use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayload;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
-use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
-use OAT\Library\Lti1p3Core\Security\Jwks\Fetcher\JwksFetcher;
-use OAT\Library\Lti1p3Core\Security\Jwks\Fetcher\JwksFetcherInterface;
-use OAT\Library\Lti1p3Core\Security\Jwt\AssociativeDecoder;
 use OAT\Library\Lti1p3Core\Security\Nonce\Nonce;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceGeneratorInterface;
-use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepositoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
 
 /**
  * @see https://www.imsglobal.org/spec/security/v1p0/#authentication-response-validation
  */
-class LaunchRequestValidator
+class ToolLaunchValidator extends AbstractLaunchValidator
 {
-    /** @var RegistrationRepositoryInterface */
-    private $registrationRepository;
-
-    /** @var NonceRepositoryInterface */
-    private $nonceRepository;
-
-    /** @var JwksFetcherInterface */
-    private $fetcher;
-
-    /** @var Signer */
-    private $signer;
-
-    /** @var Parser */
-    private $parser;
-
-    /** @var string[] */
-    private $successes = [];
-
-    public function __construct(
-        RegistrationRepositoryInterface $registrationRepository,
-        NonceRepositoryInterface $nonceRepository,
-        JwksFetcherInterface $jwksFetcher = null,
-        Signer $signer = null
-    ) {
-        $this->registrationRepository = $registrationRepository;
-        $this->nonceRepository = $nonceRepository;
-        $this->fetcher = $jwksFetcher ?? new JwksFetcher();
-        $this->signer = $signer ?? new Sha256();
-        $this->parser = new Parser(new AssociativeDecoder());
+    protected function getSupportedMessageTypes(): array
+    {
+        return [
+            LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
+            LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_REQUEST,
+        ];
     }
 
-    public function validate(ServerRequestInterface $request): LaunchRequestValidationResult
+    public function validate(ServerRequestInterface $request): LaunchValidationResult
     {
         $this->reset();
 
@@ -97,7 +67,7 @@ class LaunchRequestValidator
             );
 
             if (null === $registration) {
-                throw new LtiException('No matching registration found');
+                throw new LtiException('No matching registration found tool side');
             }
 
             $this
@@ -109,9 +79,7 @@ class LaunchRequestValidator
                 ->validatePayloadUserIdentifier($payload)
                 ->validatePayloadSignature($registration, $payload)
                 ->validatePayloadNonce($payload)
-                ->validatePayloadDeploymentId($registration, $payload)
-                ->validateStateExpiry($state)
-                ->validateStateSignature($registration, $state);
+                ->validatePayloadDeploymentId($registration, $payload);
 
             switch ($payload->getMessageType()) {
                 case LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST:
@@ -121,13 +89,17 @@ class LaunchRequestValidator
                     $this->validateDeepLinkingRequestSpecifics($payload);
                     break;
                 default:
-                    throw new LtiException(sprintf('Message type %s not handled', $payload->getMessageType()));
+                    throw new LtiException(sprintf('Launch message type %s not handled', $payload->getMessageType()));
             }
 
-            return new LaunchRequestValidationResult($registration, $payload, $state, $this->successes);
+            $this
+                ->validateStateExpiry($state)
+                ->validateStateSignature($registration, $state);
+
+            return new LaunchValidationResult($registration, $payload, $state, $this->successes);
 
         } catch (Throwable $exception) {
-            return new LaunchRequestValidationResult(null, null, null, $this->successes, $exception->getMessage());
+            return new LaunchValidationResult(null, null, null, $this->successes, $exception->getMessage());
         }
     }
 
@@ -332,23 +304,9 @@ class LaunchRequestValidator
         );
 
         if (null === $payload->getDeepLinkingSettings()) {
-            throw new LtiException('JWT id_token deep_linking_settings id claim is missing');
+            throw new LtiException('JWT id_token deep_linking_settings id claim is invalid');
         }
 
-        return $this->addSuccess('JWT id_token deep_linking_settings id claim is provided');
-    }
-
-    private function addSuccess(string $message): self
-    {
-        $this->successes[] = $message;
-
-        return $this;
-    }
-
-    private function reset(): self
-    {
-        $this->successes = [];
-
-        return $this;
+        return $this->addSuccess('JWT id_token deep_linking_settings id claim is valid');
     }
 }

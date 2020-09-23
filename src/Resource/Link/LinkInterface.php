@@ -20,23 +20,26 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Resource;
+namespace OAT\Library\Lti1p3Core\Resource\Link;
 
-interface ResourceInterface
+use OAT\Library\Lti1p3Core\Resource\ResourceInterface;
+
+/**
+ * @see https://www.imsglobal.org/spec/lti-dl/v2p0#link
+ */
+interface LinkInterface extends ResourceInterface
 {
-    public function getIdentifier(): string;
+    public const TYPE = 'link';
 
-    public function getType(): string;
+    public function getUrl(): string;
 
-    public function getTitle(): ?string;
+    public function getIcon(): ?array;
 
-    public function getText(): ?string;
+    public function getThumbnail(): ?array;
 
-    public function getProperties(): array;
+    public function getEmbed(): ?string;
 
-    public function hasProperty(string $propertyName): bool;
+    public function getWindow(): ?array;
 
-    public function getProperty(string $propertyName, $default = null);
-    
-    public function normalize(): array;
+    public function getIframe(): ?array;
 }

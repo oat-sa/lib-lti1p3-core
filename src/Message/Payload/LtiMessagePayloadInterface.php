@@ -25,7 +25,7 @@ namespace OAT\Library\Lti1p3Core\Message\Payload;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\AgsClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\BasicOutcomeClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
-use OAT\Library\Lti1p3Core\Message\Payload\Claim\DeepLinkingContentItems;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\DeepLinkingContentItemsClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\DeepLinkingSettingsClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\LaunchPresentationClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\LisClaim;
@@ -99,7 +99,7 @@ interface LtiMessagePayloadInterface extends MessagePayloadInterface
 
     public function getDeepLinkingSettings(): ?DeepLinkingSettingsClaim;
 
-    public function getDeepLinkingContentItems(): ?DeepLinkingContentItems;
+    public function getDeepLinkingContentItems(): ?DeepLinkingContentItemsClaim;
 
     public function getDeepLinkingData(): ?string;
 

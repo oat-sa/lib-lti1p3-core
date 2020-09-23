@@ -31,14 +31,14 @@ use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use Throwable;
 
 /**
- * @see https://www.imsglobal.org/spec/security/v1p0/#step-1-third-party-initiated-login
+ * @see http://www.imsglobal.org/spec/lti/v1p3/#resource-link-launch-request-message
  */
-class LtiResourceLinkLaunchRequestBuilder extends AbstractLaunchRequestBuilder
+class LtiResourceLinkLaunchRequestBuilder extends PlatformLaunchBuilder
 {
     /**
      * @throws LtiExceptionInterface
      */
-    public function build(
+    public function buildLaunchRequest(
         LtiResourceLinkInterface $ltiResourceLink,
         RegistrationInterface $registration,
         string $loginHint,
@@ -55,7 +55,7 @@ class LtiResourceLinkLaunchRequestBuilder extends AbstractLaunchRequestBuilder
                 ])
             );
 
-            return $this->buildLaunchRequest(
+            return $this->buildPlatformLaunch(
                 $registration,
                 LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
                 $ltiResourceLink->getUrl() ?? $registration->getTool()->getLaunchUrl(),
@@ -69,7 +69,7 @@ class LtiResourceLinkLaunchRequestBuilder extends AbstractLaunchRequestBuilder
             throw $exception;
         } catch (Throwable $exception) {
             throw new LtiException(
-                sprintf('Cannot create LTI launch request: %s', $exception->getMessage()),
+                sprintf('Cannot create LTI resource link launch request: %s', $exception->getMessage()),
                 $exception->getCode(),
                 $exception
             );

@@ -26,9 +26,11 @@ use Countable;
 use IteratorAggregate;
 use JsonSerializable;
 
-interface ResourceCollectionInterface extends Countable, IteratorAggregate, JsonSerializable
+interface ResourceCollectionInterface extends Countable, IteratorAggregate
 {
     public function add(ResourceInterface $resource): ResourceCollectionInterface;
 
     public function getByType(string $type): array;
+
+    public function normalize(): array;
 }

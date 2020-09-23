@@ -20,23 +20,31 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Resource;
+namespace OAT\Library\Lti1p3Core\Resource\HtmlFragment;
 
-interface ResourceInterface
+use OAT\Library\Lti1p3Core\Resource\Resource;
+
+/**
+ * @see https://www.imsglobal.org/spec/lti-dl/v2p0#html-fragment
+ */
+class HtmlFragment extends Resource implements HtmlFragmentInterface
 {
-    public function getIdentifier(): string;
+    /** @var string */
+    private $html;
 
-    public function getType(): string;
+    public function __construct(string $identifier, string $html, array $properties = [])
+    {
+        $this->html = $html;
 
-    public function getTitle(): ?string;
+        parent::__construct(
+            $identifier,
+            self::TYPE,
+            ['html' => $this->html] + $properties
+        );
+    }
 
-    public function getText(): ?string;
-
-    public function getProperties(): array;
-
-    public function hasProperty(string $propertyName): bool;
-
-    public function getProperty(string $propertyName, $default = null);
-    
-    public function normalize(): array;
+    public function getHtml(): string
+    {
+        return $this->html;
+    }
 }

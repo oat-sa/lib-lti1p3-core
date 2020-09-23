@@ -20,24 +20,32 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Resource\ResourceLink;
+namespace OAT\Library\Lti1p3Core\Resource\Link;
 
-use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Resource\Resource;
 
 /**
- * @see https://www.imsglobal.org/spec/lti-dl/v2p0#lti-resource-link
+ * @see https://www.imsglobal.org/spec/lti-dl/v2p0#link
  */
-class LtiResourceLink extends Resource implements LtiResourceLinkInterface
+class Link extends Resource implements LinkInterface
 {
-    public function __construct(string $identifier, array $properties = [])
+    /** @var string */
+    private $url;
+
+    public function __construct(string $identifier, string $url, array $properties = [])
     {
-        parent::__construct($identifier, self::TYPE, $properties);
+        $this->url = $url;
+
+        parent::__construct(
+            $identifier,
+            self::TYPE,
+            ['url' => $this->url] + $properties
+        );
     }
 
-    public function getUrl(): ?string
+    public function getUrl(): string
     {
-        return $this->getProperty('url');
+        return $this->url;
     }
 
     public function getIcon(): ?array
@@ -50,28 +58,18 @@ class LtiResourceLink extends Resource implements LtiResourceLinkInterface
         return $this->getProperty('thumbnail');
     }
 
+    public function getEmbed(): ?string
+    {
+        return $this->getProperty('embed');
+    }
+
+    public function getWindow(): ?array
+    {
+        return $this->getProperty('window');
+    }
+
     public function getIframe(): ?array
     {
         return $this->getProperty('iframe');
-    }
-
-    public function getCustom(): ?array
-    {
-        return $this->getProperty('custom');
-    }
-
-    public function getLineItem(): ?array
-    {
-        return $this->getProperty('lineItem');
-    }
-
-    public function getAvailable(): ?array
-    {
-        return $this->getProperty('available');
-    }
-
-    public function getSubmission(): ?array
-    {
-        return $this->getProperty('submission');
     }
 }

@@ -20,23 +20,15 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Resource;
+namespace OAT\Library\Lti1p3Core\DeepLink\Provider;
 
-interface ResourceInterface
+use OAT\Library\Lti1p3Core\DeepLink\Settings\DeepLinkingSettingsInterface;
+use OAT\Library\Lti1p3Core\Resource\ResourceCollectionInterface;
+
+/**
+ * @see https://www.imsglobal.org/spec/lti-dl/v2p0#content-item-types
+ */
+interface DeepLinkingResourceProviderInterface
 {
-    public function getIdentifier(): string;
-
-    public function getType(): string;
-
-    public function getTitle(): ?string;
-
-    public function getText(): ?string;
-
-    public function getProperties(): array;
-
-    public function hasProperty(string $propertyName): bool;
-
-    public function getProperty(string $propertyName, $default = null);
-    
-    public function normalize(): array;
+    public function provide(DeepLinkingSettingsInterface $settings): ResourceCollectionInterface;
 }

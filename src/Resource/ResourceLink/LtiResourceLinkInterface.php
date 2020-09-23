@@ -25,17 +25,25 @@ namespace OAT\Library\Lti1p3Core\Resource\ResourceLink;
 use OAT\Library\Lti1p3Core\Resource\ResourceInterface;
 
 /**
- * @see https://www.imsglobal.org/spec/lti-dl/v2p0/#lti-resource-link
+ * @see https://www.imsglobal.org/spec/lti-dl/v2p0#lti-resource-link
  */
 interface LtiResourceLinkInterface extends ResourceInterface
 {
     public const TYPE = 'ltiResourceLink';
 
-    public function getIdentifier(): string;
-
     public function getUrl(): ?string;
 
-    public function getTitle(): ?string;
+    public function getIcon(): ?array;
 
-    public function getText(): ?string;
+    public function getThumbnail(): ?array;
+
+    public function getIframe(): ?array;
+
+    public function getCustom(): ?array;
+
+    public function getLineItem(): ?array;
+
+    public function getAvailable(): ?array;
+
+    public function getSubmission(): ?array;
 }

@@ -22,33 +22,21 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Message\Launch\Builder;
 
-use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessage;
-use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilder;
-use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilderInterface;
-use OAT\Library\Lti1p3Core\Message\Payload\Claim\MessagePayloadClaimInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 
 /**
- * @see https://www.imsglobal.org/spec/security/v1p0/#step-1-third-party-initiated-login
+ * @see https://www.imsglobal.org/spec/security/v1p0/#platform-originating-messages
  */
-abstract class AbstractLaunchRequestBuilder
+class PlatformLaunchBuilder extends AbstractLaunchBuilder
 {
-    /** @var MessagePayloadBuilderInterface */
-    protected $builder;
-
-    public function __construct(MessagePayloadBuilderInterface $builder = null)
-    {
-        $this->builder = $builder ?? new MessagePayloadBuilder();
-    }
-
     /**
      * @throws LtiExceptionInterface
      */
-    protected function buildLaunchRequest(
+    public function buildPlatformLaunch(
         RegistrationInterface $registration,
         string $messageType,
         string $targetLinkUri,
@@ -67,13 +55,7 @@ abstract class AbstractLaunchRequestBuilder
             ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_ROLES, $roles)
             ->withClaim(LtiMessagePayloadInterface::CLAIM_REGISTRATION_ID, $registration->getIdentifier());
 
-        foreach ($optionalClaims as $claimName => $claim) {
-            if ($claim instanceof MessagePayloadClaimInterface) {
-                $this->builder->withClaim($claim);
-            } else {
-                $this->builder->withClaim($claimName, $claim);
-            }
-        }
+        $this->applyOptionalClaims($optionalClaims);
 
         $ltiMessageHintPayload = $this->builder->buildMessagePayload($registration->getPlatformKeyChain());
 
@@ -88,29 +70,5 @@ abstract class AbstractLaunchRequestBuilder
                 'client_id' => $registration->getClientId(),
             ]
         );
-    }
-
-    /**
-     * @throws LtiExceptionInterface
-     */
-    protected function resolveDeploymentId(RegistrationInterface $registration, string $deploymentId = null): string
-    {
-        if (null !== $deploymentId) {
-            if (!$registration->hasDeploymentId($deploymentId)) {
-                throw new LtiException(sprintf(
-                    'Invalid deployment id %s for registration %s',
-                    $deploymentId,
-                    $registration->getIdentifier()
-                ));
-            }
-        } else {
-            $deploymentId = $registration->getDefaultDeploymentId();
-
-            if (null === $deploymentId) {
-                throw new LtiException('Mandatory deployment id is missing');
-            }
-        }
-
-        return $deploymentId;
     }
 }

@@ -26,7 +26,7 @@ use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\AgsClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\BasicOutcomeClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
-use OAT\Library\Lti1p3Core\Message\Payload\Claim\DeepLinkingContentItems;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\DeepLinkingContentItemsClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\DeepLinkingSettingsClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\LaunchPresentationClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\LisClaim;
@@ -139,9 +139,9 @@ class LtiMessagePayload extends MessagePayload implements LtiMessagePayloadInter
         return $this->getClaim(DeepLinkingSettingsClaim::class);
     }
 
-    public function getDeepLinkingContentItems(): ?DeepLinkingContentItems
+    public function getDeepLinkingContentItems(): ?DeepLinkingContentItemsClaim
     {
-        return $this->getClaim(DeepLinkingContentItems::class);
+        return $this->getClaim(DeepLinkingContentItemsClaim::class);
     }
 
     public function getDeepLinkingData(): ?string

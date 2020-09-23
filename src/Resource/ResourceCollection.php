@@ -66,8 +66,13 @@ class ResourceCollection implements ResourceCollectionInterface
         return new ArrayIterator($this->resources);
     }
 
-    public function jsonSerialize(): array
+    public function normalize(): array
     {
-        return array_values($this->getIterator()->getArrayCopy());
+        return array_map(
+            static function(ResourceInterface $resource) {
+                return $resource->normalize();
+            },
+            $this->getIterator()->getArrayCopy()
+        );
     }
 }

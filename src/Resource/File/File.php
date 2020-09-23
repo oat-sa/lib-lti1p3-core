@@ -20,40 +20,46 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Message\Payload\Claim;
+namespace OAT\Library\Lti1p3Core\Resource\File;
 
-use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
+use OAT\Library\Lti1p3Core\Resource\Resource;
 
 /**
- * @see https://www.imsglobal.org/spec/lti-dl/v2p0#content-items
+ * @see https://www.imsglobal.org/spec/lti-dl/v2p0#file
  */
-class DeepLinkingContentItems implements MessagePayloadClaimInterface
+class File extends Resource implements FileInterface
 {
-    /** @var array */
-    private $contentItems;
+    /** @var string */
+    private $url;
 
-    public function __construct(array $contentItems = [])
+    public function __construct(string $identifier, string $url, array $properties = [])
     {
-        $this->contentItems = $contentItems;
+        $this->url = $url;
+
+        parent::__construct(
+            $identifier,
+            self::TYPE,
+            ['url' => $this->url] + $properties
+        );
     }
 
-    public function getContentItems(): array
+    public function getUrl(): string
     {
-        return $this->contentItems;
+        return $this->url;
     }
 
-    public static function getClaimName(): string
+    public function getIcon(): ?array
     {
-        return LtiMessagePayloadInterface::CLAIM_LTI_DEEP_LINKING_CONTENT_ITEMS;
+        return $this->getProperty('icon');
     }
 
-    public function normalize(): array
+    public function getThumbnail(): ?array
     {
-        return $this->contentItems;
+        return $this->getProperty('thumbnail');
     }
 
-    public static function denormalize(array $claimData): DeepLinkingContentItems
+    public function getExpiresAt(): ?string
     {
-        return new self($claimData);
+        return $this->getProperty('expiresAt');
     }
 }
