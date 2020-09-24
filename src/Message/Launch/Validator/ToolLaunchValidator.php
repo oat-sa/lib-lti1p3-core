@@ -47,11 +47,12 @@ class ToolLaunchValidator extends AbstractLaunchValidator
     {
         return [
             LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
-            LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_REQUEST
+            LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_REQUEST,
+            LtiMessageInterface::LTI_MESSAGE_TYPE_START_PROCTORING,
         ];
     }
 
-    public function validate(ServerRequestInterface $request): LaunchValidationResult
+    public function validatePlatformOriginatingLaunch(ServerRequestInterface $request): LaunchValidationResult
     {
         $this->reset();
 
@@ -80,7 +81,7 @@ class ToolLaunchValidator extends AbstractLaunchValidator
                 ->validatePayloadSignature($registration, $payload)
                 ->validatePayloadNonce($payload)
                 ->validatePayloadDeploymentId($registration, $payload)
-                ->validateLaunchSpecifics($payload)
+                ->validatePayloadLaunchMessageTypeSpecifics($payload)
                 ->validateStateExpiry($state)
                 ->validateStateSignature($registration, $state);
 
@@ -229,7 +230,7 @@ class ToolLaunchValidator extends AbstractLaunchValidator
     /**
      * @throws LtiExceptionInterface
      */
-    private function validateLaunchSpecifics(LtiMessagePayloadInterface $payload): self
+    private function validatePayloadLaunchMessageTypeSpecifics(LtiMessagePayloadInterface $payload): self
     {
         switch ($payload->getMessageType()) {
             case LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST:
@@ -237,14 +238,40 @@ class ToolLaunchValidator extends AbstractLaunchValidator
                     throw new LtiException('ID token resource_link id claim is invalid');
                 }
 
-                return $this->addSuccess('ID token  resource_link id claim is valid');
-                break;
+                return $this->addSuccess('ID token resource_link id claim is valid');
+
             case LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_REQUEST:
                 if (null === $payload->getDeepLinkingSettings()) {
-                    throw new LtiException('ID token  deep_linking_settings id claim is invalid');
+                    throw new LtiException('ID token deep_linking_settings id claim is invalid');
                 }
 
-                return $this->addSuccess('ID token  deep_linking_settings id claim is valid');
+                return $this->addSuccess('ID token deep_linking_settings id claim is valid');
+
+            case LtiMessageInterface::LTI_MESSAGE_TYPE_START_PROCTORING:
+                if (null === $payload->getProctoringStartAssessmentUrl()) {
+                    throw new LtiException('ID token start_assessment_url proctoring claim is invalid');
+                }
+
+                $this->addSuccess('ID token start_assessment_url claim proctoring is valid');
+
+                if (null === $payload->getProctoringSessionData()) {
+                    throw new LtiException('ID token session_data proctoring claim is invalid');
+                }
+
+                $this->addSuccess('ID token session_data proctoring claim is valid');
+
+                if (null === $payload->getProctoringAttemptNumber()) {
+                    throw new LtiException('ID token attempt_number proctoring claim is invalid');
+                }
+
+                $this->addSuccess('ID token attempt_number proctoring claim is valid');
+
+                if (null === $payload->getLegacyUserIdentifier()) {
+                    throw new LtiException('ID token lti11_legacy_user_id claim is invalid');
+                }
+
+                return $this->addSuccess('ID token lti11_legacy_user_id claim is valid');
+
             default:
                 throw new LtiException(sprintf('Launch message type %s not handled', $payload->getMessageType()));
         }

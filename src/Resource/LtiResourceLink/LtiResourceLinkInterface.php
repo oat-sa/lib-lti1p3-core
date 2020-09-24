@@ -20,15 +20,30 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\DeepLink\Provider;
+namespace OAT\Library\Lti1p3Core\Resource\LtiResourceLink;
 
-use OAT\Library\Lti1p3Core\DeepLink\Settings\DeepLinkingSettingsInterface;
-use OAT\Library\Lti1p3Core\Resource\ResourceCollectionInterface;
+use OAT\Library\Lti1p3Core\Resource\ResourceInterface;
 
 /**
- * @see https://www.imsglobal.org/spec/lti-dl/v2p0#content-item-types
+ * @see https://www.imsglobal.org/spec/lti-dl/v2p0#lti-resource-link
  */
-interface DeepLinkingResourceProviderInterface
+interface LtiResourceLinkInterface extends ResourceInterface
 {
-    public function provide(DeepLinkingSettingsInterface $settings): ResourceCollectionInterface;
+    public const TYPE = 'ltiResourceLink';
+
+    public function getUrl(): ?string;
+
+    public function getIcon(): ?array;
+
+    public function getThumbnail(): ?array;
+
+    public function getIframe(): ?array;
+
+    public function getCustom(): ?array;
+
+    public function getLineItem(): ?array;
+
+    public function getAvailability(): ?array;
+
+    public function getSubmission(): ?array;
 }

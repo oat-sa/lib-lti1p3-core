@@ -45,11 +45,12 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
     public function getSupportedMessageTypes(): array
     {
         return [
-            LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE
+            LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE,
+            LtiMessageInterface::LTI_MESSAGE_TYPE_START_ASSESSMENT,
         ];
     }
 
-    public function validate(ServerRequestInterface $request): LaunchValidationResult
+    public function validateToolOriginatingLaunch(ServerRequestInterface $request): LaunchValidationResult
     {
         $this->reset();
 
@@ -74,7 +75,8 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
                 ->validatePayloadMessageType($payload)
                 ->validatePayloadSignature($registration, $payload)
                 ->validatePayloadNonce($payload)
-                ->validatePayloadDeploymentId($registration, $payload);
+                ->validatePayloadDeploymentId($registration, $payload)
+                ->validatePayloadLaunchMessageTypeSpecifics($payload);
 
             return new LaunchValidationResult($registration, $payload, null, $this->successes);
 
@@ -193,5 +195,35 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
         }
 
         return $this->addSuccess('JWT deployment_id claim valid for this registration');
+    }
+
+    /**
+     * @throws LtiExceptionInterface
+     */
+    private function validatePayloadLaunchMessageTypeSpecifics(LtiMessagePayloadInterface $payload): self
+    {
+        switch ($payload->getMessageType()) {
+            case LtiMessageInterface::LTI_MESSAGE_TYPE_START_ASSESSMENT:
+                if (null === $payload->getProctoringSessionData()) {
+                    throw new LtiException('JWT session_data proctoring claim is invalid');
+                }
+
+                $this->addSuccess('JWT session_data proctoring claim is valid');
+
+                if (null === $payload->getProctoringAttemptNumber()) {
+                    throw new LtiException('JWT attempt_number proctoring claim is invalid');
+                }
+
+                $this->addSuccess('JWT attempt_number proctoring claim is valid');
+
+                if (null === $payload->getResourceLink()) {
+                    throw new LtiException('JWT resource_link claim is invalid');
+                }
+
+                return $this->addSuccess('JWT resource_link claim is valid');
+
+            default:
+                throw new LtiException(sprintf('Launch message type %s not handled', $payload->getMessageType()));
+        }
     }
 }

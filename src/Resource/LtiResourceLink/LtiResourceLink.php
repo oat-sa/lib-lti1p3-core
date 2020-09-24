@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Resource\ResourceLink;
+namespace OAT\Library\Lti1p3Core\Resource\LtiResourceLink;
 
 use OAT\Library\Lti1p3Core\Resource\Resource;
 

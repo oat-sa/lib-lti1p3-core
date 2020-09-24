@@ -35,8 +35,8 @@ class ToolTest extends TestCase
 
         $this->assertEquals('toolIdentifier', $subject->getIdentifier());
         $this->assertEquals('toolName', $subject->getName());
-        $this->assertEquals('http://tool.com/oidc-init', $subject->getOidcLoginInitiationUrl());
+        $this->assertEquals('http://tool.com/oidc-init', $subject->getOidcInitiationUrl());
         $this->assertEquals('http://tool.com/launch', $subject->getLaunchUrl());
-        $this->assertEquals('http://tool.com/deep-launch', $subject->getDeepLinkLaunchUrl());
+        $this->assertEquals('http://tool.com/deep-launch', $subject->getDeepLinkingUrl());
     }
 }

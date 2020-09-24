@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Message\Payload;
 
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\AcsClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\AgsClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\BasicOutcomeClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
@@ -31,6 +32,8 @@ use OAT\Library\Lti1p3Core\Message\Payload\Claim\LaunchPresentationClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\LisClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\NrpsClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\PlatformInstanceClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\ProctoringSettingsClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\ProctoringVerifiedUserClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\User\UserIdentityInterface;
 
@@ -52,6 +55,7 @@ interface LtiMessagePayloadInterface extends MessagePayloadInterface
     public const CLAIM_LTI_CUSTOM = 'https://purl.imsglobal.org/spec/lti/claim/custom';
     public const CLAIM_LTI_TARGET_LINK_URI = 'https://purl.imsglobal.org/spec/lti/claim/target_link_uri';
     public const CLAIM_LTI_RESOURCE_LINK = 'https://purl.imsglobal.org/spec/lti/claim/resource_link';
+    public const CLAIM_LTI_LEGACY_USER_ID = 'https://purl.imsglobal.org/spec/lti/claim/lti11_legacy_user_id';
 
     // Deep Linking claims
     public const CLAIM_LTI_DEEP_LINKING_SETTINGS = 'https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings';
@@ -61,6 +65,16 @@ interface LtiMessagePayloadInterface extends MessagePayloadInterface
     public const CLAIM_LTI_DEEP_LINKING_LOG = 'https://purl.imsglobal.org/spec/lti-dl/claim/log';
     public const CLAIM_LTI_DEEP_LINKING_ERROR_MESSAGE = 'https://purl.imsglobal.org/spec/lti-dl/claim/errormsg';
     public const CLAIM_LTI_DEEP_LINKING_ERROR_LOG = 'https://purl.imsglobal.org/spec/lti-dl/claim/errorlog';
+
+    // Proctoring claims
+    public const CLAIM_LTI_PROCTORING_START_ASSESSMENT_URL = 'https://purl.imsglobal.org/spec/lti-ap/claim/start_assessment_url';
+    public const CLAIM_LTI_PROCTORING_SETTINGS = 'https://purl.imsglobal.org/spec/lti-ap/claim/proctoring_settings';
+    public const CLAIM_LTI_PROCTORING_SESSION_DATA = 'https://purl.imsglobal.org/spec/lti-ap/claim/session_data';
+    public const CLAIM_LTI_PROCTORING_ATTEMPT_NUMBER = 'https://purl.imsglobal.org/spec/lti-ap/claim/attempt_number';
+    public const CLAIM_LTI_PROCTORING_VERIFIED_USER = 'https://purl.imsglobal.org/spec/lti-ap/claim/verified_user';
+
+    // ACS claim
+    public const CLAIM_LTI_ACS = 'https://purl.imsglobal.org/spec/lti-ap/claim/acs';
 
     // AGS claim
     public const CLAIM_LTI_AGS = 'https://purl.imsglobal.org/spec/lti-ags/claim/endpoint';
@@ -97,6 +111,8 @@ interface LtiMessagePayloadInterface extends MessagePayloadInterface
 
     public function getUserIdentity(): ?UserIdentityInterface;
 
+    public function getLegacyUserIdentifier(): ?string ;
+
     public function getDeepLinkingSettings(): ?DeepLinkingSettingsClaim;
 
     public function getDeepLinkingContentItems(): ?DeepLinkingContentItemsClaim;
@@ -110,6 +126,18 @@ interface LtiMessagePayloadInterface extends MessagePayloadInterface
     public function getDeepLinkingErrorMessage(): ?string;
 
     public function getDeepLinkingErrorLog(): ?string;
+
+    public function getProctoringStartAssessmentUrl(): ?string;
+
+    public function getProctoringSettings(): ?ProctoringSettingsClaim;
+
+    public function getProctoringSessionData(): ?string;
+
+    public function getProctoringAttemptNumber(): ?string ;
+
+    public function getProctoringVerifiedUser(): ?ProctoringVerifiedUserClaim;
+
+    public function getAcs(): ?AcsClaim;
 
     public function getAgs(): ?AgsClaim;
 

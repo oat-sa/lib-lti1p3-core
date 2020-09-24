@@ -25,9 +25,10 @@ namespace OAT\Library\Lti1p3Core\Tests\Traits;
 use OAT\Library\Lti1p3Core\Registration\Registration;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
-use OAT\Library\Lti1p3Core\Link\ResourceLink\LtiResourceLink;
 use OAT\Library\Lti1p3Core\Platform\Platform;
 use OAT\Library\Lti1p3Core\Platform\PlatformInterface;
+use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLink;
+use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLinkInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
 use OAT\Library\Lti1p3Core\Tool\Tool;
 use OAT\Library\Lti1p3Core\Tool\ToolInterface;
@@ -72,13 +73,20 @@ trait DomainTestingTrait
         return new Tool($identifier, $name, $audience, $oidcLoginInitiationUrl, $launchUrl, $deepLaunchUrl);
     }
 
-    private function createTestResourceLink(
+    private function createTestLtiResourceLink(
         string $identifier = 'resourceLinkIdentifier',
         string $url = 'http://tool.com/resource-link',
         string $title = 'resourceLinkTitle',
-        string $description = 'resourceLinkDescription'
-    ): LtiResourceLink {
-        return new LtiResourceLink($identifier, $url, $title, $description);
+        string $text = 'resourceLinkDescription'
+    ): LtiResourceLinkInterface {
+        return new LtiResourceLink(
+            $identifier,
+            [
+                'url' => $url,
+                'title' => $title,
+                'text' => $text
+            ]
+        );
     }
 
     private function createTestRegistration(

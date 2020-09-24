@@ -20,31 +20,36 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Tests\Unit\Tool;
+namespace OAT\Library\Lti1p3Core\Tests\Unit\Resource\HtmlFragment;
 
-use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
-use OAT\Library\Lti1p3Core\Tool\ToolFactory;
+use OAT\Library\Lti1p3Core\Resource\HtmlFragment\HtmlFragment;
+use OAT\Library\Lti1p3Core\Resource\HtmlFragment\HtmlFragmentInterface;
 use PHPUnit\Framework\TestCase;
 
-class ToolFactoryTest extends TestCase
+class HtmlFragmentTest extends TestCase
 {
-    use DomainTestingTrait;
+    /** @var HtmlFragmentInterface */
+    private $subject;
 
-    public function testCreate(): void
+    protected function setUp(): void
     {
-        $subject = new ToolFactory();
-
-        $tool = $this->createTestTool();
-
-        $result = $subject->create(
-            $tool->getIdentifier(),
-            $tool->getName(),
-            $tool->getAudience(),
-            $tool->getOidcInitiationUrl(),
-            $tool->getLaunchUrl(),
-            $tool->getDeepLinkingUrl()
+        $this->subject = new HtmlFragment(
+            'identifier',
+            'html',
+            [
+                'title' => 'title',
+            ]
         );
+    }
 
-        $this->assertEquals($tool, $result);
+    public function testItImplementsHtmlFragmentInterface(): void
+    {
+        $this->assertInstanceOf(HtmlFragmentInterface::class, $this->subject);
+    }
+
+    public function testPropertiesGetters(): void
+    {
+        $this->assertEquals('html', $this->subject->getHtml());
+        $this->assertEquals('title', $this->subject->getTitle());
     }
 }

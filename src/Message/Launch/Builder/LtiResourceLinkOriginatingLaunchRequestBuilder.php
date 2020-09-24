@@ -24,7 +24,7 @@ namespace OAT\Library\Lti1p3Core\Message\Launch\Builder;
 
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
-use OAT\Library\Lti1p3Core\Resource\ResourceLink\LtiResourceLinkInterface;
+use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLinkInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
@@ -33,12 +33,12 @@ use Throwable;
 /**
  * @see http://www.imsglobal.org/spec/lti/v1p3/#resource-link-launch-request-message
  */
-class LtiResourceLinkLaunchRequestBuilder extends PlatformLaunchBuilder
+class LtiResourceLinkOriginatingLaunchRequestBuilder extends PlatformOriginatingLaunchBuilder
 {
     /**
      * @throws LtiExceptionInterface
      */
-    public function buildLaunchRequest(
+    public function buildLtiResourceLinkLaunchRequest(
         LtiResourceLinkInterface $ltiResourceLink,
         RegistrationInterface $registration,
         string $loginHint,
@@ -55,7 +55,7 @@ class LtiResourceLinkLaunchRequestBuilder extends PlatformLaunchBuilder
                 ])
             );
 
-            return $this->buildPlatformLaunch(
+            return $this->buildPlatformOriginatingLaunch(
                 $registration,
                 LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
                 $ltiResourceLink->getUrl() ?? $registration->getTool()->getLaunchUrl(),

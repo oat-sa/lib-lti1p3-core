@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Message\Payload;
 
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\AcsClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\AgsClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\BasicOutcomeClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
@@ -32,6 +33,8 @@ use OAT\Library\Lti1p3Core\Message\Payload\Claim\LaunchPresentationClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\LisClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\NrpsClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\PlatformInstanceClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\ProctoringSettingsClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\ProctoringVerifiedUserClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\User\UserIdentity;
 use OAT\Library\Lti1p3Core\User\UserIdentityInterface;
@@ -134,6 +137,11 @@ class LtiMessagePayload extends MessagePayload implements LtiMessagePayloadInter
         );
     }
 
+    public function getLegacyUserIdentifier(): ?string
+    {
+        return $this->getClaim(static::CLAIM_LTI_LEGACY_USER_ID);
+    }
+
     public function getDeepLinkingSettings(): ?DeepLinkingSettingsClaim
     {
         return $this->getClaim(DeepLinkingSettingsClaim::class);
@@ -167,6 +175,36 @@ class LtiMessagePayload extends MessagePayload implements LtiMessagePayloadInter
     public function getDeepLinkingErrorLog(): ?string
     {
         return $this->getClaim(static::CLAIM_LTI_DEEP_LINKING_ERROR_LOG);
+    }
+
+    public function getProctoringStartAssessmentUrl(): ?string
+    {
+        return $this->getClaim(static::CLAIM_LTI_PROCTORING_START_ASSESSMENT_URL);
+    }
+
+    public function getProctoringSettings(): ?ProctoringSettingsClaim
+    {
+        return $this->getClaim(ProctoringSettingsClaim::class);
+    }
+
+    public function getProctoringSessionData(): ?string
+    {
+        return $this->getClaim(static::CLAIM_LTI_PROCTORING_SESSION_DATA);
+    }
+
+    public function getProctoringAttemptNumber(): ?string
+    {
+        return $this->getClaim(static::CLAIM_LTI_PROCTORING_ATTEMPT_NUMBER);
+    }
+
+    public function getProctoringVerifiedUser(): ?ProctoringVerifiedUserClaim
+    {
+        return $this->getClaim(ProctoringVerifiedUserClaim::class);
+    }
+
+    public function getAcs(): ?AcsClaim
+    {
+        return $this->getClaim(AcsClaim::class);
     }
 
     public function getAgs(): ?AgsClaim

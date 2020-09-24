@@ -50,12 +50,12 @@ To do so, you can use the [LtiResourceLinkLaunchRequestBuilder](../../src/Messag
 ```php
 <?php
 
-use OAT\Library\Lti1p3Core\Message\Launch\Builder\LtiResourceLinkLaunchRequestBuilder;
+use OAT\Library\Lti1p3Core\Message\Launch\Builder\LtiResourceLinkOriginatingLaunchRequestBuilder;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 
 // Create a builder instance
-$builder = new LtiResourceLinkLaunchRequestBuilder();
+$builder = new LtiResourceLinkOriginatingLaunchRequestBuilder();
 
 // Get related registration of the launch
 /** @var RegistrationRepositoryInterface $registrationRepository */

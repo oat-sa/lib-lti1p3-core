@@ -36,6 +36,8 @@ interface LtiMessageInterface
     public const LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST = 'LtiResourceLinkRequest';
     public const LTI_MESSAGE_TYPE_DEEP_LINKING_REQUEST = 'LtiDeepLinkingRequest';
     public const LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE = 'LtiDeepLinkingResponse';
+    public const LTI_MESSAGE_TYPE_START_PROCTORING = 'LtiStartProctoring';
+    public const LTI_MESSAGE_TYPE_START_ASSESSMENT = 'LtiStartAssessment';
 
     public function getUrl(): string;
 

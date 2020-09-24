@@ -25,49 +25,42 @@ namespace OAT\Library\Lti1p3Core\Message\Launch\Builder;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessage;
 use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 
 /**
- * @see https://www.imsglobal.org/spec/security/v1p0/#platform-originating-messages
+ * @see https://www.imsglobal.org/spec/security/v1p0/#tool-originating-messages
  */
-class PlatformLaunchBuilder extends AbstractLaunchBuilder
+class ToolOriginatingLaunchBuilder extends AbstractLaunchBuilder
 {
     /**
      * @throws LtiExceptionInterface
      */
-    public function buildPlatformLaunch(
+    public function buildToolOriginatingLaunch(
         RegistrationInterface $registration,
         string $messageType,
-        string $targetLinkUri,
-        string $loginHint,
+        string $platformUrl,
         string $deploymentId = null,
-        array $roles = [],
         array $optionalClaims = []
     ): LtiMessageInterface {
         $deploymentId = $this->resolveDeploymentId($registration, $deploymentId);
 
         $this->builder
+            ->withClaim(MessagePayloadInterface::CLAIM_ISS, $registration->getClientId())
+            ->withClaim(MessagePayloadInterface::CLAIM_AUD, $registration->getPlatform()->getAudience())
             ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_VERSION, LtiMessageInterface::LTI_VERSION)
             ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_MESSAGE_TYPE, $messageType)
-            ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_DEPLOYMENT_ID, $deploymentId)
-            ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_TARGET_LINK_URI, $targetLinkUri)
-            ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_ROLES, $roles)
-            ->withClaim(LtiMessagePayloadInterface::CLAIM_REGISTRATION_ID, $registration->getIdentifier());
+            ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_DEPLOYMENT_ID, $deploymentId);
 
         $this->applyOptionalClaims($optionalClaims);
 
-        $ltiMessageHintPayload = $this->builder->buildMessagePayload($registration->getPlatformKeyChain());
+        $payload = $this->builder->buildMessagePayload($registration->getToolKeyChain());
 
         return new LtiMessage(
-            $registration->getTool()->getOidcInitiationUrl(),
+            $platformUrl,
             [
-                'iss' => $registration->getPlatform()->getAudience(),
-                'login_hint' => $loginHint,
-                'target_link_uri' => $targetLinkUri,
-                'lti_message_hint' => $ltiMessageHintPayload->getToken()->__toString(),
-                'lti_deployment_id' => $deploymentId,
-                'client_id' => $registration->getClientId(),
+                'JWT' => $payload->getToken()->__toString(),
             ]
         );
     }
