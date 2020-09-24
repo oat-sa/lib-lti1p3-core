@@ -72,7 +72,7 @@ class ResourceCollection implements ResourceCollectionInterface
             static function(ResourceInterface $resource) {
                 return $resource->normalize();
             },
-            $this->getIterator()->getArrayCopy()
+            $this->resources
         );
     }
 }

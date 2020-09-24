@@ -59,7 +59,7 @@ class ContextClaim implements MessagePayloadClaimInterface
         $this->title = $title;
     }
 
-    public function getId(): string
+    public function getIdentifier(): string
     {
         return $this->id;
     }

@@ -234,7 +234,7 @@ class ToolLaunchValidator extends AbstractLaunchValidator
     {
         switch ($payload->getMessageType()) {
             case LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST:
-                if ($payload->getResourceLink()->getId() === '') {
+                if ($payload->getResourceLink()->getIdentifier() === '') {
                     throw new LtiException('ID token resource_link id claim is invalid');
                 }
 

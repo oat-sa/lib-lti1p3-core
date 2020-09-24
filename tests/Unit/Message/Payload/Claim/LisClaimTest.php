@@ -20,20 +20,20 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Tests\Unit\Message\Claim;
+namespace OAT\Library\Lti1p3Core\Tests\Unit\Message\Payload\Claim;
 
-use OAT\Library\Lti1p3Core\Token\Claim\LisTokenClaim;
-use OAT\Library\Lti1p3Core\Token\LtiMessageTokenInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\LisClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 use PHPUnit\Framework\TestCase;
 
 class LisClaimTest extends TestCase
 {
-    /** @var LisTokenClaim */
+    /** @var LisClaim */
     private $subject;
 
     public function setUp(): void
     {
-        $this->subject = new LisTokenClaim(
+        $this->subject = new LisClaim(
             'course_offering_sourcedid',
             'course_section_sourcedid',
             'outcome_service_url',
@@ -44,7 +44,7 @@ class LisClaimTest extends TestCase
 
     public function testGetClaimName(): void
     {
-        $this->assertEquals(LtiMessageTokenInterface::CLAIM_LTI_LIS, $this->subject::getClaimName());
+        $this->assertEquals(LtiMessagePayloadInterface::CLAIM_LTI_LIS, $this->subject::getClaimName());
     }
 
     public function testGetters(): void
@@ -72,7 +72,7 @@ class LisClaimTest extends TestCase
 
     public function testDenormalisation(): void
     {
-        $denormalisation = LisTokenClaim::denormalize([
+        $denormalisation = LisClaim::denormalize([
             'course_offering_sourcedid' => 'course_offering_sourcedid',
             'course_section_sourcedid' => 'course_section_sourcedid',
             'outcome_service_url' => 'outcome_service_url',
@@ -80,7 +80,7 @@ class LisClaimTest extends TestCase
             'result_sourcedid' => 'result_sourcedid'
         ]);
 
-        $this->assertInstanceOf(LisTokenClaim::class, $denormalisation);
+        $this->assertInstanceOf(LisClaim::class, $denormalisation);
         $this->assertEquals('course_offering_sourcedid', $denormalisation->getCourseOfferingSourcedId());
         $this->assertEquals('course_section_sourcedid', $denormalisation->getCourseSectionSourcedId());
         $this->assertEquals('outcome_service_url', $denormalisation->getOutcomeServiceUrl());

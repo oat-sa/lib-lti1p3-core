@@ -20,25 +20,25 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Tests\Unit\Message\Claim;
+namespace OAT\Library\Lti1p3Core\Tests\Unit\Message\Payload\Claim;
 
-use OAT\Library\Lti1p3Core\Token\Claim\BasicOutcomeTokenClaim;
-use OAT\Library\Lti1p3Core\Token\LtiMessageTokenInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\BasicOutcomeClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 use PHPUnit\Framework\TestCase;
 
 class BasicOutcomeClaimTest extends TestCase
 {
-    /** @var BasicOutcomeTokenClaim */
+    /** @var BasicOutcomeClaim */
     private $subject;
 
     public function setUp(): void
     {
-        $this->subject = new BasicOutcomeTokenClaim('id', 'url');
+        $this->subject = new BasicOutcomeClaim('id', 'url');
     }
 
     public function testGetClaimName(): void
     {
-        $this->assertEquals(LtiMessageTokenInterface::CLAIM_LTI_BASIC_OUTCOME, $this->subject::getClaimName());
+        $this->assertEquals(LtiMessagePayloadInterface::CLAIM_LTI_BASIC_OUTCOME, $this->subject::getClaimName());
     }
 
     public function testGetters(): void
@@ -60,12 +60,12 @@ class BasicOutcomeClaimTest extends TestCase
 
     public function testDenormalisation(): void
     {
-        $denormalisation = BasicOutcomeTokenClaim::denormalize([
+        $denormalisation = BasicOutcomeClaim::denormalize([
             'lis_result_sourcedid' => 'id',
             'lis_outcome_service_url' => 'url',
         ]);
 
-        $this->assertInstanceOf(BasicOutcomeTokenClaim::class, $denormalisation);
+        $this->assertInstanceOf(BasicOutcomeClaim::class, $denormalisation);
         $this->assertEquals('id', $denormalisation->getLisResultSourcedId());
         $this->assertEquals('url', $denormalisation->getLisOutcomeServiceUrl());
     }

@@ -50,7 +50,7 @@ class ResourceLinkClaim implements MessagePayloadClaimInterface
         $this->description = $description;
     }
 
-    public function getId(): string
+    public function getIdentifier(): string
     {
         return $this->id;
     }

@@ -33,7 +33,7 @@ use Throwable;
 /**
  * @see http://www.imsglobal.org/spec/lti/v1p3/#resource-link-launch-request-message
  */
-class LtiResourceLinkOriginatingLaunchRequestBuilder extends PlatformOriginatingLaunchBuilder
+class LtiResourceLinkLaunchRequestBuilder extends PlatformOriginatingLaunchBuilder
 {
     /**
      * @throws LtiExceptionInterface

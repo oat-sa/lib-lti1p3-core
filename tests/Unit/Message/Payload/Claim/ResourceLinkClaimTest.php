@@ -20,30 +20,30 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Tests\Unit\Message\Claim;
+namespace OAT\Library\Lti1p3Core\Tests\Unit\Message\Payload\Claim;
 
-use OAT\Library\Lti1p3Core\Token\Claim\ResourceLinkTokenClaim;
-use OAT\Library\Lti1p3Core\Token\LtiMessageTokenInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 use PHPUnit\Framework\TestCase;
 
 class ResourceLinkClaimTest extends TestCase
 {
-    /** @var ResourceLinkTokenClaim */
+    /** @var ResourceLinkClaim */
     private $subject;
 
     public function setUp(): void
     {
-        $this->subject = new ResourceLinkTokenClaim('id', 'title', 'description');
+        $this->subject = new ResourceLinkClaim('id', 'title', 'description');
     }
 
     public function testGetClaimName(): void
     {
-        $this->assertEquals(LtiMessageTokenInterface::CLAIM_LTI_RESOURCE_LINK, $this->subject::getClaimName());
+        $this->assertEquals(LtiMessagePayloadInterface::CLAIM_LTI_RESOURCE_LINK, $this->subject::getClaimName());
     }
 
     public function testGetters(): void
     {
-        $this->assertEquals('id', $this->subject->getId());
+        $this->assertEquals('id', $this->subject->getIdentifier());
         $this->assertEquals('title', $this->subject->getTitle());
         $this->assertEquals('description', $this->subject->getDescription());
     }
@@ -62,14 +62,14 @@ class ResourceLinkClaimTest extends TestCase
 
     public function testDenormalisation(): void
     {
-        $denormalisation = ResourceLinkTokenClaim::denormalize([
+        $denormalisation = ResourceLinkClaim::denormalize([
             'id' => 'id',
             'title' => 'title',
             'description' => 'description'
         ]);
 
-        $this->assertInstanceOf(ResourceLinkTokenClaim::class, $denormalisation);
-        $this->assertEquals('id', $denormalisation->getId());
+        $this->assertInstanceOf(ResourceLinkClaim::class, $denormalisation);
+        $this->assertEquals('id', $denormalisation->getIdentifier());
         $this->assertEquals('title', $denormalisation->getTitle());
         $this->assertEquals('description', $denormalisation->getDescription());
     }

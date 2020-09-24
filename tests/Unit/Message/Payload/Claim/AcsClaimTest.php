@@ -22,41 +22,37 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Message\Payload\Claim;
 
-use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\AcsClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 use PHPUnit\Framework\TestCase;
 
-class ContextClaimTest extends TestCase
+class AcsClaimTest extends TestCase
 {
-    /** @var ContextClaim */
+    /** @var AcsClaim */
     private $subject;
 
     public function setUp(): void
     {
-        $this->subject = new ContextClaim('id', ['type'], 'label', 'title');
+        $this->subject = new AcsClaim(['action1, action2'], 'assessmentControlUrl');
     }
 
     public function testGetClaimName(): void
     {
-        $this->assertEquals(LtiMessagePayloadInterface::CLAIM_LTI_CONTEXT, $this->subject::getClaimName());
+        $this->assertEquals(LtiMessagePayloadInterface::CLAIM_LTI_ACS, $this->subject::getClaimName());
     }
 
     public function testGetters(): void
     {
-        $this->assertEquals('id', $this->subject->getIdentifier());
-        $this->assertEquals(['type'], $this->subject->getTypes());
-        $this->assertEquals('label', $this->subject->getLabel());
-        $this->assertEquals('title', $this->subject->getTitle());
+        $this->assertEquals(['action1, action2'], $this->subject->getActions());
+        $this->assertEquals('assessmentControlUrl', $this->subject->getAssessmentControlUrl());
     }
 
     public function testNormalisation(): void
     {
         $this->assertEquals(
             [
-                'id' => 'id',
-                'type' => ['type'],
-                'label' => 'label',
-                'title' => 'title'
+                'actions' => ['action1, action2'],
+                'assessment_control_url' => 'assessmentControlUrl',
             ],
             $this->subject->normalize()
         );
@@ -64,17 +60,13 @@ class ContextClaimTest extends TestCase
 
     public function testDenormalisation(): void
     {
-        $denormalisation = ContextClaim::denormalize([
-            'id' => 'id',
-            'type' => ['type'],
-            'label' => 'label',
-            'title' => 'title'
+        $denormalisation = AcsClaim::denormalize([
+            'actions' => ['action1, action2'],
+            'assessment_control_url' => 'assessmentControlUrl',
         ]);
 
-        $this->assertInstanceOf(ContextClaim::class, $denormalisation);
-        $this->assertEquals('id', $denormalisation->getIdentifier());
-        $this->assertEquals(['type'], $denormalisation->getTypes());
-        $this->assertEquals('label', $denormalisation->getLabel());
-        $this->assertEquals('title', $denormalisation->getTitle());
+        $this->assertInstanceOf(AcsClaim::class, $denormalisation);
+        $this->assertEquals(['action1, action2'], $denormalisation->getActions());
+        $this->assertEquals('assessmentControlUrl', $denormalisation->getAssessmentControlUrl());
     }
 }

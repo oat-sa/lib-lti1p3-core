@@ -20,10 +20,10 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Tests\Unit\Message\Claim;
+namespace OAT\Library\Lti1p3Core\Tests\Unit\Message\Payload\Claim;
 
-use OAT\Library\Lti1p3Core\Token\Claim\AgsClaim;
-use OAT\Library\Lti1p3Core\Token\LtiMessageTokenInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\AgsClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 use PHPUnit\Framework\TestCase;
 
 class AgsClaimTest extends TestCase
@@ -38,7 +38,7 @@ class AgsClaimTest extends TestCase
 
     public function testGetClaimName(): void
     {
-        $this->assertEquals(LtiMessageTokenInterface::CLAIM_LTI_AGS, $this->subject::getClaimName());
+        $this->assertEquals(LtiMessagePayloadInterface::CLAIM_LTI_AGS, $this->subject::getClaimName());
     }
 
     public function testGetters(): void
