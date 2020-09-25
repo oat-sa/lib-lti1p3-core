@@ -109,7 +109,7 @@ class ToolLaunchValidator extends AbstractLaunchValidator
      */
     private function validatePayloadVersion(LtiMessagePayloadInterface $payload): self
     {
-        if ($payload->getVersion() !== LtiMessageInterface::LTI_VERSION) {
+        if ($payload->getClaim(LtiMessagePayloadInterface::CLAIM_LTI_VERSION) !== LtiMessageInterface::LTI_VERSION) {
             throw new LtiException('ID token version claim is invalid');
         }
 
@@ -121,14 +121,13 @@ class ToolLaunchValidator extends AbstractLaunchValidator
      */
     private function validatePayloadMessageType(LtiMessagePayloadInterface $payload): self
     {
-        if ($payload->getMessageType() === '') {
-            throw new LtiException('ID token message_type claim is missing');
-        }
-
-        if (!in_array($payload->getMessageType(), $this->getSupportedMessageTypes())) {
-            throw new LtiException(
-                sprintf('ID token message_type claim %s is not supported', $payload->getMessageType())
-            );
+        if (
+            !in_array(
+                $payload->getClaim(LtiMessagePayloadInterface::CLAIM_LTI_MESSAGE_TYPE),
+                $this->getSupportedMessageTypes()
+            )
+        ) {
+            throw new LtiException('ID token message_type claim is not supported');
         }
 
         return $this->addSuccess('ID token message_type claim is valid');
@@ -139,7 +138,7 @@ class ToolLaunchValidator extends AbstractLaunchValidator
      */
     private function validatePayloadRoles(LtiMessagePayloadInterface $payload): self
     {
-        if (!is_array($payload->getToken()->getClaim(LtiMessagePayloadInterface::CLAIM_LTI_ROLES))) {
+        if (!is_array($payload->getClaim(LtiMessagePayloadInterface::CLAIM_LTI_ROLES))) {
             throw new LtiException('ID token roles claim is invalid');
         }
 
@@ -151,8 +150,11 @@ class ToolLaunchValidator extends AbstractLaunchValidator
      */
     private function validatePayloadUserIdentifier(LtiMessagePayloadInterface $payload): self
     {
-        if ($payload->getUserIdentity() && $payload->getUserIdentity()->getIdentifier() === '') {
-            throw new LtiException('JID token user identifier (sub) claim is invalid');
+        if (
+            $payload->hasClaim(LtiMessagePayloadInterface::CLAIM_SUB)
+            && empty($payload->getClaim(LtiMessagePayloadInterface::CLAIM_SUB))
+        ) {
+            throw new LtiException('ID token user identifier (sub) claim is invalid');
         }
 
         return $this->addSuccess('ID token user identifier (sub) claim is valid');
@@ -196,6 +198,10 @@ class ToolLaunchValidator extends AbstractLaunchValidator
      */
     private function validatePayloadNonce(LtiMessagePayloadInterface $payload): self
     {
+        if (empty($payload->getToken()->getClaim(LtiMessagePayloadInterface::CLAIM_NONCE))) {
+            throw new LtiException('ID token nonce claim is missing');
+        }
+
         $nonceValue = $payload->getMandatoryClaim(MessagePayloadInterface::CLAIM_NONCE);
 
         $nonce = $this->nonceRepository->find($nonceValue);
@@ -204,15 +210,13 @@ class ToolLaunchValidator extends AbstractLaunchValidator
             if (!$nonce->isExpired()) {
                 throw new LtiException('ID token nonce claim already used');
             }
-
-            return $this->addSuccess('ID token nonce claim already used but expired');
         } else {
             $this->nonceRepository->save(
                 new Nonce($nonceValue, Carbon::now()->addSeconds(NonceGeneratorInterface::TTL))
             );
-
-            return $this->addSuccess('ID token nonce claim is valid');
         }
+
+        return $this->addSuccess('ID token nonce claim is valid');
     }
 
     /**
@@ -220,7 +224,7 @@ class ToolLaunchValidator extends AbstractLaunchValidator
      */
     private function validatePayloadDeploymentId(RegistrationInterface $registration, LtiMessagePayloadInterface $payload): self
     {
-        if (!$registration->hasDeploymentId($payload->getDeploymentId())) {
+        if (!$registration->hasDeploymentId($payload->getClaim(LtiMessagePayloadInterface::CLAIM_LTI_DEPLOYMENT_ID))) {
             throw new LtiException('ID token deployment_id claim not valid for this registration');
         }
 
@@ -232,49 +236,39 @@ class ToolLaunchValidator extends AbstractLaunchValidator
      */
     private function validatePayloadLaunchMessageTypeSpecifics(LtiMessagePayloadInterface $payload): self
     {
-        switch ($payload->getMessageType()) {
-            case LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST:
-                if ($payload->getResourceLink()->getIdentifier() === '') {
-                    throw new LtiException('ID token resource_link id claim is invalid');
-                }
-
-                return $this->addSuccess('ID token resource_link id claim is valid');
-
-            case LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_REQUEST:
-                if (null === $payload->getDeepLinkingSettings()) {
-                    throw new LtiException('ID token deep_linking_settings id claim is invalid');
-                }
-
-                return $this->addSuccess('ID token deep_linking_settings id claim is valid');
-
-            case LtiMessageInterface::LTI_MESSAGE_TYPE_START_PROCTORING:
-                if (null === $payload->getProctoringStartAssessmentUrl()) {
-                    throw new LtiException('ID token start_assessment_url proctoring claim is invalid');
-                }
-
-                $this->addSuccess('ID token start_assessment_url claim proctoring is valid');
-
-                if (null === $payload->getProctoringSessionData()) {
-                    throw new LtiException('ID token session_data proctoring claim is invalid');
-                }
-
-                $this->addSuccess('ID token session_data proctoring claim is valid');
-
-                if (null === $payload->getProctoringAttemptNumber()) {
-                    throw new LtiException('ID token attempt_number proctoring claim is invalid');
-                }
-
-                $this->addSuccess('ID token attempt_number proctoring claim is valid');
-
-                if (null === $payload->getLegacyUserIdentifier()) {
-                    throw new LtiException('ID token lti11_legacy_user_id claim is invalid');
-                }
-
-                return $this->addSuccess('ID token lti11_legacy_user_id claim is valid');
-
-            default:
-                throw new LtiException(sprintf('Launch message type %s not handled', $payload->getMessageType()));
+        if ($payload->getMessageType() === LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST) {
+            if (empty($payload->getResourceLink()) || empty($payload->getResourceLink()->getIdentifier())) {
+                throw new LtiException('ID token resource_link id claim is invalid');
+            }
         }
+
+        if ($payload->getMessageType() === LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_REQUEST) {
+            if (empty($payload->getDeepLinkingSettings())) {
+                throw new LtiException('ID token deep_linking_settings id claim is invalid');
+            }
+        }
+
+        if ($payload->getMessageType() === LtiMessageInterface::LTI_MESSAGE_TYPE_START_PROCTORING) {
+            if (empty($payload->getProctoringStartAssessmentUrl())) {
+                throw new LtiException('ID token start_assessment_url proctoring claim is invalid');
+            }
+
+            if (empty($payload->getProctoringSessionData())) {
+                throw new LtiException('ID token session_data proctoring claim is invalid');
+            }
+
+            if (empty($payload->getProctoringAttemptNumber())) {
+                throw new LtiException('ID token attempt_number proctoring claim is invalid');
+            }
+
+            if (empty($payload->getLegacyUserIdentifier())) {
+                throw new LtiException('ID token lti11_legacy_user_id claim is invalid');
+            }
+        }
+
+        return $this->addSuccess(
+            sprintf('ID token message type claim %s requirements are valid', $payload->getMessageType())
+        );
     }
 
     /**

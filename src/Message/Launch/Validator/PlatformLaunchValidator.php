@@ -114,17 +114,16 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
      */
     private function validatePayloadMessageType(LtiMessagePayloadInterface $payload): self
     {
-        if ($payload->getMessageType() === '') {
-            throw new LtiException('JWT id_token message_type claim is missing');
+        if (
+        !in_array(
+            $payload->getClaim(LtiMessagePayloadInterface::CLAIM_LTI_MESSAGE_TYPE),
+            $this->getSupportedMessageTypes()
+        )
+        ) {
+            throw new LtiException('JWT message_type claim is not supported');
         }
 
-        if (!in_array($payload->getMessageType(), $this->getSupportedMessageTypes())) {
-            throw new LtiException(
-                sprintf('JWT id_token message_type claim %s is not supported', $payload->getMessageType())
-            );
-        }
-
-        return $this->addSuccess('JWT id_token message_type claim is valid');
+        return $this->addSuccess('JWT message_type claim is valid');
     }
 
 
@@ -166,6 +165,10 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
      */
     private function validatePayloadNonce(LtiMessagePayloadInterface $payload): self
     {
+        if (empty($payload->getToken()->getClaim(LtiMessagePayloadInterface::CLAIM_NONCE))) {
+            throw new LtiException('JWT nonce claim is missing');
+        }
+
         $nonceValue = $payload->getMandatoryClaim(MessagePayloadInterface::CLAIM_NONCE);
 
         $nonce = $this->nonceRepository->find($nonceValue);
@@ -174,15 +177,13 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
             if (!$nonce->isExpired()) {
                 throw new LtiException('JWT nonce claim already used');
             }
-
-            return $this->addSuccess('JWT nonce claim already used but expired');
         } else {
             $this->nonceRepository->save(
                 new Nonce($nonceValue, Carbon::now()->addSeconds(NonceGeneratorInterface::TTL))
             );
-
-            return $this->addSuccess('JWT nonce claim is valid');
         }
+
+        return $this->addSuccess('JWT nonce claim is valid');
     }
 
     /**
@@ -202,28 +203,22 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
      */
     private function validatePayloadLaunchMessageTypeSpecifics(LtiMessagePayloadInterface $payload): self
     {
-        switch ($payload->getMessageType()) {
-            case LtiMessageInterface::LTI_MESSAGE_TYPE_START_ASSESSMENT:
-                if (null === $payload->getProctoringSessionData()) {
-                    throw new LtiException('JWT session_data proctoring claim is invalid');
-                }
+        if ($payload->getMessageType() === LtiMessageInterface::LTI_MESSAGE_TYPE_START_ASSESSMENT) {
+            if (empty($payload->getProctoringSessionData())) {
+                throw new LtiException('JWT session_data proctoring claim is invalid');
+            }
 
-                $this->addSuccess('JWT session_data proctoring claim is valid');
+            if (empty($payload->getProctoringAttemptNumber())) {
+                throw new LtiException('JWT attempt_number proctoring claim is invalid');
+            }
 
-                if (null === $payload->getProctoringAttemptNumber()) {
-                    throw new LtiException('JWT attempt_number proctoring claim is invalid');
-                }
-
-                $this->addSuccess('JWT attempt_number proctoring claim is valid');
-
-                if (null === $payload->getResourceLink()) {
-                    throw new LtiException('JWT resource_link claim is invalid');
-                }
-
-                return $this->addSuccess('JWT resource_link claim is valid');
-
-            default:
-                throw new LtiException(sprintf('Launch message type %s not handled', $payload->getMessageType()));
+            if (empty($payload->getResourceLink()) || empty($payload->getResourceLink()->getIdentifier())) {
+                throw new LtiException('JWT resource_link id claim is invalid');
+            }
         }
+
+        return $this->addSuccess(
+            sprintf('JWT message type claim %s requirements are valid', $payload->getMessageType())
+        );
     }
 }

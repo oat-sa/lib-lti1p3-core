@@ -27,7 +27,7 @@ use Exception;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Signer\Key;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
-use OAT\Library\Lti1p3Core\Token\MessageInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Security\Jwks\Fetcher\JwksFetcherInterface;
 use OAT\Library\Lti1p3Core\Service\Server\Entity\Client;
@@ -216,13 +216,13 @@ class ClientRepositoryTest extends TestCase
         $now = Carbon::now();
 
         return (new Builder())
-            ->withHeader(MessageInterface::HEADER_KID, $registration->getToolKeyChain()->getIdentifier())
+            ->withHeader(MessagePayloadInterface::HEADER_KID, $registration->getToolKeyChain()->getIdentifier())
             ->identifiedBy(sprintf('%s-%s', $registration->getIdentifier(), $now->getPreciseTimestamp()))
             ->issuedBy($registration->getTool()->getAudience())
             ->relatedTo($registration->getClientId())
             ->permittedFor($audience ?? $registration->getPlatform()->getOAuth2AccessTokenUrl())
             ->issuedAt($now->getTimestamp())
-            ->expiresAt($now->addSeconds(MessageInterface::TTL)->getTimestamp())
+            ->expiresAt($now->addSeconds(MessagePayloadInterface::TTL)->getTimestamp())
             ->getToken(new Sha256(), $registration->getToolKeyChain()->getPrivateKey())
             ->__toString();
     }

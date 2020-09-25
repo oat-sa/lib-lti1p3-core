@@ -66,11 +66,11 @@ trait DomainTestingTrait
         string $identifier = 'toolIdentifier',
         string $name = 'toolName',
         string $audience = 'platformAudience',
-        string $oidcLoginInitiationUrl = 'http://tool.com/oidc-init',
+        string $oidcInitiationUrl = 'http://tool.com/oidc-init',
         string $launchUrl = 'http://tool.com/launch',
-        string $deepLaunchUrl = 'http://tool.com/deep-launch'
+        string $deepLinkingUrl = 'http://tool.com/deep-launch'
     ): Tool {
-        return new Tool($identifier, $name, $audience, $oidcLoginInitiationUrl, $launchUrl, $deepLaunchUrl);
+        return new Tool($identifier, $name, $audience, $oidcInitiationUrl, $launchUrl, $deepLinkingUrl);
     }
 
     private function createTestLtiResourceLink(
@@ -113,6 +113,29 @@ trait DomainTestingTrait
         );
     }
 
+    private function createTestRegistrationWithoutDeploymentId(
+        string $identifier = 'registrationIdentifier',
+        string $clientId = 'registrationClientId',
+        PlatformInterface $platform = null,
+        ToolInterface $tool = null,
+        KeyChainInterface $platformKeyChain = null,
+        KeyChainInterface $toolKeyChain = null,
+        string $platformJwksUrl = null,
+        string $toolJwksUrl = null
+    ): Registration {
+        return new Registration(
+            $identifier,
+            $clientId,
+            $platform ?? $this->createTestPlatform(),
+            $tool ?? $this->createTestTool(),
+            [],
+            $platformKeyChain ?? $this->createTestKeyChain('platformKeyChain'),
+            $toolKeyChain ?? $this->createTestKeyChain('toolKeyChain'),
+            $platformJwksUrl,
+            $toolJwksUrl
+        );
+    }
+
     private function createTestRegistrationWithJwksPlatform(
         string $identifier = 'registrationIdentifier',
         string $clientId = 'registrationClientId',
@@ -125,7 +148,7 @@ trait DomainTestingTrait
             $tool ?? $this->createTestTool(),
             ['deploymentIdentifier'],
             null,
-            $toolKeyChain ?? $this->createTestKeyChain('toolKeyChain'),
+            $this->createTestKeyChain('toolKeyChain'),
             $platformJwksUrl,
             null
         );
@@ -153,14 +176,20 @@ trait DomainTestingTrait
 
     private function createTestRegistrationWithoutPlatformKeyChain(
         string $identifier = 'registrationIdentifier',
-        string $clientId = 'registrationClientId'
+        string $clientId = 'registrationClientId',
+        string $platformJwksUrl = 'http://platform.com/jwks',
+        string $toolJwksUrl = 'http://tool.com/jwks'
     ): Registration {
         return new Registration(
             $identifier,
             $clientId,
             $platform ?? $this->createTestPlatform(),
             $tool ?? $this->createTestTool(),
-            ['deploymentIdentifier']
+            ['deploymentIdentifier'],
+            null,
+            $this->createTestKeyChain('toolKeyChain'),
+            $platformJwksUrl,
+            $toolJwksUrl
         );
     }
 

@@ -22,10 +22,14 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Traits;
 
+use Carbon\Carbon;
+use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Parser;
+use Lcobucci\JWT\Signer;
 use Lcobucci\JWT\Signer\Key;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use Lcobucci\JWT\Token;
+use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Security\Jwt\AssociativeDecoder;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChain;
 use OAT\Library\Lti1p3Core\Security\Nonce\Nonce;
@@ -50,6 +54,30 @@ trait SecurityTestingTrait
             $publicKey ?? getenv('TEST_KEYS_ROOT_DIR') . '/RSA/public.key',
             $privateKey ?? getenv('TEST_KEYS_ROOT_DIR') . '/RSA/private.key',
             $privateKeyPassPhrase
+        );
+    }
+
+    private function buildJwt(
+        array $headers = [],
+        array $claims = [],
+        Key $key = null,
+        Signer $signer = null
+    ): Token {
+        $builder = new Builder();
+
+        foreach ($headers as $headerName => $headerValue) {
+            $builder->withHeader($headerName, $headerValue);
+        }
+
+        foreach ($claims as $claimName => $claimValue) {
+            $builder->withClaim($claimName, $claimValue);
+        };
+
+        $builder->expiresAt(Carbon::now()->addSeconds(MessagePayloadInterface::TTL)->getTimestamp());
+
+        return $builder->getToken(
+            $signer ?? new Sha256(),
+            $key ?? $this->createTestKeyChain()->getPrivateKey()
         );
     }
 
@@ -95,7 +123,10 @@ trait SecurityTestingTrait
 
     private function createTestNonceRepository(array $nonces = [], bool $withAutomaticFind = false): NonceRepositoryInterface
     {
-        $nonces = !empty($nonces) ? $nonces : [new Nonce('value')];
+        $nonces = !empty($nonces) ? $nonces : [
+            new Nonce('existing'),
+            new Nonce('expired', Carbon::now()->subDay()),
+        ];
 
         return new class ($nonces, $withAutomaticFind) implements NonceRepositoryInterface
         {

@@ -20,46 +20,46 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Tests\Unit\Launch\Validator;
+namespace OAT\Library\Lti1p3Core\Tests\Unit\Message\Launch\Validator\Result;
 
-use OAT\Library\Lti1p3Core\Launch\Validator\LaunchRequestValidationResult;
-use OAT\Library\Lti1p3Core\Token\LtiMessageTokenInterface;
-use OAT\Library\Lti1p3Core\Token\MessageInterface;
+use OAT\Library\Lti1p3Core\Message\Launch\Validator\Result\LaunchValidationResult;
+use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use PHPUnit\Framework\TestCase;
 
-class LtiLaunchRequestValidationResultTest extends TestCase
+class LaunchValidationResultTest extends TestCase
 {
     public function testGetRegistration(): void
     {
         $registrationMock = $this->createMock(RegistrationInterface::class);
 
-        $subject = new LaunchRequestValidationResult($registrationMock);
+        $subject = new LaunchValidationResult($registrationMock);
 
         $this->assertEquals($registrationMock, $subject->getRegistration());
     }
 
-    public function testGetLtiMessage(): void
+    public function testGetPayload(): void
     {
-        $ltiMessageMock = $this->createMock(LtiMessageTokenInterface::class);
+        $payloadMock = $this->createMock(LtiMessagePayloadInterface::class);
 
-        $subject = new LaunchRequestValidationResult(null, $ltiMessageMock);
+        $subject = new LaunchValidationResult(null, $payloadMock);
 
-        $this->assertEquals($ltiMessageMock, $subject->getLtiMessage());
+        $this->assertEquals($payloadMock, $subject->getPayload());
     }
 
-    public function testGetOidcState(): void
+    public function testGetState(): void
     {
-        $oidcStateMock = $this->createMock(MessageInterface::class);
+        $stateMock = $this->createMock(MessagePayloadInterface::class);
 
-        $subject = new LaunchRequestValidationResult(null, null, $oidcStateMock);
+        $subject = new LaunchValidationResult(null, null, $stateMock);
 
-        $this->assertEquals($oidcStateMock, $subject->getOidcState());
+        $this->assertEquals($stateMock, $subject->getState());
     }
 
-    public function testBehavior(): void
+    public function testLifecycle(): void
     {
-        $subject = new LaunchRequestValidationResult();
+        $subject = new LaunchValidationResult();
 
         $this->assertFalse($subject->hasError());
 

@@ -84,7 +84,7 @@ class LtiMessagePayload extends MessagePayload implements LtiMessagePayloadInter
         return $this->getMandatoryClaim(static::CLAIM_LTI_ROLES);
     }
 
-    public function getResourceLink(): ResourceLinkClaim
+    public function getResourceLink(): ?ResourceLinkClaim
     {
         return $this->getClaim(ResourceLinkClaim::class);
     }

@@ -63,7 +63,7 @@ class MessagePayloadBuilder implements MessagePayloadBuilderInterface
     public function withClaim($claim, $claimValue = null): MessagePayloadBuilderInterface
     {
         if (is_a($claim, MessagePayloadClaimInterface::class, true)) {
-            /**  @var MessagePayloadClaimInterface $claim */
+            /** @var MessagePayloadClaimInterface $claim */
             $this->builder->withClaim($claim::getClaimName(), $claim->normalize());
         } else {
             $this->builder->withClaim((string)$claim, $claimValue);

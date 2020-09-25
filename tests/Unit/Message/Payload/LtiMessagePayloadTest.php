@@ -22,7 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Message\Payload;
 
-use Lcobucci\JWT\Parser;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilder;
 use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilderInterface;
@@ -41,7 +40,6 @@ use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayload;
 use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
-use OAT\Library\Lti1p3Core\Security\Jwt\AssociativeDecoder;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
 use PHPUnit\Framework\TestCase;
 
@@ -55,9 +53,6 @@ class LtiMessagePayloadTest extends TestCase
     /** @var ContextClaim */
     private $claim;
 
-    /** @var Parser */
-    private $parser;
-
     /** @var MessagePayloadInterface */
     private $subject;
 
@@ -65,7 +60,6 @@ class LtiMessagePayloadTest extends TestCase
     {
         $this->builder = new MessagePayloadBuilder();
         $this->claim = new ContextClaim('identifier');
-        $this->parser = new Parser(new AssociativeDecoder());
 
         $payload = $this->builder
             ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_MESSAGE_TYPE, LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST)
@@ -99,7 +93,7 @@ class LtiMessagePayloadTest extends TestCase
             ->withClaim(new BasicOutcomeClaim('sourcedId', 'serviceUrl'))
             ->buildMessagePayload($this->createTestRegistration()->getPlatformKeyChain());
 
-        $this->subject = new LtiMessagePayload($this->parser->parse($payload->getToken()->__toString()));
+        $this->subject = new LtiMessagePayload($this->parseJwt($payload->getToken()->__toString()));
     }
 
     public function testClaims(): void
