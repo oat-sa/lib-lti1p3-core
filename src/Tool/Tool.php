@@ -36,29 +36,29 @@ class Tool implements ToolInterface
     /** @var string */
     private $audience;
 
-    /** @var string|null */
-    private $oidcLoginInitiationUrl;
+    /** @var string */
+    private $oidcInitiationUrl;
 
     /** @var string|null */
     private $launchUrl;
 
     /** @var string|null */
-    private $deepLinkLaunchUrl;
+    private $deepLinkingUrl;
 
     public function __construct(
         string $identifier,
         string $name,
         string $audience,
-        string $oidcLoginInitiationUrl = null,
+        string $oidcInitiationUrl,
         string $launchUrl = null,
-        string $deepLinkLaunchUrl = null
+        string $deepLinkingUrl = null
     ) {
         $this->identifier = $identifier;
         $this->name = $name;
         $this->audience = $audience;
-        $this->oidcLoginInitiationUrl = $oidcLoginInitiationUrl;
+        $this->oidcInitiationUrl = $oidcInitiationUrl;
         $this->launchUrl = $launchUrl;
-        $this->deepLinkLaunchUrl = $deepLinkLaunchUrl;
+        $this->deepLinkingUrl = $deepLinkingUrl;
     }
 
     public function getIdentifier(): string
@@ -76,9 +76,9 @@ class Tool implements ToolInterface
         return $this->audience;
     }
 
-    public function getOidcLoginInitiationUrl(): ?string
+    public function getOidcInitiationUrl(): string
     {
-        return $this->oidcLoginInitiationUrl;
+        return $this->oidcInitiationUrl;
     }
 
     public function getLaunchUrl(): ?string
@@ -86,8 +86,8 @@ class Tool implements ToolInterface
         return $this->launchUrl;
     }
 
-    public function getDeepLinkLaunchUrl(): ?string
+    public function getDeepLinkingUrl(): ?string
     {
-        return $this->deepLinkLaunchUrl;
+        return $this->deepLinkingUrl;
     }
 }

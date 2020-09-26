@@ -25,7 +25,6 @@ namespace OAT\Library\Lti1p3Core\Tests\Integration\Service\Server\Validator;
 use Carbon\Carbon;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
-use League\OAuth2\Server\Exception\OAuthServerException;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Service\Server\Validator\AccessTokenRequestValidationResult;
 use OAT\Library\Lti1p3Core\Service\Server\Validator\AccessTokenRequestValidator;
@@ -34,7 +33,6 @@ use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
 use OAT\Library\Lti1p3Core\Tests\Traits\NetworkTestingTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
-use Throwable;
 
 class AccessTokenRequestValidatorTest extends TestCase
 {

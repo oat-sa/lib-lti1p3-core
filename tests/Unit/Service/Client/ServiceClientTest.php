@@ -26,6 +26,7 @@ use Cache\Adapter\PHPArray\ArrayCachePool;
 use Carbon\Carbon;
 use GuzzleHttp\ClientInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
+use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Service\Client\ServiceClient;
 use OAT\Library\Lti1p3Core\Service\Client\ServiceClientInterface;
@@ -41,6 +42,9 @@ class ServiceClientTest extends TestCase
     use DomainTestingTrait;
     use NetworkTestingTrait;
 
+    /** @var RegistrationInterface */
+    private $registration;
+
     /** @var ArrayCachePool */
     private $cache;
 
@@ -52,28 +56,37 @@ class ServiceClientTest extends TestCase
 
     protected function setUp(): void
     {
+        $this->registration = $this->createTestRegistration();
+
         $this->cache = new ArrayCachePool();
         $this->clientMock = $this->createMock(ClientInterface::class);
 
         $this->subject = new ServiceClient($this->cache, $this->clientMock);
+
+        // Lock date for this test scope, to control time related claims
+        Carbon::setTestNow('2020-01-01');
+    }
+
+    protected function tearDown()
+    {
+        // Release time lock, for other tests scopes
+        Carbon::setTestNow();
     }
 
     public function testItCanPerformAServiceCallFromEmptyTokenCache(): void
     {
-        $registration = $this->createTestRegistration();
-
         $this->clientMock
             ->expects($this->exactly(2))
             ->method('request')
             ->withConsecutive(
                 [
                     'POST',
-                    $registration->getPlatform()->getOAuth2AccessTokenUrl(),
+                    $this->registration->getPlatform()->getOAuth2AccessTokenUrl(),
                     [
                         'form_params' => [
                             'grant_type' => ServiceClientInterface::GRANT_TYPE,
                             'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
-                            'client_assertion' => $this->getTestJwtClientAssertion(),
+                            'client_assertion' => $this->generateTestJwtClientAssertion(),
                             'scope' => ''
                         ]
                     ]
@@ -91,21 +104,19 @@ class ServiceClientTest extends TestCase
                 $this->createResponse('service response')
             );
 
-        $result = $this->subject->request($registration, 'GET', 'http://example.com');
+        $result = $this->subject->request($this->registration, 'GET', 'http://example.com');
 
         $this->assertInstanceOf(ResponseInterface::class, $result);
         $this->assertEquals('service response', $result->getBody()->__toString());
 
-        $cacheKey = $this->generateAccessTokenCacheKey($registration);
+        $cacheKey = $this->generateAccessTokenCacheKey($this->registration);
         $this->assertTrue($this->cache->hasItem($cacheKey));
         $this->assertEquals('access_token', $this->cache->getItem($cacheKey)->get());
     }
 
     public function testItCanPerformAServiceCallFromPopulatedTokenCacheWithoutScopes(): void
     {
-        $registration = $this->createTestRegistration();
-
-        $cacheKey = $this->generateAccessTokenCacheKey($registration);
+        $cacheKey = $this->generateAccessTokenCacheKey($this->registration);
         $cacheItem = $this->cache->getItem($cacheKey)->set('cached_access_token');
         $this->cache->save($cacheItem);
 
@@ -123,7 +134,7 @@ class ServiceClientTest extends TestCase
                 $this->createResponse('service response')
             );
 
-        $result = $this->subject->request($registration, 'GET', 'http://example.com');
+        $result = $this->subject->request($this->registration, 'GET', 'http://example.com');
 
         $this->assertInstanceOf(ResponseInterface::class, $result);
         $this->assertEquals('service response', $result->getBody()->__toString());
@@ -131,11 +142,9 @@ class ServiceClientTest extends TestCase
 
     public function testItCanPerformAServiceCallFromPopulatedTokenCacheWithScopes(): void
     {
-        $registration = $this->createTestRegistration();
-
         $scopes = ['scope1', 'scope2'];
 
-        $cacheKey = $this->generateAccessTokenCacheKey($registration, $scopes);
+        $cacheKey = $this->generateAccessTokenCacheKey($this->registration, $scopes);
         $cacheItem = $this->cache->getItem($cacheKey)->set('cached_access_token');
         $this->cache->save($cacheItem);
 
@@ -153,7 +162,7 @@ class ServiceClientTest extends TestCase
                 $this->createResponse('service response')
             );
 
-        $result = $this->subject->request($registration, 'GET', 'http://example.com', [], $scopes);
+        $result = $this->subject->request($this->registration, 'GET', 'http://example.com', [], $scopes);
 
         $this->assertInstanceOf(ResponseInterface::class, $result);
         $this->assertEquals('service response', $result->getBody()->__toString());
@@ -174,19 +183,17 @@ class ServiceClientTest extends TestCase
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage('Cannot get access token: invalid response http status code');
 
-        $registration = $this->createTestRegistration();
-
         $this->clientMock
             ->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
-                $registration->getPlatform()->getOAuth2AccessTokenUrl(),
+                $this->registration->getPlatform()->getOAuth2AccessTokenUrl(),
                 [
                     'form_params' => [
                         'grant_type' => ServiceClientInterface::GRANT_TYPE,
                         'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
-                        'client_assertion' => $this->getTestJwtClientAssertion(),
+                        'client_assertion' => $this->generateTestJwtClientAssertion(),
                         'scope' => '',
                     ]
                 ]
@@ -195,7 +202,7 @@ class ServiceClientTest extends TestCase
                 $this->createResponse('invalid service response', 500)
             );
 
-        $this->subject->request($registration, 'GET', 'http://example.com');
+        $this->subject->request($this->registration, 'GET', 'http://example.com');
     }
 
     public function testItThrowAnLtiExceptionOnInvalidAccessTokenResponseBodyFormat(): void
@@ -203,19 +210,17 @@ class ServiceClientTest extends TestCase
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage('Cannot get access token: json_decode error: Syntax error');
 
-        $registration = $this->createTestRegistration();
-
         $this->clientMock
             ->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
-                $registration->getPlatform()->getOAuth2AccessTokenUrl(),
+                $this->registration->getPlatform()->getOAuth2AccessTokenUrl(),
                 [
                     'form_params' => [
                         'grant_type' => ServiceClientInterface::GRANT_TYPE,
                         'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
-                        'client_assertion' => $this->getTestJwtClientAssertion(),
+                        'client_assertion' => $this->generateTestJwtClientAssertion(),
                         'scope' => '',
                     ]
                 ]
@@ -224,7 +229,7 @@ class ServiceClientTest extends TestCase
                 $this->createResponse('invalid')
             );
 
-        $this->subject->request($registration, 'GET', 'http://example.com');
+        $this->subject->request($this->registration, 'GET', 'http://example.com');
     }
 
     public function testItThrowAnLtiExceptionOnInvalidAccessTokenResponseBodyContent(): void
@@ -232,19 +237,17 @@ class ServiceClientTest extends TestCase
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage('Cannot get access token: invalid response body');
 
-        $registration = $this->createTestRegistration();
-
         $this->clientMock
             ->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
-                $registration->getPlatform()->getOAuth2AccessTokenUrl(),
+                $this->registration->getPlatform()->getOAuth2AccessTokenUrl(),
                 [
                     'form_params' => [
                         'grant_type' => ServiceClientInterface::GRANT_TYPE,
                         'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
-                        'client_assertion' => $this->getTestJwtClientAssertion(),
+                        'client_assertion' => $this->generateTestJwtClientAssertion(),
                         'scope' => '',
                     ]
                 ]
@@ -253,7 +256,7 @@ class ServiceClientTest extends TestCase
                 $this->createResponse('{}')
             );
 
-        $this->subject->request($registration, 'GET', 'http://example.com');
+        $this->subject->request($this->registration, 'GET', 'http://example.com');
     }
 
     public function testItThrowAnLtiExceptionOnPlatformEndpointFailure(): void
@@ -261,20 +264,18 @@ class ServiceClientTest extends TestCase
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage('Cannot perform request');
 
-        $registration = $this->createTestRegistration();
-
         $this->clientMock
             ->expects($this->exactly(2))
             ->method('request')
             ->withConsecutive(
                 [
                     'POST',
-                    $registration->getPlatform()->getOAuth2AccessTokenUrl(),
+                    $this->registration->getPlatform()->getOAuth2AccessTokenUrl(),
                     [
                         'form_params' => [
                             'grant_type' => ServiceClientInterface::GRANT_TYPE,
                             'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
-                            'client_assertion' => $this->getTestJwtClientAssertion(),
+                            'client_assertion' => $this->generateTestJwtClientAssertion(),
                             'scope' => ''
                         ]
                     ]
@@ -292,14 +293,31 @@ class ServiceClientTest extends TestCase
                 'invalid output'
             );
 
-        $this->subject->request($registration, 'GET', 'http://example.com');
+        $this->subject->request($this->registration, 'GET', 'http://example.com');
     }
 
-    private function getTestJwtClientAssertion(): string
+    private function generateTestJwtClientAssertion(): string
     {
-        Carbon::setTestNow(Carbon::create(2000, 1, 1));
+        $token = $this->buildJwt(
+            [
+                MessagePayloadInterface::HEADER_KID => $this->registration->getToolKeyChain()->getIdentifier()
+            ],
+            [
+                MessagePayloadInterface::CLAIM_JTI => sprintf(
+                    '%s-%s',
+                    $this->registration->getIdentifier(),
+                    Carbon::now()->getTimestamp()
+                ),
+                MessagePayloadInterface::CLAIM_ISS => $this->registration->getTool()->getAudience(),
+                MessagePayloadInterface::CLAIM_SUB => $this->registration->getClientId(),
+                MessagePayloadInterface::CLAIM_AUD => $this->registration->getPlatform()->getAudience(),
+                MessagePayloadInterface::CLAIM_IAT => Carbon::now()->getTimestamp(),
+                MessagePayloadInterface::CLAIM_EXP => Carbon::now()->addSeconds(MessagePayloadInterface::TTL)->getTimestamp(),
+            ],
+            $this->registration->getToolKeyChain()->getPrivateKey()
+        );
 
-        return 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6InRvb2xLZXlDaGFpbiJ9.eyJqdGkiOiJyZWdpc3RyYXRpb25JZGVudGlmaWVyLTkuNDY2ODQ4RSsxNCIsImlzcyI6InBsYXRmb3JtQXVkaWVuY2UiLCJzdWIiOiJyZWdpc3RyYXRpb25DbGllbnRJZCIsImF1ZCI6Imh0dHA6XC9cL3BsYXRmb3JtLmNvbVwvYWNjZXNzLXRva2VuIiwiaWF0Ijo5NDY2ODQ4MDAsImV4cCI6OTQ2Njg1NDAwfQ.t5VpD-QctqxVTbfsm9fpMsMaK__3_YMGbWQEY25FpZFqxSf9NxaXgjv62xpfuGTYJIB20BHj4VToVHSK3gA9PAxrXArFKx5NYzLcnQgN3wLn7wulfkP703805xMQ5duAJJTMNZYbKVfFOEPRgay2iVUuN9EnAe7q-SSTSWgzG1FEtqkYMUM-ohDzjWYs0K7BCEpf3MEsNhg3amxoLAhC7MKJj4SNaBw46qTiTew4Nyi_143yO7niPw5KGBqm3KdBUoDDc7ot7OLOvlKKN9252jgkZdTkpalT9b5i3rbdx5npqWsFN_EmbLTdNhwnw_DHs1T0ALG-tDegnEr46-h6iQ';
+        return $token->__toString();
     }
 
     private function generateAccessTokenCacheKey(RegistrationInterface $registration, array $scopes = []): string

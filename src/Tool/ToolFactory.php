@@ -28,10 +28,10 @@ class ToolFactory
         string $identifier,
         string $name,
         string $audience,
-        string $oidcLoginInitiationUrl = null,
+        string $oidcInitiationUrl,
         string $launchUrl = null,
-        string $deepLinkLaunchUrl = null
+        string $deepLinkingUrl = null
     ): ToolInterface {
-        return new Tool($identifier, $name, $audience, $oidcLoginInitiationUrl, $launchUrl, $deepLinkLaunchUrl);
+        return new Tool($identifier, $name, $audience, $oidcInitiationUrl, $launchUrl, $deepLinkingUrl);
     }
 }

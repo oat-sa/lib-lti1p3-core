@@ -25,9 +25,10 @@ namespace OAT\Library\Lti1p3Core\Tests\Traits;
 use OAT\Library\Lti1p3Core\Registration\Registration;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
-use OAT\Library\Lti1p3Core\Link\ResourceLink\ResourceLink;
 use OAT\Library\Lti1p3Core\Platform\Platform;
 use OAT\Library\Lti1p3Core\Platform\PlatformInterface;
+use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLink;
+use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLinkInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
 use OAT\Library\Lti1p3Core\Tool\Tool;
 use OAT\Library\Lti1p3Core\Tool\ToolInterface;
@@ -65,20 +66,27 @@ trait DomainTestingTrait
         string $identifier = 'toolIdentifier',
         string $name = 'toolName',
         string $audience = 'platformAudience',
-        string $oidcLoginInitiationUrl = 'http://tool.com/oidc-init',
+        string $oidcInitiationUrl = 'http://tool.com/oidc-init',
         string $launchUrl = 'http://tool.com/launch',
-        string $deepLaunchUrl = 'http://tool.com/deep-launch'
+        string $deepLinkingUrl = 'http://tool.com/deep-launch'
     ): Tool {
-        return new Tool($identifier, $name, $audience, $oidcLoginInitiationUrl, $launchUrl, $deepLaunchUrl);
+        return new Tool($identifier, $name, $audience, $oidcInitiationUrl, $launchUrl, $deepLinkingUrl);
     }
 
-    private function createTestResourceLink(
+    private function createTestLtiResourceLink(
         string $identifier = 'resourceLinkIdentifier',
         string $url = 'http://tool.com/resource-link',
         string $title = 'resourceLinkTitle',
-        string $description = 'resourceLinkDescription'
-    ): ResourceLink {
-        return new ResourceLink($identifier, $url, $title, $description);
+        string $text = 'resourceLinkDescription'
+    ): LtiResourceLinkInterface {
+        return new LtiResourceLink(
+            $identifier,
+            [
+                'url' => $url,
+                'title' => $title,
+                'text' => $text
+            ]
+        );
     }
 
     private function createTestRegistration(
@@ -105,21 +113,26 @@ trait DomainTestingTrait
         );
     }
 
-    private function createTestRegistrationWithJwksPlatform(
+    private function createTestRegistrationWithoutDeploymentId(
         string $identifier = 'registrationIdentifier',
         string $clientId = 'registrationClientId',
-        string $platformJwksUrl = 'http://platform.com/jwks'
+        PlatformInterface $platform = null,
+        ToolInterface $tool = null,
+        KeyChainInterface $platformKeyChain = null,
+        KeyChainInterface $toolKeyChain = null,
+        string $platformJwksUrl = null,
+        string $toolJwksUrl = null
     ): Registration {
         return new Registration(
             $identifier,
             $clientId,
             $platform ?? $this->createTestPlatform(),
             $tool ?? $this->createTestTool(),
-            ['deploymentIdentifier'],
-            null,
+            [],
+            $platformKeyChain ?? $this->createTestKeyChain('platformKeyChain'),
             $toolKeyChain ?? $this->createTestKeyChain('toolKeyChain'),
             $platformJwksUrl,
-            null
+            $toolJwksUrl
         );
     }
 
@@ -145,14 +158,20 @@ trait DomainTestingTrait
 
     private function createTestRegistrationWithoutPlatformKeyChain(
         string $identifier = 'registrationIdentifier',
-        string $clientId = 'registrationClientId'
+        string $clientId = 'registrationClientId',
+        string $platformJwksUrl = 'http://platform.com/jwks',
+        string $toolJwksUrl = 'http://tool.com/jwks'
     ): Registration {
         return new Registration(
             $identifier,
             $clientId,
             $platform ?? $this->createTestPlatform(),
             $tool ?? $this->createTestTool(),
-            ['deploymentIdentifier']
+            ['deploymentIdentifier'],
+            null,
+            $this->createTestKeyChain('toolKeyChain'),
+            $platformJwksUrl,
+            $toolJwksUrl
         );
     }
 

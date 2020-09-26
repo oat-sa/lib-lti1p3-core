@@ -40,9 +40,9 @@ class ToolFactoryTest extends TestCase
             $tool->getIdentifier(),
             $tool->getName(),
             $tool->getAudience(),
-            $tool->getOidcLoginInitiationUrl(),
+            $tool->getOidcInitiationUrl(),
             $tool->getLaunchUrl(),
-            $tool->getDeepLinkLaunchUrl()
+            $tool->getDeepLinkingUrl()
         );
 
         $this->assertEquals($tool, $result);

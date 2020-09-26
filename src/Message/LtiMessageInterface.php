@@ -22,76 +22,38 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Message;
 
-use OAT\Library\Lti1p3Core\Message\Claim\AgsClaim;
-use OAT\Library\Lti1p3Core\Message\Claim\BasicOutcomeClaim;
-use OAT\Library\Lti1p3Core\Message\Claim\ContextClaim;
-use OAT\Library\Lti1p3Core\Message\Claim\LaunchPresentationClaim;
-use OAT\Library\Lti1p3Core\Message\Claim\LisClaim;
-use OAT\Library\Lti1p3Core\Message\Claim\NrpsClaim;
-use OAT\Library\Lti1p3Core\Message\Claim\PlatformInstanceClaim;
-use OAT\Library\Lti1p3Core\Message\Claim\ResourceLinkClaim;
-use OAT\Library\Lti1p3Core\User\UserIdentityInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * @see http://www.imsglobal.org/spec/lti/v1p3/#lti-message-general-details
  */
-interface LtiMessageInterface extends MessageInterface
+interface LtiMessageInterface
 {
     // LTI version
     public const LTI_VERSION = '1.3.0';
 
-    // LTI claims
-    public const CLAIM_LTI_MESSAGE_TYPE = 'https://purl.imsglobal.org/spec/lti/claim/message_type';
-    public const CLAIM_LTI_VERSION = 'https://purl.imsglobal.org/spec/lti/claim/version';
-    public const CLAIM_LTI_DEPLOYMENT_ID = 'https://purl.imsglobal.org/spec/lti/claim/deployment_id';
-    public const CLAIM_LTI_ROLES = 'https://purl.imsglobal.org/spec/lti/claim/roles';
-    public const CLAIM_LTI_CONTEXT = 'https://purl.imsglobal.org/spec/lti/claim/context';
-    public const CLAIM_LTI_TOOL_PLATFORM = 'https://purl.imsglobal.org/spec/lti/claim/tool_platform';
-    public const CLAIM_LTI_ROLE_SCOPE_MENTOR = 'https://purl.imsglobal.org/spec/lti/claim/role_scope_mentor';
-    public const CLAIM_LTI_LAUNCH_PRESENTATION = 'https://purl.imsglobal.org/spec/lti/claim/launch_presentation';
-    public const CLAIM_LTI_LIS = 'https://purl.imsglobal.org/spec/lti/claim/lis';
-    public const CLAIM_LTI_CUSTOM = 'https://purl.imsglobal.org/spec/lti/claim/custom';
-    public const CLAIM_LTI_TARGET_LINK_URI = 'https://purl.imsglobal.org/spec/lti/claim/target_link_uri';
-    public const CLAIM_LTI_RESOURCE_LINK = 'https://purl.imsglobal.org/spec/lti/claim/resource_link';
+    // LTI message types
+    public const LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST = 'LtiResourceLinkRequest';
+    public const LTI_MESSAGE_TYPE_DEEP_LINKING_REQUEST = 'LtiDeepLinkingRequest';
+    public const LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE = 'LtiDeepLinkingResponse';
+    public const LTI_MESSAGE_TYPE_START_PROCTORING = 'LtiStartProctoring';
+    public const LTI_MESSAGE_TYPE_START_ASSESSMENT = 'LtiStartAssessment';
 
-    // LTI AGS claim
-    public const CLAIM_LTI_AGS = 'https://purl.imsglobal.org/spec/lti-ags/claim/endpoint';
+    public function getUrl(): string;
 
-    // LTI NRPS claim
-    public const CLAIM_LTI_NRPS = 'https://purl.imsglobal.org/spec/lti-nrps/claim/namesroleservice';
+    public function getParameters(): array;
 
-    // LTI Basic Outcome claim
-    public const CLAIM_LTI_BASIC_OUTCOME = 'https://purl.imsglobal.org/spec/lti-bo/claim/basicoutcome';
+    public function hasParameter(string $parameterName): bool;
 
-    public function getMessageType(): string;
+    public function getMandatoryParameter(string $parameterName): string;
 
-    public function getVersion(): string;
+    public function getParameter(string $parameterName, string $default = null): ?string;
 
-    public function getDeploymentId(): string;
+    public static function fromServerRequest(ServerRequestInterface $request): LtiMessageInterface;
 
-    public function getTargetLinkUri(): string;
+    public function toUrl(): string;
 
-    public function getRoles(): array;
+    public function toHtmlLink(string $title, array $attributes = []): string;
 
-    public function getRoleScopeMentor(): array;
-
-    public function getCustom(): array;
-
-    public function getResourceLink(): ResourceLinkClaim;
-
-    public function getContext(): ?ContextClaim;
-
-    public function getPlatformInstance(): ?PlatformInstanceClaim;
-
-    public function getLaunchPresentation(): ?LaunchPresentationClaim;
-
-    public function getLis(): ?LisClaim;
-
-    public function getUserIdentity(): ?UserIdentityInterface;
-
-    public function getAgs(): ?AgsClaim;
-
-    public function getNrps(): ?NrpsClaim;
-
-    public function getBasicOutcome(): ?BasicOutcomeClaim;
+    public function toHtmlRedirectForm(bool $autoSubmit = true): string;
 }
