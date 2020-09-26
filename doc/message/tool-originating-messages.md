@@ -19,14 +19,15 @@ You can find below required steps to generate a tool originating message, needed
 
 ### Create the launch
 
-Once your `LtiResourceLinkInterface` implementation is ready, you need to launch it to a registered tool following the [OIDC launch workflow](https://www.imsglobal.org/spec/security/v1p0#openid_connect_launch_flow), within the context of a registration.
+As a tool, you can create a tool originating message for a platform within the context of a registration.
 
-To do so, you can use the [LtiResourceLinkLaunchRequestBuilder](../../src/Message/Launch/Builder/LtiResourceLinkLaunchRequestBuilder.php) to create an LTI resource link launch request, to start OIDC flow:
+To do so, you can use the [ToolOriginatingLaunchBuilder](../../src/Message/Launch/Builder/ToolOriginatingLaunchBuilder.php):
 ```php
 <?php
 
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\ToolOriginatingLaunchBuilder;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\DeepLinkingContentItemsClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 
 // Create a builder instance
@@ -43,21 +44,22 @@ $message = $builder->buildToolOriginatingLaunch(
     'http://platform.com/launch',                                // platform launch url
     null,                                                        // will use the registration default deployment id, but you can pass a specific one
     [
+        new DeepLinkingContentItemsClaim(...),                   // LTI claim representing the DeepLinking returned resources 
         'myCustomClaim' => 'myCustomValue'                       // custom claim
     ]
 );
 ```
-**Note**: like the `ContextClaim` class, any claim that implement the [MessagePayloadClaimInterface](../../src/Message/Payload/Claim/MessagePayloadClaimInterface.php) will be automatically normalized and added to the message payload claims.
+**Note**: like the `DeepLinkingContentItemsClaim` class, any claim that implement the [MessagePayloadClaimInterface](../../src/Message/Payload/Claim/MessagePayloadClaimInterface.php) will be automatically normalized and added to the message payload claims.
 
 ### Use the launch
 
-As a result of the build, you get a [LtiMessageInterface](../../src/Message/LtiMessageInterface.php) instance that has to be used this way:
+As a result of the build, you get a [LtiMessageInterface](../../src/Message/LtiMessageInterface.php) instance that has to be used this way (form POST into `JWT` parameter):
 ```php
 <?php
 
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 
-// Auto redirection to the platform via the user's browser
+// Auto redirection from the tool to the platform via the user's browser
 /** @var LtiMessageInterface $message */
 echo $message->toHtmlRedirectForm();
 ```
@@ -105,10 +107,9 @@ if (!$result->hasError()) {
     echo $result->getRegistration()->getIdentifier();
 
     // And to the LTI message payload (JWT parameter)
-    echo $result->getPayload()->getVersion();                 // '1.3.0'
-    echo $result->getPayload()->getContext()->getId();        // 'contextId'
-    echo $result->getPayload()->getClaim('myCustomClaim');    // 'myCustomValue'
-    echo $result->getPayload()->getUserIdentity()->getName(); // given by the platform during OIDC authentication step
+    echo $result->getPayload()->getVersion();               // '1.3.0'
+    echo $result->getPayload()->getMessageType();           // 'LtiDeepLinkingResponse'
+    echo $result->getPayload()->getClaim('myCustomClaim');  // 'myCustomValue'
 
     // If needed, you can also access the validation successes
     foreach ($result->getSuccesses() as $success) {

@@ -285,10 +285,10 @@ if (!$result->hasError()) {
     echo $result->getRegistration()->getIdentifier();
 
     // And to the LTI message payload (id_token parameter)
-    echo $result->getPayload()->getVersion();                 // '1.3.0'
-    echo $result->getPayload()->getContext()->getId();        // 'contextId'
-    echo $result->getPayload()->getClaim('myCustomClaim');    // 'myCustomValue'
-    echo $result->getPayload()->getUserIdentity()->getName(); // given by the platform during OIDC authentication step
+    echo $result->getPayload()->getVersion();                  // '1.3.0'
+    echo $result->getPayload()->getContext()->getIdentifier(); // 'contextId'
+    echo $result->getPayload()->getClaim('myCustomClaim');     // 'myCustomValue'
+    echo $result->getPayload()->getUserIdentity()->getName();  // given by the platform during OIDC authentication step
     
     // If needed, you can also access the OIDC state (state parameter)
     echo $result->getState()->getToken()->__toString();    // state JWT
