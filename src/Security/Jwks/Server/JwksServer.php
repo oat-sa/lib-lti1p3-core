@@ -60,16 +60,13 @@ class JwksServer
         try {
             $body = json_encode($this->exporter->export($keySetName));
 
-            if (false === $body) {
-                throw new RuntimeException('Cannot json_encode JWKS export: %s', json_last_error_msg());
-            }
-
             $headers = [
                 'Content-Type' => 'application/json',
                 'Content-Length' => strlen($body)
             ];
 
             return $this->factory->createResponse(200, null, $headers, $body);
+
         } catch (Throwable $exception) {
             $this->logger->error(sprintf('Error during JWKS server handling: %s', $exception->getMessage()));
 

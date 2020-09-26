@@ -180,14 +180,15 @@ class ServiceClient implements ServiceClientInterface
 
             return $this->builder
                 ->withHeader(MessagePayloadInterface::HEADER_KID, $registration->getToolKeyChain()->getIdentifier())
-                ->identifiedBy(sprintf('%s-%s', $registration->getIdentifier(), $now->getPreciseTimestamp()))
+                ->identifiedBy(sprintf('%s-%s', $registration->getIdentifier(), $now->getTimestamp()))
                 ->issuedBy($registration->getTool()->getAudience())
                 ->relatedTo($registration->getClientId())
-                ->permittedFor($registration->getPlatform()->getOAuth2AccessTokenUrl())
+                ->permittedFor($registration->getPlatform()->getAudience())
                 ->issuedAt($now->getTimestamp())
                 ->expiresAt($now->addSeconds(MessagePayloadInterface::TTL)->getTimestamp())
                 ->getToken($this->signer, $registration->getToolKeyChain()->getPrivateKey())
                 ->__toString();
+
         } catch (Throwable $exception) {
             throw new LtiException(
                 sprintf('Cannot generate credentials: %s', $exception->getMessage()),

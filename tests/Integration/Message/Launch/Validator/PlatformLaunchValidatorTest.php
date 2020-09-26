@@ -28,11 +28,11 @@ use OAT\Library\Lti1p3Core\Message\Launch\Builder\ToolOriginatingLaunchBuilder;
 use OAT\Library\Lti1p3Core\Message\Launch\Validator\PlatformLaunchValidator;
 use OAT\Library\Lti1p3Core\Message\Launch\Validator\Result\LaunchValidationResult;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
-use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
+use OAT\Library\Lti1p3Core\Security\Jwks\Fetcher\JwksFetcherInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepositoryInterface;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
 use OAT\Library\Lti1p3Core\Tests\Traits\NetworkTestingTrait;
@@ -126,6 +126,34 @@ class PlatformLaunchValidatorTest extends TestCase
         $this->assertInstanceOf(LaunchValidationResult::class, $result);
         $this->assertTrue($result->hasError());
         $this->assertEquals('JWT is expired', $result->getError());
+    }
+
+    public function testValidateToolOriginatingLaunchFallbackOnJwks(): void
+    {
+        $registration = $this->createTestRegistrationWithoutToolKeyChain();
+
+        $jwksFetcherMock = $this->createMock(JwksFetcherInterface::class);
+        $jwksFetcherMock
+            ->expects($this->once())
+            ->method('fetchKey')
+            ->willReturn($this->registration->getPlatformKeyChain()->getPublicKey());
+
+        $subject = new PlatformLaunchValidator(
+            $this->createTestRegistrationRepository([$registration]),
+            $this->nonceRepository,
+            $jwksFetcherMock
+        );
+
+        $message = $this->builder->buildToolOriginatingLaunch(
+            $this->registration,
+            LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE,
+            'http://platform.com/launch'
+        );
+
+        $result = $subject->validateToolOriginatingLaunch($this->createServerRequest('GET', $message->toUrl()));
+
+        $this->assertInstanceOf(LaunchValidationResult::class, $result);
+        $this->assertFalse($result->hasError());
     }
 
     public function testValidateToolOriginatingLaunchFailureOnInvalidPayloadSignature(): void

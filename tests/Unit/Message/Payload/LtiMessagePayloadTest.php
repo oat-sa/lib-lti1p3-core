@@ -129,4 +129,19 @@ class LtiMessagePayloadTest extends TestCase
         $this->assertEquals('sourcedId', $this->subject->getBasicOutcome()->getLisResultSourcedId());
         $this->assertNull($this->subject->getUserIdentity());
     }
+
+    public function testGetUserIdentity(): void
+    {
+        $payload = $this->builder
+            ->withClaim(LtiMessagePayloadInterface::CLAIM_SUB, 'userIdentifier')
+            ->withClaim('name', 'userName')
+            ->withClaim('email', 'user@example.com')
+            ->buildMessagePayload($this->createTestRegistration()->getPlatformKeyChain());
+
+        $this->subject = new LtiMessagePayload($this->parseJwt($payload->getToken()->__toString()));
+
+        $this->assertEquals('userIdentifier', $this->subject->getUserIdentity()->getIdentifier());
+        $this->assertEquals('userName', $this->subject->getUserIdentity()->getName());
+        $this->assertEquals('user@example.com', $this->subject->getUserIdentity()->getEmail());
+    }
 }

@@ -36,6 +36,7 @@ interface MessagePayloadInterface
     public const HEADER_KID = 'kid';
 
     // Claims
+    public const CLAIM_JTI = 'jti';
     public const CLAIM_ISS = 'iss';
     public const CLAIM_SUB = 'sub';
     public const CLAIM_AUD = 'aud';
