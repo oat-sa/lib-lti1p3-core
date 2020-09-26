@@ -77,7 +77,9 @@ try {
 
 ## Validation of access token request
 
-Once a tool has been granted with an access token, it can perform LTI service authenticated calls (with header `Authorization: Bearer <token>`).
+Once a tool has been granted with an access token, it can perform LTI service authenticated calls.
+
+(with header `Authorization: Bearer <token>`).
 
 To be able to protect your platform endpoints, you can use the provided [AccessTokenRequestValidator](../../src/Service/Server/Validator/AccessTokenRequestValidator.php):
 - it requires a registration repository implementation [as explained here](../quickstart/interfaces.md) to automate the token signature checks
