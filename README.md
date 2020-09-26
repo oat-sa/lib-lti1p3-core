@@ -64,7 +64,7 @@ You can find below some tutorials, presented by topics.
 
 ### Services interactions
 
-- how to [set up a LTI service server](doc/service/service-server.md)
+- how to [set up an LTI service server](doc/service/service-server.md)
 - how to [use the LTI service client](doc/service/service-client.md)
 
 ## Tests
