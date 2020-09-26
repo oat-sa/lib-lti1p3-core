@@ -11,7 +11,7 @@ To handle the OIDC flow for an LTI resource link launch request, each step will 
 ## Table of contents
 
 - [1 - Tool side: launch generation](#1---tool-side-launch-generation)
-- [2 - Platform side: launch validation](#2---tool-side-oidc-flow-initiation)
+- [2 - Platform side: launch validation](#2---platform-side-launch-validation)
 
 ## 1 - Tool side: launch generation
 

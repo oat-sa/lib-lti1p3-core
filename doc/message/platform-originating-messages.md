@@ -15,9 +15,9 @@ To handle the OIDC launch flow for platform originating messages, each step will
 ## Table of contents
 
 - [1 - Platform side: launch generation](#1---platform-side-launch-generation)
-- [2 - Tool side: OIDC initiation](#2---tool-side-oidc-flow-initiation)
-- [3 - Platform side: OIDC authentication](#3---platform-side-oidc-flow-authentication)
-- [4 - Tool side: launch validation](#4---tool-side-validating-the-launch-after-oidc-flow)
+- [2 - Tool side: OIDC initiation](#2---tool-side-oidc-initiation)
+- [3 - Platform side: OIDC authentication](#3---platform-side-oidc-authentication)
+- [4 - Tool side: launch validation](#4---tool-side-launch-validation)
 
 ## 1 - Platform side: launch generation
 
@@ -242,7 +242,7 @@ $server = new OidcAuthenticationServer(new OidcAuthenticator($registrationReposi
 $response = $server->handle($request);
 ```
 
-## 4 - Tool side: validating the launch
+## 4 - Tool side: launch validation
 
 You can find below required steps to validate a platform originating message, needed only if you're acting as a tool.
 
