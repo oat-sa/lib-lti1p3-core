@@ -38,11 +38,11 @@ Messages represent integration between platforms and tools intermediated by a us
 - [Lti Message](src/Message/LtiMessageInterface.php): reference to an exchange between platforms and tools in message based communications.
 - [Lti Message Payload](src/Message/Payload/LtiMessagePayloadInterface.php): reference to the payload (JWT) of an exchange between platforms and tools in message based communications, containing LTI claims.
 - [Lti Resource Link](src/Resource/LtiResourceLink/LtiResourceLinkInterface.php): reference to a resource made available from a tool for a platform.
-- [Lti Launch](src/Message/Launch/Builder/LtiResourceLinkLaunchRequestBuilder.php): refers to the process in which a user interacts with an LTI Resource Link within the platform and is subsequently "launched" into a tool.
+- [Lti Resource Link Launch](src/Message/Launch/Builder/LtiResourceLinkLaunchRequestBuilder.php): refers to the process in which a user interacts with an LTI Resource Link within the platform and is subsequently "launched" into a tool.
 
 ### Services
 
-Services represent direct connections between platforms and tools.
+Services represent direct connections between platforms and tools (without involving user's browser).
 
 - [Server](src/Service/Server): server side of LTI service
 - [Client](src/Service/Client): client side of LTI service
@@ -54,17 +54,18 @@ You can find below some tutorials, presented by topics.
 ### Quick start
 
 - how to [configure the library](doc/quickstart/configuration.md)
-- how to implement the [library interfaces](doc/quickstart/interfaces.md)
-- how to expose a [JWKS endpoint](doc/quickstart/jwks.md)
+- how to [implement the library interfaces](doc/quickstart/interfaces.md)
+- how to [expose a JWKS endpoint](doc/quickstart/jwks.md)
 
 ### Messages interactions
 
-- how to handle a [LTI resource link launch](doc/message/oidc-lti-resource-link-launch.md) (with [OIDC](https://www.imsglobal.org/spec/security/v1p0/#openid_connect_launch_flow))
+- how to [handle platform originating messages](doc/message/platform-originating-messages.md)
+- how to [handle tool originating messages](doc/message/tool-originating-messages.md)
 
 ### Services interactions
 
-- how to set up a [LTI service server](doc/service/service-server.md)
-- how to use the [LTI service client](doc/service/service-client.md)
+- how to [set up a LTI service server](doc/service/service-server.md)
+- how to [use the LTI service client](doc/service/service-client.md)
 
 ## Tests
 
