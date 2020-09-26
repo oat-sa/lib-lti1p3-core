@@ -35,10 +35,10 @@ You can find below the implementations of the main concepts of the [LTI 1.3 Core
 
 Messages represent integration between platforms and tools intermediated by a user's browser.
 
-- [Lti Message](src/Message/LtiMessageInterface.php): reference to an exchange between platforms and tools in message based communications.
-- [Lti Message Payload](src/Message/Payload/LtiMessagePayloadInterface.php): reference to the payload (JWT) of an exchange between platforms and tools in message based communications, containing LTI claims.
-- [Lti Resource Link](src/Resource/LtiResourceLink/LtiResourceLinkInterface.php): reference to a resource made available from a tool for a platform.
-- [Lti Resource Link Launch](src/Message/Launch/Builder/LtiResourceLinkLaunchRequestBuilder.php): refers to the process in which a user interacts with an LTI Resource Link within the platform and is subsequently "launched" into a tool.
+- [LTI Message](src/Message/LtiMessageInterface.php): reference to an exchange between platforms and tools in message based communications.
+- [LTI Message Payload](src/Message/Payload/LtiMessagePayloadInterface.php): reference to the payload (JWT) of an exchange between platforms and tools in message based communications, containing LTI claims.
+- [LTI Resource Link](src/Resource/LtiResourceLink/LtiResourceLinkInterface.php): reference to a resource made available from a tool for a platform.
+- [LTI Resource Link Launch](src/Message/Launch/Builder/LtiResourceLinkLaunchRequestBuilder.php): refers to the process in which a user interacts with an LTI Resource Link within the platform and is subsequently "launched" into a tool.
 
 ### Services
 
@@ -53,14 +53,14 @@ You can find below some tutorials, presented by topics.
 
 ### Quick start
 
-- how to [configure the library](doc/quickstart/configuration.md)
-- how to [implement the library interfaces](doc/quickstart/interfaces.md)
+- how to [configure the core library](doc/quickstart/configuration.md)
+- how to [implement the core library interfaces](doc/quickstart/interfaces.md)
 - how to [expose a JWKS endpoint](doc/quickstart/jwks.md)
 
 ### Messages interactions
 
-- how to [handle platform originating messages](doc/message/platform-originating-messages.md)
-- how to [handle tool originating messages](doc/message/tool-originating-messages.md)
+- how to [handle platform originating LTI messages](doc/message/platform-originating-messages.md)
+- how to [handle tool originating LTI messages](doc/message/tool-originating-messages.md)
 
 ### Services interactions
 
