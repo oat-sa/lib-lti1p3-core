@@ -6,7 +6,7 @@
 
 ![Tool originating flow](../images/message/tool-to-platform.png)
 
-To handle the OIDC flow for an LTI resource link launch request, each step will be detailed below, from both platform and tool perspectives.
+Each step will be detailed below, from both platform and tool perspectives.
 
 ## Table of contents
 
