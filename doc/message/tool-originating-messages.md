@@ -1,4 +1,4 @@
-# LTI resource link launch process with OIDC
+# Tool originating messages
 
 > How to [perform secured tool originating messages](https://www.imsglobal.org/spec/security/v1p0/#tool-originating-messages).
 
