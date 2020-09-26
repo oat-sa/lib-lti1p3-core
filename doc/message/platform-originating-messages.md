@@ -253,7 +253,7 @@ As a tool, you'll receive an HTTP request containing the [LTI resource link laun
 The [ToolLaunchValidator](../../src/Message/Launch/Validator/ToolLaunchValidator.php) can be used for this:
 - it requires a registration repository and a nonce repository implementations [as explained here](../quickstart/interfaces.md)
 - it expects a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface) to validate
-- it will output a [LtiResourceLinkLaunchRequestValidationResult](../../src/Message/Launch/Validator/LaunchRequestValidationResult.php) representing the launch validation, the related registration and the message payload itself.
+- it will output a [LaunchValidationResult](../../src/Message/Launch/Validator/Result/LaunchValidationResult.php) representing the launch validation, the related registration and the message payload itself.
 
 For example:
 ```php
