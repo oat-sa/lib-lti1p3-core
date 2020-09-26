@@ -37,11 +37,11 @@ trait NetworkTestingTrait
     ): ServerRequestInterface {
         $serverRequest =  (new Psr17Factory())->createServerRequest($method, $uri);
 
-        $method = strtoupper($method);
-
         foreach ($headers as $headerName => $headerValue) {
             $serverRequest = $serverRequest->withAddedHeader($headerName, $headerValue);
         }
+
+        $method = strtoupper($method);
 
         if ($method === 'GET') {
             return $serverRequest->withQueryParams($params);

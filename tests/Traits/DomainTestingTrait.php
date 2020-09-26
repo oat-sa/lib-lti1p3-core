@@ -136,24 +136,6 @@ trait DomainTestingTrait
         );
     }
 
-    private function createTestRegistrationWithJwksPlatform(
-        string $identifier = 'registrationIdentifier',
-        string $clientId = 'registrationClientId',
-        string $platformJwksUrl = 'http://platform.com/jwks'
-    ): Registration {
-        return new Registration(
-            $identifier,
-            $clientId,
-            $platform ?? $this->createTestPlatform(),
-            $tool ?? $this->createTestTool(),
-            ['deploymentIdentifier'],
-            null,
-            $this->createTestKeyChain('toolKeyChain'),
-            $platformJwksUrl,
-            null
-        );
-    }
-
     private function createTestRegistrationWithoutToolKeyChain(
         string $identifier = 'registrationIdentifier',
         string $clientId = 'registrationClientId',

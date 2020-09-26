@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Tests\Integration\Security\Jwks\Exporter;
+namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\Jwks\Exporter;
 
 use OAT\Library\Lti1p3Core\Security\Jwks\Exporter\JwksExporter;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepository;

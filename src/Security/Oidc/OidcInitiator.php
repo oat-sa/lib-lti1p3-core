@@ -67,7 +67,7 @@ class OidcInitiator
         try {
             $oidcRequest = LtiMessage::fromServerRequest($request);
 
-            $registration = $registration = $this->repository->findByPlatformIssuer(
+            $registration = $this->repository->findByPlatformIssuer(
                 $oidcRequest->getMandatoryParameter('iss'),
                 $oidcRequest->getParameter('client_id')
             );

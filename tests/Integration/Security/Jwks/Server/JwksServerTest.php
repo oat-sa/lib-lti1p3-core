@@ -35,12 +35,10 @@ class JwksServerTest extends TestCase
 {
     use SecurityTestingTrait;
 
-    public function testJwksResponse(): void
+    public function testJwksSuccessResponse(): void
     {
         $repository = new KeyChainRepository([
-            $this->createTestKeyChain('keyChainIdentifier1', 'keySetName1'),
-            $this->createTestKeyChain('keyChainIdentifier2', 'keySetName2'),
-            $this->createTestKeyChain('keyChainIdentifier3', 'keySetName1')
+            $this->createTestKeyChain('keyChainIdentifier', 'keySetName')
         ]);
 
         $subject = new JwksServer(new JwksExporter($repository));
@@ -54,36 +52,28 @@ class JwksServerTest extends TestCase
                         'use' => 'sig',
                         'n' => 'yZXlfd5yqChtTH91N76VokquRu2r1EwNDUjA0GAygrPzCpPbYokasxzs-60Do_lyTIgd7nRzudAzHnujIPr8GOPIlPlOKT8HuL7xQEN6gmUtz33iDhK97zK7zOFEmvS8kYPwFAjQ03YKv-3T9b_DbrBZWy2Vx4Wuxf6mZBggKQfwHUuJxXDv79NenZarUtC5iFEhJ85ovwjW7yMkcflhUgkf1o_GIR5RKoNPttMXhKYZ4hTlLglMm1FgRR63pvYoy9Eq644a9x2mbGelO3HnGbkaFo0HxiKbFW1vplHzixYCyjc15pvtBxw_x26p8-lNthuxzaX5HaFMPGs10rRPLw',
                         'e' => 'AQAB',
-                        'kid' => 'keyChainIdentifier1',
-                    ],
-                    [
-                        'alg' => 'RS256',
-                        'kty' => 'RSA',
-                        'use' => 'sig',
-                        'n' => 'yZXlfd5yqChtTH91N76VokquRu2r1EwNDUjA0GAygrPzCpPbYokasxzs-60Do_lyTIgd7nRzudAzHnujIPr8GOPIlPlOKT8HuL7xQEN6gmUtz33iDhK97zK7zOFEmvS8kYPwFAjQ03YKv-3T9b_DbrBZWy2Vx4Wuxf6mZBggKQfwHUuJxXDv79NenZarUtC5iFEhJ85ovwjW7yMkcflhUgkf1o_GIR5RKoNPttMXhKYZ4hTlLglMm1FgRR63pvYoy9Eq644a9x2mbGelO3HnGbkaFo0HxiKbFW1vplHzixYCyjc15pvtBxw_x26p8-lNthuxzaX5HaFMPGs10rRPLw',
-                        'e' => 'AQAB',
-                        'kid' => 'keyChainIdentifier3',
+                        'kid' => 'keyChainIdentifier',
                     ]
                 ]
             ],
-            json_decode((string)$subject->handle('keySetName1')->getBody(), true)
+            json_decode((string)$subject->handle('keySetName')->getBody(), true)
         );
     }
 
-    public function testJwksResponseErrorOnInvalidExport(): void
+    public function testJwksErrorResponseOnInvalidExport(): void
     {
         $exporterMock = $this->createMock(JwksExporter::class);
         $exporterMock
             ->expects($this->once())
             ->method('export')
-            ->with('keySetName1')
+            ->with('keySetName')
             ->willThrowException(new Exception('custom error'));
 
         $logger = new TestLogger();
 
         $subject = new JwksServer($exporterMock, null, $logger);
 
-        $response = $subject->handle('keySetName1');
+        $response = $subject->handle('keySetName');
 
         $this->assertEquals(500, $response->getStatusCode());
         $this->assertEquals('Internal JWKS server error', (string)$response->getBody());
