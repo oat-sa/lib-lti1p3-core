@@ -231,7 +231,9 @@ $userAuthenticator = new class implements UserAuthenticatorInterface
    public function authenticate(string $loginHint): UserAuthenticationResultInterface
    {
        // Perform user authentication based on the login hint (ex: owned session, LDAP, external auth service, etc)
-       return new UserAuthenticationResult(
+       ...       
+
+        return new UserAuthenticationResult(
            true,                                          // success
            new UserIdentity('userIdentifier', 'userName') // authenticated user identity
        );   
