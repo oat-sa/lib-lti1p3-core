@@ -52,4 +52,9 @@ class TestLogger extends AbstractLogger
 
         return false;
     }
+
+    public function getLogs(): array
+    {
+        return $this->logs;
+    }
 }

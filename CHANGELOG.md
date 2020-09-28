@@ -1,6 +1,19 @@
 CHANGELOG
 =========
 
+3.0.0
+-----
+
+* Added claims handling for DeepLinking, ACS, and Proctoring
+* Added PSR7 aware components to automate JWKS and OIDC (init and auth) exposition
+* Added content item resources for deep linking (form DeepLinking specifications)
+* Added new core message layer foundations (new interfaces and abstractions)
+* Added core tool originating message layer (builder, validator, result) based on new foundation
+* Reworked (breaking changes) core platform originating message layer (builder, validator, result) based on new foundation
+* Fixed core service client audience for access token requests
+* Updated documentation
+
+
 2.4.0
 -----
 
@@ -9,18 +22,18 @@ CHANGELOG
 2.3.0
 -----
 
-* Added `UserIdentityFactoryInterface`
-* Added NRPS claim getter on `LtiMessageInterface`
+* Added UserIdentityFactoryInterface
+* Added NRPS claim getter on LtiMessageInterface
 
 2.2.0
 -----
 
-* Added `UserIdentityFactory`
+* Added UserIdentityFactory
 
 2.1.0
 -----
 
-* Added additional properties handling to the `UserIdentity`
+* Added additional properties handling to the UserIdentity
 * Added NRPS claim handling
 * Adapted JWT validations to test expiry first, to spare useless checks
 * Adapted tool message validator to match IMS certification requirements
@@ -28,38 +41,38 @@ CHANGELOG
 2.0.4
 -----
 
-* Fixed `ServiceClient` access tokens caching scoping
+* Fixed ServiceClient access tokens caching scoping
 
 2.0.3
 -----
 
-* Fixed `JwksExporter` output structure
+* Fixed JwksExporter output structure
 
 2.0.2
 -----
 
-* Fixed `OidcAuthenticationRequest` parameters exposition
+* Fixed OidcAuthenticationRequest parameters exposition
 
 2.0.1
 -----
 
-* Fixed `ServiceClient` header
+* Fixed ServiceClient header
 
 
 2.0.0
 -----
 
-* Updated `AccessTokenResponseGenerator` to generate for a key chain instead of a registration
+* Updated AccessTokenResponseGenerator to generate for a key chain instead of a registration
 
 1.2.0
 -----
 
-* Added `getOidcState()` method to `LtiLaunchRequestValidationResult`
+* Added getOidcState() method to LtiLaunchRequestValidationResult
 
 1.1.0
 -----
 
-* Added `findAll()` method to `RegistrationRepositoryInterface`
+* Added findAll() method to RegistrationRepositoryInterface
 
 1.0.0
 -----

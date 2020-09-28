@@ -27,6 +27,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use Lcobucci\JWT\Signer\Key;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
+use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use Psr\Cache\CacheException;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
@@ -63,7 +64,7 @@ class JwksFetcher implements JwksFetcherInterface
     }
 
     /**
-     * @throws LtiException
+     * @throws LtiExceptionInterface
      */
     public function fetchKey(string $jwksUrl, string $kId): Key
     {
@@ -95,7 +96,7 @@ class JwksFetcher implements JwksFetcherInterface
     }
 
     /**
-     * @throws LtiException
+     * @throws LtiExceptionInterface
      */
     private function fetchJwksDataFromUrl(string $jwksUrl): ?array
     {
