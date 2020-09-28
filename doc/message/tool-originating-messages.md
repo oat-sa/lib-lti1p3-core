@@ -1,6 +1,6 @@
 # Tool originating messages
 
-> How to [perform secured tool originating messages](https://www.imsglobal.org/spec/security/v1p0/#tool-originating-messages).
+> How to [perform secured tool originating messages](https://www.imsglobal.org/spec/security/v1p0/#tool-originating-messages) (tool -> platform).
 
 ## Flow
 
@@ -17,7 +17,7 @@ Each step will be detailed below, from both platform and tool perspectives.
 
 You can find below required steps to generate a tool originating message, needed only if you're acting as a tool.
 
-### Create the launch
+### Create the message
 
 As a tool, you can create a tool originating message for a platform within the context of a registration.
 
@@ -40,18 +40,18 @@ $registration = $registrationRepository->find(...);
 // Build a launch request
 $message = $builder->buildToolOriginatingLaunch(
     $registration,                                               // related registration
-    LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE, // message type of the launch
+    LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE, // message type of the launch, as an example: 'LtiDeepLinkingResponse'
     'http://platform.com/launch',                                // platform launch url
     null,                                                        // will use the registration default deployment id, but you can pass a specific one
     [
-        new DeepLinkingContentItemsClaim(...),                   // LTI claim representing the DeepLinking returned resources 
-        'myCustomClaim' => 'myCustomValue'                       // custom claim
+        'myCustomClaim' => 'myCustomValue',                      // custom claim
+        new DeepLinkingContentItemsClaim(...)                    // LTI claim representing the DeepLinking returned resources 
     ]
 );
 ```
 **Note**: like the `DeepLinkingContentItemsClaim` class, any claim that implement the [MessagePayloadClaimInterface](../../src/Message/Payload/Claim/MessagePayloadClaimInterface.php) will be automatically normalized and added to the message payload claims.
 
-### Use the launch
+### Launch the message
 
 As a result of the build, you get a [LtiMessageInterface](../../src/Message/LtiMessageInterface.php) instance that has to be used this way (form POST into `JWT` parameter):
 ```php
@@ -66,7 +66,7 @@ echo $message->toHtmlRedirectForm();
 
 ## 2 - Platform side: launch validation
 
-You can find below required steps to validate a tool originating message, needed only if you're acting as a platform.
+You can find below required steps to validate a tool originating message launch, needed only if you're acting as a platform.
 
 ### Validate the launch
 
@@ -107,9 +107,14 @@ if (!$result->hasError()) {
     echo $result->getRegistration()->getIdentifier();
 
     // And to the LTI message payload (JWT parameter)
-    echo $result->getPayload()->getVersion();               // '1.3.0'
-    echo $result->getPayload()->getMessageType();           // 'LtiDeepLinkingResponse'
-    echo $result->getPayload()->getClaim('myCustomClaim');  // 'myCustomValue'
+    echo $result->getPayload()->getVersion();                 // '1.3.0'
+    echo $result->getPayload()->getMessageType();             // 'LtiDeepLinkingResponse'
+    echo $result->getPayload()->getClaim('myCustomClaim');    // 'myCustomValue'
+
+    // You can iterate on the example DeepLinking response content items
+    foreach ($result->getPayload()->getDeepLinkingContentItems()->getContentItems() as $item) {
+        ...
+    }
 
     // If needed, you can also access the validation successes
     foreach ($result->getSuccesses() as $success) {

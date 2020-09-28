@@ -1,6 +1,6 @@
 # Platform originating messages
 
-> How to [perform secured platform originating messages](https://www.imsglobal.org/spec/security/v1p0/#platform-originating-messages), complying to the [OIDC launch flow](https://www.imsglobal.org/spec/security/v1p0/#openid_connect_launch_flow).
+> How to [perform secured platform originating messages](https://www.imsglobal.org/spec/security/v1p0/#platform-originating-messages) (platform -> tool), complying to the [OIDC launch flow](https://www.imsglobal.org/spec/security/v1p0/#openid_connect_launch_flow).
 
 ## OIDC flow
 
@@ -21,11 +21,72 @@ To handle the OIDC launch flow for platform originating messages, each step will
 
 ## 1 - Platform side: launch generation
 
-You can find below required steps to generate platform originating messages, needed only if you're acting as a platform.
+You can find below required steps to generate a platform originating message, needed only if you're acting as a platform.
 
-### Create the LTI resource link
+### Create the message
 
-A [LTI resource link](http://www.imsglobal.org/spec/lti/v1p3#resource-link-0) represent a resource made available from a tool to a platform.
+As a platform, you can create a platform originating message for a tool within the context of a registration.
+
+To do so, you can use the [PlatformOriginatingLaunchBuilder](../../src/Message/Launch/Builder/PlatformOriginatingLaunchBuilder.php):
+```php
+<?php
+
+use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuilder;
+use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
+
+// Create a builder instance
+$builder = new PlatformOriginatingLaunchBuilder();
+
+// Get related registration of the launch
+/** @var RegistrationRepositoryInterface $registrationRepository */
+$registration = $registrationRepository->find(...);
+
+// Build a launch request
+$message = $builder->buildPlatformOriginatingLaunch(
+    $registration,                                               // related registration
+    LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST, // message type of the launch, as an example: 'LtiDeepLinkingResponse'
+    'http://tool.com/launch',                                    // target link uri of the launch (final destination after OIDC flow)
+    'loginHint',                                                 // login hint that will be used afterwards by the platform to perform authentication
+    null,                                                        // will use the registration default deployment id, but you can pass a specific one
+    [
+        'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner' // role
+    ],
+    [
+        'myCustomClaim' => 'myCustomValue',    // custom claim
+        new ContextClaim('contextIdentifier')  // LTI claim representing the context of the launch 
+    ]
+);
+```
+**Note**: like the `ContextClaim` class, any claim that implement the [MessagePayloadClaimInterface](../../src/Message/Payload/Claim/MessagePayloadClaimInterface.php) will be automatically normalized and added to the message payload claims.
+
+### Launch the message
+
+As a result of the build, you get a [LtiMessageInterface](../../src/Message/LtiMessageInterface.php) instance that has to be used in the following ways:
+
+```php
+<?php
+
+use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+
+/** @var LtiMessageInterface $message */
+
+// Main properties you can use as you want to offer the launch to the platform users
+echo $message->getUrl();             // url of the launch
+echo $message->getParameters();      // parameters of the launch
+
+// Or use those helpers methods to ease the launch interactions
+echo $message->toUrl();                // url with launch parameters as query parameters
+echo $message->toHtmlLink('click me'); // HTML link, where href is the output url
+echo $message->toHtmlRedirectForm();   // HTML hidden form, with possibility of auto redirection
+```
+
+### Launching an LTI Resource Link
+
+This library also allow you to perform easily launches of an [LTI Resource Link](http://www.imsglobal.org/spec/lti/v1p3/#resource-link-launch-request-message).
+
+This becomes handy when a platform owns an LTI Resource Link to a tool resource (previously fetched with [DeepLinking](https://www.imsglobal.org/spec/lti-dl/v2p0) for example).
 
 First of all, you need to create a [LtiResourceLink](../../src/Resource/LtiResourceLink/LtiResourceLink.php) instance:
 ```php
@@ -41,15 +102,9 @@ $ltiResourceLink = new LtiResourceLink(
     ]
 );
 ```
-**Notes**:
-- if no resource link url parameter is given, the launch will be done on the default launch url of the registered tool
-- since the platform should be able to manage their resource links the way they want (pre fetched from [deep link](https://www.imsglobal.org/spec/lti-dl/v2p0) for example), you can implement your own [LtiResourceLinkInterface](../../src/Resource/LtiResourceLink/LtiResourceLinkInterface.php)
 
-### Create an LTI resource link launch request message for the LTI resource link
+Once your `LtiResourceLinkInterface` implementation is ready, you can use the [LtiResourceLinkLaunchRequestBuilder](../../src/Message/Launch/Builder/LtiResourceLinkLaunchRequestBuilder.php) to create an LTI Resource Link launch:
 
-Once your `LtiResourceLinkInterface` implementation is ready, you need to launch it to a registered tool following the [OIDC launch workflow](https://www.imsglobal.org/spec/security/v1p0#openid_connect_launch_flow), within the context of a registration.
-
-To do so, you can use the [LtiResourceLinkLaunchRequestBuilder](../../src/Message/Launch/Builder/LtiResourceLinkLaunchRequestBuilder.php) to create an LTI resource link launch request, to start OIDC flow:
 ```php
 <?php
 
@@ -79,29 +134,8 @@ $message = $builder->buildLtiResourceLinkLaunchRequest(
     ]
 );
 ```
-**Notes**:
-- like the `ContextClaim`, any claim that implement the [MessagePayloadClaimInterface](../../src/Message/Payload/Claim/MessagePayloadClaimInterface.php) will be automatically normalized and added to the message payload claims.
-- you can also generate if needed generic platform launches with the [PlatformOriginatingLaunchBuilder](../../src/Message/Launch/Builder/PlatformOriginatingLaunchBuilder.php) 
 
-As a result of the build, you get a [LtiMessageInterface](../../src/Message/LtiMessageInterface.php) instance that can be used in several ways:
-```php
-<?php
-
-use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
-
-/** @var LtiMessageInterface $message */
-
-// Main properties you can use as you want to offer the launch to the platform users
-echo $message->getUrl();             // url of the launch
-echo $message->getParameters();      // parameters of the launch
-
-// Or use those helpers methods to ease the launch interactions
-echo $message->toUrl();                // url with launch parameters as query parameters
-echo $message->toHtmlLink('click me'); // HTML link, where href is the output url
-echo $message->toHtmlRedirectForm();   // HTML hidden form, with possibility of auto redirection
-```
-
-All you need to do now is to present this launch request message to the users, to launch them to the tool.
+As it also returns an [LtiMessageInterface](../../src/Message/LtiMessageInterface.php) instance, you can then use the generated message to launch it as explained previously.
 
 ## 2 - Tool side: OIDC initiation
 
@@ -109,7 +143,7 @@ You can find below required steps to handle the initiation an OIDC flow, needed 
 
 ### Handling the OIDC initiation
 
-As a tool, you'll receive an HTTP request containing the [OIDC initiation](https://www.imsglobal.org/spec/security/v1p0#step-2-authentication-request).
+As a tool, you'll receive an HTTP request containing the [OIDC initiation](https://www.imsglobal.org/spec/security/v1p0#step-2-authentication-request), generated by the platform originating messages builders.
 
 You can use the [OidcInitiator](../../src/Security/Oidc/OidcInitiator.php) to handle this:
 - it requires a registration repository implementation [as explained here](../quickstart/interfaces.md)
@@ -171,7 +205,7 @@ $response = $server->handle($request);
 
 ## 3 - Platform side: OIDC authentication
 
-You can find below required steps to provide authentication during the OIDC flow and performing the launch, needed only if you're acting as a platform.
+You can find below required steps to provide authentication during the OIDC flow, needed only if you're acting as a platform.
 
 ### Perform the OIDC authentication and redirecting to the tool
 
@@ -182,20 +216,33 @@ It can be handled with the [OidcAuthenticator](../../src/Security/Oidc/OidcAuthe
 - it expects a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface) to handle
 - it will output a [LtiMessageInterface](../../src/Message/LtiMessageInterface.php) that cab be used to redirect to the tool to finish the OIDC flow.
 
-For example:
+You have to specify how to provide platform authentication, for example:
+
+```php
+<?php
+
+use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
+use OAT\Library\Lti1p3Core\Security\User\UserAuthenticationResultInterface;
+
+$userAuthenticator = new class implements UserAuthenticatorInterface
+{
+   public function authenticate(string $loginHint): UserAuthenticationResultInterface
+   {
+       // TODO: Implement authenticate() method to perform user authentication based on the login hint (ex: session, LDAP, etc)
+   }
+};
+```
+
+To then use it to continue OIDC fow:
 ```php
 <?php
 
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticator;
-use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /** @var RegistrationRepositoryInterface $registrationRepository */
 $registrationRepository = ...
-
-/** @var UserAuthenticatorInterface $userAuthenticator */
-$userAuthenticator = ...
 
 /** @var ServerRequestInterface $request */
 $request = ...
@@ -244,11 +291,11 @@ $response = $server->handle($request);
 
 ## 4 - Tool side: launch validation
 
-You can find below required steps to validate a platform originating message, needed only if you're acting as a tool.
+You can find below required steps to validate a platform originating message launch after OIDC flow, needed only if you're acting as a tool.
 
-### Validate the launch after OIDC flow
+### Validate the launch
 
-As a tool, you'll receive an HTTP request containing the [LTI resource link launch request message](http://www.imsglobal.org/spec/lti/v1p3#resource-link-launch-request-message).
+As a tool, you'll receive an HTTP request containing the launch message after OIDC flow completion.
 
 The [ToolLaunchValidator](../../src/Message/Launch/Validator/ToolLaunchValidator.php) can be used for this:
 - it requires a registration repository and a nonce repository implementations [as explained here](../quickstart/interfaces.md)
