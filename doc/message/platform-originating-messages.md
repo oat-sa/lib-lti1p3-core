@@ -222,14 +222,19 @@ You have to specify how to provide platform authentication, for example:
 <?php
 
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
+use OAT\Library\Lti1p3Core\Security\User\UserAuthenticationResult;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticationResultInterface;
+use OAT\Library\Lti1p3Core\User\UserIdentity;
 
 $userAuthenticator = new class implements UserAuthenticatorInterface
 {
    public function authenticate(string $loginHint): UserAuthenticationResultInterface
    {
        //Perform user authentication based on the login hint (ex: owned session, LDAP, external auth service, etc)
-       ...
+       return new UserAuthenticationResult(
+           true,                                          // success
+           new UserIdentity('userIdentifier', 'userName') // authenticated user identity
+       );   
    }
 };
 ```
@@ -336,7 +341,7 @@ if (!$result->hasError()) {
     echo $result->getPayload()->getVersion();                  // '1.3.0'
     echo $result->getPayload()->getContext()->getIdentifier(); // 'contextId'
     echo $result->getPayload()->getClaim('myCustomClaim');     // 'myCustomValue'
-    echo $result->getPayload()->getUserIdentity()->getName();  // given by the platform during OIDC authentication step
+    echo $result->getPayload()->getUserIdentity()->getName();  // 'userName', see platform during OIDC authentication
     
     // If needed, you can also access the OIDC state (state parameter)
     echo $result->getState()->getToken()->__toString();    // state JWT
