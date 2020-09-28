@@ -1,6 +1,6 @@
 # Platform originating LTI messages
 
-> How to [perform secured platform originating LTI messages](https://www.imsglobal.org/spec/security/v1p0/#platform-originating-messages) (platform -> tool), complying to the [OIDC launch flow](https://www.imsglobal.org/spec/security/v1p0/#openid_connect_launch_flow).
+> How to [perform secured platform originating LTI messages launches](https://www.imsglobal.org/spec/security/v1p0/#platform-originating-messages) (platform -> tool), complying to the [OIDC launch flow](https://www.imsglobal.org/spec/security/v1p0/#openid_connect_launch_flow).
 
 ## OIDC flow
 
