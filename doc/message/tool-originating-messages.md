@@ -37,7 +37,7 @@ $builder = new ToolOriginatingLaunchBuilder();
 /** @var RegistrationRepositoryInterface $registrationRepository */
 $registration = $registrationRepository->find(...);
 
-// Build a launch request
+// Build a launch message
 $message = $builder->buildToolOriginatingLaunch(
     $registration,                                               // related registration
     LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE, // message type of the launch, as an example: 'LtiDeepLinkingResponse'
@@ -54,6 +54,7 @@ $message = $builder->buildToolOriginatingLaunch(
 ### Launch the message
 
 As a result of the build, you get a [LtiMessageInterface](../../src/Message/LtiMessageInterface.php) instance that has to be used this way (form POST into `JWT` parameter):
+
 ```php
 <?php
 
