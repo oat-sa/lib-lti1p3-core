@@ -43,7 +43,7 @@ $builder = new PlatformOriginatingLaunchBuilder();
 /** @var RegistrationRepositoryInterface $registrationRepository */
 $registration = $registrationRepository->find(...);
 
-// Build a launch request
+// Build a launch message
 $message = $builder->buildPlatformOriginatingLaunch(
     $registration,                                               // related registration
     LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST, // message type of the launch, as an example: 'LtiDeepLinkingResponse'
@@ -72,7 +72,7 @@ use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 
 /** @var LtiMessageInterface $message */
 
-// Main properties you can use as you want to offer the launch to the platform users
+// Main message properties you can use as you want to offer the launch to the platform users
 echo $message->getUrl();             // url of the launch
 echo $message->getParameters();      // parameters of the launch
 
@@ -119,7 +119,7 @@ $builder = new LtiResourceLinkLaunchRequestBuilder();
 /** @var RegistrationRepositoryInterface $registrationRepository */
 $registration = $registrationRepository->find(...);
 
-// Build a launch request
+// Build a launch message
 $message = $builder->buildLtiResourceLinkLaunchRequest(
     $ltiResourceLink, // LTI resource link to launch
     $registration,    // related registration
@@ -199,7 +199,7 @@ $request = ...
 // Create the OIDC server
 $server = new OidcInitiationServer(new OidcInitiator($registrationRepository));
 
-// Redirect response from OIDC initiation (including state generation, via 302)
+// Redirect response from OIDC initiation (including state & nonce generation, via 302)
 $response = $server->handle($request);
 ```
 
@@ -228,7 +228,8 @@ $userAuthenticator = new class implements UserAuthenticatorInterface
 {
    public function authenticate(string $loginHint): UserAuthenticationResultInterface
    {
-       // TODO: Implement authenticate() method to perform user authentication based on the login hint (ex: session, LDAP, etc)
+       //Perform user authentication based on the login hint (ex: owned session, LDAP, external auth service, etc)
+       ...
    }
 };
 ```
