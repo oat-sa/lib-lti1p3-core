@@ -6,7 +6,7 @@
 
 ![Tool originating flow](../images/message/tool-to-platform.png)
 
-Each step will be detailed below, from both platform and tool perspectives.
+Each step will be detailed below, from both tool and platform perspectives.
 
 ## Table of contents
 
