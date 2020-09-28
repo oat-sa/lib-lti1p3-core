@@ -1,6 +1,6 @@
-# Tool originating messages
+# Tool originating LTI messages
 
-> How to [perform secured tool originating messages](https://www.imsglobal.org/spec/security/v1p0/#tool-originating-messages) (tool -> platform).
+> How to [perform secured tool originating LTI messages](https://www.imsglobal.org/spec/security/v1p0/#tool-originating-messages) (tool -> platform).
 
 ## Flow
 
