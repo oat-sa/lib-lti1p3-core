@@ -88,7 +88,7 @@ This library also allow you to perform easily launches of an [LTI Resource Link]
 
 This becomes handy when a platform owns an LTI Resource Link to a tool resource (previously fetched with [DeepLinking](https://www.imsglobal.org/spec/lti-dl/v2p0) for example).
 
-First of all, you need to create a [LtiResourceLink](../../src/Resource/LtiResourceLink/LtiResourceLink.php) instance:
+First of all, you need to create or retrieve an [LtiResourceLink](../../src/Resource/LtiResourceLink/LtiResourceLink.php) instance:
 ```php
 <?php
 
