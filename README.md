@@ -1,5 +1,11 @@
 # LTI 1.3 Core Library
 
+[![Latest Version](https://img.shields.io/github/tag/oat-sa/lib-lti1p3-core.svg?style=flat&label=release)](https://github.com/oat-sa/lib-lti1p3-core/tags)
+[![License GPL2](http://img.shields.io/badge/licence-gpl2-blue.svg)](http://www.gnu.org/licenses/gpl-2.0.html)
+[![Build Status](https://travis-ci.org/oat-sa/lib-lti1p3-core.svg?branch=master)](https://travis-ci.org/oat-sa/lib-lti1p3-core)
+[![Coverage Status](https://coveralls.io/repos/github/oat-sa/lib-lti1p3-core/badge.svg?branch=master)](https://coveralls.io/github/oat-sa/lib-lti1p3-core?branch=master)
+[![Packagist Downloads](http://img.shields.io/packagist/dt/oat-sa/lib-lti1p3-core.svg)](https://packagist.org/packages/oat-sa/lib-lti1p3-core)
+
 > PHP library for [LTI 1.3 Core](http://www.imsglobal.org/spec/lti/v1p3) implementations as platforms and / or as tools.
 
 ## Table of contents

@@ -67,7 +67,7 @@ class ServiceClientTest extends TestCase
         Carbon::setTestNow('2020-01-01');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         // Release time lock, for other tests scopes
         Carbon::setTestNow();
