@@ -341,7 +341,7 @@ if (!$result->hasError()) {
 
     // And to the LTI message payload (id_token parameter)
     echo $result->getPayload()->getVersion();                  // '1.3.0'
-    echo $result->getPayload()->getContext()->getIdentifier(); // 'contextId'
+    echo $result->getPayload()->getContext()->getIdentifier(); // 'contextIdentifier'
     echo $result->getPayload()->getClaim('myCustomClaim');     // 'myCustomValue'
     echo $result->getPayload()->getUserIdentity()->getName();  // 'userName', see platform during OIDC authentication
     

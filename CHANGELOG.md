@@ -4,13 +4,16 @@ CHANGELOG
 3.0.0
 -----
 
+* Added Travis integration
 * Added claims handling for DeepLinking, ACS, and Proctoring
 * Added PSR7 aware components to automate JWKS and OIDC (init and auth) exposition
-* Added content item resources for deep linking (form DeepLinking specifications)
+* Added content item resources for DeepLinking (form DeepLinking specifications)
 * Added new core message layer foundations (new interfaces and abstractions)
-* Added core tool originating message layer (builder, validator, result) based on new foundation
-* Reworked (breaking changes) core platform originating message layer (builder, validator, result) based on new foundation
+* Added core tool originating message layer (builder, validator, result) based on new foundations
+* Reworked (breaking changes) core platform originating message layer (builder, validator, result) based on new foundations
 * Fixed core service client audience for access token requests
+* Updated php dependency to >= 7.2.0
+* Updated phpunit dependency to 8.5.8
 * Updated documentation
 
 
