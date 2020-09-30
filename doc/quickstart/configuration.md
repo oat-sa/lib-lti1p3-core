@@ -125,9 +125,9 @@ Using JWKS is recommended (but not mandatory):
 Depending on the side you're acting on, you need to provide a `KeyChainInterface` instance that contains a public key and it's associated private key (and passphrase).
 
 For example, if you're acting as a platform:
-- the `$platformKeyChain` have to be given, containing public & private keys (to sign platform originating messages)
-- either the `$toolKeyChain` (with only a public key) or the `$toolJwksUrl` have to be given to validate tool originating messages
+- the `$platformKeyChain` has to be given, containing public & private keys (to sign platform originating messages)
+- either the `$toolKeyChain` (with only a public key) or the `$toolJwksUrl` has to be given to validate tool originating messages
 
 Or, if you're acting as a tool:
-- the `$toolKeyChain` have to be given, containing public & private keys (to sign tool originating messages)
-- either the `$platformKeyChain` (with only a public key) or the `$platformJwksUrl` have to be given to validate platform originating messages
+- the `$toolKeyChain` has to be given, containing public & private keys (to sign tool originating messages)
+- either the `$platformKeyChain` (with only a public key) or the `$platformJwksUrl` has to be given to validate platform originating messages
