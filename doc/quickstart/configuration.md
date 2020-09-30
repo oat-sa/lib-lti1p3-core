@@ -8,6 +8,7 @@
 - [Configure a platform](#configure-a-platform)
 - [Configure a tool](#configure-a-tool)
 - [Configure a registration](#configure-a-registration)
+- [Public key versus JWKS](#public-key-versus-jwks)
 
 ## Configure security keys
 
@@ -40,7 +41,7 @@ You need to provide configuration for the [platform](http://www.imsglobal.org/sp
 - you are representing if you use the library from platform side
 - where your tool is deployed on, if you use the library from tool side
 
-By example:
+For example:
 ```php
 <?php
 
@@ -62,7 +63,7 @@ You need to provide configuration for the [tool](http://www.imsglobal.org/spec/l
 - you are representing if you use the library from tool side
 - you want to provide functionality from, if you use the library from platform side
 
-By example:
+For example:
 ```php
 <?php
 
@@ -73,8 +74,8 @@ $tool = new Tool(
     'toolName',                     // [required] name
     'https://tool.com',             // [required] audience
     'https://tool.com/oidc-init',   // [required] OIDC initiation url
-    'https://tool.com/launch',      // [optional] LTI default ResourceLink launch url
-    'https://tool.com/deep-linking' // [optional] LTI DeepLinking url
+    'https://tool.com/launch',      // [optional] default tool launch url
+    'https://tool.com/deep-linking' // [optional] DeepLinking url
 );
 ```
 **Note**: you can also provide your own implementation of the [ToolInterface](../../src/Tool/ToolInterface.php).
@@ -85,7 +86,7 @@ You need then to create a [registration](http://www.imsglobal.org/spec/lti/v1p3#
 
 A same platform instance can deploy several tools (or several times the same tool instance), that is why this binding is handled on the deployment ids level.
 
-By example:
+For example:
 ```php
 <?php
 
@@ -106,5 +107,27 @@ $registration = new Registration(
 **Notes**:
 - you can also provide your own implementation of the [RegistrationInterface](../../src/Registration/RegistrationInterface.php)
 - depending on the side you act (platform or tool), you need to configure what is relevant regarding the keys and the JWKS urls
-- for signature verification, the library will try first to use first the configured key chain if given, and fallback on a JWKS call to avoid performances issues
 - since you should be in control of the way you retrieve your registrations configuration (from YML files, array, database, etc), you have to provide your own implementation of the [RegistrationRepositoryInterface](../../src/Registration/RegistrationRepositoryInterface.php) to fit your needs
+
+## Public key versus JWKS
+
+On a registration creation, you can give both JWKS url and public key for the tool and platform.
+
+To be optimal for signature verification:
+- if both JWKS and public key given, the library will always use the public key (to avoid JWKS calls)
+- if only one of them given, it'll use the given one
+- if none given, it'll throw an error (unable to validate calls)
+
+Using JWKS is recommended (but not mandatory):
+- it avoids keys exchange / maintenance processes, and allow easier integrations (keys can rotate, JWKS url remains the same)
+- it handles automatically caching (to avoid useless traffic), see possibility to inject a [PSR6 cache](https://www.php-fig.org/psr/psr-6/#cacheitempoolinterface) into the [JwksFetcher](../../src/Security/Jwks/Fetcher/JwksFetcher.php)
+
+Depending on the side you're acting on, you need to provide a `KeyChainInterface` instance that contains a public key and it's associated private key (and passphrase).
+
+For example, if you're acting as a platform:
+- the `$platformKeyChain` has to be given, containing public & private keys (to sign platform originating messages)
+- either the `$toolKeyChain` (with only a public key) or the `$toolJwksUrl` has to be given to validate tool originating messages
+
+Or, if you're acting as a tool:
+- the `$toolKeyChain` has to be given, containing public & private keys (to sign tool originating messages)
+- either the `$platformKeyChain` (with only a public key) or the `$platformJwksUrl` has to be given to validate platform originating messages
