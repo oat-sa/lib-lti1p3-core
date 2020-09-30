@@ -122,7 +122,7 @@ Using JWKS is recommended (but not mandatory):
 - it avoids keys exchange / maintenance processes, and allow easier integrations (keys can rotate, JWKS url remains the same)
 - it handles automatically caching (to avoid useless traffic), see possibility to inject a [PSR6 cache](https://www.php-fig.org/psr/psr-6/#cacheitempoolinterface) into the [JwksFetcher](../../src/Security/Jwks/Fetcher/JwksFetcher.php)
 
-Depending on the side you're acting on, you need to provide a `KeyChainInterface` instance that contain the associated private key to the public key.
+Depending on the side you're acting on, you need to provide a `KeyChainInterface` instance that contains a public key and it's associated private key (and passphrase).
 
 For example, if you're acting as a platform:
 - the `$platformKeyChain` have to be given, containing public & private keys (to sign platform originating messages)
