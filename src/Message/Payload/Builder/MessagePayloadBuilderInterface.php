@@ -27,6 +27,10 @@ use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
 
 interface MessagePayloadBuilderInterface
 {
+    public function reset(): MessagePayloadBuilderInterface;
+
+    public function withClaims(array $claims): MessagePayloadBuilderInterface;
+
     public function withClaim($claim, $claimValue = null): MessagePayloadBuilderInterface;
 
     public function withMessagePayloadClaims(MessagePayloadInterface $payload): MessagePayloadBuilderInterface;

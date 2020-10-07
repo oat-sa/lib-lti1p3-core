@@ -76,7 +76,7 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
                 ->validatePayloadSignature($registration, $payload)
                 ->validatePayloadNonce($payload)
                 ->validatePayloadDeploymentId($registration, $payload)
-                ->validatePayloadLaunchMessageTypeSpecifics($payload);
+                ->validatePayloadLaunchMessageTypeSpecifics($registration, $payload);
 
             return new LaunchValidationResult($registration, $payload, null, $this->successes);
 
@@ -201,8 +201,20 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
     /**
      * @throws LtiExceptionInterface
      */
-    private function validatePayloadLaunchMessageTypeSpecifics(LtiMessagePayloadInterface $payload): self
+    private function validatePayloadLaunchMessageTypeSpecifics(RegistrationInterface $registration, LtiMessagePayloadInterface $payload): self
     {
+        if ($payload->getMessageType() === LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE) {
+            if (empty($payload->getDeepLinkingData())) {
+                throw new LtiException('JWT data deep linking claim is missing');
+            }
+
+            $dataToken = $this->parser->parse($payload->getDeepLinkingData());
+
+            if (!$dataToken->verify($this->signer, $registration->getPlatformKeyChain()->getPublicKey())) {
+                throw new LtiException('JWT data deep linking claim signature validation failure');
+            }
+        }
+
         if ($payload->getMessageType() === LtiMessageInterface::LTI_MESSAGE_TYPE_START_ASSESSMENT) {
             if (empty($payload->getProctoringSessionData())) {
                 throw new LtiException('JWT session_data proctoring claim is invalid');

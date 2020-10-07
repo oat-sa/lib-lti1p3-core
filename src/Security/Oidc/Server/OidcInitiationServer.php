@@ -27,6 +27,7 @@ use Nyholm\Psr7\Factory\HttplugFactory;
 use OAT\Library\Lti1p3Core\Security\Oidc\OidcInitiator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Throwable;
@@ -34,7 +35,7 @@ use Throwable;
 /**
  * @see https://www.imsglobal.org/spec/security/v1p0/#step-2-authentication-request
  */
-class OidcInitiationServer
+class OidcInitiationServer implements RequestHandlerInterface
 {
     /** @var OidcInitiator */
     private $initiator;
