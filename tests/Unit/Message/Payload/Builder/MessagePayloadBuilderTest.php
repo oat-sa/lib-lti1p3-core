@@ -42,6 +42,19 @@ class MessagePayloadBuilderTest extends TestCase
         $this->subject = new MessagePayloadBuilder();
     }
 
+    public function testItCanBeReset(): void
+    {
+        $payload = $this->subject
+            ->withClaim('a', 'b')
+            ->reset()
+            ->withClaim('c', 'd')
+            ->buildMessagePayload($this->createTestKeyChain());
+
+        $this->assertInstanceOf(MessagePayloadInterface::class, $payload);
+        $this->assertNull($payload->getClaim('a'));
+        $this->assertEquals('d', $payload->getClaim('c'));
+    }
+
     public function testItCanGenerateAMessagePayloadWithRegularClaim(): void
     {
         $payload = $this->subject
@@ -61,6 +74,24 @@ class MessagePayloadBuilderTest extends TestCase
             ->buildMessagePayload($this->createTestKeyChain());
 
         $this->assertInstanceOf(MessagePayloadInterface::class, $payload);
+        $this->assertEquals($claim, $payload->getClaim(ResourceLinkClaim::class));
+    }
+
+    public function testItCanGenerateAMessagePayloadFromMultipleMixedClaims(): void
+    {
+        $claim = new ResourceLinkClaim('id');
+
+        $claims = [
+            'a' => 'b',
+            $claim
+        ];
+
+        $payload = $this->subject
+            ->withClaims($claims)
+            ->buildMessagePayload($this->createTestKeyChain());
+
+        $this->assertInstanceOf(MessagePayloadInterface::class, $payload);
+        $this->assertEquals('b', $payload->getClaim('a'));
         $this->assertEquals($claim, $payload->getClaim(ResourceLinkClaim::class));
     }
 

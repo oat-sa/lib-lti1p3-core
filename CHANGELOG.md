@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+3.1.0
+-----
+
+* Added PSR15 support for OIDC (init and auth) server components
+* Added possibility to reset the MessagePayloadBuilder to allow multiple generation
+* Added possibility to add several claims at once on the MessagePayloadBuilder
+* Added tool originating DeepLinking response messages stronger validation (on settings data claim)
+* Updated documentation
+
 3.0.0
 -----
 
@@ -15,7 +24,6 @@ CHANGELOG
 * Updated php dependency to >= 7.2.0
 * Updated phpunit dependency to 8.5.8
 * Updated documentation
-
 
 2.4.0
 -----
