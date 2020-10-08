@@ -177,7 +177,7 @@ die;
 
 ### OIDC initiation redirection automation
 
-This library provides the [OidcInitiationServer](../../src/Security/Oidc/Server/OidcInitiationServer.php) that can be exposed in an application controller to automate a redirect response creation from the [OidcInitiator](../../src/Security/Oidc/OidcInitiator.php) output:
+This library provides the [OidcInitiationServer](../../src/Security/Oidc/Server/OidcInitiationServer.php), implementing the [PSR15 RequestHandlerInterface](https://www.php-fig.org/psr/psr-15/#21-psrhttpserverrequesthandlerinterface), that can be exposed in an application controller to automate a redirect response creation from the [OidcInitiator](../../src/Security/Oidc/OidcInitiator.php) output:
 - it expects a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface) to handle
 - it will return a [PSR7 ResponseInterface](https://www.php-fig.org/psr/psr-7/#33-psrhttpmessageresponseinterface) instance to make the redirection to the platform.
 
@@ -267,7 +267,7 @@ echo $message->toHtmlRedirectForm();
 
 ### OIDC authentication redirection automation
 
-This library provides the [OidcAuthenticationServer](../../src/Security/Oidc/Server/OidcAuthenticationServer.php) that can be exposed in an application controller to automate a redirect form response creation from the [OidcAuthenticator](../../src/Security/Oidc/OidcAuthenticator.php) output:
+This library provides the [OidcAuthenticationServer](../../src/Security/Oidc/Server/OidcAuthenticationServer.php), implementing the [PSR15 RequestHandlerInterface](https://www.php-fig.org/psr/psr-15/#21-psrhttpserverrequesthandlerinterface), that can be exposed in an application controller to automate a redirect form response creation from the [OidcAuthenticator](../../src/Security/Oidc/OidcAuthenticator.php) output:
 - it expects a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface) to handle
 - it will return a [PSR7 ResponseInterface](https://www.php-fig.org/psr/psr-7/#33-psrhttpmessageresponseinterface) instance to make the redirection to the tool via a form POST.
 

@@ -83,10 +83,18 @@ class PlatformLaunchValidatorTest extends TestCase
 
     public function testValidateToolOriginatingLaunchSuccess(): void
     {
+        $dataToken = $this
+            ->buildJwt([], [], $this->registration->getPlatformKeyChain()->getPrivateKey())
+            ->__toString();
+
         $message = $this->builder->buildToolOriginatingLaunch(
             $this->registration,
             LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE,
-            'http://platform.com/launch'
+            'http://platform.com/launch',
+            null,
+            [
+                LtiMessagePayloadInterface::CLAIM_LTI_DEEP_LINKING_DATA => $dataToken
+            ]
         );
 
         $result = $this->subject->validateToolOriginatingLaunch($this->createServerRequest('GET', $message->toUrl()));
@@ -132,6 +140,10 @@ class PlatformLaunchValidatorTest extends TestCase
     {
         $registration = $this->createTestRegistrationWithoutToolKeyChain();
 
+        $dataToken = $this
+            ->buildJwt([], [], $registration->getPlatformKeyChain()->getPrivateKey())
+            ->__toString();
+
         $jwksFetcherMock = $this->createMock(JwksFetcherInterface::class);
         $jwksFetcherMock
             ->expects($this->once())
@@ -147,7 +159,11 @@ class PlatformLaunchValidatorTest extends TestCase
         $message = $this->builder->buildToolOriginatingLaunch(
             $this->registration,
             LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE,
-            'http://platform.com/launch'
+            'http://platform.com/launch',
+            null,
+            [
+                LtiMessagePayloadInterface::CLAIM_LTI_DEEP_LINKING_DATA => $dataToken
+            ]
         );
 
         $result = $subject->validateToolOriginatingLaunch($this->createServerRequest('GET', $message->toUrl()));
@@ -363,6 +379,43 @@ class PlatformLaunchValidatorTest extends TestCase
                     LtiMessagePayloadInterface::CLAIM_LTI_RESOURCE_LINK => ['id' => ''],
                 ],
                 'JWT resource_link id claim is invalid'
+            ],
+            'Missing JWT data for deep linking response' => [
+                [
+                    MessagePayloadInterface::HEADER_KID => $registration->getPlatformKeyChain()->getIdentifier()
+                ],
+                [
+                    MessagePayloadInterface::CLAIM_ISS => $registration->getClientId(),
+                    MessagePayloadInterface::CLAIM_AUD => $registration->getPlatform()->getAudience(),
+                    LtiMessagePayloadInterface::CLAIM_LTI_VERSION => LtiMessageInterface::LTI_VERSION,
+                    LtiMessagePayloadInterface::CLAIM_LTI_MESSAGE_TYPE => LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE,
+                    LtiMessagePayloadInterface::CLAIM_LTI_ROLES => ['Learner'],
+                    LtiMessagePayloadInterface::CLAIM_NONCE => 'value',
+                    LtiMessagePayloadInterface::CLAIM_LTI_DEPLOYMENT_ID => $registration->getDefaultDeploymentId(),
+                    LtiMessagePayloadInterface::CLAIM_LTI_DEEP_LINKING_DATA => ''
+                ],
+                'JWT data deep linking claim is missing'
+            ],
+            'Invalid JWT data signature for deep linking response' => [
+                [
+                    MessagePayloadInterface::HEADER_KID => $registration->getPlatformKeyChain()->getIdentifier()
+                ],
+                [
+                    MessagePayloadInterface::CLAIM_ISS => $registration->getClientId(),
+                    MessagePayloadInterface::CLAIM_AUD => $registration->getPlatform()->getAudience(),
+                    LtiMessagePayloadInterface::CLAIM_LTI_VERSION => LtiMessageInterface::LTI_VERSION,
+                    LtiMessagePayloadInterface::CLAIM_LTI_MESSAGE_TYPE => LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE,
+                    LtiMessagePayloadInterface::CLAIM_LTI_ROLES => ['Learner'],
+                    LtiMessagePayloadInterface::CLAIM_NONCE => 'value',
+                    LtiMessagePayloadInterface::CLAIM_LTI_DEPLOYMENT_ID => $registration->getDefaultDeploymentId(),
+                    LtiMessagePayloadInterface::CLAIM_LTI_DEEP_LINKING_DATA => $this->buildJwt(
+                        [],
+                        [],
+                        $registration->getPlatformKeyChain()->getPrivateKey(),
+                        new Sha384()
+                    )->__toString(),
+                ],
+                'JWT data deep linking claim signature validation failure'
             ],
         ];
     }

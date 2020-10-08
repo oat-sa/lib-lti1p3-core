@@ -60,6 +60,26 @@ class MessagePayloadBuilder implements MessagePayloadBuilderInterface
         $this->signer = $signer ?? new Sha256();
     }
 
+    public function reset(): MessagePayloadBuilderInterface
+    {
+        $this->builder = new Builder();
+
+        return $this;
+    }
+
+    public function withClaims(array $claims): MessagePayloadBuilderInterface
+    {
+        foreach ($claims as $claimName => $claimValue){
+            if (is_a($claimValue, MessagePayloadClaimInterface::class, true)) {
+                $this->withClaim($claimValue);
+            } else {
+                $this->withClaim((string)$claimName, $claimValue);
+            }
+        }
+
+        return $this;
+    }
+
     public function withClaim($claim, $claimValue = null): MessagePayloadBuilderInterface
     {
         if (is_a($claim, MessagePayloadClaimInterface::class, true)) {
