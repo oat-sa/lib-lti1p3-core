@@ -130,40 +130,33 @@ class DeepLinkingSettingsClaim implements MessagePayloadClaimInterface
 
     public function normalize(): array
     {
-        return array_filter([
-            'deep_link_return_url' => $this->deepLinkingReturnUrl,
-            'accept_types' => $this->acceptedTypes,
-            'accept_presentation_document_targets' => $this->acceptedPresentationDocumentTargets,
-            'accept_media_types' => $this->acceptedMediaTypes,
-            'accept_multiple' => $this->acceptMultiple ? 'true' : 'false',
-            'auto_create' => $this->autoCreate ? 'true' : 'false',
-            'title' => $this->title,
-            'text' => $this->text,
-            'data' => $this->data,
-        ]);
+        return array_filter(
+            [
+                'deep_link_return_url' => $this->deepLinkingReturnUrl,
+                'accept_types' => $this->acceptedTypes,
+                'accept_presentation_document_targets' => $this->acceptedPresentationDocumentTargets,
+                'accept_media_types' => $this->acceptedMediaTypes,
+                'accept_multiple' => $this->acceptMultiple,
+                'auto_create' => $this->autoCreate,
+                'title' => $this->title,
+                'text' => $this->text,
+                'data' => $this->data,
+            ],
+            static function($var) {
+                return null !== $var;
+            }
+        );
     }
 
     public static function denormalize(array $claimData): DeepLinkingSettingsClaim
     {
-
-        $acceptMultiple = true;
-        $autoCreate = false;
-
-        if (array_key_exists('accept_multiple',$claimData )) {
-            $acceptMultiple = 'true' === $claimData['accept_multiple'];
-        }
-
-        if (array_key_exists('auto_create',$claimData )) {
-            $autoCreate = 'true' === $claimData['auto_create'];
-        }
-
         return new self(
             $claimData['deep_link_return_url'],
             $claimData['accept_types'],
             $claimData['accept_presentation_document_targets'],
             $claimData['accept_media_types'] ?? null,
-            $acceptMultiple,
-            $autoCreate,
+            $claimData['accept_multiple'] ?? true,
+            $claimData['auto_create'] ?? false,
             $claimData['title'] ?? null,
             $claimData['text'] ?? null,
             $claimData['data'] ?? null

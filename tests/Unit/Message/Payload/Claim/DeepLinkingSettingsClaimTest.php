@@ -38,8 +38,8 @@ class DeepLinkingSettingsClaimTest extends TestCase
             ['ltiResourceLink', 'link', 'image'],
             ['window'],
             'text/html',
-            true,
             false,
+            true,
             'title',
             'text',
             'data'
@@ -57,8 +57,8 @@ class DeepLinkingSettingsClaimTest extends TestCase
         $this->assertEquals(['ltiResourceLink', 'link', 'image'], $this->subject->getAcceptedTypes());
         $this->assertEquals(['window'], $this->subject->getAcceptedPresentationDocumentTargets());
         $this->assertEquals('text/html', $this->subject->getAcceptedMediaTypes());
-        $this->assertTrue($this->subject->shouldAcceptMultiple());
-        $this->assertFalse($this->subject->shouldAutoCreate());
+        $this->assertFalse($this->subject->shouldAcceptMultiple());
+        $this->assertTrue($this->subject->shouldAutoCreate());
         $this->assertEquals('title', $this->subject->getTitle());
         $this->assertEquals('text', $this->subject->getText());
         $this->assertEquals('data', $this->subject->getData());
@@ -72,8 +72,8 @@ class DeepLinkingSettingsClaimTest extends TestCase
                 'accept_types' => ['ltiResourceLink', 'link', 'image'],
                 'accept_presentation_document_targets' => ['window'],
                 'accept_media_types' => 'text/html',
-                'accept_multiple' => 'true',
-                'auto_create' => 'false',
+                'accept_multiple' => false,
+                'auto_create' => true,
                 'title' => 'title',
                 'text' => 'text',
                 'data' => 'data',
@@ -89,8 +89,8 @@ class DeepLinkingSettingsClaimTest extends TestCase
             'accept_types' => ['ltiResourceLink', 'link', 'image'],
             'accept_presentation_document_targets' => ['window'],
             'accept_media_types' => 'text/html',
-            'accept_multiple' => 'true',
-            'auto_create' => 'false',
+            'accept_multiple' => false,
+            'auto_create' => true,
             'title' => 'title',
             'text' => 'text',
             'data' => 'data',
@@ -101,8 +101,8 @@ class DeepLinkingSettingsClaimTest extends TestCase
         $this->assertEquals(['ltiResourceLink', 'link', 'image'], $denormalisation->getAcceptedTypes());
         $this->assertEquals(['window'], $denormalisation->getAcceptedPresentationDocumentTargets());
         $this->assertEquals('text/html', $denormalisation->getAcceptedMediaTypes());
-        $this->assertTrue($denormalisation->shouldAcceptMultiple());
-        $this->assertFalse($denormalisation->shouldAutoCreate());
+        $this->assertFalse($denormalisation->shouldAcceptMultiple());
+        $this->assertTrue($denormalisation->shouldAutoCreate());
         $this->assertEquals('title', $denormalisation->getTitle());
         $this->assertEquals('text', $denormalisation->getText());
         $this->assertEquals('data', $denormalisation->getData());
