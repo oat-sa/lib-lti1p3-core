@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.1.1
+-----
+
+* Fixed DeepLinkingSettingsClaim boolean properties handling (select multiple, auto create)
+
 3.1.0
 -----
 
