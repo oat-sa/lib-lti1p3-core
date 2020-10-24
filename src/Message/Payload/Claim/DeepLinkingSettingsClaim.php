@@ -155,11 +155,24 @@ class DeepLinkingSettingsClaim implements MessagePayloadClaimInterface
             $claimData['accept_types'],
             $claimData['accept_presentation_document_targets'],
             $claimData['accept_media_types'] ?? null,
-            $claimData['accept_multiple'] ?? true,
-            $claimData['auto_create'] ?? false,
+            self::extractBooleanValue($claimData, 'accept_multiple', true),
+            self::extractBooleanValue($claimData, 'auto_create', false),
             $claimData['title'] ?? null,
             $claimData['text'] ?? null,
             $claimData['data'] ?? null
         );
+    }
+
+    private static function extractBooleanValue(array $claimData, string $key, bool $defaultValue): bool
+    {
+        if (!array_key_exists($key, $claimData)) {
+            return $defaultValue;
+        }
+
+        if (is_string($claimData[$key])) {
+            return 'true' === $claimData[$key];
+        } else {
+            return (bool) $claimData[$key];
+        }
     }
 }

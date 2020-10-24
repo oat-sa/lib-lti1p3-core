@@ -107,4 +107,34 @@ class DeepLinkingSettingsClaimTest extends TestCase
         $this->assertEquals('text', $denormalisation->getText());
         $this->assertEquals('data', $denormalisation->getData());
     }
+
+    public function testDenormalisationWithStringBooleans(): void
+    {
+        $denormalisation = DeepLinkingSettingsClaim::denormalize([
+            'deep_link_return_url' => 'deepLinkingReturnUrl',
+            'accept_types' => ['ltiResourceLink', 'link', 'image'],
+            'accept_presentation_document_targets' => ['window'],
+            'accept_media_types' => 'text/html',
+            'accept_multiple' => 'false',
+            'auto_create' => 'true',
+        ]);
+
+        $this->assertInstanceOf(DeepLinkingSettingsClaim::class, $denormalisation);
+        $this->assertFalse($denormalisation->shouldAcceptMultiple());
+        $this->assertTrue($denormalisation->shouldAutoCreate());
+    }
+
+    public function testDenormalisationWithMissingBooleans(): void
+    {
+        $denormalisation = DeepLinkingSettingsClaim::denormalize([
+            'deep_link_return_url' => 'deepLinkingReturnUrl',
+            'accept_types' => ['ltiResourceLink', 'link', 'image'],
+            'accept_presentation_document_targets' => ['window'],
+            'accept_media_types' => 'text/html',
+        ]);
+
+        $this->assertInstanceOf(DeepLinkingSettingsClaim::class, $denormalisation);
+        $this->assertTrue($denormalisation->shouldAcceptMultiple());
+        $this->assertFalse($denormalisation->shouldAutoCreate());
+    }
 }
