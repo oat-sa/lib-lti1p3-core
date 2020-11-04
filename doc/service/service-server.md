@@ -6,7 +6,7 @@
 
 - [Preparation of required dependencies](#preparation-of-required-dependencies)
 - [Generation of access token response for a key chain](#generation-of-access-token-response-for-a-key-chain)
-- [Validation of access token request](#validation-of-access-token-request)
+- [Service endpoint authentication](#service-endpoint-authentication)
 
 ## Preparation of required dependencies
 
@@ -75,7 +75,7 @@ try {
 }
 ``` 
 
-## Validation of access token request
+## Service endpoint authentication
 
 Once a tool has been granted with an access token, it can perform LTI service authenticated calls.
 
@@ -102,8 +102,8 @@ $validator = new AccessTokenRequestValidator($repository);
 /** @var ServerRequestInterface $request */
 $request = ...
 
-// Validate access token using the registration platform public key
-$result = $validator->validate($request);
+// Validate request provided access token using the registration platform public key, against allowed scopes
+$result = $validator->validate($request, ['allowed-scope', 'other-allowed-scope']);
 
 // Result exploitation
 if (!$result->hasError()) {

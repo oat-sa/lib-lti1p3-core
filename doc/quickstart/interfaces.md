@@ -185,8 +185,8 @@ In order to store service calls access tokens, an implementation of the [AccessT
 
 **Default implementation**: [ScopeRepository](../../src/Service/Server/Repository/ScopeRepository.php)  
 
-In order to retrieve and enrich scopes during grants, an implementation of the [ScopeRepositoryInterface](https://github.com/thephpleague/oauth2-server/blob/master/src/Repositories/ScopeRepositoryInterface.php) can be provided.
+In order to retrieve and finalize scopes during grants, an implementation of the [ScopeRepositoryInterface](https://github.com/thephpleague/oauth2-server/blob/master/src/Repositories/ScopeRepositoryInterface.php) can be provided.
 
 **Notes**:
-- the default `ScopeRepository` will just provide scope given at construction.
+- the default `ScopeRepository` will just provide back scopes given at construction.
 
