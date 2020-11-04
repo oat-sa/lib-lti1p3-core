@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+3.2.0
+-----
+
+* Added possibility to specify allowed scopes for service calls validation
+* Fixed service client repository audience check
+* Updated documentation
+
 3.1.1
 -----
 

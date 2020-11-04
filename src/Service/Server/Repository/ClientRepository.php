@@ -110,7 +110,7 @@ class ClientRepository implements ClientRepositoryInterface
             return false;
         }
 
-        if ($token->getClaim('aud') !== $registration->getPlatform()->getOAuth2AccessTokenUrl()) {
+        if ($token->getClaim('aud') !== $registration->getPlatform()->getAudience()) {
             $this->logger->error('Invalid audience: ' . $token->getClaim('aud'));
 
             return false;

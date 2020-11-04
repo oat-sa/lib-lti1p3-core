@@ -62,7 +62,7 @@ class AccessTokenRequestValidator
         $this->parser = new Parser();
     }
 
-    public function validate(ServerRequestInterface $request): AccessTokenRequestValidationResult
+    public function validate(ServerRequestInterface $request, array $allowedScopes = []): AccessTokenRequestValidationResult
     {
         $this->reset();
 
@@ -102,6 +102,12 @@ class AccessTokenRequestValidator
             }
 
             $this->addSuccess('JWT access token signature is valid');
+
+            if (empty(array_intersect($token->getClaim('scopes', []), $allowedScopes))) {
+                throw new LtiException('JWT access token scopes are invalid');
+            }
+
+            $this->addSuccess('JWT access token scopes are valid');
 
             return new AccessTokenRequestValidationResult($registration, $token, $this->successes);
 
