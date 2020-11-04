@@ -122,7 +122,11 @@ class AccessTokenResponseGeneratorTest extends TestCase
             ->willReturn($keyChain);
 
         $registration = $this->createTestRegistration();
-        $request = $this->createServerRequest('POST', '/example', $this->generateCredentials($registration, ['scope1', 'scope2']));
+        $request = $this->createServerRequest(
+            'POST',
+            '/example',
+            $this->generateCredentials($registration, ['scope1', 'scope2'])
+        );
 
         $result = $this->subject->generate(
             $request,
@@ -155,7 +159,11 @@ class AccessTokenResponseGeneratorTest extends TestCase
             ->willReturn($keyChain);
 
         $registration = $this->createTestRegistration();
-        $request = $this->createServerRequest('POST', '/example', $this->generateCredentials($registration, ['scope1']));
+        $request = $this->createServerRequest(
+            'POST',
+            '/example',
+            $this->generateCredentials($registration, ['scope1'])
+        );
 
         $result = $this->subject->generate(
             $request,
@@ -220,7 +228,11 @@ class AccessTokenResponseGeneratorTest extends TestCase
             ->willReturn($keyChain);
 
         $registration = $this->createTestRegistration();
-        $request = $this->createServerRequest('POST', '/example', $this->generateCredentials($registration, ['invalid']));
+        $request = $this->createServerRequest(
+            'POST',
+            '/example',
+            $this->generateCredentials($registration, ['invalid'])
+        );
 
         $this->subject->generate(
             $request,
@@ -235,7 +247,11 @@ class AccessTokenResponseGeneratorTest extends TestCase
         $this->expectExceptionMessage('Invalid key chain identifier');
 
         $registration = $this->createTestRegistration();
-        $request = $this->createServerRequest('POST', '/example', $this->generateCredentials($registration, ['scope1', 'scope2']));
+        $request = $this->createServerRequest(
+            'POST',
+            '/example',
+            $this->generateCredentials($registration, ['scope1', 'scope2'])
+        );
 
         $result = $this->subject->generate(
             $request,
