@@ -86,7 +86,7 @@ class AccessTokenRequestValidatorTest extends TestCase
             ['Authorization' => 'Bearer ' . $this->generateCredentials($registration)]
         );
 
-        $result = $this->subject->validate($request);
+        $result = $this->subject->validate($request, ['allowed-scope']);
 
         $this->assertInstanceOf(AccessTokenRequestValidationResult::class, $result);
         $this->assertFalse($result->hasError());
@@ -97,6 +97,7 @@ class AccessTokenRequestValidatorTest extends TestCase
                 'Registration found for client_id: registrationClientId',
                 'Platform key chain found for registration: registrationIdentifier',
                 'JWT access token signature is valid',
+                'JWT access token scopes are valid',
             ],
             $result->getSuccesses()
         );
@@ -221,8 +222,36 @@ class AccessTokenRequestValidatorTest extends TestCase
         );
     }
 
-    private function generateCredentials(RegistrationInterface $registration, string $audience = null): string
+    public function testValidationFailureWithInvalidScopes(): void
     {
+        $registration = $this->createTestRegistration();
+
+        $request = $this->createServerRequest(
+            'GET',
+            '/example',
+            [],
+            ['Authorization' => 'Bearer ' . $this->generateCredentials($registration, null, ['invalid-scope'])]
+        );
+
+        $result = $this->subject->validate($request, ['allowed-scope']);
+
+        $this->assertInstanceOf(AccessTokenRequestValidationResult::class, $result);
+        $this->assertTrue($result->hasError());
+        $this->assertEquals('JWT access token scopes are invalid', $result->getError());
+
+        $this->assertTrue(
+            $this->logger->hasLog(
+                LogLevel::ERROR,
+                'Access token validation error: JWT access token scopes are invalid'
+            )
+        );
+    }
+
+    private function generateCredentials(
+        RegistrationInterface $registration,
+        string $audience = null,
+        array $scopes = ['allowed-scope']
+    ): string {
         $now = Carbon::now();
 
         return (new Builder())
@@ -230,6 +259,7 @@ class AccessTokenRequestValidatorTest extends TestCase
             ->identifiedBy(uniqid())
             ->issuedAt($now->getTimestamp())
             ->expiresAt($now->addSeconds(3600)->getTimestamp())
+            ->withClaim('scopes', $scopes)
             ->getToken(new Sha256(), $registration->getPlatformKeyChain()->getPrivateKey())
             ->__toString();
     }

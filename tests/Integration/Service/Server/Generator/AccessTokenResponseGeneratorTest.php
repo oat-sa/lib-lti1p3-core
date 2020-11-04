@@ -67,7 +67,12 @@ class AccessTokenResponseGeneratorTest extends TestCase
         $factory = new AuthorizationServerFactory(
             new ClientRepository($this->createTestRegistrationRepository()),
             new AccessTokenRepository($this->cache),
-            new ScopeRepository([new Scope('scope1'), new Scope('scope2')]),
+            new ScopeRepository(
+                [
+                    new Scope('scope1'),
+                    new Scope('scope2')
+                ]
+            ),
             'encryptionKey'
         );
 
@@ -117,7 +122,11 @@ class AccessTokenResponseGeneratorTest extends TestCase
             ->willReturn($keyChain);
 
         $registration = $this->createTestRegistration();
-        $request = $this->createServerRequest('POST', '/example', $this->generateCredentials($registration, ['scope1', 'scope2']));
+        $request = $this->createServerRequest(
+            'POST',
+            '/example',
+            $this->generateCredentials($registration, ['scope1', 'scope2'])
+        );
 
         $result = $this->subject->generate(
             $request,
@@ -140,7 +149,44 @@ class AccessTokenResponseGeneratorTest extends TestCase
         $this->assertEquals(['scope1', 'scope2'], $token->getClaim('scopes'));
     }
 
-    public function testGenerateWitInvalidCredentials(): void
+    public function testGenerateWithPartialScopes(): void
+    {
+        $keyChain = $this->createTestKeyChain();
+        $this->keyChainRepositoryMock
+            ->expects($this->once())
+            ->method('find')
+            ->with($keyChain->getIdentifier())
+            ->willReturn($keyChain);
+
+        $registration = $this->createTestRegistration();
+        $request = $this->createServerRequest(
+            'POST',
+            '/example',
+            $this->generateCredentials($registration, ['scope1'])
+        );
+
+        $result = $this->subject->generate(
+            $request,
+            $this->createResponse(),
+            $keyChain->getIdentifier()
+        );
+
+        $this->assertInstanceOf(ResponseInterface::class, $result);
+        $this->assertEquals(200, $result->getStatusCode());
+
+        $resultData = json_decode((string)$result->getBody(), true);
+
+        $this->assertEquals('scope1', $resultData['scope']);
+        $this->assertEquals('Bearer', $resultData['token_type']);
+        $this->assertEquals(3600, $resultData['expires_in']);
+
+        $token = (new Parser())->parse($resultData['access_token']);
+
+        $this->assertEquals($registration->getClientId(), $token->getClaim('aud'));
+        $this->assertEquals(['scope1'], $token->getClaim('scopes'));
+    }
+
+    public function testGenerateWithInvalidCredentials(): void
     {
         $this->expectException(OAuthServerException::class);
         $this->expectExceptionMessage('The user credentials were incorrect');
@@ -169,13 +215,43 @@ class AccessTokenResponseGeneratorTest extends TestCase
         $this->assertEquals(401, $result->getStatusCode());
     }
 
+    public function testGenerateWithInvalidScopes(): void
+    {
+        $this->expectException(OAuthServerException::class);
+        $this->expectExceptionMessage('The requested scope is invalid, unknown, or malformed');
+
+        $keyChain = $this->createTestKeyChain();
+        $this->keyChainRepositoryMock
+            ->expects($this->once())
+            ->method('find')
+            ->with($keyChain->getIdentifier())
+            ->willReturn($keyChain);
+
+        $registration = $this->createTestRegistration();
+        $request = $this->createServerRequest(
+            'POST',
+            '/example',
+            $this->generateCredentials($registration, ['invalid'])
+        );
+
+        $this->subject->generate(
+            $request,
+            $this->createResponse(),
+            $keyChain->getIdentifier()
+        );
+    }
+
     public function testGenerateWitInvalidKeyChain(): void
     {
         $this->expectException(OAuthServerException::class);
         $this->expectExceptionMessage('Invalid key chain identifier');
 
         $registration = $this->createTestRegistration();
-        $request = $this->createServerRequest('POST', '/example', $this->generateCredentials($registration, ['scope1', 'scope2']));
+        $request = $this->createServerRequest(
+            'POST',
+            '/example',
+            $this->generateCredentials($registration, ['scope1', 'scope2'])
+        );
 
         $result = $this->subject->generate(
             $request,
@@ -196,7 +272,7 @@ class AccessTokenResponseGeneratorTest extends TestCase
             ->identifiedBy(sprintf('%s-%s', $registration->getIdentifier(), $now->getPreciseTimestamp()))
             ->issuedBy($registration->getTool()->getAudience())
             ->relatedTo($registration->getClientId())
-            ->permittedFor($registration->getPlatform()->getOAuth2AccessTokenUrl())
+            ->permittedFor($registration->getPlatform()->getAudience())
             ->issuedAt($now->getTimestamp())
             ->expiresAt($now->addSeconds(MessagePayloadInterface::TTL)->getTimestamp())
             ->getToken(new Sha256(), $registration->getToolKeyChain()->getPrivateKey())
