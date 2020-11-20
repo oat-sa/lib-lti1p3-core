@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.2.1
+-----
+
+* Added fallback to JWKS lookup to check URL if key is not found in cache
+
 3.2.0
 -----
 
