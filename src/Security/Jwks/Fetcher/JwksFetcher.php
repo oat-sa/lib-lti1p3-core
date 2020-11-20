@@ -70,26 +70,18 @@ class JwksFetcher implements JwksFetcherInterface
     {
         $jwksData = $this->fetchJwksDataFromCache($jwksUrl);
 
-        if (null === $jwksData) {
-            $jwksData = $this->fetchJwksDataFromUrl($jwksUrl);
-
-            if (null !== $jwksData) {
-                $this->saveJwksDataInCache($jwksUrl, $jwksData);
-            }
+        if (null !== $jwksData && $key = $this->findKeyFromJwksData($kId, $jwksData)) {
+            return $key;
         }
 
-        try {
-            foreach ($jwksData['keys'] ?? [] as $data) {
-                if ($data['kid'] === $kId) {
-                    return new Key($this->converter->toPEM($data));
-                }
+        $jwksData = $this->fetchJwksDataFromUrl($jwksUrl);
+
+        if (null !== $jwksData) {
+            $this->saveJwksDataInCache($jwksUrl, $jwksData);
+
+            if ($key = $this->findKeyFromJwksData($kId, $jwksData)) {
+                return $key;
             }
-        } catch (Throwable $exception) {
-            throw new LtiException(
-                sprintf('Error during JWKS PEM conversion: %s', $exception->getMessage()),
-                $exception->getCode(),
-                $exception
-            );
         }
 
         throw new LtiException(sprintf('Could not find key id %s from cache or url %s', $kId, $jwksUrl));
@@ -156,5 +148,24 @@ class JwksFetcher implements JwksFetcherInterface
                 $this->logger->error(sprintf('Cannot save JWKS data in cache: %s', $exception->getMessage()));
             }
         }
+    }
+
+    private function findKeyFromJwksData(string $kId, array $jwksData): ?Key
+    {
+        try {
+            foreach ($jwksData['keys'] ?? [] as $data) {
+                if ($data['kid'] === $kId) {
+                    return new Key($this->converter->toPEM($data));
+                }
+            }
+        } catch (Throwable $exception) {
+            throw new LtiException(
+                sprintf('Error during JWKS PEM conversion: %s', $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
+        }
+
+        return null;
     }
 }

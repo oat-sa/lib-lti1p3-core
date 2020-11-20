@@ -119,6 +119,36 @@ class JwksFetcherTest extends TestCase
         $this->assertEquals($expectedDetails, $jwksDetails);
     }
 
+    public function testItCanFetchAJwksKeyFromUrlIfCacheIsMissingKey(): void
+    {
+        $this->cache->set(
+            'lti1p3-jwks-' . base64_encode('http://test.com'),
+            ['keys' => []]
+        );
+
+        $this->clientMock
+            ->expects($this->once())
+            ->method('request')
+            ->with('GET', 'http://test.com', ['headers' => ['Accept' => 'application/json']])
+            ->willReturn(
+                $this->createResponse(json_encode($this->exporter->export($this->keyChain->getKeySetName())))
+            );
+
+        $key = $this->subject->fetchKey('http://test.com', $this->keyChain->getIdentifier());
+
+        $this->assertInstanceOf(Key::class, $key);
+
+        $expectedDetails = openssl_pkey_get_details(
+            openssl_pkey_get_public($this->keyChain->getPublicKey()->getContent())
+        );
+
+        $jwksDetails = openssl_pkey_get_details(
+            openssl_pkey_get_public($key->getContent())
+        );
+
+        $this->assertEquals($expectedDetails, $jwksDetails);
+    }
+
     public function testItThrowAnLtiExceptionOnMissingKeyFromBothCacheAndJwksUrl(): void
     {
         $this->expectException(LtiException::class);
