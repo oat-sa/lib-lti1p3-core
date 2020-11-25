@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.2.2
+-----
+
+* Fixed lcobucci/jwt dependency to version 3.3.3
+
 3.2.1
 -----
 
