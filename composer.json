@@ -9,7 +9,7 @@
         "ext-json": "*",
         "codercat/jwk-to-pem": "^0.0.3",
         "guzzlehttp/guzzle": "^6.5",
-        "lcobucci/jwt": "^3.3",
+        "lcobucci/jwt": "3.3.3",
         "league/oauth2-server": "^8.1",
         "nesbot/carbon": "^2.31",
         "nyholm/psr7": "^1.2",
