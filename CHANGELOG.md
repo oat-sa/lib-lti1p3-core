@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.3.0
+-----
+
+* Added OidcTestingTrait to ease OIDC based testing flows 
+
 3.2.2
 -----
 

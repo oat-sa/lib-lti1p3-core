@@ -38,15 +38,13 @@ use OAT\Library\Lti1p3Core\Security\Jwks\Fetcher\JwksFetcherInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticator;
 use OAT\Library\Lti1p3Core\Security\Oidc\OidcInitiator;
-use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
-use OAT\Library\Lti1p3Core\Tests\Traits\NetworkTestingTrait;
+use OAT\Library\Lti1p3Core\Tests\Traits\OidcTestingTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 
 class ToolLaunchValidatorTest extends TestCase
 {
-    use DomainTestingTrait;
-    use NetworkTestingTrait;
+    use OidcTestingTrait;
 
     /** @var RegistrationRepositoryInterface */
     private $registrationRepository;
@@ -109,7 +107,7 @@ class ToolLaunchValidatorTest extends TestCase
             ]
         );
 
-        $result = $this->subject->validatePlatformOriginatingLaunch($this->performOidcFlow($message));
+        $result = $this->subject->validatePlatformOriginatingLaunch($this->buildOidcFlowRequest($message));
 
         $this->assertInstanceOf(LaunchValidationResult::class, $result);
         $this->assertFalse($result->hasError());
@@ -152,7 +150,7 @@ class ToolLaunchValidatorTest extends TestCase
             ]
         );
 
-        $result = $this->subject->validatePlatformOriginatingLaunch($this->performOidcFlow($message));
+        $result = $this->subject->validatePlatformOriginatingLaunch($this->buildOidcFlowRequest($message));
 
         $this->assertInstanceOf(LaunchValidationResult::class, $result);
         $this->assertFalse($result->hasError());
@@ -201,7 +199,7 @@ class ToolLaunchValidatorTest extends TestCase
             ]
         );
 
-        $result = $this->subject->validatePlatformOriginatingLaunch($this->performOidcFlow($message));
+        $result = $this->subject->validatePlatformOriginatingLaunch($this->buildOidcFlowRequest($message));
 
         $this->assertInstanceOf(LaunchValidationResult::class, $result);
         $this->assertFalse($result->hasError());
@@ -261,7 +259,7 @@ class ToolLaunchValidatorTest extends TestCase
             ]
         );
 
-        $result =$subject->validatePlatformOriginatingLaunch($this->performOidcFlow($message));
+        $result =$subject->validatePlatformOriginatingLaunch($this->buildOidcFlowRequest($message));
 
         $this->assertInstanceOf(LaunchValidationResult::class, $result);
         $this->assertFalse($result->hasError());
@@ -288,7 +286,7 @@ class ToolLaunchValidatorTest extends TestCase
             ]
         );
 
-        $result =$subject->validatePlatformOriginatingLaunch($this->performOidcFlow($message));
+        $result =$subject->validatePlatformOriginatingLaunch($this->buildOidcFlowRequest($message));
 
         $this->assertInstanceOf(LaunchValidationResult::class, $result);
         $this->assertTrue($result->hasError());
@@ -305,7 +303,7 @@ class ToolLaunchValidatorTest extends TestCase
         );
 
         Carbon::setTestNow(Carbon::now()->subSeconds(MessagePayloadInterface::TTL + 1));
-        $result = $this->subject->validatePlatformOriginatingLaunch($this->performOidcFlow($message));
+        $result = $this->subject->validatePlatformOriginatingLaunch($this->buildOidcFlowRequest($message));
         Carbon::setTestNow();
 
         $this->assertInstanceOf(LaunchValidationResult::class, $result);
@@ -698,12 +696,8 @@ class ToolLaunchValidatorTest extends TestCase
         ];
     }
 
-    private function performOidcFlow(LtiMessageInterface $message): ServerRequestInterface
+    private function buildOidcFlowRequest(LtiMessageInterface $message): ServerRequestInterface
     {
-        $initMessage = $this->oidcInitiator->initiate($this->createServerRequest('GET', $message->toUrl()));
-
-        $authMessage = $this->oidcAuthenticator->authenticate($this->createServerRequest('GET', $initMessage->toUrl()));
-
-        return $this->createServerRequest('GET', $authMessage->toUrl());
+        return $this->createServerRequest('GET', $this->performOidcFlow($message)->toUrl());
     }
 }
