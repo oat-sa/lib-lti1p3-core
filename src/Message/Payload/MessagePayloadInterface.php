@@ -45,6 +45,13 @@ interface MessagePayloadInterface
     public const CLAIM_REGISTRATION_ID = 'registration_id';
     public const CLAIM_NONCE = 'nonce';
     public const CLAIM_PARAMETERS = 'parameters';
+    public const CLAIM_USER_NAME ='name';
+    public const CLAIM_USER_EMAIL = 'email';
+    public const CLAIM_USER_GIVEN_NAME ='given_name';
+    public const CLAIM_USER_FAMILY_NAME ='family_name';
+    public const CLAIM_USER_MIDDLE_NAME ='middle_name';
+    public const CLAIM_USER_LOCALE ='locale';
+    public const CLAIM_USER_PICTURE ='picture';
 
     public function getToken(): Token;
 

@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+3.3.1
+-----
+
+* Fixed possibility to provide user identity claims during platform originating messages launch generation
+* Fixed issue [#74](https://github.com/oat-sa/lib-lti1p3-core/issues/74)
+
 3.3.0
 -----
 
@@ -47,7 +53,7 @@ CHANGELOG
 * Added new core message layer foundations (new interfaces and abstractions)
 * Added core tool originating message layer (builder, validator, result) based on new foundations
 * Reworked (breaking changes) core platform originating message layer (builder, validator, result) based on new foundations
-* Fixed core service client audience for access token requests
+* Fixed issue [#46](https://github.com/oat-sa/lib-lti1p3-core/issues/46)
 * Updated php dependency to >= 7.2.0
 * Updated phpunit dependency to 8.5.8
 * Updated documentation

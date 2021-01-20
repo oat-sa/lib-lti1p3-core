@@ -39,13 +39,17 @@ abstract class AbstractLaunchBuilder
         $this->builder = $builder ?? new MessagePayloadBuilder();
     }
 
-    protected function applyOptionalClaims(array $optionalClaims): self
+    protected function applyOptionalClaims(array $optionalClaims, array $exclusions = []): self
     {
         foreach ($optionalClaims as $claimName => $claim) {
             if ($claim instanceof MessagePayloadClaimInterface) {
-                $this->builder->withClaim($claim);
+                if (!in_array($claim->getClaimName(), $exclusions)) {
+                    $this->builder->withClaim($claim);
+                }
             } else {
-                $this->builder->withClaim($claimName, $claim);
+                if (!in_array($claimName, $exclusions)) {
+                    $this->builder->withClaim($claimName, $claim);
+                }
             }
         }
 

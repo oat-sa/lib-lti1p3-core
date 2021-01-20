@@ -33,7 +33,10 @@ interface MessagePayloadBuilderInterface
 
     public function withClaim($claim, $claimValue = null): MessagePayloadBuilderInterface;
 
-    public function withMessagePayloadClaims(MessagePayloadInterface $payload): MessagePayloadBuilderInterface;
+    public function withMessagePayloadClaims(
+        MessagePayloadInterface $payload,
+        array $exclusions = []
+    ): MessagePayloadBuilderInterface;
 
     public function buildMessagePayload(KeyChainInterface $keyChain): MessagePayloadInterface;
 }

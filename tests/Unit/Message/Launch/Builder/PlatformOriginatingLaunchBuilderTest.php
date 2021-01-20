@@ -26,6 +26,7 @@ use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuilder;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayload;
 use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
 use PHPUnit\Framework\TestCase;
@@ -83,6 +84,48 @@ class PlatformOriginatingLaunchBuilderTest extends TestCase
             'contextIdentifier',
             $ltiMessageHintToken->getClaim(LtiMessagePayloadInterface::CLAIM_LTI_CONTEXT)['id'] ?? null
         );
+    }
+
+    public function testBuildPlatformOriginatingLaunchSuccessWithUserIdentityClaimsExclusion(): void
+    {
+        $registration = $this->createTestRegistration();
+
+        $result = $this->subject->buildPlatformOriginatingLaunch(
+            $registration,
+            LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
+            'targetLinkUri',
+            'loginHint',
+            'deploymentIdentifier',
+            [],
+            [
+                'a' => 'b',
+                'sub' => 'sub',
+                'name' => 'name',
+                'email' => 'email',
+                'given_name' => 'given_name',
+                'family_name' => 'family_name',
+                'middle_name' => 'middle_name',
+                'locale' => 'locale',
+                'picture' => 'picture',
+            ]
+        );
+
+        $this->assertInstanceOf(LtiMessageInterface::class, $result);
+
+        $ltiMessageHintToken = $this->parseJwt($result->getMandatoryParameter('lti_message_hint'));
+
+        $this->assertTrue($this->verifyJwt($ltiMessageHintToken, $registration->getPlatformKeyChain()->getPublicKey()));
+
+        $this->assertEquals('b', $ltiMessageHintToken->getClaim('a'));
+
+        $this->assertFalse($ltiMessageHintToken->hasClaim('sub'));
+        $this->assertFalse($ltiMessageHintToken->hasClaim('name'));
+        $this->assertFalse($ltiMessageHintToken->hasClaim('email'));
+        $this->assertFalse($ltiMessageHintToken->hasClaim('given_name'));
+        $this->assertFalse($ltiMessageHintToken->hasClaim('family_name'));
+        $this->assertFalse($ltiMessageHintToken->hasClaim('middle_name'));
+        $this->assertFalse($ltiMessageHintToken->hasClaim('locale'));
+        $this->assertFalse($ltiMessageHintToken->hasClaim('picture'));
     }
 
     public function testBuildPlatformOriginatingLaunchErrorOnInvalidDeploymentId(): void

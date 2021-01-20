@@ -107,7 +107,19 @@ class OidcAuthenticator
             }
 
             $this->builder
-                ->withMessagePayloadClaims($originalPayload)
+                ->withMessagePayloadClaims(
+                    $originalPayload,
+                    [
+                        LtiMessagePayloadInterface::CLAIM_SUB,
+                        LtiMessagePayloadInterface::CLAIM_USER_NAME,
+                        LtiMessagePayloadInterface::CLAIM_USER_EMAIL,
+                        LtiMessagePayloadInterface::CLAIM_USER_GIVEN_NAME,
+                        LtiMessagePayloadInterface::CLAIM_USER_FAMILY_NAME,
+                        LtiMessagePayloadInterface::CLAIM_USER_MIDDLE_NAME,
+                        LtiMessagePayloadInterface::CLAIM_USER_LOCALE,
+                        LtiMessagePayloadInterface::CLAIM_USER_PICTURE,
+                    ]
+                )
                 ->withClaim(LtiMessagePayloadInterface::CLAIM_ISS, $registration->getPlatform()->getAudience())
                 ->withClaim(LtiMessagePayloadInterface::CLAIM_AUD, $registration->getClientId());
 

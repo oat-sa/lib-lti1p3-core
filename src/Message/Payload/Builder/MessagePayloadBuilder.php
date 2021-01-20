@@ -92,11 +92,15 @@ class MessagePayloadBuilder implements MessagePayloadBuilderInterface
         return $this;
     }
 
-    public function withMessagePayloadClaims(MessagePayloadInterface $payload): MessagePayloadBuilderInterface
-    {
+    public function withMessagePayloadClaims(
+        MessagePayloadInterface $payload,
+        array $exclusions = []
+    ): MessagePayloadBuilderInterface {
         /** @var Claim $claim */
         foreach ($payload->getToken()->getClaims() as $claim) {
-            $this->builder->withClaim($claim->getName(), $claim->getValue());
+            if (!in_array($claim->getName(), $exclusions)) {
+                $this->builder->withClaim($claim->getName(), $claim->getValue());
+            }
         }
 
         return $this;

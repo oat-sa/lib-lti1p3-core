@@ -152,7 +152,7 @@ class OidcAuthenticatorTest extends TestCase
         $this->subject->authenticate($request);
     }
 
-    public function testAuthenticationFailureOnAuthenticationFailure(): void
+    public function testAuthenticationFailureOnUserAuthenticationFailure(): void
     {
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage('User authentication failure');

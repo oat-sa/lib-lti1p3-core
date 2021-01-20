@@ -55,7 +55,19 @@ class PlatformOriginatingLaunchBuilder extends AbstractLaunchBuilder
             ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_ROLES, $roles)
             ->withClaim(LtiMessagePayloadInterface::CLAIM_REGISTRATION_ID, $registration->getIdentifier());
 
-        $this->applyOptionalClaims($optionalClaims);
+        $this->applyOptionalClaims(
+            $optionalClaims,
+            [
+                LtiMessagePayloadInterface::CLAIM_SUB,
+                LtiMessagePayloadInterface::CLAIM_USER_NAME,
+                LtiMessagePayloadInterface::CLAIM_USER_EMAIL,
+                LtiMessagePayloadInterface::CLAIM_USER_GIVEN_NAME,
+                LtiMessagePayloadInterface::CLAIM_USER_FAMILY_NAME,
+                LtiMessagePayloadInterface::CLAIM_USER_MIDDLE_NAME,
+                LtiMessagePayloadInterface::CLAIM_USER_LOCALE,
+                LtiMessagePayloadInterface::CLAIM_USER_PICTURE,
+            ]
+        );
 
         $ltiMessageHintPayload = $this->builder->buildMessagePayload($registration->getPlatformKeyChain());
 

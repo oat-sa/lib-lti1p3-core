@@ -65,7 +65,7 @@ trait DomainTestingTrait
     private function createTestTool(
         string $identifier = 'toolIdentifier',
         string $name = 'toolName',
-        string $audience = 'platformAudience',
+        string $audience = 'toolAudience',
         string $oidcInitiationUrl = 'http://tool.com/oidc-init',
         string $launchUrl = 'http://tool.com/launch',
         string $deepLinkingUrl = 'http://tool.com/deep-launch'
