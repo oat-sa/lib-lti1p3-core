@@ -32,6 +32,8 @@ use Lcobucci\JWT\Token;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Security\Jwt\AssociativeDecoder;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChain;
+use OAT\Library\Lti1p3Core\Security\Key\KeyChainFactory;
+use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\Nonce;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepositoryInterface;
@@ -47,8 +49,8 @@ trait SecurityTestingTrait
         string $publicKey = null,
         string $privateKey = null,
         string $privateKeyPassPhrase = null
-    ): KeyChain {
-        return new KeyChain(
+    ): KeyChainInterface {
+        return (new KeyChainFactory)->create(
             $identifier,
             $keySetName,
             $publicKey ?? getenv('TEST_KEYS_ROOT_DIR') . '/RSA/public.key',
@@ -73,7 +75,7 @@ trait SecurityTestingTrait
             $builder->withClaim($claimName, $claimValue);
         };
 
-        $builder->expiresAt(Carbon::now()->addSeconds(MessagePayloadInterface::TTL)->getTimestamp());
+        $builder->expiresAt(Carbon::now()->addSeconds(MessagePayloadInterface::TTL)->toDateTimeImmutable());
 
         return $builder->getToken(
             $signer ?? new Sha256(),

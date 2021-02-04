@@ -23,16 +23,16 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Message\Payload\Builder;
 
 use Carbon\Carbon;
-use Lcobucci\JWT\Builder;
-use Lcobucci\JWT\Claim;
-use Lcobucci\JWT\Signer;
-use Lcobucci\JWT\Signer\Rsa\Sha256;
-use Lcobucci\JWT\Token;
+use Lcobucci\JWT\Token\Plain;
+use OAT\Library\Lti1p3Core\Collection\Collection;
+use OAT\Library\Lti1p3Core\Collection\CollectionInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\MessagePayloadClaimInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayload;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
+use OAT\Library\Lti1p3Core\Security\Jwt\ConfigurationFactory;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceGenerator;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceGeneratorInterface;
@@ -44,25 +44,22 @@ class MessagePayloadBuilder implements MessagePayloadBuilderInterface
     /** @var NonceGeneratorInterface */
     private $generator;
 
-    /** @var Builder */
-    private $builder;
+    /** @var ConfigurationFactory */
+    private $factory;
 
-    /** @var Signer */
-    private $signer;
+    /** @var CollectionInterface */
+    private $claims;
 
-    public function __construct(
-        NonceGeneratorInterface $generator = null,
-        Builder $builder = null,
-        Signer $signer = null
-    ) {
+    public function __construct(NonceGeneratorInterface $generator = null, ConfigurationFactory $factory = null)
+    {
         $this->generator = $generator ?? new NonceGenerator();
-        $this->builder = $builder ?? new Builder();
-        $this->signer = $signer ?? new Sha256();
+        $this->factory = $factory ?? new ConfigurationFactory();
+        $this->claims = new Collection();
     }
 
     public function reset(): MessagePayloadBuilderInterface
     {
-        $this->builder = new Builder();
+        $this->claims->replace([]);
 
         return $this;
     }
@@ -83,10 +80,9 @@ class MessagePayloadBuilder implements MessagePayloadBuilderInterface
     public function withClaim($claim, $claimValue = null): MessagePayloadBuilderInterface
     {
         if (is_a($claim, MessagePayloadClaimInterface::class, true)) {
-            /** @var MessagePayloadClaimInterface $claim */
-            $this->builder->withClaim($claim::getClaimName(), $claim->normalize());
+            $this->claims->set($claim::getClaimName(), $claim->normalize());
         } else {
-            $this->builder->withClaim((string)$claim, $claimValue);
+            $this->claims->set((string)$claim, $claimValue);
         }
 
         return $this;
@@ -94,12 +90,7 @@ class MessagePayloadBuilder implements MessagePayloadBuilderInterface
 
     public function withMessagePayloadClaims(MessagePayloadInterface $payload): MessagePayloadBuilderInterface
     {
-        /** @var Claim $claim */
-        foreach ($payload->getToken()->getClaims() as $claim) {
-            $this->builder->withClaim($claim->getName(), $claim->getValue());
-        }
-
-        return $this;
+        return $this->withClaims($payload->getToken()->claims()->all());
     }
 
     /**
@@ -113,19 +104,44 @@ class MessagePayloadBuilder implements MessagePayloadBuilderInterface
     /**
      * @throws LtiExceptionInterface
      */
-    protected function getToken(KeyChainInterface $keyChain): Token
+    protected function getToken(KeyChainInterface $keyChain): Plain
     {
         try {
             $now = Carbon::now();
+            $config = $this->factory->create($keyChain->getPrivateKey());
+            $builder = $config->builder();
 
-            $this->builder
+            foreach ($this->claims->all() as $claimName => $claimValue) {
+                switch ($claimName) {
+                    case LtiMessagePayloadInterface::CLAIM_JTI:
+                    case LtiMessagePayloadInterface::CLAIM_EXP:
+                    case LtiMessagePayloadInterface::CLAIM_IAT:
+                    case LtiMessagePayloadInterface::CLAIM_NBF:
+                        break;
+                    case LtiMessagePayloadInterface::CLAIM_SUB:
+                        $builder->relatedTo($claimValue);
+                        break;
+                    case LtiMessagePayloadInterface::CLAIM_ISS:
+                        $builder->issuedBy($claimValue);
+                        break;
+                    case LtiMessagePayloadInterface::CLAIM_AUD:
+                        $builder->permittedFor($claimValue);
+                        break;
+                    default:
+                        $builder->withClaim($claimName, $claimValue);
+                }
+            }
+
+            $builder
                 ->withHeader(MessagePayloadInterface::HEADER_KID, $keyChain->getIdentifier())
-                ->withClaim(MessagePayloadInterface::CLAIM_NONCE, $this->generator->generate()->getValue())
                 ->identifiedBy(Uuid::uuid4()->toString())
-                ->issuedAt($now->getTimestamp())
-                ->expiresAt($now->addSeconds(MessagePayloadInterface::TTL)->getTimestamp());
+                ->issuedAt($now->toDateTimeImmutable())
+                ->canOnlyBeUsedAfter($now->toDateTimeImmutable())
+                ->expiresAt($now->addSeconds(MessagePayloadInterface::TTL)->toDateTimeImmutable())
+                ->withClaim(MessagePayloadInterface::CLAIM_NONCE, $this->generator->generate()->getValue());
 
-            return $this->builder->getToken($this->signer, $keyChain->getPrivateKey());
+            return $builder->getToken($config->signer(), $config->signingKey());
+
         } catch (Throwable $exception) {
             throw new LtiException(
                 sprintf('Cannot generate message token: %s', $exception->getMessage()),

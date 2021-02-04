@@ -63,7 +63,7 @@ class AccessTokenRequestValidationResult
 
     public function getScopes(): array
     {
-        return $this->token->getClaim('scopes', []);
+        return $this->token->claims()->get('scopes', []);
     }
 
     public function addSuccess(string $success): self

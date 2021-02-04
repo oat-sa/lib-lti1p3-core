@@ -29,6 +29,7 @@ use Lcobucci\JWT\Signer\Rsa\Sha256;
 use League\OAuth2\Server\Exception\OAuthServerException;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
+use OAT\Library\Lti1p3Core\Security\Jwt\ConfigurationFactory;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -42,11 +43,8 @@ class AccessTokenRequestValidator
     /** @var LoggerInterface */
     private $logger;
 
-    /** @var Signer */
-    private $signer;
-
-    /** @var Parser */
-    private $parser;
+    /** @var ConfigurationFactory */
+    private $factory;
 
     /** @var string[] */
     private $successes = [];
@@ -54,12 +52,11 @@ class AccessTokenRequestValidator
     public function __construct(
         RegistrationRepositoryInterface $repository,
         LoggerInterface $logger = null,
-        Signer $signer = null
+        ConfigurationFactory $factory = null
     ) {
         $this->repository = $repository;
         $this->logger = $logger ?? new NullLogger();
-        $this->signer = $signer ?? new Sha256();
-        $this->parser = new Parser();
+        $this->factory = $factory ?? new ConfigurationFactory();
     }
 
     public function validate(ServerRequestInterface $request, array $allowedScopes = []): AccessTokenRequestValidationResult
@@ -71,17 +68,17 @@ class AccessTokenRequestValidator
                 throw new LtiException('Missing Authorization header');
             }
 
-            $token = $this->parser->parse(
+            $token = $this->factory->create()->parser()->parse(
                 substr($request->getHeaderLine('Authorization'), strlen('Bearer '))
             );
 
-            if ($token->isExpired(Carbon::now())) {
-                throw new LtiException('JWT access token is expired');
+            $clientId = $token->claims()->has('aud')
+                ? current($token->claims()->get('aud'))
+                : null;
+
+            if (null === $clientId) {
+                throw new LtiException('JWT access token invalid aud claim');
             }
-
-            $this->addSuccess('JWT access token is not expired');
-
-            $clientId = $token->getClaim('aud');
 
             $registration = $this->repository->findByClientId($clientId);
 
@@ -97,13 +94,15 @@ class AccessTokenRequestValidator
 
             $this->addSuccess('Platform key chain found for registration: ' . $registration->getIdentifier());
 
-            if (!$token->verify($this->signer, $registration->getPlatformKeyChain()->getPublicKey())) {
-                throw new LtiException('JWT access token signature is invalid');
+            $config = $this->factory->create(null, $registration->getPlatformKeyChain()->getPublicKey());
+
+            if (!$config->validator()->validate($token, ...$config->validationConstraints())) {
+                throw new LtiException('JWT access token is invalid');
             }
 
-            $this->addSuccess('JWT access token signature is valid');
+            $this->addSuccess('JWT access token is valid');
 
-            if (empty(array_intersect($token->getClaim('scopes', []), $allowedScopes))) {
+            if (empty(array_intersect($token->claims()->get('scopes', []), $allowedScopes))) {
                 throw new LtiException('JWT access token scopes are invalid');
             }
 

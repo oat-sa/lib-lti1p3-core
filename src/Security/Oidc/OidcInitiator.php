@@ -68,15 +68,15 @@ class OidcInitiator
             $oidcRequest = LtiMessage::fromServerRequest($request);
 
             $registration = $this->repository->findByPlatformIssuer(
-                $oidcRequest->getMandatoryParameter('iss'),
-                $oidcRequest->getParameter('client_id')
+                $oidcRequest->getParameters()->getMandatory('iss'),
+                $oidcRequest->getParameters()->get('client_id')
             );
 
             if (null === $registration) {
                 throw new LtiException('Cannot find registration for OIDC request');
             }
 
-            $deploymentId = $oidcRequest->getParameter('lti_deployment_id');
+            $deploymentId = $oidcRequest->getParameters()->get('lti_deployment_id');
 
             if (null !== $deploymentId) {
                 if (!$registration->hasDeploymentId($deploymentId)) {
@@ -98,12 +98,12 @@ class OidcInitiator
             return new LtiMessage(
                 $registration->getPlatform()->getOidcAuthenticationUrl(),
                 [
-                    'redirect_uri' => $oidcRequest->getMandatoryParameter('target_link_uri'),
+                    'redirect_uri' => $oidcRequest->getParameters()->getMandatory('target_link_uri'),
                     'client_id' => $registration->getClientId(),
-                    'login_hint' => $oidcRequest->getMandatoryParameter('login_hint'),
+                    'login_hint' => $oidcRequest->getParameters()->getMandatory('login_hint'),
                     'nonce' => $nonce->getValue(),
-                    'state' => $statePayload->getToken()->__toString(),
-                    'lti_message_hint' => $oidcRequest->getParameter('lti_message_hint'),
+                    'state' => $statePayload->getToken()->toString(),
+                    'lti_message_hint' => $oidcRequest->getParameters()->get('lti_message_hint'),
                     'scope' => 'openid',
                     'response_type' => 'id_token',
                     'response_mode' => 'form_post',

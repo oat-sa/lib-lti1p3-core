@@ -22,51 +22,13 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Security\Key;
 
-use Lcobucci\JWT\Signer\Key;
-
-class KeyChain implements KeyChainInterface
+interface KeyChainFactoryInterface
 {
-    /** @var string */
-    private $identifier;
-
-    /** @var string */
-    private $keySetName;
-
-    /** @var Key */
-    private $publicKey;
-
-    /** @var Key|null */
-    private $privateKey;
-
-    public function __construct(
+    public function create(
         string $identifier,
         string $keySetName,
-        Key $publicKey,
-        Key $privateKey = null
-    ) {
-        $this->identifier = $identifier;
-        $this->keySetName = $keySetName;
-        $this->publicKey = $publicKey;
-        $this->privateKey = $privateKey;
-    }
-
-    public function getIdentifier(): string
-    {
-        return $this->identifier;
-    }
-
-    public function getKeySetName(): string
-    {
-        return $this->keySetName;
-    }
-
-    public function getPublicKey(): Key
-    {
-        return $this->publicKey;
-    }
-
-    public function getPrivateKey(): ?Key
-    {
-        return $this->privateKey;
-    }
+        string $publicKey,
+        string $privateKey = null,
+        string $privateKeyPassPhrase = null
+    ): KeyChainInterface;
 }

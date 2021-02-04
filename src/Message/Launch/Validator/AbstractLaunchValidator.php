@@ -29,6 +29,7 @@ use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Jwks\Fetcher\JwksFetcher;
 use OAT\Library\Lti1p3Core\Security\Jwks\Fetcher\JwksFetcherInterface;
 use OAT\Library\Lti1p3Core\Security\Jwt\AssociativeDecoder;
+use OAT\Library\Lti1p3Core\Security\Jwt\ConfigurationFactory;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepositoryInterface;
 
 abstract class AbstractLaunchValidator
@@ -42,11 +43,8 @@ abstract class AbstractLaunchValidator
     /** @var JwksFetcherInterface */
     protected $fetcher;
 
-    /** @var Signer */
-    protected $signer;
-
-    /** @var Parser */
-    protected $parser;
+    /** @var ConfigurationFactory */
+    protected $factory;
 
     /** @var string[] */
     protected $successes = [];
@@ -55,13 +53,12 @@ abstract class AbstractLaunchValidator
         RegistrationRepositoryInterface $registrationRepository,
         NonceRepositoryInterface $nonceRepository,
         JwksFetcherInterface $jwksFetcher = null,
-        Signer $signer = null
+        ConfigurationFactory $factory = null
     ) {
         $this->registrationRepository = $registrationRepository;
         $this->nonceRepository = $nonceRepository;
         $this->fetcher = $jwksFetcher ?? new JwksFetcher();
-        $this->signer = $signer ?? new Sha256();
-        $this->parser = new Parser(new AssociativeDecoder());
+        $this->factory = $factory ?? new ConfigurationFactory();
     }
 
     abstract public function getSupportedMessageTypes(): array;

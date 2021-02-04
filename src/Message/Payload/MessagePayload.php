@@ -22,26 +22,25 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Message\Payload;
 
-use Lcobucci\JWT\Token;
+use Lcobucci\JWT\Token\Plain;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\MessagePayloadClaimInterface;
-use Throwable;
 
 /**
  * @see http://www.imsglobal.org/spec/lti/v1p3/#json-web-token-0
  */
 class MessagePayload implements MessagePayloadInterface
 {
-    /** @var Token */
+    /** @var Plain */
     protected $token;
 
-    public function __construct(Token $token)
+    public function __construct(Plain $token)
     {
         $this->token = $token;
     }
 
-    public function getToken(): Token
+    public function getToken(): Plain
     {
         return $this->token;
     }
@@ -51,43 +50,32 @@ class MessagePayload implements MessagePayloadInterface
      */
     public function getMandatoryClaim(string $claim)
     {
-        try {
-            if (is_a($claim, MessagePayloadClaimInterface::class, true)) {
-                /**  @var MessagePayloadClaimInterface $claim */
-                return $claim::denormalize($this->token->getClaim($claim::getClaimName()));
-            }
-
-            return $this->token->getClaim($claim);
-        } catch (Throwable $exception) {
-            throw new LtiException(
-                sprintf('Cannot read mandatory %s claim: %s', $claim, $exception->getMessage()),
-                $exception->getCode(),
-                $exception
-            );
+        if (!$this->hasClaim($claim)) {
+            throw new LtiException(sprintf('Cannot get mandatory %s claim', $claim));
         }
+
+        return $this->getClaim($claim);
     }
 
     public function getClaim(string $claim, $default = null)
     {
         if (is_a($claim, MessagePayloadClaimInterface::class, true)) {
-            /**  @var MessagePayloadClaimInterface $claim */
-            return $this->token->hasClaim($claim::getClaimName())
-                ? $claim::denormalize($this->token->getClaim($claim::getClaimName()))
+            /** @var MessagePayloadClaimInterface $claim */
+            return $this->token->claims()->has($claim::getClaimName())
+                ? $claim::denormalize($this->token->claims()->get($claim::getClaimName()))
                 : $default;
         }
 
-        return $this->token->hasClaim($claim)
-            ? $this->token->getClaim($claim)
-            : $default;
+        return $this->token->claims()->get($claim, $default);
     }
 
     public function hasClaim(string $claim): bool
     {
         if (is_a($claim, MessagePayloadClaimInterface::class, true)) {
             /**  @var MessagePayloadClaimInterface $claim */
-            return $this->token->hasClaim($claim::getClaimName());
+            return $this->token->claims()->has($claim::getClaimName());
         }
 
-        return $this->token->hasClaim($claim);
+        return $this->token->claims()->has($claim);
     }
 }

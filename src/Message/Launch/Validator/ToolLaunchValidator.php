@@ -59,12 +59,14 @@ class ToolLaunchValidator extends AbstractLaunchValidator
         try {
             $message = LtiMessage::fromServerRequest($request);
 
-            $payload = new LtiMessagePayload($this->parser->parse($message->getMandatoryParameter('id_token')));
-            $state = new MessagePayload($this->parser->parse($message->getMandatoryParameter('state')));
+            $parser = $this->factory->create()->parser();
+
+            $payload = new LtiMessagePayload($parser->parse($message->getParameters()->getMandatory('id_token')));
+            $state = new MessagePayload($parser->parse($message->getParameters()->getMandatory('state')));
 
             $registration = $this->registrationRepository->findByPlatformIssuer(
                 $payload->getMandatoryClaim(MessagePayloadInterface::CLAIM_ISS),
-                $payload->getMandatoryClaim(MessagePayloadInterface::CLAIM_AUD)
+                current($payload->getMandatoryClaim(MessagePayloadInterface::CLAIM_AUD))
             );
 
             if (null === $registration) {
@@ -72,18 +74,16 @@ class ToolLaunchValidator extends AbstractLaunchValidator
             }
 
             $this
-                ->validatePayloadExpiry($payload)
+                ->validatePayloadToken($registration, $payload)
                 ->validatePayloadKid($payload)
                 ->validatePayloadVersion($payload)
                 ->validatePayloadMessageType($payload)
                 ->validatePayloadRoles($payload)
                 ->validatePayloadUserIdentifier($payload)
-                ->validatePayloadSignature($registration, $payload)
                 ->validatePayloadNonce($payload)
                 ->validatePayloadDeploymentId($registration, $payload)
                 ->validatePayloadLaunchMessageTypeSpecifics($payload)
-                ->validateStateExpiry($state)
-                ->validateStateSignature($registration, $state);
+                ->validateStateToken($registration, $state);
 
             return new LaunchValidationResult($registration, $payload, $state, $this->successes);
 
@@ -95,9 +95,32 @@ class ToolLaunchValidator extends AbstractLaunchValidator
     /**
      * @throws LtiExceptionInterface
      */
+    private function validatePayloadToken(RegistrationInterface $registration, LtiMessagePayloadInterface $payload): self
+    {
+        if (null === $registration->getPlatformKeyChain()) {
+            $key = $this->fetcher->fetchKey(
+                $registration->getPlatformJwksUrl(),
+                $payload->getToken()->headers()->get(LtiMessagePayloadInterface::HEADER_KID)
+            );
+        } else {
+            $key = $registration->getPlatformKeyChain()->getPublicKey();
+        }
+
+        $config = $this->factory->create(null, $key);
+
+        if (!$config->validator()->validate($payload->getToken(), ...$config->validationConstraints())) {
+            throw new LtiException('ID token validation failure');
+        }
+
+        return $this->addSuccess('ID token validation success');
+    }
+
+    /**
+     * @throws LtiExceptionInterface
+     */
     private function validatePayloadKid(LtiMessagePayloadInterface $payload): self
     {
-        if (!$payload->getToken()->hasHeader(LtiMessagePayloadInterface::HEADER_KID)) {
+        if (!$payload->getToken()->headers()->has(LtiMessagePayloadInterface::HEADER_KID)) {
             throw new LtiException('ID token kid header is missing');
         }
 
@@ -158,39 +181,6 @@ class ToolLaunchValidator extends AbstractLaunchValidator
         }
 
         return $this->addSuccess('ID token user identifier (sub) claim is valid');
-    }
-
-    /**
-     * @throws LtiExceptionInterface
-     */
-    private function validatePayloadSignature(RegistrationInterface $registration, LtiMessagePayloadInterface $payload): self
-    {
-        if (null === $registration->getPlatformKeyChain()) {
-            $key = $this->fetcher->fetchKey(
-                $registration->getPlatformJwksUrl(),
-                $payload->getToken()->getHeader(LtiMessagePayloadInterface::HEADER_KID)
-            );
-        } else {
-            $key = $registration->getPlatformKeyChain()->getPublicKey();
-        }
-
-        if (!$payload->getToken()->verify($this->signer, $key)) {
-            throw new LtiException('ID token signature validation failure');
-        }
-
-        return $this->addSuccess('ID token signature validation success');
-    }
-
-    /**
-     * @throws LtiExceptionInterface
-     */
-    private function validatePayloadExpiry(LtiMessagePayloadInterface $payload): self
-    {
-        if ($payload->getToken()->isExpired()) {
-            throw new LtiException('ID token is expired');
-        }
-
-        return $this->addSuccess('ID token is not expired');
     }
 
     /**
@@ -274,28 +264,18 @@ class ToolLaunchValidator extends AbstractLaunchValidator
     /**
      * @throws LtiExceptionInterface
      */
-    private function validateStateSignature(RegistrationInterface $registration, MessagePayloadInterface $state): self
+    private function validateStateToken(RegistrationInterface $registration, MessagePayloadInterface $state): self
     {
         if (null === $registration->getToolKeyChain()) {
             throw new LtiException('Tool key chain not configured');
         }
 
-        if (!$state->getToken()->verify($this->signer, $registration->getToolKeyChain()->getPublicKey())) {
-            throw new LtiException('State signature validation failure');
+        $config = $this->factory->create(null, $registration->getToolKeyChain()->getPublicKey());
+
+        if (!$config->validator()->validate($state->getToken(), ...$config->validationConstraints())) {
+            throw new LtiException('State validation failure');
         }
 
-        return $this->addSuccess('State signature validation success');
-    }
-
-    /**
-     * @throws LtiExceptionInterface
-     */
-    private function validateStateExpiry(MessagePayloadInterface $state): self
-    {
-        if ($state->getToken()->isExpired()) {
-            throw new LtiException('State is expired');
-        }
-
-        return $this->addSuccess('State is not expired');
+        return $this->addSuccess('State validation success');
     }
 }

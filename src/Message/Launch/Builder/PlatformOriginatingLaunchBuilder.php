@@ -65,7 +65,7 @@ class PlatformOriginatingLaunchBuilder extends AbstractLaunchBuilder
                 'iss' => $registration->getPlatform()->getAudience(),
                 'login_hint' => $loginHint,
                 'target_link_uri' => $targetLinkUri,
-                'lti_message_hint' => $ltiMessageHintPayload->getToken()->__toString(),
+                'lti_message_hint' => $ltiMessageHintPayload->getToken()->toString(),
                 'lti_deployment_id' => $deploymentId,
                 'client_id' => $registration->getClientId(),
             ]

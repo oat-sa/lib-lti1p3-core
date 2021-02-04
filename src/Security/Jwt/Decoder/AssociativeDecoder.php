@@ -20,24 +20,31 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Security\Jwt;
+namespace OAT\Library\Lti1p3Core\Security\Jwt\Decoder;
 
+use JsonException;
+use Lcobucci\JWT\Encoding\CannotDecodeContent;
 use Lcobucci\JWT\Parsing\Decoder;
-use RuntimeException;
 
 class AssociativeDecoder extends Decoder
 {
     public function jsonDecode($json)
     {
-        $data = json_decode($json, true);
+        if (PHP_VERSION_ID < 70300) {
+            $data = json_decode($json, true);
 
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new RuntimeException(
-                sprintf('Error while decoding to JSON: %s', json_last_error_msg())
-            );
+            if (json_last_error() != JSON_ERROR_NONE) {
+                throw CannotDecodeContent::jsonIssues(new JsonException(json_last_error_msg()));
+            }
+
+            return $data;
         }
 
-        return $data;
+        try {
+            return json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException $exception) {
+            throw CannotDecodeContent::jsonIssues($exception);
+        }
     }
 
 }

@@ -41,13 +41,7 @@ abstract class AbstractLaunchBuilder
 
     protected function applyOptionalClaims(array $optionalClaims): self
     {
-        foreach ($optionalClaims as $claimName => $claim) {
-            if ($claim instanceof MessagePayloadClaimInterface) {
-                $this->builder->withClaim($claim);
-            } else {
-                $this->builder->withClaim($claimName, $claim);
-            }
-        }
+        $this->builder->withClaims($optionalClaims);
 
         return $this;
     }

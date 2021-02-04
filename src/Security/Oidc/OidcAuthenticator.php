@@ -22,9 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Security\Oidc;
 
-use Lcobucci\JWT\Parser;
-use Lcobucci\JWT\Signer;
-use Lcobucci\JWT\Signer\Rsa\Sha256;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilder;
@@ -34,7 +31,7 @@ use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Message\LtiMessage;
-use OAT\Library\Lti1p3Core\Security\Jwt\AssociativeDecoder;
+use OAT\Library\Lti1p3Core\Security\Jwt\ConfigurationFactory;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
@@ -53,23 +50,19 @@ class OidcAuthenticator
     /** @var MessagePayloadBuilderInterface */
     private $builder;
 
-    /** @var Signer */
-    private $signer;
-
-    /** @var Parser */
-    private $parser;
+    /** @var ConfigurationFactory */
+    private $factory;
 
     public function __construct(
         RegistrationRepositoryInterface $repository,
         UserAuthenticatorInterface $authenticator,
         MessagePayloadBuilderInterface $builder = null,
-        Signer $signer = null
+        ConfigurationFactory $factory = null
     ) {
         $this->repository = $repository;
         $this->authenticator = $authenticator;
         $this->builder = $builder ?? new MessagePayloadBuilder();
-        $this->signer = $signer ?? new Sha256();
-        $this->parser = new Parser(new AssociativeDecoder());
+        $this->factory = $factory ?? new ConfigurationFactory();
     }
 
     /**
@@ -80,13 +73,11 @@ class OidcAuthenticator
         try {
             $oidcRequest = LtiMessage::fromServerRequest($request);
 
-            $originalPayload = new LtiMessagePayload(
-                $this->parser->parse($oidcRequest->getParameter('lti_message_hint'))
+            $originalToken = $this->factory->create()->parser()->parse(
+                $oidcRequest->getParameters()->get('lti_message_hint')
             );
 
-            if ($originalPayload->getToken()->isExpired()) {
-                throw new LtiException('Message hint expired');
-            }
+            $originalPayload = new LtiMessagePayload($originalToken);
 
             $registration = $this->repository->find(
                 $originalPayload->getMandatoryClaim(LtiMessagePayloadInterface::CLAIM_REGISTRATION_ID)
@@ -96,11 +87,18 @@ class OidcAuthenticator
                 throw new LtiException('Invalid message hint registration id claim');
             }
 
-            if (!$originalPayload->getToken()->verify($this->signer, $registration->getPlatformKeyChain()->getPublicKey())) {
-               throw new LtiException('Invalid message hint signature');
+            $config = $this->factory->create(
+                $registration->getPlatformKeyChain()->getPrivateKey(),
+                $registration->getPlatformKeyChain()->getPublicKey()
+            );
+
+            if (!$config->validator()->validate($originalToken, ...$config->validationConstraints())) {
+                throw new LtiException('Invalid message hint');
             }
 
-            $authenticationResult = $this->authenticator->authenticate($oidcRequest->getMandatoryParameter('login_hint'));
+            $authenticationResult = $this->authenticator->authenticate(
+                $oidcRequest->getParameters()->getMandatory('login_hint')
+            );
 
             if (!$authenticationResult->isSuccess()) {
                 throw new LtiException('User authentication failure');
@@ -122,8 +120,8 @@ class OidcAuthenticator
             return new LtiMessage(
                 $originalPayload->getMandatoryClaim(LtiMessagePayloadInterface::CLAIM_LTI_TARGET_LINK_URI),
                 [
-                    'id_token' => $payload->getToken()->__toString(),
-                    'state' => $oidcRequest->getMandatoryParameter('state')
+                    'id_token' => $payload->getToken()->toString(),
+                    'state' => $oidcRequest->getParameters()->getMandatory('state')
                 ]
             );
 

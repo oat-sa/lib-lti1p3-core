@@ -26,6 +26,7 @@ use CoderCat\JWKToPEM\JWKConverter;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use Lcobucci\JWT\Signer\Key;
+use Lcobucci\JWT\Signer\Key\InMemory;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use Psr\Cache\CacheException;
@@ -155,7 +156,7 @@ class JwksFetcher implements JwksFetcherInterface
         try {
             foreach ($jwksData['keys'] ?? [] as $data) {
                 if ($data['kid'] === $kId) {
-                    return new Key($this->converter->toPEM($data));
+                    return InMemory::plainText($this->converter->toPEM($data), '');
                 }
             }
         } catch (Throwable $exception) {

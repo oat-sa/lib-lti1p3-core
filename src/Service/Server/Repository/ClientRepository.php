@@ -32,6 +32,7 @@ use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Jwks\Fetcher\JwksFetcher;
 use OAT\Library\Lti1p3Core\Security\Jwks\Fetcher\JwksFetcherInterface;
+use OAT\Library\Lti1p3Core\Security\Jwt\ConfigurationFactory;
 use OAT\Library\Lti1p3Core\Service\Server\Entity\Client;
 use OAT\Library\Lti1p3Core\Service\Server\Grant\ClientAssertionCredentialsGrant;
 use Psr\Log\LoggerInterface;
@@ -52,23 +53,19 @@ class ClientRepository implements ClientRepositoryInterface
     /** @var LoggerInterface */
     private $logger;
 
-    /** @var Signer */
-    private $signer;
-
-    /** @var Parser */
-    private $parser;
+    /** @var ConfigurationFactory */
+    private $factory;
 
     public function __construct(
         RegistrationRepositoryInterface $registrationRepository,
         JwksFetcherInterface $jwksFetcher = null,
         LoggerInterface $logger = null,
-        Signer $signer = null
+        ConfigurationFactory $factory = null
     ) {
         $this->repository = $registrationRepository;
         $this->fetcher = $jwksFetcher ?? new JwksFetcher();
         $this->logger = $logger ?? new NullLogger();
-        $this->signer = $signer ?? new Sha256();
-        $this->parser = new Parser();
+        $this->factory = $factory ?? new ConfigurationFactory();
     }
 
     public function getClientEntity($clientIdentifier): ?ClientEntityInterface
@@ -89,15 +86,9 @@ class ClientRepository implements ClientRepositoryInterface
         }
 
         try {
-            $token = $this->parser->parse($clientSecret);
+            $token = $this->factory->create()->parser()->parse($clientSecret);
         } catch (Throwable $exception) {
             $this->logger->error('Cannot parse the client_assertion JWT: ' . $exception->getMessage());
-
-            return false;
-        }
-
-        if ($token->isExpired(Carbon::now())) {
-            $this->logger->error('The client_assertion JWT is expired');
 
             return false;
         }
@@ -110,8 +101,12 @@ class ClientRepository implements ClientRepositoryInterface
             return false;
         }
 
-        if ($token->getClaim('aud') !== $registration->getPlatform()->getAudience()) {
-            $this->logger->error('Invalid audience: ' . $token->getClaim('aud'));
+        $tokenAudience = $token->claims()->has('aud')
+            ? current($token->claims()->get('aud'))
+            : null;
+
+        if ($tokenAudience !== $registration->getPlatform()->getAudience()) {
+            $this->logger->error(sprintf('Invalid audience: %s', $tokenAudience));
 
             return false;
         }
@@ -120,19 +115,21 @@ class ClientRepository implements ClientRepositoryInterface
             if (null === $registration->getToolKeyChain()) {
                 $key = $this->fetcher->fetchKey(
                     $registration->getToolJwksUrl(),
-                    $token->getHeader(MessagePayloadInterface::HEADER_KID)
+                    $token->headers()->get(MessagePayloadInterface::HEADER_KID)
                 );
             } else {
                 $key = $registration->getToolKeyChain()->getPublicKey();
             }
         } catch (Throwable $exception) {
-            $this->logger->error('Cannot find tool public key: ' . $exception->getMessage());
+            $this->logger->error(sprintf('Cannot find tool public key: %s', $exception->getMessage()));
 
             return false;
         }
 
-        if (!$token->verify($this->signer, $key)) {
-            $this->logger->error('Invalid JWT signature');
+        $config = $this->factory->create(null, $key);
+
+        if (!$config->validator()->validate($token, ...$config->validationConstraints())) {
+            $this->logger->error('Invalid client_assertion JWT signature');
 
             return false;
         }
