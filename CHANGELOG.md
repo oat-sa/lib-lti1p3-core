@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.3.1
+-----
+
+* Updated the version of ramsey/uuid dependency to allow the use of version 4 
+
 3.3.0
 -----
 
