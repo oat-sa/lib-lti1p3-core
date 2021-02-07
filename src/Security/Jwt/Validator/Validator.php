@@ -20,31 +20,33 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Security\Key;
+namespace OAT\Library\Lti1p3Core\Security\Jwt\Validator;
 
-use OAT\Library\Lti1p3Core\Exception\LtiException;
+use OAT\Library\Lti1p3Core\Security\Jwt\Configuration\ConfigurationFactory;
+use OAT\Library\Lti1p3Core\Security\Jwt\TokenInterface;
+use OAT\Library\Lti1p3Core\Security\Key\KeyInterface;
 use Throwable;
 
-class KeyChainFactory implements KeyChainFactoryInterface
+class Validator implements ValidatorInterface
 {
-    public function create(
-        string $identifier,
-        string $keySetName,
-        $publicKey,
-        $privateKey = null,
-        string $privateKeyPassPhrase = null
-    ): KeyChainInterface {
-        try {
-            $publicKey = new Key($publicKey);
-            $privateKey = $privateKey !== null ? new Key($privateKey, $privateKeyPassPhrase) : null;
+    /** @var ConfigurationFactory */
+    private $factory;
 
-            return new KeyChain($identifier, $keySetName, $publicKey, $privateKey);
+    public function __construct(ConfigurationFactory $factory = null)
+    {
+        $this->factory = $factory ?? new ConfigurationFactory();
+    }
+
+    public function validate(TokenInterface $token, KeyInterface $key): bool
+    {
+        try {
+            $config = $this->factory->create(null, $key);
+            $plainToken = $config->parser()->parse($token->toString());
+
+            return $config->validator()->validate($plainToken, ...$config->validationConstraints());
+
         } catch (Throwable $exception) {
-            throw new LtiException(
-                sprintf('Cannot create key chain: %s', $exception->getMessage()),
-                $exception->getCode(),
-                $exception
-            );
+            return false;
         }
     }
 }

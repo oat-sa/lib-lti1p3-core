@@ -22,25 +22,25 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Message\Payload;
 
-use Lcobucci\JWT\Token\Plain;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\MessagePayloadClaimInterface;
+use OAT\Library\Lti1p3Core\Security\Jwt\TokenInterface;
 
 /**
  * @see http://www.imsglobal.org/spec/lti/v1p3/#json-web-token-0
  */
 class MessagePayload implements MessagePayloadInterface
 {
-    /** @var Plain */
+    /** @var TokenInterface */
     protected $token;
 
-    public function __construct(Plain $token)
+    public function __construct(TokenInterface $token)
     {
         $this->token = $token;
     }
 
-    public function getToken(): Plain
+    public function getToken(): TokenInterface
     {
         return $this->token;
     }
@@ -61,21 +61,21 @@ class MessagePayload implements MessagePayloadInterface
     {
         if (is_a($claim, MessagePayloadClaimInterface::class, true)) {
             /** @var MessagePayloadClaimInterface $claim */
-            return $this->token->claims()->has($claim::getClaimName())
-                ? $claim::denormalize($this->token->claims()->get($claim::getClaimName()))
+            return $this->token->getClaims()->has($claim::getClaimName())
+                ? $claim::denormalize($this->token->getClaims()->get($claim::getClaimName()))
                 : $default;
         }
 
-        return $this->token->claims()->get($claim, $default);
+        return $this->token->getClaims()->get($claim, $default);
     }
 
     public function hasClaim(string $claim): bool
     {
         if (is_a($claim, MessagePayloadClaimInterface::class, true)) {
             /**  @var MessagePayloadClaimInterface $claim */
-            return $this->token->claims()->has($claim::getClaimName());
+            return $this->token->getClaims()->has($claim::getClaimName());
         }
 
-        return $this->token->claims()->has($claim);
+        return $this->token->getClaims()->has($claim);
     }
 }

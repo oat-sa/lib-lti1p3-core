@@ -59,10 +59,8 @@ class ToolLaunchValidator extends AbstractLaunchValidator
         try {
             $message = LtiMessage::fromServerRequest($request);
 
-            $parser = $this->factory->create()->parser();
-
-            $payload = new LtiMessagePayload($parser->parse($message->getParameters()->getMandatory('id_token')));
-            $state = new MessagePayload($parser->parse($message->getParameters()->getMandatory('state')));
+            $payload = new LtiMessagePayload($this->parser->parse($message->getParameters()->getMandatory('id_token')));
+            $state = new MessagePayload($this->parser->parse($message->getParameters()->getMandatory('state')));
 
             $registration = $this->registrationRepository->findByPlatformIssuer(
                 $payload->getMandatoryClaim(MessagePayloadInterface::CLAIM_ISS),
@@ -100,15 +98,13 @@ class ToolLaunchValidator extends AbstractLaunchValidator
         if (null === $registration->getPlatformKeyChain()) {
             $key = $this->fetcher->fetchKey(
                 $registration->getPlatformJwksUrl(),
-                $payload->getToken()->headers()->get(LtiMessagePayloadInterface::HEADER_KID)
+                $payload->getToken()->getHeaders()->get(LtiMessagePayloadInterface::HEADER_KID)
             );
         } else {
             $key = $registration->getPlatformKeyChain()->getPublicKey();
         }
 
-        $config = $this->factory->create(null, $key);
-
-        if (!$config->validator()->validate($payload->getToken(), ...$config->validationConstraints())) {
+        if (!$this->validator->validate($payload->getToken(), $key)) {
             throw new LtiException('ID token validation failure');
         }
 
@@ -120,7 +116,7 @@ class ToolLaunchValidator extends AbstractLaunchValidator
      */
     private function validatePayloadKid(LtiMessagePayloadInterface $payload): self
     {
-        if (!$payload->getToken()->headers()->has(LtiMessagePayloadInterface::HEADER_KID)) {
+        if (!$payload->getToken()->getHeaders()->has(LtiMessagePayloadInterface::HEADER_KID)) {
             throw new LtiException('ID token kid header is missing');
         }
 
@@ -188,7 +184,7 @@ class ToolLaunchValidator extends AbstractLaunchValidator
      */
     private function validatePayloadNonce(LtiMessagePayloadInterface $payload): self
     {
-        if (empty($payload->getToken()->getClaim(LtiMessagePayloadInterface::CLAIM_NONCE))) {
+        if (!$payload->getToken()->getClaims()->has(LtiMessagePayloadInterface::CLAIM_NONCE)) {
             throw new LtiException('ID token nonce claim is missing');
         }
 
@@ -270,9 +266,7 @@ class ToolLaunchValidator extends AbstractLaunchValidator
             throw new LtiException('Tool key chain not configured');
         }
 
-        $config = $this->factory->create(null, $registration->getToolKeyChain()->getPublicKey());
-
-        if (!$config->validator()->validate($state->getToken(), ...$config->validationConstraints())) {
+        if (!$this->validator->validate($state->getToken(), $registration->getToolKeyChain()->getPublicKey())) {
             throw new LtiException('State validation failure');
         }
 

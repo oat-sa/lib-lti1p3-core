@@ -22,29 +22,20 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Security\Key;
 
-use OAT\Library\Lti1p3Core\Exception\LtiException;
-use Throwable;
-
-class KeyChainFactory implements KeyChainFactoryInterface
+interface KeyInterface
 {
-    public function create(
-        string $identifier,
-        string $keySetName,
-        $publicKey,
-        $privateKey = null,
-        string $privateKeyPassPhrase = null
-    ): KeyChainInterface {
-        try {
-            $publicKey = new Key($publicKey);
-            $privateKey = $privateKey !== null ? new Key($privateKey, $privateKeyPassPhrase) : null;
+    public const DEFAULT_ALGORITHM = 'RS256';
+    public const FILE_PREFIX = 'file://';
 
-            return new KeyChain($identifier, $keySetName, $publicKey, $privateKey);
-        } catch (Throwable $exception) {
-            throw new LtiException(
-                sprintf('Cannot create key chain: %s', $exception->getMessage()),
-                $exception->getCode(),
-                $exception
-            );
-        }
-    }
+    public function getContent();
+
+    public function getPassPhrase(): ?string;
+
+    public function getAlgorithm(): string;
+
+    public function isFromString(): bool;
+
+    public function isFromArray(): bool;
+
+    public function isFromFile(): bool;
 }

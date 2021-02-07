@@ -23,17 +23,14 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Traits;
 
 use Carbon\Carbon;
-use Lcobucci\JWT\Builder;
-use Lcobucci\JWT\Parser;
-use Lcobucci\JWT\Signer;
-use Lcobucci\JWT\Signer\Key;
-use Lcobucci\JWT\Signer\Rsa\Sha256;
-use Lcobucci\JWT\Token;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
-use OAT\Library\Lti1p3Core\Security\Jwt\AssociativeDecoder;
-use OAT\Library\Lti1p3Core\Security\Key\KeyChain;
+use OAT\Library\Lti1p3Core\Security\Jwt\Builder\Builder;
+use OAT\Library\Lti1p3Core\Security\Jwt\Parser\Parser;
+use OAT\Library\Lti1p3Core\Security\Jwt\TokenInterface;
+use OAT\Library\Lti1p3Core\Security\Jwt\Validator\Validator;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainFactory;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
+use OAT\Library\Lti1p3Core\Security\Key\KeyInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\Nonce;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepositoryInterface;
@@ -62,35 +59,23 @@ trait SecurityTestingTrait
     private function buildJwt(
         array $headers = [],
         array $claims = [],
-        Key $key = null,
-        Signer $signer = null
-    ): Token {
-        $builder = new Builder();
-
-        foreach ($headers as $headerName => $headerValue) {
-            $builder->withHeader($headerName, $headerValue);
-        }
-
-        foreach ($claims as $claimName => $claimValue) {
-            $builder->withClaim($claimName, $claimValue);
-        };
-
-        $builder->expiresAt(Carbon::now()->addSeconds(MessagePayloadInterface::TTL)->toDateTimeImmutable());
-
-        return $builder->getToken(
-            $signer ?? new Sha256(),
+        KeyInterface $key = null
+    ): TokenInterface {
+        return (new Builder)->build(
+            $headers,
+            $claims,
             $key ?? $this->createTestKeyChain()->getPrivateKey()
         );
     }
 
-    private function parseJwt(string $tokenString): Token
+    private function parseJwt(string $tokenString): TokenInterface
     {
-        return (new Parser(new AssociativeDecoder()))->parse($tokenString);
+        return (new Parser())->parse($tokenString);
     }
 
-    private function verifyJwt(Token $token, Key $key): bool
+    private function verifyJwt(TokenInterface $token, KeyInterface $key): bool
     {
-        return $token->verify(new Sha256(), $key);
+        return (new Validator())->validate($token, $key);
     }
 
     private function createTestUserAuthenticator(

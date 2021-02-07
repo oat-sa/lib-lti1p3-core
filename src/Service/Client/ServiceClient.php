@@ -22,14 +22,14 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Service\Client;
 
-use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
-use OAT\Library\Lti1p3Core\Security\Jwt\ConfigurationFactory;
+use OAT\Library\Lti1p3Core\Security\Jwt\Builder\Builder;
+use OAT\Library\Lti1p3Core\Security\Jwt\Builder\BuilderInterface;
 use OAT\Library\Lti1p3Core\Service\Server\Grant\ClientAssertionCredentialsGrant;
 use Psr\Cache\CacheException;
 use Psr\Cache\CacheItemPoolInterface;
@@ -50,17 +50,17 @@ class ServiceClient implements ServiceClientInterface
     /** @var ClientInterface */
     private $client;
 
-    /** @var ConfigurationFactory */
-    private $factory;
+    /** @var BuilderInterface */
+    private $builder;
 
     public function __construct(
         CacheItemPoolInterface $cache = null,
         ClientInterface $client = null,
-        ConfigurationFactory $factory = null
+        BuilderInterface $builder = null
     ) {
         $this->cache = $cache;
         $this->client = $client ?? new Client();
-        $this->factory = $factory ?? new ConfigurationFactory();
+        $this->builder = $builder ?? new Builder();
     }
 
     /**
@@ -169,20 +169,19 @@ class ServiceClient implements ServiceClientInterface
                 throw new LtiException('Tool key chain is not configured');
             }
 
-            $now = Carbon::now();
-            $config = $this->factory->create($registration->getToolKeyChain()->getPrivateKey());
+            $token = $this->builder->build(
+                [
+                    MessagePayloadInterface::HEADER_KID => $registration->getToolKeyChain()->getIdentifier()
+                ],
+                [
+                    MessagePayloadInterface::CLAIM_ISS => $registration->getTool()->getAudience(),
+                    MessagePayloadInterface::CLAIM_SUB => $registration->getClientId(),
+                    MessagePayloadInterface::CLAIM_AUD => $registration->getPlatform()->getAudience(),
+                ],
+                $registration->getToolKeyChain()->getPrivateKey()
+            );
 
-            return $config
-                ->builder()
-                ->withHeader(MessagePayloadInterface::HEADER_KID, $registration->getToolKeyChain()->getIdentifier())
-                ->identifiedBy(sprintf('%s-%s', $registration->getIdentifier(), $now->getTimestamp()))
-                ->issuedBy($registration->getTool()->getAudience())
-                ->relatedTo($registration->getClientId())
-                ->permittedFor($registration->getPlatform()->getAudience())
-                ->issuedAt($now->toDateTimeImmutable())
-                ->expiresAt($now->addSeconds(MessagePayloadInterface::TTL)->toDateTimeImmutable())
-                ->getToken($config->signer(), $config->signingKey())
-                ->toString();
+            return $token->toString();
 
         } catch (Throwable $exception) {
             throw new LtiException(

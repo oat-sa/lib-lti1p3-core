@@ -22,8 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Security\Key;
 
-use Lcobucci\JWT\Signer\Key;
-
 class KeyChain implements KeyChainInterface
 {
     /** @var string */
@@ -32,10 +30,10 @@ class KeyChain implements KeyChainInterface
     /** @var string */
     private $keySetName;
 
-    /** @var Key */
+    /** @var KeyInterface */
     private $publicKey;
 
-    /** @var Key|null */
+    /** @var KeyInterface|null */
     private $privateKey;
 
     public function __construct(
@@ -60,12 +58,12 @@ class KeyChain implements KeyChainInterface
         return $this->keySetName;
     }
 
-    public function getPublicKey(): Key
+    public function getPublicKey(): KeyInterface
     {
         return $this->publicKey;
     }
 
-    public function getPrivateKey(): ?Key
+    public function getPrivateKey(): ?KeyInterface
     {
         return $this->privateKey;
     }

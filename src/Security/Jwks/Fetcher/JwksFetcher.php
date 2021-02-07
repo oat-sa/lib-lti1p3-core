@@ -25,10 +25,10 @@ namespace OAT\Library\Lti1p3Core\Security\Jwks\Fetcher;
 use CoderCat\JWKToPEM\JWKConverter;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
-use Lcobucci\JWT\Signer\Key;
-use Lcobucci\JWT\Signer\Key\InMemory;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
+use OAT\Library\Lti1p3Core\Security\Key\Key;
+use OAT\Library\Lti1p3Core\Security\Key\KeyInterface;
 use Psr\Cache\CacheException;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
@@ -67,12 +67,12 @@ class JwksFetcher implements JwksFetcherInterface
     /**
      * @throws LtiExceptionInterface
      */
-    public function fetchKey(string $jwksUrl, string $kId): Key
+    public function fetchKey(string $jwksUrl, string $kId): KeyInterface
     {
         $jwksData = $this->fetchJwksDataFromCache($jwksUrl);
 
-        if (null !== $jwksData && $key = $this->findKeyFromJwksData($kId, $jwksData)) {
-            return $key;
+        if (null !== $jwksData) {
+            return new Key($jwksData);
         }
 
         $jwksData = $this->fetchJwksDataFromUrl($jwksUrl);
@@ -80,9 +80,7 @@ class JwksFetcher implements JwksFetcherInterface
         if (null !== $jwksData) {
             $this->saveJwksDataInCache($jwksUrl, $jwksData);
 
-            if ($key = $this->findKeyFromJwksData($kId, $jwksData)) {
-                return $key;
-            }
+            return new Key($jwksData);
         }
 
         throw new LtiException(sprintf('Could not find key id %s from cache or url %s', $kId, $jwksUrl));
@@ -149,24 +147,5 @@ class JwksFetcher implements JwksFetcherInterface
                 $this->logger->error(sprintf('Cannot save JWKS data in cache: %s', $exception->getMessage()));
             }
         }
-    }
-
-    private function findKeyFromJwksData(string $kId, array $jwksData): ?Key
-    {
-        try {
-            foreach ($jwksData['keys'] ?? [] as $data) {
-                if ($data['kid'] === $kId) {
-                    return InMemory::plainText($this->converter->toPEM($data), '');
-                }
-            }
-        } catch (Throwable $exception) {
-            throw new LtiException(
-                sprintf('Error during JWKS PEM conversion: %s', $exception->getMessage()),
-                $exception->getCode(),
-                $exception
-            );
-        }
-
-        return null;
     }
 }

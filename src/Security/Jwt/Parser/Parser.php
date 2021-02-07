@@ -20,28 +20,35 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Security\Key;
+namespace OAT\Library\Lti1p3Core\Security\Jwt\Parser;
 
 use OAT\Library\Lti1p3Core\Exception\LtiException;
+use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
+use OAT\Library\Lti1p3Core\Security\Jwt\Configuration\ConfigurationFactory;
+use OAT\Library\Lti1p3Core\Security\Jwt\Token;
+use OAT\Library\Lti1p3Core\Security\Jwt\TokenInterface;
 use Throwable;
 
-class KeyChainFactory implements KeyChainFactoryInterface
+class Parser implements ParserInterface
 {
-    public function create(
-        string $identifier,
-        string $keySetName,
-        $publicKey,
-        $privateKey = null,
-        string $privateKeyPassPhrase = null
-    ): KeyChainInterface {
-        try {
-            $publicKey = new Key($publicKey);
-            $privateKey = $privateKey !== null ? new Key($privateKey, $privateKeyPassPhrase) : null;
+    /** @var ConfigurationFactory */
+    private $factory;
 
-            return new KeyChain($identifier, $keySetName, $publicKey, $privateKey);
+    public function __construct(ConfigurationFactory $factory = null)
+    {
+        $this->factory = $factory ?? new ConfigurationFactory();
+    }
+
+    /**
+     * @throws LtiExceptionInterface
+     */
+    public function parse(string $token): TokenInterface
+    {
+        try {
+            return new Token($this->factory->create()->parser()->parse($token));
         } catch (Throwable $exception) {
             throw new LtiException(
-                sprintf('Cannot create key chain: %s', $exception->getMessage()),
+                sprintf('Cannot parse token: %s', $exception->getMessage()),
                 $exception->getCode(),
                 $exception
             );

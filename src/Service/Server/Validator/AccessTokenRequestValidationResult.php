@@ -22,15 +22,15 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Service\Server\Validator;
 
-use Lcobucci\JWT\Token;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
+use OAT\Library\Lti1p3Core\Security\Jwt\TokenInterface;
 
 class AccessTokenRequestValidationResult
 {
     /** @var RegistrationInterface|null */
     private $registration;
 
-    /** @var Token|null */
+    /** @var TokenInterface|null */
     private $token;
 
     /** @var string[] */
@@ -41,7 +41,7 @@ class AccessTokenRequestValidationResult
 
     public function __construct(
         RegistrationInterface $registration = null,
-        Token $token = null,
+        TokenInterface $token = null,
         array $successes = [],
         string $error = null
     ) {
@@ -56,14 +56,14 @@ class AccessTokenRequestValidationResult
         return $this->registration;
     }
 
-    public function getToken(): ?Token
+    public function getToken(): ?TokenInterface
     {
         return $this->token;
     }
 
     public function getScopes(): array
     {
-        return $this->token->claims()->get('scopes', []);
+        return $this->token->getClaims()->get('scopes', []);
     }
 
     public function addSuccess(string $success): self

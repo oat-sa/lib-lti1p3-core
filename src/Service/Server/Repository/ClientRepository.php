@@ -22,17 +22,16 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Service\Server\Repository;
 
-use Carbon\Carbon;
-use Lcobucci\JWT\Parser;
-use Lcobucci\JWT\Signer;
-use Lcobucci\JWT\Signer\Rsa\Sha256;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Jwks\Fetcher\JwksFetcher;
 use OAT\Library\Lti1p3Core\Security\Jwks\Fetcher\JwksFetcherInterface;
-use OAT\Library\Lti1p3Core\Security\Jwt\ConfigurationFactory;
+use OAT\Library\Lti1p3Core\Security\Jwt\Parser\Parser;
+use OAT\Library\Lti1p3Core\Security\Jwt\Parser\ParserInterface;
+use OAT\Library\Lti1p3Core\Security\Jwt\Validator\Validator;
+use OAT\Library\Lti1p3Core\Security\Jwt\Validator\ValidatorInterface;
 use OAT\Library\Lti1p3Core\Service\Server\Entity\Client;
 use OAT\Library\Lti1p3Core\Service\Server\Grant\ClientAssertionCredentialsGrant;
 use Psr\Log\LoggerInterface;
@@ -53,19 +52,24 @@ class ClientRepository implements ClientRepositoryInterface
     /** @var LoggerInterface */
     private $logger;
 
-    /** @var ConfigurationFactory */
-    private $factory;
+    /** @var ValidatorInterface */
+    private $validator;
+
+    /** @var ParserInterface */
+    private $parser;
 
     public function __construct(
         RegistrationRepositoryInterface $registrationRepository,
         JwksFetcherInterface $jwksFetcher = null,
         LoggerInterface $logger = null,
-        ConfigurationFactory $factory = null
+        ValidatorInterface $validator = null,
+        ParserInterface $parser = null
     ) {
         $this->repository = $registrationRepository;
         $this->fetcher = $jwksFetcher ?? new JwksFetcher();
         $this->logger = $logger ?? new NullLogger();
-        $this->factory = $factory ?? new ConfigurationFactory();
+        $this->validator = $validator ?? new Validator();
+        $this->parser = $parser ?? new Parser();
     }
 
     public function getClientEntity($clientIdentifier): ?ClientEntityInterface
@@ -86,7 +90,7 @@ class ClientRepository implements ClientRepositoryInterface
         }
 
         try {
-            $token = $this->factory->create()->parser()->parse($clientSecret);
+            $token = $this->parser->parse($clientSecret);
         } catch (Throwable $exception) {
             $this->logger->error('Cannot parse the client_assertion JWT: ' . $exception->getMessage());
 
@@ -101,8 +105,8 @@ class ClientRepository implements ClientRepositoryInterface
             return false;
         }
 
-        $tokenAudience = $token->claims()->has('aud')
-            ? current($token->claims()->get('aud'))
+        $tokenAudience = $token->getClaims()->has('aud')
+            ? current($token->getClaims()->get('aud'))
             : null;
 
         if ($tokenAudience !== $registration->getPlatform()->getAudience()) {
@@ -115,7 +119,7 @@ class ClientRepository implements ClientRepositoryInterface
             if (null === $registration->getToolKeyChain()) {
                 $key = $this->fetcher->fetchKey(
                     $registration->getToolJwksUrl(),
-                    $token->headers()->get(MessagePayloadInterface::HEADER_KID)
+                    $token->getHeaders()->get(MessagePayloadInterface::HEADER_KID)
                 );
             } else {
                 $key = $registration->getToolKeyChain()->getPublicKey();
@@ -126,9 +130,7 @@ class ClientRepository implements ClientRepositoryInterface
             return false;
         }
 
-        $config = $this->factory->create(null, $key);
-
-        if (!$config->validator()->validate($token, ...$config->validationConstraints())) {
+        if (!$this->validator->validate($token, $key)) {
             $this->logger->error('Invalid client_assertion JWT signature');
 
             return false;

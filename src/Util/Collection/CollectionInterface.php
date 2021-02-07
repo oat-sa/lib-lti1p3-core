@@ -20,15 +20,33 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Security\Key;
+namespace OAT\Library\Lti1p3Core\Util\Collection;
 
-interface KeyChainFactoryInterface
+use ArrayIterator;
+use Countable;
+use IteratorAggregate;
+
+interface CollectionInterface extends IteratorAggregate, Countable
 {
-    public function create(
-        string $identifier,
-        string $keySetName,
-        $publicKey,
-        $privateKey = null,
-        string $privateKeyPassPhrase = null
-    ): KeyChainInterface;
+    public function all(): array;
+
+    public function keys(): array;
+
+    public function replace(array $items): CollectionInterface;
+
+    public function add(array $items): CollectionInterface;
+
+    public function get(string $key, $defaultValue = null);
+
+    public function getMandatory(string $key);
+
+    public function set(string $key, $value): CollectionInterface;
+
+    public function has(string $key): bool;
+
+    public function remove(string $key): CollectionInterface;
+
+    public function getIterator(): ArrayIterator;
+
+    public function count(): int;
 }

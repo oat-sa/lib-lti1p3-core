@@ -20,33 +20,17 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Collection;
+namespace OAT\Library\Lti1p3Core\Util\Result;
 
-use ArrayIterator;
-use Countable;
-use IteratorAggregate;
-
-interface CollectionInterface extends IteratorAggregate, Countable
+interface ResultInterface
 {
-    public function all(): array;
+    public function hasErrors(): bool;
 
-    public function keys(): array;
+    public function addSuccess(string $message): ResultInterface;
 
-    public function replace(array $items): CollectionInterface;
+    public function addError(string $message): ResultInterface;
 
-    public function add(array $items): CollectionInterface;
+    public function getSuccesses(): array;
 
-    public function get(string $key, $defaultValue = null);
-
-    public function getMandatory(string $key);
-
-    public function set(string $key, $value): CollectionInterface;
-
-    public function has(string $key): bool;
-
-    public function remove(string $key): CollectionInterface;
-
-    public function getIterator(): ArrayIterator;
-
-    public function count(): int;
+    public function getErrors(): array;
 }

@@ -25,8 +25,8 @@ namespace OAT\Library\Lti1p3Core\Service\Server\Repository;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Entities\ScopeEntityInterface;
 use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
-use OAT\Library\Lti1p3Core\Collection\Collection;
-use OAT\Library\Lti1p3Core\Collection\CollectionInterface;
+use OAT\Library\Lti1p3Core\Util\Collection\Collection;
+use OAT\Library\Lti1p3Core\Util\Collection\CollectionInterface;
 
 class ScopeRepository implements ScopeRepositoryInterface
 {

@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Message;
 
-use OAT\Library\Lti1p3Core\Collection\CollectionInterface;
+use OAT\Library\Lti1p3Core\Util\Collection\CollectionInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**

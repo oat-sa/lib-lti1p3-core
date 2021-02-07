@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Message\Payload;
 
-use Lcobucci\JWT\Token\Plain;
+use OAT\Library\Lti1p3Core\Security\Jwt\TokenInterface;
 
 /**
  * @see http://www.imsglobal.org/spec/lti/v1p3/#json-web-token-0
@@ -47,7 +47,7 @@ interface MessagePayloadInterface
     public const CLAIM_NONCE = 'nonce';
     public const CLAIM_PARAMETERS = 'parameters';
 
-    public function getToken(): Plain;
+    public function getToken(): TokenInterface;
 
     public function getMandatoryClaim(string $claim);
 

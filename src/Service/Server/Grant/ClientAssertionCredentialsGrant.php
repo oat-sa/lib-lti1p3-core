@@ -24,7 +24,8 @@ namespace OAT\Library\Lti1p3Core\Service\Server\Grant;
 
 use League\OAuth2\Server\Exception\OAuthServerException;
 use League\OAuth2\Server\Grant\ClientCredentialsGrant;
-use OAT\Library\Lti1p3Core\Security\Jwt\ConfigurationFactory;
+use OAT\Library\Lti1p3Core\Security\Jwt\Parser\Parser;
+use OAT\Library\Lti1p3Core\Security\Jwt\Parser\ParserInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
 
@@ -37,12 +38,12 @@ class ClientAssertionCredentialsGrant extends ClientCredentialsGrant
     public const GRANT_IDENTIFIER = 'client_assertion_credentials';
     public const CLIENT_ASSERTION_TYPE = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer';
 
-    /** @var ConfigurationFactory */
-    private $factory;
+    /** @var ParserInterface */
+    private $parser;
 
     public function __construct()
     {
-        $this->factory = new ConfigurationFactory();
+        $this->parser = new Parser();
     }
 
     public function getIdentifier(): string
@@ -70,10 +71,10 @@ class ClientAssertionCredentialsGrant extends ClientCredentialsGrant
         $clientAssertion = $this->getRequestParameter('client_assertion', $request);
 
         try {
-            $token = $this->factory->create()->parser()->parse($clientAssertion);
+            $token = $this->parser->parse($clientAssertion);
 
             return [
-                $token->claims()->get('sub'),
+                $token->getClaims()->getMandatory('sub'),
                 $clientAssertion
             ];
         } catch (Throwable $exception) {

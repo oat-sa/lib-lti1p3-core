@@ -22,15 +22,13 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Security\Key;
 
-use Lcobucci\JWT\Signer\Key;
-
 interface KeyChainInterface
 {
     public function getIdentifier(): string;
 
     public function getKeySetName(): string;
 
-    public function getPublicKey(): Key;
+    public function getPublicKey(): KeyInterface;
 
-    public function getPrivateKey(): ?Key;
+    public function getPrivateKey(): ?KeyInterface;
 }

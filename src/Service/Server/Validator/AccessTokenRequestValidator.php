@@ -22,14 +22,12 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Service\Server\Validator;
 
-use Carbon\Carbon;
-use Lcobucci\JWT\Parser;
-use Lcobucci\JWT\Signer;
-use Lcobucci\JWT\Signer\Rsa\Sha256;
-use League\OAuth2\Server\Exception\OAuthServerException;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
-use OAT\Library\Lti1p3Core\Security\Jwt\ConfigurationFactory;
+use OAT\Library\Lti1p3Core\Security\Jwt\Parser\Parser;
+use OAT\Library\Lti1p3Core\Security\Jwt\Parser\ParserInterface;
+use OAT\Library\Lti1p3Core\Security\Jwt\Validator\Validator;
+use OAT\Library\Lti1p3Core\Security\Jwt\Validator\ValidatorInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -43,8 +41,11 @@ class AccessTokenRequestValidator
     /** @var LoggerInterface */
     private $logger;
 
-    /** @var ConfigurationFactory */
-    private $factory;
+    /** @var ValidatorInterface */
+    private $validator;
+
+    /** @var ParserInterface */
+    private $parser;
 
     /** @var string[] */
     private $successes = [];
@@ -52,11 +53,13 @@ class AccessTokenRequestValidator
     public function __construct(
         RegistrationRepositoryInterface $repository,
         LoggerInterface $logger = null,
-        ConfigurationFactory $factory = null
+        ValidatorInterface $validator = null,
+        ParserInterface $parser = null
     ) {
         $this->repository = $repository;
         $this->logger = $logger ?? new NullLogger();
-        $this->factory = $factory ?? new ConfigurationFactory();
+        $this->validator = $validator ?? new Validator();
+        $this->parser = $parser ?? new Parser();
     }
 
     public function validate(ServerRequestInterface $request, array $allowedScopes = []): AccessTokenRequestValidationResult
@@ -68,12 +71,12 @@ class AccessTokenRequestValidator
                 throw new LtiException('Missing Authorization header');
             }
 
-            $token = $this->factory->create()->parser()->parse(
+            $token = $this->parser->parse(
                 substr($request->getHeaderLine('Authorization'), strlen('Bearer '))
             );
 
-            $clientId = $token->claims()->has('aud')
-                ? current($token->claims()->get('aud'))
+            $clientId = $token->getClaims()->has('aud')
+                ? current($token->getClaims()->get('aud'))
                 : null;
 
             if (null === $clientId) {
@@ -94,15 +97,13 @@ class AccessTokenRequestValidator
 
             $this->addSuccess('Platform key chain found for registration: ' . $registration->getIdentifier());
 
-            $config = $this->factory->create(null, $registration->getPlatformKeyChain()->getPublicKey());
-
-            if (!$config->validator()->validate($token, ...$config->validationConstraints())) {
+            if (!$this->validator->validate($token, $registration->getPlatformKeyChain()->getPublicKey())) {
                 throw new LtiException('JWT access token is invalid');
             }
 
             $this->addSuccess('JWT access token is valid');
 
-            if (empty(array_intersect($token->claims()->get('scopes', []), $allowedScopes))) {
+            if (empty(array_intersect($token->getClaims()->get('scopes', []), $allowedScopes))) {
                 throw new LtiException('JWT access token scopes are invalid');
             }
 

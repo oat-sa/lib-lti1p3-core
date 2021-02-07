@@ -20,15 +20,12 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Security\Key;
+namespace OAT\Library\Lti1p3Core\Security\Jwt\Validator;
 
-interface KeyChainFactoryInterface
+use OAT\Library\Lti1p3Core\Security\Jwt\TokenInterface;
+use OAT\Library\Lti1p3Core\Security\Key\KeyInterface;
+
+interface ValidatorInterface
 {
-    public function create(
-        string $identifier,
-        string $keySetName,
-        $publicKey,
-        $privateKey = null,
-        string $privateKeyPassPhrase = null
-    ): KeyChainInterface;
+    public function validate(TokenInterface $token, KeyInterface $key): bool;
 }

@@ -31,7 +31,12 @@ use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Message\LtiMessage;
+use OAT\Library\Lti1p3Core\Security\Jwt\Builder\BuilderInterface;
 use OAT\Library\Lti1p3Core\Security\Jwt\ConfigurationFactory;
+use OAT\Library\Lti1p3Core\Security\Jwt\Parser\Parser;
+use OAT\Library\Lti1p3Core\Security\Jwt\Parser\ParserInterface;
+use OAT\Library\Lti1p3Core\Security\Jwt\Validator\Validator;
+use OAT\Library\Lti1p3Core\Security\Jwt\Validator\ValidatorInterface;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
@@ -50,19 +55,24 @@ class OidcAuthenticator
     /** @var MessagePayloadBuilderInterface */
     private $builder;
 
-    /** @var ConfigurationFactory */
-    private $factory;
+    /** @var ValidatorInterface */
+    private $validator;
+
+    /** @var ParserInterface */
+    private $parser;
 
     public function __construct(
         RegistrationRepositoryInterface $repository,
         UserAuthenticatorInterface $authenticator,
         MessagePayloadBuilderInterface $builder = null,
-        ConfigurationFactory $factory = null
+        ValidatorInterface $validator = null,
+        ParserInterface $parser = null
     ) {
         $this->repository = $repository;
         $this->authenticator = $authenticator;
         $this->builder = $builder ?? new MessagePayloadBuilder();
-        $this->factory = $factory ?? new ConfigurationFactory();
+        $this->validator = $validator ?? new Validator();
+        $this->parser = $parser ?? new Parser();
     }
 
     /**
@@ -73,26 +83,17 @@ class OidcAuthenticator
         try {
             $oidcRequest = LtiMessage::fromServerRequest($request);
 
-            $originalToken = $this->factory->create()->parser()->parse(
-                $oidcRequest->getParameters()->get('lti_message_hint')
-            );
-
-            $originalPayload = new LtiMessagePayload($originalToken);
+            $originalToken = $this->parser->parse($oidcRequest->getParameters()->get('lti_message_hint'));
 
             $registration = $this->repository->find(
-                $originalPayload->getMandatoryClaim(LtiMessagePayloadInterface::CLAIM_REGISTRATION_ID)
+                $originalToken->getClaims()->getMandatory(LtiMessagePayloadInterface::CLAIM_REGISTRATION_ID)
             );
 
             if (null === $registration) {
                 throw new LtiException('Invalid message hint registration id claim');
             }
 
-            $config = $this->factory->create(
-                $registration->getPlatformKeyChain()->getPrivateKey(),
-                $registration->getPlatformKeyChain()->getPublicKey()
-            );
-
-            if (!$config->validator()->validate($originalToken, ...$config->validationConstraints())) {
+            if (!$this->validator->validate($originalToken, $registration->getPlatformKeyChain()->getPublicKey())) {
                 throw new LtiException('Invalid message hint');
             }
 
@@ -105,7 +106,7 @@ class OidcAuthenticator
             }
 
             $this->builder
-                ->withMessagePayloadClaims($originalPayload)
+                ->withClaims($originalToken->getClaims()->all())
                 ->withClaim(LtiMessagePayloadInterface::CLAIM_ISS, $registration->getPlatform()->getAudience())
                 ->withClaim(LtiMessagePayloadInterface::CLAIM_AUD, $registration->getClientId());
 
@@ -118,7 +119,7 @@ class OidcAuthenticator
             $payload = $this->builder->buildMessagePayload($registration->getPlatformKeyChain());
 
             return new LtiMessage(
-                $originalPayload->getMandatoryClaim(LtiMessagePayloadInterface::CLAIM_LTI_TARGET_LINK_URI),
+                $originalToken->getClaims()->getMandatory(LtiMessagePayloadInterface::CLAIM_LTI_TARGET_LINK_URI),
                 [
                     'id_token' => $payload->getToken()->toString(),
                     'state' => $oidcRequest->getParameters()->getMandatory('state')

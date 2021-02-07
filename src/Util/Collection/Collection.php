@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Collection;
+namespace OAT\Library\Lti1p3Core\Util\Collection;
 
 use ArrayIterator;
 use InvalidArgumentException;

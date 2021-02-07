@@ -57,9 +57,7 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
         try {
             $message = LtiMessage::fromServerRequest($request);
 
-            $parser = $this->factory->create()->parser();
-
-            $payload = new LtiMessagePayload($parser->parse($message->getParameters()->getMandatory('JWT')));
+            $payload = new LtiMessagePayload($this->parser->parse($message->getParameters()->getMandatory('JWT')));
 
             $registration = $this->registrationRepository->findByPlatformIssuer(
                 current($payload->getMandatoryClaim(MessagePayloadInterface::CLAIM_AUD)),
@@ -91,7 +89,7 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
      */
     private function validatePayloadKid(LtiMessagePayloadInterface $payload): self
     {
-        if (!$payload->getToken()->headers()->has(LtiMessagePayloadInterface::HEADER_KID)) {
+        if (!$payload->getToken()->getHeaders()->has(LtiMessagePayloadInterface::HEADER_KID)) {
             throw new LtiException('JWT kid header is missing');
         }
 
@@ -136,15 +134,13 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
         if (null === $registration->getToolKeyChain()) {
             $key = $this->fetcher->fetchKey(
                 $registration->getToolJwksUrl(),
-                $payload->getToken()->headers()->get(LtiMessagePayloadInterface::HEADER_KID)
+                $payload->getToken()->getHeaders()->get(LtiMessagePayloadInterface::HEADER_KID)
             );
         } else {
             $key = $registration->getToolKeyChain()->getPublicKey();
         }
 
-        $config = $this->factory->create(null, $key);
-
-        if (!$config->validator()->validate($payload->getToken(), ...$config->validationConstraints())) {
+        if (!$this->validator->validate($payload->getToken(), $key)) {
             throw new LtiException('JWT validation failure');
         }
 
@@ -156,7 +152,7 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
      */
     private function validatePayloadNonce(LtiMessagePayloadInterface $payload): self
     {
-        if (empty($payload->getToken()->claims()->get(LtiMessagePayloadInterface::CLAIM_NONCE))) {
+        if (!$payload->getToken()->getClaims()->has(LtiMessagePayloadInterface::CLAIM_NONCE)) {
             throw new LtiException('JWT nonce claim is missing');
         }
 
@@ -199,11 +195,9 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
                 throw new LtiException('JWT data deep linking claim is missing');
             }
 
-            $config = $this->factory->create(null, $registration->getPlatformKeyChain()->getPublicKey());
+            $dataToken = $this->parser->parse($payload->getDeepLinkingData());
 
-            $dataToken = $config->parser()->parse($payload->getDeepLinkingData());
-
-            if (!$config->validator()->validate($dataToken, ...$config->validationConstraints())) {
+            if (!$this->validator->validate($dataToken, $registration->getPlatformKeyChain()->getPublicKey())) {
                 throw new LtiException('JWT data deep linking claim signature validation failure');
             }
         }

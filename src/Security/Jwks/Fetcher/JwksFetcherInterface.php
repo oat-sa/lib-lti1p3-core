@@ -22,12 +22,12 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Security\Jwks\Fetcher;
 
-use Lcobucci\JWT\Signer\Key;
+use OAT\Library\Lti1p3Core\Security\Key\KeyInterface;
 
 interface JwksFetcherInterface
 {
     // Default TTL (in seconds)
     public const TTL = 86400;
 
-    public function fetchKey(string $jwksUrl, string $kId): Key;
+    public function fetchKey(string $jwksUrl, string $kId): KeyInterface;
 }
