@@ -23,7 +23,6 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Traits;
 
 use Carbon\Carbon;
-use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Security\Jwt\Builder\Builder;
 use OAT\Library\Lti1p3Core\Security\Jwt\Parser\Parser;
 use OAT\Library\Lti1p3Core\Security\Jwt\TokenInterface;
@@ -117,7 +116,7 @@ trait SecurityTestingTrait
 
         return new class ($nonces, $withAutomaticFind) implements NonceRepositoryInterface
         {
-            /** @var NonceRepositoryInterface */
+            /** @var NonceInterface[] */
             private $nonces;
 
             /** @var bool */

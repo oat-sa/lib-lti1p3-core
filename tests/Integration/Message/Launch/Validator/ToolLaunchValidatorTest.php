@@ -349,74 +349,6 @@ class ToolLaunchValidatorTest extends TestCase
         $this->assertEquals('State is expired', $result->getError());
     }
 
-    public function testValidatePlatformOriginatingLaunchFailureWithNonValidPayloadSignature(): void {
-        $token = $this->buildJwt(
-            [
-                MessagePayloadInterface::HEADER_KID => $this->registration->getPlatformKeyChain()->getIdentifier()
-            ],
-            [
-                MessagePayloadInterface::CLAIM_ISS => $this->registration->getPlatform()->getAudience(),
-                MessagePayloadInterface::CLAIM_AUD => $this->registration->getClientId(),
-                LtiMessagePayloadInterface::CLAIM_LTI_VERSION => LtiMessageInterface::LTI_VERSION,
-                LtiMessagePayloadInterface::CLAIM_LTI_MESSAGE_TYPE => LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
-                LtiMessagePayloadInterface::CLAIM_LTI_ROLES => ['Learner'],
-                LtiMessagePayloadInterface::CLAIM_SUB => 'user',
-                LtiMessagePayloadInterface::CLAIM_NONCE => 'value',
-                LtiMessagePayloadInterface::CLAIM_LTI_DEPLOYMENT_ID => $this->registration->getDefaultDeploymentId()
-            ],
-            $this->registration->getPlatformKeyChain()->getPrivateKey(),
-            new Sha384()
-        );
-
-        $request = $this->createServerRequest('GET', sprintf(
-            '%s?id_token=%s&state=%s',
-            $this->registration->getTool()->getLaunchUrl(),
-            $token->__toString(),
-            $this->buildJwt()
-        ));
-
-        $result = $this->subject->validatePlatformOriginatingLaunch($request);
-
-        $this->assertInstanceOf(LaunchValidationResult::class, $result);
-        $this->assertTrue($result->hasError());
-        $this->assertEquals('ID token signature validation failure', $result->getError());
-    }
-
-    public function testValidatePlatformOriginatingLaunchFailureWithNonValidStateSignature(): void {
-        $token = $this->buildJwt(
-            [
-                MessagePayloadInterface::HEADER_KID => $this->registration->getPlatformKeyChain()->getIdentifier()
-            ],
-            [
-                MessagePayloadInterface::CLAIM_ISS => $this->registration->getPlatform()->getAudience(),
-                MessagePayloadInterface::CLAIM_AUD => $this->registration->getClientId(),
-                LtiMessagePayloadInterface::CLAIM_LTI_VERSION => LtiMessageInterface::LTI_VERSION,
-                LtiMessagePayloadInterface::CLAIM_LTI_MESSAGE_TYPE => LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
-                LtiMessagePayloadInterface::CLAIM_LTI_ROLES => ['Learner'],
-                LtiMessagePayloadInterface::CLAIM_SUB => 'user',
-                LtiMessagePayloadInterface::CLAIM_NONCE => 'value',
-                LtiMessagePayloadInterface::CLAIM_LTI_DEPLOYMENT_ID => $this->registration->getDefaultDeploymentId(),
-                LtiMessagePayloadInterface::CLAIM_LTI_RESOURCE_LINK => ['id' => 'identifier'],
-            ],
-            $this->registration->getPlatformKeyChain()->getPrivateKey()
-        );
-
-        $state = $this->buildJwt([], [], $this->registration->getToolKeyChain()->getPrivateKey(), new Sha384());
-
-        $request = $this->createServerRequest('GET', sprintf(
-            '%s?id_token=%s&state=%s',
-            $this->registration->getTool()->getLaunchUrl(),
-            $token->__toString(),
-            $state->__toString()
-        ));
-
-        $result = $this->subject->validatePlatformOriginatingLaunch($request);
-
-        $this->assertInstanceOf(LaunchValidationResult::class, $result);
-        $this->assertTrue($result->hasError());
-        $this->assertEquals('State signature validation failure', $result->getError());
-    }
-
     /**
      * @dataProvider provideValidationFailureContexts
      */
@@ -434,7 +366,7 @@ class ToolLaunchValidatorTest extends TestCase
         $request = $this->createServerRequest('GET', sprintf(
             '%s?id_token=%s&state=%s',
             $this->registration->getTool()->getLaunchUrl(),
-            $token->__toString(),
+            $token->toString(),
             $this->buildJwt()
         ));
 

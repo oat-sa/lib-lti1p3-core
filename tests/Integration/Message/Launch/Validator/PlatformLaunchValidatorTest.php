@@ -23,7 +23,6 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Integration\Message\Launch\Validator;
 
 use Carbon\Carbon;
-use Lcobucci\JWT\Signer\Rsa\Sha384;
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\ToolOriginatingLaunchBuilder;
 use OAT\Library\Lti1p3Core\Message\Launch\Validator\PlatformLaunchValidator;
 use OAT\Library\Lti1p3Core\Message\Launch\Validator\Result\LaunchValidationResult;
@@ -85,7 +84,7 @@ class PlatformLaunchValidatorTest extends TestCase
     {
         $dataToken = $this
             ->buildJwt([], [], $this->registration->getPlatformKeyChain()->getPrivateKey())
-            ->__toString();
+            ->toString();
 
         $message = $this->builder->buildToolOriginatingLaunch(
             $this->registration,
@@ -142,7 +141,7 @@ class PlatformLaunchValidatorTest extends TestCase
 
         $dataToken = $this
             ->buildJwt([], [], $registration->getPlatformKeyChain()->getPrivateKey())
-            ->__toString();
+            ->toString();
 
         $jwksFetcherMock = $this->createMock(JwksFetcherInterface::class);
         $jwksFetcherMock
@@ -172,40 +171,6 @@ class PlatformLaunchValidatorTest extends TestCase
         $this->assertFalse($result->hasError());
     }
 
-    public function testValidateToolOriginatingLaunchFailureOnInvalidPayloadSignature(): void
-    {
-        $token = $this->buildJwt(
-            [
-                MessagePayloadInterface::HEADER_KID => $this->registration->getPlatformKeyChain()->getIdentifier()
-            ],
-            [
-                MessagePayloadInterface::CLAIM_ISS => $this->registration->getClientId(),
-                MessagePayloadInterface::CLAIM_AUD => $this->registration->getPlatform()->getAudience(),
-                LtiMessagePayloadInterface::CLAIM_LTI_VERSION => LtiMessageInterface::LTI_VERSION,
-                LtiMessagePayloadInterface::CLAIM_LTI_MESSAGE_TYPE => LtiMessageInterface::LTI_MESSAGE_TYPE_START_ASSESSMENT,
-                LtiMessagePayloadInterface::CLAIM_LTI_ROLES => ['Learner'],
-                LtiMessagePayloadInterface::CLAIM_NONCE => 'value',
-                LtiMessagePayloadInterface::CLAIM_LTI_DEPLOYMENT_ID => $this->registration->getDefaultDeploymentId(),
-                LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_SESSION_DATA => 'data',
-                LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_ATTEMPT_NUMBER => '1',
-                LtiMessagePayloadInterface::CLAIM_LTI_RESOURCE_LINK => ['id' => 'identifier'],
-            ],
-            $this->registration->getPlatformKeyChain()->getPrivateKey(),
-            new Sha384()
-        );
-
-        $request = $this->createServerRequest(
-            'GET',
-            sprintf('http://platform.com/launch?JWT=%s', $token->__toString())
-        );
-
-        $result = $this->subject->validateToolOriginatingLaunch($request);
-
-        $this->assertInstanceOf(LaunchValidationResult::class, $result);
-        $this->assertTrue($result->hasError());
-        $this->assertEquals('JWT signature validation failure', $result->getError());
-    }
-
     /**
      * @dataProvider provideValidationFailureContexts
      */
@@ -222,7 +187,7 @@ class PlatformLaunchValidatorTest extends TestCase
 
         $request = $this->createServerRequest(
             'GET',
-            sprintf('http://platform.com/launch?JWT=%s', $token->__toString())
+            sprintf('http://platform.com/launch?JWT=%s', $token->toString())
         );
 
         $result = $this->subject->validateToolOriginatingLaunch($request);
@@ -395,28 +360,7 @@ class PlatformLaunchValidatorTest extends TestCase
                     LtiMessagePayloadInterface::CLAIM_LTI_DEEP_LINKING_DATA => ''
                 ],
                 'JWT data deep linking claim is missing'
-            ],
-            'Invalid JWT data signature for deep linking response' => [
-                [
-                    MessagePayloadInterface::HEADER_KID => $registration->getPlatformKeyChain()->getIdentifier()
-                ],
-                [
-                    MessagePayloadInterface::CLAIM_ISS => $registration->getClientId(),
-                    MessagePayloadInterface::CLAIM_AUD => $registration->getPlatform()->getAudience(),
-                    LtiMessagePayloadInterface::CLAIM_LTI_VERSION => LtiMessageInterface::LTI_VERSION,
-                    LtiMessagePayloadInterface::CLAIM_LTI_MESSAGE_TYPE => LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE,
-                    LtiMessagePayloadInterface::CLAIM_LTI_ROLES => ['Learner'],
-                    LtiMessagePayloadInterface::CLAIM_NONCE => 'value',
-                    LtiMessagePayloadInterface::CLAIM_LTI_DEPLOYMENT_ID => $registration->getDefaultDeploymentId(),
-                    LtiMessagePayloadInterface::CLAIM_LTI_DEEP_LINKING_DATA => $this->buildJwt(
-                        [],
-                        [],
-                        $registration->getPlatformKeyChain()->getPrivateKey(),
-                        new Sha384()
-                    )->__toString(),
-                ],
-                'JWT data deep linking claim signature validation failure'
-            ],
+            ]
         ];
     }
 }
