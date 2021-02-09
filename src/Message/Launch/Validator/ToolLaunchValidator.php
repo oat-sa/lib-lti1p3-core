@@ -62,10 +62,17 @@ class ToolLaunchValidator extends AbstractLaunchValidator
             $payload = new LtiMessagePayload($this->parser->parse($message->getParameters()->getMandatory('id_token')));
             $state = new MessagePayload($this->parser->parse($message->getParameters()->getMandatory('state')));
 
-            $registration = $this->registrationRepository->findByPlatformIssuer(
-                $payload->getMandatoryClaim(MessagePayloadInterface::CLAIM_ISS),
-                current($payload->getMandatoryClaim(MessagePayloadInterface::CLAIM_AUD))
-            );
+            $audiences = $payload->getMandatoryClaim(MessagePayloadInterface::CLAIM_AUD);
+            $audiences = is_array($audiences) ? $audiences : [$audiences];
+
+            $registration = null;
+
+            foreach ($audiences as $audience) {
+                $registration = $this->registrationRepository->findByPlatformIssuer(
+                    $payload->getMandatoryClaim(MessagePayloadInterface::CLAIM_ISS),
+                    $audience
+                );
+            }
 
             if (null === $registration) {
                 throw new LtiException('No matching registration found tool side');

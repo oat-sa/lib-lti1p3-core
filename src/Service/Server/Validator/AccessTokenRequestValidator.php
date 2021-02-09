@@ -75,21 +75,29 @@ class AccessTokenRequestValidator
                 substr($request->getHeaderLine('Authorization'), strlen('Bearer '))
             );
 
-            $clientId = $token->getClaims()->has('aud')
-                ? current($token->getClaims()->get('aud'))
-                : null;
+            try {
+                $audiences = $token->getClaims()->getMandatory('aud');
+                $audiences = is_array($audiences) ? $audiences : [$audiences];
 
-            if (null === $clientId) {
-                throw new LtiException('JWT access token invalid aud claim');
+                $registration = null;
+
+                foreach ($audiences as $audience) {
+                    $registration = $this->repository->findByClientId($audience);
+
+                    if (null !== $registration) {
+                        $this->addSuccess('Registration found for client_id: ' . $audience);
+                        break;
+                    }
+                }
+
+                if (!$registration) {
+                    throw new LtiException(
+                        sprintf('No registration found with client_id for audience(s) %s ', implode(', ', $audiences))
+                    );
+                }
+            } catch (Throwable $exception) {
+                throw new LtiException($exception->getMessage(), $exception->getCode(), $exception);
             }
-
-            $registration = $this->repository->findByClientId($clientId);
-
-            if (null === $registration) {
-                throw new LtiException('No registration found for client_id: ' . $clientId);
-            }
-
-            $this->addSuccess('Registration found for client_id: ' . $clientId);
 
             if (null === $registration->getPlatformKeyChain()) {
                 throw new LtiException('Missing platform key chain for registration: ' . $registration->getIdentifier());

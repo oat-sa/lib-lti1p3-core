@@ -59,10 +59,21 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
 
             $payload = new LtiMessagePayload($this->parser->parse($message->getParameters()->getMandatory('JWT')));
 
-            $registration = $this->registrationRepository->findByPlatformIssuer(
-                current($payload->getMandatoryClaim(MessagePayloadInterface::CLAIM_AUD)),
-                $payload->getMandatoryClaim(MessagePayloadInterface::CLAIM_ISS)
-            );
+            $audiences = $payload->getMandatoryClaim(MessagePayloadInterface::CLAIM_AUD);
+            $audiences = is_array($audiences) ? $audiences : [$audiences];
+
+            $registration = null;
+
+            foreach ($audiences as $audience) {
+                $registration = $this->registrationRepository->findByPlatformIssuer(
+                    $audience,
+                    $payload->getMandatoryClaim(MessagePayloadInterface::CLAIM_ISS)
+                );
+
+                if (null !== $registration) {
+                    break;
+                }
+            }
 
             if (null === $registration) {
                 throw new LtiException('No matching registration found platform side');
