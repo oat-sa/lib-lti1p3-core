@@ -27,28 +27,32 @@ class Result implements ResultInterface
     /** @var string[] */
     private $successes;
 
-    /** @var string[] */
-    private $errors;
+    /** @var string|null */
+    private $error;
 
-    public function __construct(array $successes = [], array $errors = [])
+    public function __construct(array $successes = [], string $error = null)
     {
         $this->successes = $successes;
-        $this->errors = $errors;
+        $this->error = $error;
     }
 
-    public function hasErrors(): bool
+    public function hasError(): bool
     {
-        return !empty($this->errors);
+        return null !== $this->error;
     }
 
-    public function addSuccess(string $message): ResultInterface
+    public function addSuccess(string $success): ResultInterface
     {
-        $this->successes[] = $message;
+        $this->successes[] = $success;
+
+        return $this;
     }
 
-    public function addError(string $message): ResultInterface
+    public function setError(string $error): ResultInterface
     {
-        $this->errors[] = $message;
+        $this->error = $error;
+
+        return $this;
     }
 
     public function getSuccesses(): array
@@ -56,8 +60,8 @@ class Result implements ResultInterface
         return $this->successes;
     }
 
-    public function getErrors(): array
+    public function getError(): ?string
     {
-        return $this->errors;
+        return $this->error;
     }
 }

@@ -24,20 +24,15 @@ namespace OAT\Library\Lti1p3Core\Service\Server\Validator;
 
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Security\Jwt\TokenInterface;
+use OAT\Library\Lti1p3Core\Util\Result\Result;
 
-class AccessTokenRequestValidationResult
+class AccessTokenRequestValidationResult extends Result
 {
     /** @var RegistrationInterface|null */
     private $registration;
 
     /** @var TokenInterface|null */
     private $token;
-
-    /** @var string[] */
-    private $successes;
-
-    /** @var string|null */
-    private $error;
 
     public function __construct(
         RegistrationInterface $registration = null,
@@ -47,8 +42,8 @@ class AccessTokenRequestValidationResult
     ) {
         $this->registration = $registration;
         $this->token = $token;
-        $this->successes = $successes;
-        $this->error = $error;
+
+        parent::__construct($successes, $error);
     }
 
     public function getRegistration(): ?RegistrationInterface
@@ -64,34 +59,5 @@ class AccessTokenRequestValidationResult
     public function getScopes(): array
     {
         return $this->token->getClaims()->get('scopes', []);
-    }
-
-    public function addSuccess(string $success): self
-    {
-        $this->successes[] = $success;
-
-        return $this;
-    }
-
-    public function getSuccesses(): array
-    {
-        return $this->successes;
-    }
-
-    public function hasError(): bool
-    {
-        return null !== $this->error;
-    }
-
-    public function setError(string $error): self
-    {
-        $this->error = $error;
-
-        return $this;
-    }
-
-    public function getError(): ?string
-    {
-        return $this->error;
     }
 }

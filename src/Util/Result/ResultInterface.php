@@ -24,13 +24,13 @@ namespace OAT\Library\Lti1p3Core\Util\Result;
 
 interface ResultInterface
 {
-    public function hasErrors(): bool;
+    public function hasError(): bool;
 
-    public function addSuccess(string $message): ResultInterface;
+    public function addSuccess(string $success): ResultInterface;
 
-    public function addError(string $message): ResultInterface;
+    public function setError(string $error): ResultInterface;
 
     public function getSuccesses(): array;
 
-    public function getErrors(): array;
+    public function getError(): ?string;
 }

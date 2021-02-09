@@ -60,7 +60,7 @@ class ToolOriginatingLaunchBuilder extends AbstractLaunchBuilder
         return new LtiMessage(
             $platformUrl,
             [
-                'JWT' => $payload->getToken()->__toString(),
+                'JWT' => $payload->getToken()->toString(),
             ]
         );
     }
