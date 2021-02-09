@@ -23,6 +23,9 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Traits;
 
 use Carbon\Carbon;
+use Lcobucci\JWT\Signer\Rsa\Sha256;
+use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Security\Jwt\Builder\Builder;
 use OAT\Library\Lti1p3Core\Security\Jwt\Parser\Parser;
 use OAT\Library\Lti1p3Core\Security\Jwt\TokenInterface;
@@ -49,8 +52,8 @@ trait SecurityTestingTrait
         return (new KeyChainFactory)->create(
             $identifier,
             $keySetName,
-            $publicKey ?? getenv('TEST_KEYS_ROOT_DIR') . '/RSA/public.key',
-            $privateKey ?? getenv('TEST_KEYS_ROOT_DIR') . '/RSA/private.key',
+            $publicKey ?? getenv('TEST_KEYS_ROOT_DIR') . '/public.key',
+            $privateKey ?? getenv('TEST_KEYS_ROOT_DIR') . '/private.key',
             $privateKeyPassPhrase
         );
     }
@@ -75,6 +78,37 @@ trait SecurityTestingTrait
     private function verifyJwt(TokenInterface $token, KeyInterface $key): bool
     {
         return (new Validator())->validate($token, $key);
+    }
+
+    private function createTestClientAssertion(RegistrationInterface $registration, array $scopes = []): string
+    {
+        $assertion =  $this->buildJwt(
+            [
+                MessagePayloadInterface::HEADER_KID => $registration->getToolKeyChain()->getIdentifier()
+            ],
+            [
+                MessagePayloadInterface::CLAIM_ISS => $registration->getTool()->getAudience(),
+                MessagePayloadInterface::CLAIM_SUB => $registration->getClientId(),
+                MessagePayloadInterface::CLAIM_AUD => $registration->getPlatform()->getAudience(),
+            ],
+            $registration->getToolKeyChain()->getPrivateKey()
+        );
+
+        return $assertion->toString();
+    }
+
+    private function createTestClientAccessToken(RegistrationInterface $registration, array $scopes = []): string
+    {
+        $accessToken =  $this->buildJwt(
+            [],
+            [
+                MessagePayloadInterface::CLAIM_AUD => $registration->getClientId(),
+                'scopes' => $scopes
+            ],
+            $registration->getPlatformKeyChain()->getPrivateKey()
+        );
+
+        return $accessToken->toString();
     }
 
     private function createTestUserAuthenticator(
