@@ -85,7 +85,7 @@ class Builder implements BuilderInterface
                         $builder->issuedBy($claimValue);
                         break;
                     case MessagePayloadInterface::CLAIM_AUD:
-                        $builder->permittedFor($claimValue);
+                        $builder->permittedFor(is_array($claimValue) ? current($claimValue) : $claimValue);
                         break;
                     default:
                         $builder->withClaim($claimName, $claimValue);
