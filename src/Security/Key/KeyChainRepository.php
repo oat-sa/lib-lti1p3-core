@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Security\Key;
 
+use OAT\Library\Lti1p3Core\Util\Collection\Collection;
 use OAT\Library\Lti1p3Core\Util\Collection\CollectionInterface;
 
 class KeyChainRepository implements KeyChainRepositoryInterface
@@ -31,6 +32,8 @@ class KeyChainRepository implements KeyChainRepositoryInterface
 
     public function __construct(array $keyChains = [])
     {
+        $this->keyChains = new Collection();
+
         foreach ($keyChains as $keyChain) {
             $this->addKeyChain($keyChain);
         }

@@ -35,7 +35,7 @@ class JwkRS256Exporter implements JwkExporterInterface
     public function export(KeyChainInterface $keyChain): array
     {
         $details = openssl_pkey_get_details(
-            openssl_pkey_get_public($keyChain->getPublicKey()->contents())
+            openssl_pkey_get_public($keyChain->getPublicKey()->getContent())
         );
 
         if ($details['type'] !== OPENSSL_KEYTYPE_RSA) {
