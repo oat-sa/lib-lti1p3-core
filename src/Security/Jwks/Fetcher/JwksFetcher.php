@@ -71,8 +71,8 @@ class JwksFetcher implements JwksFetcherInterface
     {
         $jwksData = $this->fetchJwksDataFromCache($jwksUrl);
 
-        if (null !== $jwksData) {
-            return new Key($jwksData);
+        if (null !== $jwksData && $key = $this->findKeyFromJwksData($kId, $jwksData)) {
+            return $key;
         }
 
         $jwksData = $this->fetchJwksDataFromUrl($jwksUrl);
@@ -80,7 +80,9 @@ class JwksFetcher implements JwksFetcherInterface
         if (null !== $jwksData) {
             $this->saveJwksDataInCache($jwksUrl, $jwksData);
 
-            return new Key($jwksData);
+            if ($key = $this->findKeyFromJwksData($kId, $jwksData)) {
+                return $key;
+            }
         }
 
         throw new LtiException(sprintf('Could not find key id %s from cache or url %s', $kId, $jwksUrl));
@@ -147,5 +149,16 @@ class JwksFetcher implements JwksFetcherInterface
                 $this->logger->error(sprintf('Cannot save JWKS data in cache: %s', $exception->getMessage()));
             }
         }
+    }
+
+    private function findKeyFromJwksData(string $kId, array $jwksData): ?KeyInterface
+    {
+        foreach ($jwksData['keys'] ?? [] as $data) {
+            if ($data['kid'] === $kId) {
+                return new Key($data);
+            }
+        }
+
+        return null;
     }
 }

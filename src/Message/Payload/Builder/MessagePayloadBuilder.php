@@ -104,9 +104,12 @@ class MessagePayloadBuilder implements MessagePayloadBuilderInterface
                 MessagePayloadInterface::HEADER_KID => $keyChain->getIdentifier()
             ];
 
-            $claims = $this->claims->all() + [
-                MessagePayloadInterface::CLAIM_NONCE => $this->generator->generate()->getValue()
-            ];
+            $claims = array_merge(
+                $this->claims->all(),
+                [
+                    MessagePayloadInterface::CLAIM_NONCE => $this->generator->generate()->getValue()
+                ]
+            );
 
             return $this->builder->build($headers, $claims, $keyChain->getPrivateKey());
 

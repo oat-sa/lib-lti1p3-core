@@ -57,12 +57,15 @@ class Builder implements BuilderInterface
                 $builder->withHeader($headerName, $headerValue);
             }
 
-            $claims = $claims + [
-                MessagePayloadInterface::CLAIM_JTI => Uuid::uuid4()->toString(),
-                MessagePayloadInterface::CLAIM_IAT => $now->toDateTimeImmutable(),
-                MessagePayloadInterface::CLAIM_NBF => $now->toDateTimeImmutable(),
-                MessagePayloadInterface::CLAIM_EXP => $now->addSeconds(MessagePayloadInterface::TTL)->toDateTimeImmutable(),
-            ];
+            $claims = array_merge(
+                $claims,
+                [
+                    MessagePayloadInterface::CLAIM_JTI => Uuid::uuid4()->toString(),
+                    MessagePayloadInterface::CLAIM_IAT => $now->toDateTimeImmutable(),
+                    MessagePayloadInterface::CLAIM_NBF => $now->toDateTimeImmutable(),
+                    MessagePayloadInterface::CLAIM_EXP => $now->addSeconds(MessagePayloadInterface::TTL)->toDateTimeImmutable(),
+                ]
+            );
 
             foreach ($claims as $claimName => $claimValue) {
                 switch ($claimName) {
