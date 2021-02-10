@@ -51,9 +51,7 @@ class ConfigurationFactory
     {
         $algorithm = $this->findAlgorithm($signingKey, $verificationKey);
 
-        $decoder = class_exists('Lcobucci\JWT\Parsing\Decoder')
-            ? new AssociativeDecoder()
-            : null;
+        $decoder = class_exists('Lcobucci\JWT\Parsing\Decoder') ? new AssociativeDecoder() : null;
 
         $configuration = Configuration::forAsymmetricSigner(
             $this->factory->create($algorithm),

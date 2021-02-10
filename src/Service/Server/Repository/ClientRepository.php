@@ -24,7 +24,6 @@ namespace OAT\Library\Lti1p3Core\Service\Server\Repository;
 
 use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
-use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Jwks\Fetcher\JwksFetcher;
@@ -106,26 +105,22 @@ class ClientRepository implements ClientRepositoryInterface
             return false;
         }
 
-        try {
-            $tokenAudiences = $token->getClaims()->getMandatory('aud');
-            $tokenAudiences = is_array($tokenAudiences) ? $tokenAudiences : [$tokenAudiences];
+        $tokenAudiences = $token->getClaims()->getMandatory('aud');
+        $tokenAudiences = is_array($tokenAudiences) ? $tokenAudiences : [$tokenAudiences];
 
-            $foundAudience = false;
+        $foundAudience = false;
 
-            foreach ($tokenAudiences as $audience) {
-                if ($audience == $registration->getPlatform()->getAudience()) {
-                    $foundAudience = true;
-                    break;
-                }
+        foreach ($tokenAudiences as $audience) {
+            if ($audience == $registration->getPlatform()->getAudience()) {
+                $foundAudience = true;
+                break;
             }
+        }
 
-            if (!$foundAudience) {
-                throw new LtiException(
-                    sprintf('registration does not match audience(s) %s', implode(', ', $tokenAudiences))
-                );
-            }
-        } catch (Throwable $exception) {
-            $this->logger->error(sprintf('Invalid audience: %s', $exception->getMessage()));
+        if (!$foundAudience) {
+            $this->logger->error(
+                sprintf('Registration platform does not match audience(s): %s', implode(', ', $tokenAudiences))
+            );
 
             return false;
         }

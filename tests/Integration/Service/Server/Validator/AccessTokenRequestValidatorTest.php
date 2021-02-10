@@ -23,6 +23,8 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Integration\Service\Server\Validator;
 
 use Carbon\Carbon;
+use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Service\Server\Validator\AccessTokenRequestValidationResult;
 use OAT\Library\Lti1p3Core\Service\Server\Validator\AccessTokenRequestValidator;
 use OAT\Library\Lti1p3Core\Tests\Resource\Logger\TestLogger;
@@ -51,18 +53,6 @@ class AccessTokenRequestValidatorTest extends TestCase
             $this->createTestRegistrationWithoutPlatformKeyChain(
                 'missingKeyIdentifier',
                 'missingKeyClientId'
-            ),
-            $this->createTestRegistration(
-                'invalidKeyIdentifier',
-                'invalidKeyClientId',
-                $this->createTestPlatform(),
-                $this->createTestTool(),
-                ['deploymentIdentifier'],
-                $this->createTestKeyChain(
-                    'keyChainIdentifier',
-                    'keySetName',
-                    getenv('TEST_KEYS_ROOT_DIR') . '/RSA/public2.key'
-                )
             )
         ];
 
@@ -80,7 +70,7 @@ class AccessTokenRequestValidatorTest extends TestCase
             'GET',
             '/example',
             [],
-            ['Authorization' => 'Bearer ' . $this->createTestClientAccessToken($registration, ['allowed-scope'])]
+            ['Authorization' => 'Bearer ' . $this->generateTestClientAccessToken($registration, ['allowed-scope'])]
         );
 
         $result = $this->subject->validate($request, ['allowed-scope']);
@@ -116,7 +106,57 @@ class AccessTokenRequestValidatorTest extends TestCase
         );
     }
 
-    public function testValidationFailureWithExpiredToken(): void
+    public function testValidationFailureWithInvalidAudience(): void
+    {
+        $registration = $this->createTestRegistration();
+
+        $request = $this->createServerRequest(
+            'GET',
+            '/example',
+            [],
+            ['Authorization' => 'Bearer ' . $this->generateTestClientAccessToken($registration, ['allowed-scope'], 'invalid')]
+        );
+
+        $result = $this->subject->validate($request);
+
+        $this->assertInstanceOf(AccessTokenRequestValidationResult::class, $result);
+        $this->assertTrue($result->hasError());
+        $this->assertEquals('No registration found with client_id for audience(s) invalid', $result->getError());
+
+        $this->assertTrue(
+            $this->logger->hasLog(
+                LogLevel::ERROR,
+                'Access token validation error: No registration found with client_id for audience(s) invalid'
+            )
+        );
+    }
+
+    public function testValidationFailureWithInvalidRegistrationPlatformKeyChain(): void
+    {
+        $registration = $this->createTestRegistration();
+
+        $request = $this->createServerRequest(
+            'GET',
+            '/example',
+            [],
+            ['Authorization' => 'Bearer ' . $this->generateTestClientAccessToken($registration, ['allowed-scope'], 'missingKeyClientId')]
+        );
+
+        $result = $this->subject->validate($request);
+
+        $this->assertInstanceOf(AccessTokenRequestValidationResult::class, $result);
+        $this->assertTrue($result->hasError());
+        $this->assertEquals('Missing platform key chain for registration: missingKeyIdentifier', $result->getError());
+
+        $this->assertTrue(
+            $this->logger->hasLog(
+                LogLevel::ERROR,
+                'Access token validation error: Missing platform key chain for registration: missingKeyIdentifier'
+            )
+        );
+    }
+
+    public function testValidationFailureWithInvalidToken(): void
     {
         $registration = $this->createTestRegistration();
 
@@ -127,7 +167,7 @@ class AccessTokenRequestValidatorTest extends TestCase
             'GET',
             '/example',
             [],
-            ['Authorization' => 'Bearer ' . $this->createTestClientAccessToken($registration, ['allowed-scope'])]
+            ['Authorization' => 'Bearer ' . $this->generateTestClientAccessToken($registration, ['allowed-scope'])]
         );
 
         Carbon::setTestNow();
@@ -151,7 +191,7 @@ class AccessTokenRequestValidatorTest extends TestCase
             'GET',
             '/example',
             [],
-            ['Authorization' => 'Bearer ' . $this->createTestClientAccessToken($registration, ['invalid-scope'])]
+            ['Authorization' => 'Bearer ' . $this->generateTestClientAccessToken($registration, ['invalid-scope'])]
         );
 
         $result = $this->subject->validate($request, ['allowed-scope']);
@@ -166,5 +206,22 @@ class AccessTokenRequestValidatorTest extends TestCase
                 'Access token validation error: JWT access token scopes are invalid'
             )
         );
+    }
+
+    private function generateTestClientAccessToken(
+        RegistrationInterface $registration,
+        array $scopes = [],
+        string $audience = null
+    ): string {
+        $accessToken = $this->buildJwt(
+            [],
+            [
+                MessagePayloadInterface::CLAIM_AUD => $audience ?? $registration->getClientId(),
+                'scopes' => $scopes
+            ],
+            $registration->getPlatformKeyChain()->getPrivateKey()
+        );
+
+        return $accessToken->toString();
     }
 }

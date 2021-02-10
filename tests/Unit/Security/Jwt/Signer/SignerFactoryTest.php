@@ -39,47 +39,47 @@ class SignerFactoryTest extends TestCase
         $this->subject = new SignerFactory();
     }
 
-    public function testCreateES256(): void
+    public function testCreateForES256(): void
     {
         $this->assertInstanceOf(Ecdsa\Sha256::class, $this->subject->create('ES256'));
     }
 
-    public function testCreateES384(): void
+    public function testCreateForES384(): void
     {
         $this->assertInstanceOf(Ecdsa\Sha384::class, $this->subject->create('ES384'));
     }
 
-    public function testCreateES521(): void
+    public function testCreateForES521(): void
     {
         $this->assertInstanceOf(Ecdsa\Sha512::class, $this->subject->create('ES512'));
     }
 
-    public function testCreateHS256(): void
+    public function testCreateForHS256(): void
     {
         $this->assertInstanceOf(Hmac\Sha256::class, $this->subject->create('HS256'));
     }
 
-    public function testCreateHS384(): void
+    public function testCreateForHS384(): void
     {
         $this->assertInstanceOf(Hmac\Sha384::class, $this->subject->create('HS384'));
     }
 
-    public function testCreateHS521(): void
+    public function testCreateForHS521(): void
     {
         $this->assertInstanceOf(Hmac\Sha512::class, $this->subject->create('HS512'));
     }
 
-    public function testCreateRS256(): void
+    public function testCreateForRS256(): void
     {
         $this->assertInstanceOf(Rsa\Sha256::class, $this->subject->create('RS256'));
     }
 
-    public function testCreateRS384(): void
+    public function testCreateForRS384(): void
     {
         $this->assertInstanceOf(Rsa\Sha384::class, $this->subject->create('RS384'));
     }
 
-    public function testCreateRS521(): void
+    public function testCreateForRS521(): void
     {
         $this->assertInstanceOf(Rsa\Sha512::class, $this->subject->create('RS512'));
     }

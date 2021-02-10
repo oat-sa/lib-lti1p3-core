@@ -86,10 +86,6 @@ class KeyConverter
             );
         }
 
-        if (false !== base64_decode($key->getContent())) {
-            return InMemory::base64Encoded($key->getContent(), $key->getPassPhrase() ?? '');
-        }
-
         return InMemory::plainText($key->getContent(), $key->getPassPhrase() ?? '');
     }
 }

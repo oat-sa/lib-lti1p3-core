@@ -24,6 +24,7 @@ namespace OAT\Library\Lti1p3Core\Tests\Integration\Service\Server\Repository;
 
 use Carbon\Carbon;
 use Exception;
+use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Security\Jwks\Fetcher\JwksFetcherInterface;
 use OAT\Library\Lti1p3Core\Security\Key\Key;
@@ -144,6 +145,22 @@ class ClientRepositoryTest extends TestCase
         $this->assertTrue($this->logger->hasLog(LogLevel::ERROR, 'Cannot find registration for client_id: invalid'));
     }
 
+    public function testValidateClientFailureWithInvalidAudience(): void
+    {
+        $registration = $this->createTestRegistration();
+
+        $secret = $this->generateClientAssertion($registration, 'invalid');
+
+        $result = $this->subject->validateClient(
+            $registration->getClientId(),
+            $secret,
+            ClientAssertionCredentialsGrant::GRANT_IDENTIFIER
+        );
+
+        $this->assertFalse($result);
+        $this->assertTrue($this->logger->hasLog(LogLevel::ERROR, 'Registration platform does not match audience(s): invalid'));
+    }
+
     public function testValidateClientFailureWithJWKSFetchError(): void
     {
         $registration = $this->createTestRegistrationWithoutToolKeyChain(
@@ -194,6 +211,18 @@ class ClientRepositoryTest extends TestCase
 
     private function generateClientAssertion(RegistrationInterface $registration, string $audience = null): string
     {
-        return $this->createTestClientAssertion($registration);
+        $assertion = $this->buildJwt(
+            [
+                MessagePayloadInterface::HEADER_KID => $registration->getToolKeyChain()->getIdentifier()
+            ],
+            [
+                MessagePayloadInterface::CLAIM_ISS => $registration->getTool()->getAudience(),
+                MessagePayloadInterface::CLAIM_SUB => $registration->getClientId(),
+                MessagePayloadInterface::CLAIM_AUD => $audience ?? $registration->getPlatform()->getAudience(),
+            ],
+            $registration->getToolKeyChain()->getPrivateKey()
+        );
+
+        return $assertion->toString();
     }
 }

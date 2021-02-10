@@ -75,28 +75,24 @@ class AccessTokenRequestValidator
                 substr($request->getHeaderLine('Authorization'), strlen('Bearer '))
             );
 
-            try {
-                $audiences = $token->getClaims()->getMandatory('aud');
-                $audiences = is_array($audiences) ? $audiences : [$audiences];
+            $registration = null;
 
-                $registration = null;
+            $audiences = $token->getClaims()->getMandatory('aud');
+            $audiences = is_array($audiences) ? $audiences : [$audiences];
 
-                foreach ($audiences as $audience) {
-                    $registration = $this->repository->findByClientId($audience);
+            foreach ($audiences as $audience) {
+                $registration = $this->repository->findByClientId($audience);
 
-                    if (null !== $registration) {
-                        $this->addSuccess('Registration found for client_id: ' . $audience);
-                        break;
-                    }
+                if (null !== $registration) {
+                    $this->addSuccess('Registration found for client_id: ' . $audience);
+                    break;
                 }
+            }
 
-                if (!$registration) {
-                    throw new LtiException(
-                        sprintf('No registration found with client_id for audience(s) %s ', implode(', ', $audiences))
-                    );
-                }
-            } catch (Throwable $exception) {
-                throw new LtiException($exception->getMessage(), $exception->getCode(), $exception);
+            if (null === $registration) {
+                throw new LtiException(
+                    sprintf('No registration found with client_id for audience(s) %s', implode(', ', $audiences))
+                );
             }
 
             if (null === $registration->getPlatformKeyChain()) {
