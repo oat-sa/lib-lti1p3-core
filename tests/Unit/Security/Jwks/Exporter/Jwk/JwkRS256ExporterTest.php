@@ -24,6 +24,8 @@ namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\Jwks\Exporter\Jwk;
 
 use InvalidArgumentException;
 use OAT\Library\Lti1p3Core\Security\Jwks\Exporter\Jwk\JwkRS256Exporter;
+use OAT\Library\Lti1p3Core\Security\Key\Key;
+use OAT\Library\Lti1p3Core\Security\Key\KeyChain;
 use OAT\Library\Lti1p3Core\Tests\Traits\SecurityTestingTrait;
 use PHPUnit\Framework\TestCase;
 
@@ -55,11 +57,11 @@ class JwkRS256ExporterTest extends TestCase
 
         $subject = new JwkRS256Exporter();
 
-        $dsaKeyChain = $this->createTestKeyChain(
+        $dsaKeyChain = new KeyChain(
             'keyChainIdentifier',
             'keySetName',
-            $publicKey ?? getenv('TEST_KEYS_ROOT_DIR') . '/DSA/public.key',
-            $privateKey ?? getenv('TEST_KEYS_ROOT_DIR') . '/DSA/private.key'
+            new Key('file://' .  __DIR__ . '/../../../../../Resource/Key/DSA/public.key'),
+            new Key('file://' .  __DIR__ . '/../../../../../Resource/Key/DSA/private.key')
         );
 
         $subject->export($dsaKeyChain);

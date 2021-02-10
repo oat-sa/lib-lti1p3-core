@@ -30,7 +30,8 @@ use OAT\Library\Lti1p3Core\Security\Jwt\Configuration\ConfigurationFactory;
 use OAT\Library\Lti1p3Core\Security\Jwt\Token;
 use OAT\Library\Lti1p3Core\Security\Jwt\TokenInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyInterface;
-use Ramsey\Uuid\Uuid;
+use OAT\Library\Lti1p3Core\Util\Generator\IdGenerator;
+use OAT\Library\Lti1p3Core\Util\Generator\IdGeneratorInterface;
 use Throwable;
 
 class Builder implements BuilderInterface
@@ -38,9 +39,13 @@ class Builder implements BuilderInterface
     /** @var ConfigurationFactory */
     private $factory;
 
-    public function __construct(ConfigurationFactory $factory = null)
+    /** @var IdGeneratorInterface */
+    private $generator;
+
+    public function __construct(ConfigurationFactory $factory = null, IdGeneratorInterface $generator = null)
     {
         $this->factory = $factory ?? new ConfigurationFactory();
+        $this->generator = $generator ?? new IdGenerator();
     }
 
     /**
@@ -60,7 +65,7 @@ class Builder implements BuilderInterface
             $claims = array_merge(
                 $claims,
                 [
-                    MessagePayloadInterface::CLAIM_JTI => Uuid::uuid4()->toString(),
+                    MessagePayloadInterface::CLAIM_JTI => $this->generator->generate(),
                     MessagePayloadInterface::CLAIM_IAT => $now->toDateTimeImmutable(),
                     MessagePayloadInterface::CLAIM_NBF => $now->toDateTimeImmutable(),
                     MessagePayloadInterface::CLAIM_EXP => $now->addSeconds(MessagePayloadInterface::TTL)->toDateTimeImmutable(),

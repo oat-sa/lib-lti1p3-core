@@ -146,7 +146,7 @@ class ClientRepository implements ClientRepositoryInterface
         }
 
         if (!$this->validator->validate($token, $key)) {
-            $this->logger->error('Invalid client_assertion JWT signature');
+            $this->logger->error('Invalid client_assertion JWT');
 
             return false;
         }

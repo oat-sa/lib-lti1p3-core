@@ -24,12 +24,9 @@ namespace OAT\Library\Lti1p3Core\Tests\Integration\Service\Server\Repository;
 
 use Carbon\Carbon;
 use Exception;
-use Lcobucci\JWT\Builder;
-use Lcobucci\JWT\Signer\Key;
-use Lcobucci\JWT\Signer\Rsa\Sha256;
-use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Security\Jwks\Fetcher\JwksFetcherInterface;
+use OAT\Library\Lti1p3Core\Security\Key\Key;
 use OAT\Library\Lti1p3Core\Service\Server\Entity\Client;
 use OAT\Library\Lti1p3Core\Service\Server\Grant\ClientAssertionCredentialsGrant;
 use OAT\Library\Lti1p3Core\Service\Server\Repository\ClientRepository;
@@ -105,7 +102,7 @@ class ClientRepositoryTest extends TestCase
         $this->assertTrue(
             $this->logger->hasLog(
                 LogLevel::ERROR,
-                'Cannot parse the client_assertion JWT: The JWT string must have two dots'
+                'Cannot parse the client_assertion JWT: Cannot parse token: The JWT string must have two dots'
             )
         );
     }
@@ -128,7 +125,7 @@ class ClientRepositoryTest extends TestCase
         );
 
         $this->assertFalse($result);
-        $this->assertTrue($this->logger->hasLog(LogLevel::ERROR, 'The client_assertion JWT is expired'));
+        $this->assertTrue($this->logger->hasLog(LogLevel::ERROR, 'Invalid client_assertion JWT'));
     }
 
     public function testValidateClientFailureWithInvalidIdentifier(): void
@@ -145,22 +142,6 @@ class ClientRepositoryTest extends TestCase
 
         $this->assertFalse($result);
         $this->assertTrue($this->logger->hasLog(LogLevel::ERROR, 'Cannot find registration for client_id: invalid'));
-    }
-
-    public function testValidateClientFailureWithInvalidAudience(): void
-    {
-        $registration = $this->createTestRegistration();
-
-        $secret = $this->generateClientAssertion($registration, 'invalid');
-
-        $result = $this->subject->validateClient(
-            $registration->getClientId(),
-            $secret,
-            ClientAssertionCredentialsGrant::GRANT_IDENTIFIER
-        );
-
-        $this->assertFalse($result);
-        $this->assertTrue($this->logger->hasLog(LogLevel::ERROR, 'Invalid audience: invalid'));
     }
 
     public function testValidateClientFailureWithJWKSFetchError(): void
@@ -208,22 +189,11 @@ class ClientRepositoryTest extends TestCase
         );
 
         $this->assertFalse($result);
-        $this->assertTrue($this->logger->hasLog(LogLevel::ERROR, 'Invalid JWT signature'));
+        $this->assertTrue($this->logger->hasLog(LogLevel::ERROR, 'Invalid client_assertion JWT'));
     }
 
     private function generateClientAssertion(RegistrationInterface $registration, string $audience = null): string
     {
-        $now = Carbon::now();
-
-        return (new Builder())
-            ->withHeader(MessagePayloadInterface::HEADER_KID, $registration->getToolKeyChain()->getIdentifier())
-            ->identifiedBy(sprintf('%s-%s', $registration->getIdentifier(), $now->getPreciseTimestamp()))
-            ->issuedBy($registration->getTool()->getAudience())
-            ->relatedTo($registration->getClientId())
-            ->permittedFor($audience ?? $registration->getPlatform()->getAudience())
-            ->issuedAt($now->getTimestamp())
-            ->expiresAt($now->addSeconds(MessagePayloadInterface::TTL)->getTimestamp())
-            ->getToken(new Sha256(), $registration->getToolKeyChain()->getPrivateKey())
-            ->__toString();
+        return $this->createTestClientAssertion($registration);
     }
 }

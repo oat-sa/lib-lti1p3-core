@@ -23,7 +23,6 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Traits;
 
 use Carbon\Carbon;
-use Lcobucci\JWT\Signer\Rsa\Sha256;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Security\Jwt\Builder\Builder;
@@ -39,6 +38,7 @@ use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticationResult;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticationResultInterface;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
+use OAT\Library\Lti1p3Core\Util\Generator\IdGeneratorInterface;
 
 trait SecurityTestingTrait
 {
@@ -53,8 +53,10 @@ trait SecurityTestingTrait
             $identifier,
             $keySetName,
             $publicKey ?? getenv('TEST_KEYS_ROOT_DIR') . '/public.key',
+            KeyInterface::DEFAULT_ALGORITHM,
             $privateKey ?? getenv('TEST_KEYS_ROOT_DIR') . '/private.key',
-            $privateKeyPassPhrase
+            $privateKeyPassPhrase,
+            KeyInterface::DEFAULT_ALGORITHM
         );
     }
 
@@ -63,7 +65,7 @@ trait SecurityTestingTrait
         array $claims = [],
         KeyInterface $key = null
     ): TokenInterface {
-        return (new Builder)->build(
+        return (new Builder(null, $this->createTestIdGenerator()))->build(
             $headers,
             $claims,
             $key ?? $this->createTestKeyChain()->getPrivateKey()
@@ -80,9 +82,9 @@ trait SecurityTestingTrait
         return (new Validator())->validate($token, $key);
     }
 
-    private function createTestClientAssertion(RegistrationInterface $registration, array $scopes = []): string
+    private function createTestClientAssertion(RegistrationInterface $registration): string
     {
-        $assertion =  $this->buildJwt(
+        $assertion = $this->buildJwt(
             [
                 MessagePayloadInterface::HEADER_KID => $registration->getToolKeyChain()->getIdentifier()
             ],
@@ -99,7 +101,7 @@ trait SecurityTestingTrait
 
     private function createTestClientAccessToken(RegistrationInterface $registration, array $scopes = []): string
     {
-        $accessToken =  $this->buildJwt(
+        $accessToken = $this->buildJwt(
             [],
             [
                 MessagePayloadInterface::CLAIM_AUD => $registration->getClientId(),
@@ -109,6 +111,25 @@ trait SecurityTestingTrait
         );
 
         return $accessToken->toString();
+    }
+
+    private function createTestIdGenerator(string $generatedId = null): IdGeneratorInterface
+    {
+        return new class ($generatedId) implements IdGeneratorInterface
+        {
+            /** @var string */
+            private $generatedId;
+
+            public function __construct(string $generatedId = null)
+            {
+                $this->generatedId = $generatedId ?? 'id';
+            }
+
+            public function generate(): string
+            {
+                return $this->generatedId;
+            }
+        };
     }
 
     private function createTestUserAuthenticator(

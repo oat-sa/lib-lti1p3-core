@@ -64,24 +64,24 @@ class PlatformOriginatingLaunchBuilderTest extends TestCase
         $this->assertInstanceOf(LtiMessageInterface::class, $result);
 
         $this->assertEquals($registration->getTool()->getOidcInitiationUrl(), $result->getUrl());
-        $this->assertEquals($registration->getPlatform()->getAudience(), $result->getMandatoryParameter('iss'));
-        $this->assertEquals('loginHint', $result->getMandatoryParameter('login_hint'));
-        $this->assertEquals('targetLinkUri', $result->getMandatoryParameter('target_link_uri'));
-        $this->assertEquals('deploymentIdentifier', $result->getMandatoryParameter('lti_deployment_id'));
-        $this->assertEquals($registration->getClientId(), $result->getMandatoryParameter('client_id'));
+        $this->assertEquals($registration->getPlatform()->getAudience(), $result->getParameters()->getMandatory('iss'));
+        $this->assertEquals('loginHint', $result->getParameters()->getMandatory('login_hint'));
+        $this->assertEquals('targetLinkUri', $result->getParameters()->getMandatory('target_link_uri'));
+        $this->assertEquals('deploymentIdentifier', $result->getParameters()->getMandatory('lti_deployment_id'));
+        $this->assertEquals($registration->getClientId(), $result->getParameters()->getMandatory('client_id'));
 
-        $ltiMessageHintToken = $this->parseJwt($result->getMandatoryParameter('lti_message_hint'));
+        $ltiMessageHintToken = $this->parseJwt($result->getParameters()->getMandatory('lti_message_hint'));
 
         $this->assertTrue($this->verifyJwt($ltiMessageHintToken, $registration->getPlatformKeyChain()->getPublicKey()));
 
         $this->assertEquals(
             ['role'],
-            $ltiMessageHintToken->getClaim(LtiMessagePayloadInterface::CLAIM_LTI_ROLES)
+            $ltiMessageHintToken->getClaims()->get(LtiMessagePayloadInterface::CLAIM_LTI_ROLES)
         );
-        $this->assertEquals('b', $ltiMessageHintToken->getClaim('a'));
+        $this->assertEquals('b', $ltiMessageHintToken->getClaims()->get('a'));
         $this->assertEquals(
             'contextIdentifier',
-            $ltiMessageHintToken->getClaim(LtiMessagePayloadInterface::CLAIM_LTI_CONTEXT)['id'] ?? null
+            $ltiMessageHintToken->getClaims()->get(LtiMessagePayloadInterface::CLAIM_LTI_CONTEXT)['id'] ?? null
         );
     }
 

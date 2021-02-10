@@ -191,7 +191,7 @@ class ToolLaunchValidator extends AbstractLaunchValidator
      */
     private function validatePayloadNonce(LtiMessagePayloadInterface $payload): self
     {
-        if (!$payload->getToken()->getClaims()->has(LtiMessagePayloadInterface::CLAIM_NONCE)) {
+        if (empty($payload->getToken()->getClaims()->get(LtiMessagePayloadInterface::CLAIM_NONCE))) {
             throw new LtiException('ID token nonce claim is missing');
         }
 

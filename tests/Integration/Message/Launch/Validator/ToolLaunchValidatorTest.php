@@ -117,18 +117,16 @@ class ToolLaunchValidatorTest extends TestCase
 
         $this->assertEquals(
             [
-                'ID token is not expired',
+                'ID token validation success',
                 'ID token kid header is provided',
                 'ID token version claim is valid',
                 'ID token message_type claim is valid',
                 'ID token roles claim is valid',
                 'ID token user identifier (sub) claim is valid',
-                'ID token signature validation success',
                 'ID token nonce claim is valid',
                 'ID token deployment_id claim valid for this registration',
                 'ID token message type claim LtiResourceLinkRequest requirements are valid',
-                'State is not expired',
-                'State signature validation success',
+                'State validation success',
             ],
             $result->getSuccesses()
         );
@@ -160,18 +158,16 @@ class ToolLaunchValidatorTest extends TestCase
 
         $this->assertEquals(
             [
-                'ID token is not expired',
+                'ID token validation success',
                 'ID token kid header is provided',
                 'ID token version claim is valid',
                 'ID token message_type claim is valid',
                 'ID token roles claim is valid',
                 'ID token user identifier (sub) claim is valid',
-                'ID token signature validation success',
                 'ID token nonce claim is valid',
                 'ID token deployment_id claim valid for this registration',
                 'ID token message type claim LtiDeepLinkingRequest requirements are valid',
-                'State is not expired',
-                'State signature validation success',
+                'State validation success',
             ],
             $result->getSuccesses()
         );
@@ -209,18 +205,16 @@ class ToolLaunchValidatorTest extends TestCase
 
         $this->assertEquals(
             [
-                'ID token is not expired',
+                'ID token validation success',
                 'ID token kid header is provided',
                 'ID token version claim is valid',
                 'ID token message_type claim is valid',
                 'ID token roles claim is valid',
                 'ID token user identifier (sub) claim is valid',
-                'ID token signature validation success',
                 'ID token nonce claim is valid',
                 'ID token deployment_id claim valid for this registration',
                 'ID token message type claim LtiStartProctoring requirements are valid',
-                'State is not expired',
-                'State signature validation success',
+                'State validation success',
             ],
             $result->getSuccesses()
         );
@@ -308,7 +302,7 @@ class ToolLaunchValidatorTest extends TestCase
 
         $this->assertInstanceOf(LaunchValidationResult::class, $result);
         $this->assertTrue($result->hasError());
-        $this->assertEquals('ID token is expired', $result->getError());
+        $this->assertEquals('ID token validation failure', $result->getError());
     }
 
     public function testValidatePlatformOriginatingLaunchFailureWithExpiredState(): void
@@ -338,15 +332,15 @@ class ToolLaunchValidatorTest extends TestCase
         $request = $this->createServerRequest('GET', sprintf(
             '%s?id_token=%s&state=%s',
             $this->registration->getTool()->getLaunchUrl(),
-            $token->__toString(),
-            $state->__toString()
+            $token->toString(),
+            $state->toString()
         ));
 
         $result = $this->subject->validatePlatformOriginatingLaunch($request);
 
         $this->assertInstanceOf(LaunchValidationResult::class, $result);
         $this->assertTrue($result->hasError());
-        $this->assertEquals('State is expired', $result->getError());
+        $this->assertEquals('State validation failure', $result->getError());
     }
 
     /**
@@ -367,7 +361,7 @@ class ToolLaunchValidatorTest extends TestCase
             '%s?id_token=%s&state=%s',
             $this->registration->getTool()->getLaunchUrl(),
             $token->toString(),
-            $this->buildJwt()
+            $this->buildJwt()->toString()
         ));
 
         $result = $this->subject->validatePlatformOriginatingLaunch($request);

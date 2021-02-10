@@ -61,7 +61,7 @@ class OidcAuthenticatorTest extends TestCase
     public function testAuthenticationFailureOnExpiredMessageHint(): void
     {
         $this->expectException(LtiException::class);
-        $this->expectExceptionMessage('Message hint expired');
+        $this->expectExceptionMessage('Invalid message hint');
 
         $registration = $this->createTestRegistration();
 
@@ -70,15 +70,23 @@ class OidcAuthenticatorTest extends TestCase
             [
                 MessagePayloadInterface::HEADER_KID => $registration->getToolKeyChain()->getIdentifier()
             ],
-            [],
+            [
+                MessagePayloadInterface::CLAIM_REGISTRATION_ID => $registration->getIdentifier()
+            ],
             $registration->getToolKeyChain()->getPrivateKey()
         );
         Carbon::setTestNow();
 
+        $this->repositoryMock
+            ->expects($this->once())
+            ->method('find')
+            ->with($registration->getIdentifier())
+            ->willReturn($registration);
+
         $request = $this->createServerRequest(
             'GET',
             sprintf('http://platform.com/init?%s', http_build_query([
-                'lti_message_hint' => $messageHint->__toString(),
+                'lti_message_hint' => $messageHint->toString(),
             ]))
         );
 
@@ -111,41 +119,7 @@ class OidcAuthenticatorTest extends TestCase
         $request = $this->createServerRequest(
             'GET',
             sprintf('http://platform.com/init?%s', http_build_query([
-                'lti_message_hint' => $messageHint->__toString(),
-            ]))
-        );
-
-        $this->subject->authenticate($request);
-    }
-
-    public function testAuthenticationFailureOnInvalidMessageHintSignature(): void
-    {
-        $this->expectException(LtiException::class);
-        $this->expectExceptionMessage('Invalid message hint signature');
-
-        $registration = $this->createTestRegistration();
-
-        $messageHint = $this->buildJwt(
-            [
-                MessagePayloadInterface::HEADER_KID => $registration->getToolKeyChain()->getIdentifier()
-            ],
-            [
-                MessagePayloadInterface::CLAIM_REGISTRATION_ID => $registration->getIdentifier()
-            ],
-            $registration->getToolKeyChain()->getPrivateKey(),
-            new Sha384()
-        );
-
-        $this->repositoryMock
-            ->expects($this->once())
-            ->method('find')
-            ->with($registration->getIdentifier())
-            ->willReturn($registration);
-
-        $request = $this->createServerRequest(
-            'GET',
-            sprintf('http://platform.com/init?%s', http_build_query([
-                'lti_message_hint' => $messageHint->__toString(),
+                'lti_message_hint' => $messageHint->toString(),
             ]))
         );
 
@@ -184,7 +158,7 @@ class OidcAuthenticatorTest extends TestCase
         $request = $this->createServerRequest(
             'GET',
             sprintf('http://platform.com/init?%s', http_build_query([
-                'lti_message_hint' => $messageHint->__toString(),
+                'lti_message_hint' => $messageHint->toString(),
                 'login_hint' => 'login_hint'
             ]))
         );
@@ -218,7 +192,7 @@ class OidcAuthenticatorTest extends TestCase
         $request = $this->createServerRequest(
             'GET',
             sprintf('http://platform.com/init?%s', http_build_query([
-                'lti_message_hint' => $messageHint->__toString(),
+                'lti_message_hint' => $messageHint->toString(),
                 'login_hint' => 'login_hint'
             ]))
         );

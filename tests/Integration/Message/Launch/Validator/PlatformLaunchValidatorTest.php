@@ -105,11 +105,10 @@ class PlatformLaunchValidatorTest extends TestCase
 
         $this->assertEquals(
             [
-                'JWT is not expired',
+                'JWT validation success',
                 'JWT kid header is provided',
                 'JWT version claim is valid',
                 'JWT message_type claim is valid',
-                'JWT signature validation success',
                 'JWT nonce claim is valid',
                 'JWT deployment_id claim valid for this registration',
                 'JWT message type claim LtiDeepLinkingResponse requirements are valid',
@@ -132,7 +131,7 @@ class PlatformLaunchValidatorTest extends TestCase
 
         $this->assertInstanceOf(LaunchValidationResult::class, $result);
         $this->assertTrue($result->hasError());
-        $this->assertEquals('JWT is expired', $result->getError());
+        $this->assertEquals('JWT validation failure', $result->getError());
     }
 
     public function testValidateToolOriginatingLaunchFallbackOnJwks(): void

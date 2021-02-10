@@ -20,17 +20,11 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Security\Key;
+namespace OAT\Library\Lti1p3Core\Util\Generator;
 
-interface KeyChainFactoryInterface
+use Ramsey\Uuid\Uuid;
+
+interface IdGeneratorInterface
 {
-    public function create(
-        string $identifier,
-        string $keySetName,
-        $publicKey,
-        string $publicKeyAlgorithm = KeyInterface::DEFAULT_ALGORITHM,
-        $privateKey = null,
-        string $privateKeyPassPhrase = null,
-        string $privateKeyAlgorithm = KeyInterface::DEFAULT_ALGORITHM
-    ): KeyChainInterface;
+    public function generate(): string;
 }
