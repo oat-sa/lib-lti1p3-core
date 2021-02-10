@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Security\Jwt\Signer;
 
 use Lcobucci\JWT\Signer;
+use Lcobucci\JWT\Signer\Ecdsa\MultibyteStringConverter;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 
@@ -35,11 +36,11 @@ class SignerFactory
     {
         switch ($algorithm) {
             case 'ES256';
-                return new Signer\Ecdsa\Sha256();
+                return new Signer\Ecdsa\Sha256(new MultibyteStringConverter());
             case 'ES384';
-                return new Signer\Ecdsa\Sha384();
+                return new Signer\Ecdsa\Sha384(new MultibyteStringConverter());
             case 'ES512';
-                return new Signer\Ecdsa\Sha512();
+                return new Signer\Ecdsa\Sha512(new MultibyteStringConverter());
             case 'HS256';
                 return new Signer\Hmac\Sha256();
             case 'HS384';

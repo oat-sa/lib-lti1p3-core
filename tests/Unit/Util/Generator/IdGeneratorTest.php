@@ -20,22 +20,29 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Security\Key;
+namespace OAT\Library\Lti1p3Core\Tests\Unit\Util\Generator;
 
-interface KeyInterface
+use OAT\Library\Lti1p3Core\Util\Generator\IdGenerator;
+use OAT\Library\Lti1p3Core\Util\Generator\IdGeneratorInterface;
+use PHPUnit\Framework\TestCase;
+
+class IdGeneratorTest extends TestCase
 {
-    public const DEFAULT_ALGORITHM = 'RS256';
-    public const FILE_PREFIX = 'file://';
+    public function testInterface(): void
+    {
+        $this->assertInstanceOf(IdGeneratorInterface::class, new IdGenerator());
+    }
 
-    public function getContent();
+    public function testUniqueGenerations(): void
+    {
+        $subject = new IdGenerator();
 
-    public function getPassPhrase(): ?string;
+        $id1 = $subject->generate();
+        $id2 = $subject->generate();
+        $id3 = $subject->generate();
 
-    public function getAlgorithm(): string;
-
-    public function isFromFile(): bool;
-
-    public function isFromArray(): bool;
-
-    public function isFromString(): bool;
+        $this->assertNotEquals($id1, $id2);
+        $this->assertNotEquals($id2, $id3);
+        $this->assertNotEquals($id1, $id3);
+    }
 }

@@ -22,9 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Security\Key;
 
-use OAT\Library\Lti1p3Core\Exception\LtiException;
-use Throwable;
-
 class KeyChainFactory implements KeyChainFactoryInterface
 {
     public function create(
@@ -36,17 +33,9 @@ class KeyChainFactory implements KeyChainFactoryInterface
         string $privateKeyPassPhrase = null,
         string $privateKeyAlgorithm = KeyInterface::DEFAULT_ALGORITHM
     ): KeyChainInterface {
-        try {
             $publicKey = new Key($publicKey, null, $publicKeyAlgorithm);
             $privateKey = $privateKey !== null ? new Key($privateKey, $privateKeyPassPhrase, $privateKeyAlgorithm) : null;
 
             return new KeyChain($identifier, $keySetName, $publicKey, $privateKey);
-        } catch (Throwable $exception) {
-            throw new LtiException(
-                sprintf('Cannot create key chain: %s', $exception->getMessage()),
-                $exception->getCode(),
-                $exception
-            );
-        }
     }
 }

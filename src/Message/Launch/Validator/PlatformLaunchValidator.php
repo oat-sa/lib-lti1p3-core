@@ -209,7 +209,7 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
             $dataToken = $this->parser->parse($payload->getDeepLinkingData());
 
             if (!$this->validator->validate($dataToken, $registration->getPlatformKeyChain()->getPublicKey())) {
-                throw new LtiException('JWT data deep linking claim signature validation failure');
+                throw new LtiException('JWT data deep linking claim validation failure');
             }
         }
 

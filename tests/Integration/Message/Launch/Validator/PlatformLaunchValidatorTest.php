@@ -200,6 +200,10 @@ class PlatformLaunchValidatorTest extends TestCase
     {
         $registration = $this->createTestRegistration();
 
+        Carbon::setTestNow(Carbon::now()->subSeconds(MessagePayloadInterface::TTL + 1));
+        $invalidDeepLinkingData = $this->buildJwt([], [], $registration->getPlatformKeyChain()->getPrivateKey());
+        Carbon::setTestNow();
+
         return [
             'Invalid registration' => [
                 [],
@@ -359,6 +363,22 @@ class PlatformLaunchValidatorTest extends TestCase
                     LtiMessagePayloadInterface::CLAIM_LTI_DEEP_LINKING_DATA => ''
                 ],
                 'JWT data deep linking claim is missing'
+            ],
+            'Invalid JWT data for deep linking response' => [
+                [
+                    MessagePayloadInterface::HEADER_KID => $registration->getPlatformKeyChain()->getIdentifier()
+                ],
+                [
+                    MessagePayloadInterface::CLAIM_ISS => $registration->getClientId(),
+                    MessagePayloadInterface::CLAIM_AUD => $registration->getPlatform()->getAudience(),
+                    LtiMessagePayloadInterface::CLAIM_LTI_VERSION => LtiMessageInterface::LTI_VERSION,
+                    LtiMessagePayloadInterface::CLAIM_LTI_MESSAGE_TYPE => LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE,
+                    LtiMessagePayloadInterface::CLAIM_LTI_ROLES => ['Learner'],
+                    LtiMessagePayloadInterface::CLAIM_NONCE => 'value',
+                    LtiMessagePayloadInterface::CLAIM_LTI_DEPLOYMENT_ID => $registration->getDefaultDeploymentId(),
+                    LtiMessagePayloadInterface::CLAIM_LTI_DEEP_LINKING_DATA => $invalidDeepLinkingData->toString()
+                ],
+                'JWT data deep linking claim validation failure'
             ]
         ];
     }

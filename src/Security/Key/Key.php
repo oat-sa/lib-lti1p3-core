@@ -55,9 +55,13 @@ class Key implements KeyInterface
         return $this->algorithm;
     }
 
-    public function isFromString(): bool
+    public function isFromFile(): bool
     {
-        return is_string($this->content);
+        if (!is_string($this->content)) {
+            return false;
+        }
+
+        return strpos($this->content, self::FILE_PREFIX) === 0;
     }
 
     public function isFromArray(): bool
@@ -65,12 +69,12 @@ class Key implements KeyInterface
         return is_array($this->content);
     }
 
-    public function isFromFile(): bool
+    public function isFromString(): bool
     {
-        if (!$this->isFromString()) {
-            return false;
+        if (is_string($this->content)) {
+            return !$this->isFromFile();
         }
 
-        return strpos($this->content, self::FILE_PREFIX) === 0;
+        return false;
     }
 }

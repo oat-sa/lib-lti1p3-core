@@ -47,18 +47,9 @@ class Collection implements CollectionInterface
         return $this;
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
     public function add(array $items): CollectionInterface
     {
-        $replaced = array_replace($this->items, $items);
-
-        if (null === $replaced) {
-            throw new InvalidArgumentException('Cannot add items to collection');
-        }
-
-        $this->items = $replaced;
+        $this->items = array_replace($this->items, $items);
 
         return $this;
     }
