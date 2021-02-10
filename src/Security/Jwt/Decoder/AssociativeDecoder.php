@@ -24,8 +24,12 @@ namespace OAT\Library\Lti1p3Core\Security\Jwt\Decoder;
 
 use JsonException;
 use Lcobucci\JWT\Encoding\CannotDecodeContent;
+use Lcobucci\JWT\Parsing\Decoder;
 
-class AssociativeDecoder
+/**
+ * @codeCoverageIgnore
+ */
+class AssociativeDecoder extends Decoder
 {
     public function jsonDecode($json)
     {
@@ -46,12 +50,4 @@ class AssociativeDecoder
         }
     }
 
-    public function base64UrlDecode($data)
-    {
-        if ($remainder = strlen($data) % 4) {
-            $data .= str_repeat('=', 4 - $remainder);
-        }
-
-        return base64_decode(strtr($data, '-_', '+/'));
-    }
 }
