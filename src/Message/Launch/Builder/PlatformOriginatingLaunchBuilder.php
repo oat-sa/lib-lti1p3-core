@@ -55,7 +55,7 @@ class PlatformOriginatingLaunchBuilder extends AbstractLaunchBuilder
             ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_ROLES, $roles)
             ->withClaim(LtiMessagePayloadInterface::CLAIM_REGISTRATION_ID, $registration->getIdentifier());
 
-        $this->applyOptionalClaims($optionalClaims);
+        $this->applyOptionalClaims($this->sanitizeClaims($optionalClaims));
 
         $ltiMessageHintPayload = $this->builder->buildMessagePayload($registration->getPlatformKeyChain());
 
@@ -70,5 +70,14 @@ class PlatformOriginatingLaunchBuilder extends AbstractLaunchBuilder
                 'client_id' => $registration->getClientId(),
             ]
         );
+    }
+
+    private function sanitizeClaims(array $claims): array
+    {
+        foreach (LtiMessagePayloadInterface::RESERVED_USER_CLAIMS as $reservedClaim) {
+            unset($claims[$reservedClaim]);
+        }
+
+        return $claims;
     }
 }

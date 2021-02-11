@@ -23,8 +23,9 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\Oidc;
 
 use Carbon\Carbon;
-use Lcobucci\JWT\Signer\Hmac\Sha384;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
+use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticator;
@@ -56,6 +57,109 @@ class OidcAuthenticatorTest extends TestCase
         $this->authenticatorMock = $this->createMock(UserAuthenticatorInterface::class);
 
         $this->subject= new OidcAuthenticator($this->repositoryMock, $this->authenticatorMock);
+    }
+
+    public function testAuthenticationSuccess(): void
+    {
+        $this->subject= new OidcAuthenticator($this->createTestRegistrationRepository(), $this->createTestUserAuthenticator());
+
+        $registration = $this->createTestRegistration();
+
+        $messageHint = $this->buildJwt(
+            [
+                MessagePayloadInterface::HEADER_KID => $registration->getToolKeyChain()->getIdentifier()
+            ],
+            [
+                LtiMessagePayloadInterface::CLAIM_LTI_TARGET_LINK_URI => 'target_link_uri',
+                LtiMessagePayloadInterface::CLAIM_REGISTRATION_ID => $registration->getIdentifier(),
+
+            ],
+            $registration->getToolKeyChain()->getPrivateKey()
+        );
+
+        $request = $this->createServerRequest(
+            'GET',
+            sprintf('http://platform.com/init?%s', http_build_query([
+                'login_hint' => 'login_hint',
+                'lti_message_hint' => $messageHint->toString(),
+                'state' => 'state'
+            ]))
+        );
+
+        $result = $this->subject->authenticate($request);
+
+        $this->assertInstanceOf(LtiMessageInterface::class, $result);
+
+        $this->assertTrue($result->getParameters()->has('id_token'));
+        $this->assertTrue($result->getParameters()->has('state'));
+
+        $idToken = $this->parseJwt($result->getParameters()->get('id_token'));
+
+        $this->assertTrue($this->verifyJwt($idToken, $registration->getPlatformKeyChain()->getPublicKey()));
+
+        $this->assertEquals(
+            'target_link_uri',
+            $idToken->getClaims()->get(LtiMessagePayloadInterface::CLAIM_LTI_TARGET_LINK_URI)
+        );
+        $this->assertEquals(
+            $registration->getIdentifier(),
+            $idToken->getClaims()->get(LtiMessagePayloadInterface::CLAIM_REGISTRATION_ID)
+        );
+    }
+
+    public function testAuthenticationSuccessWithUserIdentityClaimsSanitization(): void
+    {
+        $this->subject= new OidcAuthenticator($this->createTestRegistrationRepository(), $this->createTestUserAuthenticator());
+
+        $registration = $this->createTestRegistration();
+
+        $messageHint = $this->buildJwt(
+            [
+                MessagePayloadInterface::HEADER_KID => $registration->getToolKeyChain()->getIdentifier()
+            ],
+            [
+                LtiMessagePayloadInterface::CLAIM_LTI_TARGET_LINK_URI => 'target_link_uri',
+                LtiMessagePayloadInterface::CLAIM_REGISTRATION_ID => $registration->getIdentifier(),
+                LtiMessagePayloadInterface::CLAIM_SUB => 'sub',
+                LtiMessagePayloadInterface::CLAIM_USER_NAME => 'name',
+                LtiMessagePayloadInterface::CLAIM_USER_EMAIL => 'email',
+                LtiMessagePayloadInterface::CLAIM_USER_GIVEN_NAME => 'given_name',
+                LtiMessagePayloadInterface::CLAIM_USER_FAMILY_NAME => 'family_name',
+                LtiMessagePayloadInterface::CLAIM_USER_MIDDLE_NAME => 'middle_name',
+                LtiMessagePayloadInterface::CLAIM_USER_LOCALE => 'locale',
+                LtiMessagePayloadInterface::CLAIM_USER_PICTURE => 'picture',
+
+            ],
+            $registration->getToolKeyChain()->getPrivateKey()
+        );
+
+        $request = $this->createServerRequest(
+            'GET',
+            sprintf('http://platform.com/init?%s', http_build_query([
+                'login_hint' => 'login_hint',
+                'lti_message_hint' => $messageHint->toString(),
+                'state' => 'state'
+            ]))
+        );
+
+        $result = $this->subject->authenticate($request);
+
+        $this->assertInstanceOf(LtiMessageInterface::class, $result);
+
+        $this->assertTrue($result->getParameters()->has('id_token'));
+
+        $idToken = $this->parseJwt($result->getParameters()->get('id_token'));
+
+        $this->assertTrue($this->verifyJwt($idToken, $registration->getPlatformKeyChain()->getPublicKey()));
+
+        $this->assertEquals('userIdentifier', $idToken->getClaims()->get(LtiMessagePayloadInterface::CLAIM_SUB));
+        $this->assertEquals('userName', $idToken->getClaims()->get(LtiMessagePayloadInterface::CLAIM_USER_NAME));
+        $this->assertEquals('userEmail', $idToken->getClaims()->get(LtiMessagePayloadInterface::CLAIM_USER_EMAIL));
+        $this->assertEquals('userGivenName', $idToken->getClaims()->get(LtiMessagePayloadInterface::CLAIM_USER_GIVEN_NAME));
+        $this->assertEquals('userFamilyName', $idToken->getClaims()->get(LtiMessagePayloadInterface::CLAIM_USER_FAMILY_NAME));
+        $this->assertEquals('userMiddleName', $idToken->getClaims()->get(LtiMessagePayloadInterface::CLAIM_USER_MIDDLE_NAME));
+        $this->assertEquals('userLocale', $idToken->getClaims()->get(LtiMessagePayloadInterface::CLAIM_USER_LOCALE));
+        $this->assertEquals('userPicture', $idToken->getClaims()->get(LtiMessagePayloadInterface::CLAIM_USER_PICTURE));
     }
 
     public function testAuthenticationFailureOnExpiredMessageHint(): void

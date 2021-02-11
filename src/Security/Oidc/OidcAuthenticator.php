@@ -26,13 +26,10 @@ use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilder;
 use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilderInterface;
-use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayload;
 use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Message\LtiMessage;
-use OAT\Library\Lti1p3Core\Security\Jwt\Builder\BuilderInterface;
-use OAT\Library\Lti1p3Core\Security\Jwt\ConfigurationFactory;
 use OAT\Library\Lti1p3Core\Security\Jwt\Parser\Parser;
 use OAT\Library\Lti1p3Core\Security\Jwt\Parser\ParserInterface;
 use OAT\Library\Lti1p3Core\Security\Jwt\Validator\Validator;
@@ -106,7 +103,7 @@ class OidcAuthenticator
             }
 
             $this->builder
-                ->withClaims($originalToken->getClaims()->all())
+                ->withClaims($this->sanitizeClaims($originalToken->getClaims()->all()))
                 ->withClaim(LtiMessagePayloadInterface::CLAIM_ISS, $registration->getPlatform()->getAudience())
                 ->withClaim(LtiMessagePayloadInterface::CLAIM_AUD, $registration->getClientId());
 
@@ -135,5 +132,14 @@ class OidcAuthenticator
                 $exception
             );
         }
+    }
+
+    private function sanitizeClaims(array $claims): array
+    {
+        foreach (LtiMessagePayloadInterface::RESERVED_USER_CLAIMS as $reservedClaim) {
+            unset($claims[$reservedClaim]);
+        }
+
+        return $claims;
     }
 }

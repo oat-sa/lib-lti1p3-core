@@ -54,6 +54,17 @@ interface MessagePayloadInterface
     public const CLAIM_USER_LOCALE ='locale';
     public const CLAIM_USER_PICTURE ='picture';
 
+    public const RESERVED_USER_CLAIMS = [
+        self::CLAIM_SUB,
+        self::CLAIM_USER_NAME,
+        self::CLAIM_USER_EMAIL,
+        self::CLAIM_USER_GIVEN_NAME,
+        self::CLAIM_USER_FAMILY_NAME,
+        self::CLAIM_USER_MIDDLE_NAME,
+        self::CLAIM_USER_LOCALE,
+        self::CLAIM_USER_PICTURE,
+    ];
+
     public function getToken(): TokenInterface;
 
     public function getMandatoryClaim(string $claim);
