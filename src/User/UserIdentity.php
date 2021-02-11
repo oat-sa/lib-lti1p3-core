@@ -21,6 +21,8 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\User;
 
+use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
+
 /**
  * @see http://www.imsglobal.org/spec/lti/v1p3/#user-identity-claims-0
  */
@@ -127,15 +129,18 @@ class UserIdentity implements UserIdentityInterface
 
     public function normalize(): array
     {
-        return array_filter([
-            'sub' => $this->getIdentifier(),
-            'name' => $this->getName(),
-            'email' => $this->getEmail(),
-            'given_name' => $this->getGivenName(),
-            'family_name' => $this->getFamilyName(),
-            'middle_name' => $this->getMiddleName(),
-            'locale' => $this->getLocale(),
-            'picture' => $this->getPicture(),
-        ] + $this->additionalProperties);
+        return array_filter(
+            [
+                MessagePayloadInterface::CLAIM_SUB => $this->getIdentifier(),
+                MessagePayloadInterface::CLAIM_USER_NAME => $this->getName(),
+                MessagePayloadInterface::CLAIM_USER_EMAIL => $this->getEmail(),
+                MessagePayloadInterface::CLAIM_USER_GIVEN_NAME => $this->getGivenName(),
+                MessagePayloadInterface::CLAIM_USER_FAMILY_NAME => $this->getFamilyName(),
+                MessagePayloadInterface::CLAIM_USER_MIDDLE_NAME => $this->getMiddleName(),
+                MessagePayloadInterface::CLAIM_USER_LOCALE => $this->getLocale(),
+                MessagePayloadInterface::CLAIM_USER_PICTURE => $this->getPicture(),
+            ]
+            + $this->additionalProperties
+        );
     }
 }
