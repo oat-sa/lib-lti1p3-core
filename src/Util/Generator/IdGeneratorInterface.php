@@ -22,8 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Util\Generator;
 
-use Ramsey\Uuid\Uuid;
-
 interface IdGeneratorInterface
 {
     public function generate(): string;

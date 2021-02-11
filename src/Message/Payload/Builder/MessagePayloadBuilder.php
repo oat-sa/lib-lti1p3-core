@@ -22,19 +22,19 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Message\Payload\Builder;
 
-use OAT\Library\Lti1p3Core\Security\Jwt\Builder\Builder;
-use OAT\Library\Lti1p3Core\Security\Jwt\Builder\BuilderInterface;
-use OAT\Library\Lti1p3Core\Security\Jwt\TokenInterface;
-use OAT\Library\Lti1p3Core\Util\Collection\Collection;
-use OAT\Library\Lti1p3Core\Util\Collection\CollectionInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\MessagePayloadClaimInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayload;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
+use OAT\Library\Lti1p3Core\Security\Jwt\Builder\Builder;
+use OAT\Library\Lti1p3Core\Security\Jwt\Builder\BuilderInterface;
+use OAT\Library\Lti1p3Core\Security\Jwt\TokenInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceGenerator;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceGeneratorInterface;
+use OAT\Library\Lti1p3Core\Util\Collection\Collection;
+use OAT\Library\Lti1p3Core\Util\Collection\CollectionInterface;
 use Throwable;
 
 class MessagePayloadBuilder implements MessagePayloadBuilderInterface
