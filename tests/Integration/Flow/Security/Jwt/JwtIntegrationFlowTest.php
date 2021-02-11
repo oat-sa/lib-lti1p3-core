@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Tests\Integration\Security\Jwt;
+namespace OAT\Library\Lti1p3Core\Tests\Integration\Flow\Security\Jwt;
 
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Security\Jwt\Builder\Builder;
@@ -33,7 +33,7 @@ use OAT\Library\Lti1p3Core\Security\Jwt\Validator\ValidatorInterface;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
 use PHPUnit\Framework\TestCase;
 
-class JwtIntegrationTest extends TestCase
+class JwtIntegrationFlowTest extends TestCase
 {
     use DomainTestingTrait;
 
