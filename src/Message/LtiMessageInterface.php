@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Message;
 
+use OAT\Library\Lti1p3Core\Util\Collection\CollectionInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -41,13 +42,7 @@ interface LtiMessageInterface
 
     public function getUrl(): string;
 
-    public function getParameters(): array;
-
-    public function hasParameter(string $parameterName): bool;
-
-    public function getMandatoryParameter(string $parameterName): string;
-
-    public function getParameter(string $parameterName, string $default = null): ?string;
+    public function getParameters(): CollectionInterface;
 
     public static function fromServerRequest(ServerRequestInterface $request): LtiMessageInterface;
 

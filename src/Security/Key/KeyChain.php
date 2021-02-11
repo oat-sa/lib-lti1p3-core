@@ -22,8 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Security\Key;
 
-use Lcobucci\JWT\Signer\Key;
-
 class KeyChain implements KeyChainInterface
 {
     /** @var string */
@@ -32,33 +30,22 @@ class KeyChain implements KeyChainInterface
     /** @var string */
     private $keySetName;
 
-    /** @var string */
+    /** @var KeyInterface */
     private $publicKey;
 
-    /** @var string|null */
+    /** @var KeyInterface|null */
     private $privateKey;
-
-    /** @var string|null */
-    private $privateKeyPassPhrase;
-
-    /** @var Key|null */
-    private $cachedPublicKey;
-
-    /** @var Key|null */
-    private $cachedPrivateKey;
 
     public function __construct(
         string $identifier,
         string $keySetName,
-        string $publicKey,
-        string $privateKey = null,
-        string $privateKeyPassPhrase = null
+        Key $publicKey,
+        Key $privateKey = null
     ) {
         $this->identifier = $identifier;
         $this->keySetName = $keySetName;
         $this->publicKey = $publicKey;
         $this->privateKey = $privateKey;
-        $this->privateKeyPassPhrase = $privateKeyPassPhrase;
     }
 
     public function getIdentifier(): string
@@ -71,25 +58,13 @@ class KeyChain implements KeyChainInterface
         return $this->keySetName;
     }
 
-    public function getPublicKey(): Key
+    public function getPublicKey(): KeyInterface
     {
-        if (null === $this->cachedPublicKey) {
-            $this->cachedPublicKey = new Key($this->publicKey);
-        }
-
-        return $this->cachedPublicKey;
+        return $this->publicKey;
     }
 
-    public function getPrivateKey(): ?Key
+    public function getPrivateKey(): ?KeyInterface
     {
-        if (null === $this->privateKey) {
-            return null;
-        }
-
-        if (null === $this->cachedPrivateKey) {
-            $this->cachedPrivateKey = new Key($this->privateKey, $this->privateKeyPassPhrase);
-        }
-
-        return $this->cachedPrivateKey;
+        return $this->privateKey;
     }
 }

@@ -26,8 +26,8 @@ use Cache\Adapter\PHPArray\ArrayCachePool;
 use Carbon\Carbon;
 use GuzzleHttp\ClientInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
-use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
+use OAT\Library\Lti1p3Core\Security\Jwt\Builder\Builder;
 use OAT\Library\Lti1p3Core\Service\Client\ServiceClient;
 use OAT\Library\Lti1p3Core\Service\Client\ServiceClientInterface;
 use OAT\Library\Lti1p3Core\Service\Server\Grant\ClientAssertionCredentialsGrant;
@@ -61,7 +61,11 @@ class ServiceClientTest extends TestCase
         $this->cache = new ArrayCachePool();
         $this->clientMock = $this->createMock(ClientInterface::class);
 
-        $this->subject = new ServiceClient($this->cache, $this->clientMock);
+        $this->subject = new ServiceClient(
+            $this->cache,
+            $this->clientMock,
+            new Builder(null, $this->createTestIdGenerator())
+        );
 
         // Lock date for this test scope, to control time related claims
         Carbon::setTestNow('2020-01-01');
@@ -86,7 +90,7 @@ class ServiceClientTest extends TestCase
                         'form_params' => [
                             'grant_type' => ServiceClientInterface::GRANT_TYPE,
                             'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
-                            'client_assertion' => $this->generateTestJwtClientAssertion(),
+                            'client_assertion' => $this->createTestClientAssertion($this->registration),
                             'scope' => ''
                         ]
                     ]
@@ -193,7 +197,7 @@ class ServiceClientTest extends TestCase
                     'form_params' => [
                         'grant_type' => ServiceClientInterface::GRANT_TYPE,
                         'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
-                        'client_assertion' => $this->generateTestJwtClientAssertion(),
+                        'client_assertion' => $this->createTestClientAssertion($this->registration),
                         'scope' => '',
                     ]
                 ]
@@ -220,7 +224,7 @@ class ServiceClientTest extends TestCase
                     'form_params' => [
                         'grant_type' => ServiceClientInterface::GRANT_TYPE,
                         'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
-                        'client_assertion' => $this->generateTestJwtClientAssertion(),
+                        'client_assertion' => $this->createTestClientAssertion($this->registration),
                         'scope' => '',
                     ]
                 ]
@@ -247,7 +251,7 @@ class ServiceClientTest extends TestCase
                     'form_params' => [
                         'grant_type' => ServiceClientInterface::GRANT_TYPE,
                         'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
-                        'client_assertion' => $this->generateTestJwtClientAssertion(),
+                        'client_assertion' => $this->createTestClientAssertion($this->registration),
                         'scope' => '',
                     ]
                 ]
@@ -275,7 +279,7 @@ class ServiceClientTest extends TestCase
                         'form_params' => [
                             'grant_type' => ServiceClientInterface::GRANT_TYPE,
                             'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
-                            'client_assertion' => $this->generateTestJwtClientAssertion(),
+                            'client_assertion' => $this->createTestClientAssertion($this->registration),
                             'scope' => ''
                         ]
                     ]
@@ -294,30 +298,6 @@ class ServiceClientTest extends TestCase
             );
 
         $this->subject->request($this->registration, 'GET', 'http://example.com');
-    }
-
-    private function generateTestJwtClientAssertion(): string
-    {
-        $token = $this->buildJwt(
-            [
-                MessagePayloadInterface::HEADER_KID => $this->registration->getToolKeyChain()->getIdentifier()
-            ],
-            [
-                MessagePayloadInterface::CLAIM_JTI => sprintf(
-                    '%s-%s',
-                    $this->registration->getIdentifier(),
-                    Carbon::now()->getTimestamp()
-                ),
-                MessagePayloadInterface::CLAIM_ISS => $this->registration->getTool()->getAudience(),
-                MessagePayloadInterface::CLAIM_SUB => $this->registration->getClientId(),
-                MessagePayloadInterface::CLAIM_AUD => $this->registration->getPlatform()->getAudience(),
-                MessagePayloadInterface::CLAIM_IAT => Carbon::now()->getTimestamp(),
-                MessagePayloadInterface::CLAIM_EXP => Carbon::now()->addSeconds(MessagePayloadInterface::TTL)->getTimestamp(),
-            ],
-            $this->registration->getToolKeyChain()->getPrivateKey()
-        );
-
-        return $token->__toString();
     }
 
     private function generateAccessTokenCacheKey(RegistrationInterface $registration, array $scopes = []): string

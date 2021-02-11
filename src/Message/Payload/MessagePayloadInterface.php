@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Message\Payload;
 
-use Lcobucci\JWT\Token;
+use OAT\Library\Lti1p3Core\Security\Jwt\TokenInterface;
 
 /**
  * @see http://www.imsglobal.org/spec/lti/v1p3/#json-web-token-0
@@ -42,11 +42,30 @@ interface MessagePayloadInterface
     public const CLAIM_AUD = 'aud';
     public const CLAIM_EXP = 'exp';
     public const CLAIM_IAT = 'iat';
+    public const CLAIM_NBF = 'nbf';
     public const CLAIM_REGISTRATION_ID = 'registration_id';
     public const CLAIM_NONCE = 'nonce';
     public const CLAIM_PARAMETERS = 'parameters';
+    public const CLAIM_USER_NAME ='name';
+    public const CLAIM_USER_EMAIL = 'email';
+    public const CLAIM_USER_GIVEN_NAME ='given_name';
+    public const CLAIM_USER_FAMILY_NAME ='family_name';
+    public const CLAIM_USER_MIDDLE_NAME ='middle_name';
+    public const CLAIM_USER_LOCALE ='locale';
+    public const CLAIM_USER_PICTURE ='picture';
 
-    public function getToken(): Token;
+    public const RESERVED_USER_CLAIMS = [
+        self::CLAIM_SUB,
+        self::CLAIM_USER_NAME,
+        self::CLAIM_USER_EMAIL,
+        self::CLAIM_USER_GIVEN_NAME,
+        self::CLAIM_USER_FAMILY_NAME,
+        self::CLAIM_USER_MIDDLE_NAME,
+        self::CLAIM_USER_LOCALE,
+        self::CLAIM_USER_PICTURE,
+    ];
+
+    public function getToken(): TokenInterface;
 
     public function getMandatoryClaim(string $claim);
 

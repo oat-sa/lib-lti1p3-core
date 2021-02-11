@@ -61,14 +61,14 @@ class ToolOriginatingLaunchBuilderTest extends TestCase
 
         $this->assertEquals('platformUrl', $result->getUrl());
 
-        $token = $this->parseJwt($result->getMandatoryParameter('JWT'));
+        $token = $this->parseJwt($result->getParameters()->getMandatory('JWT'));
 
         $this->assertTrue($this->verifyJwt($token, $registration->getToolKeyChain()->getPublicKey()));
 
-        $this->assertEquals('b', $token->getClaim('a'));
+        $this->assertEquals('b', $token->getClaims()->get('a'));
         $this->assertEquals(
             'contextIdentifier',
-            $token->getClaim(LtiMessagePayloadInterface::CLAIM_LTI_CONTEXT)['id'] ?? null
+            $token->getClaims()->get(LtiMessagePayloadInterface::CLAIM_LTI_CONTEXT)['id'] ?? null
         );
     }
 

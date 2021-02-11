@@ -22,29 +22,27 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\Key;
 
-use Lcobucci\JWT\Signer\Key;
+use OAT\Library\Lti1p3Core\Security\Key\Key;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChain;
+use OAT\Library\Lti1p3Core\Security\Key\KeyInterface;
+use OAT\Library\Lti1p3Core\Tests\Traits\SecurityTestingTrait;
 use PHPUnit\Framework\TestCase;
 
 class KeyChainTest extends TestCase
 {
+    use SecurityTestingTrait;
+
     /** @var KeyChain */
     private $subject;
 
     public function setUp(): void
     {
-        $this->subject = new KeyChain(
-            'identifier',
-            'keySetName',
-            getenv('TEST_KEYS_ROOT_DIR') . '/RSA/public.key',
-            getenv('TEST_KEYS_ROOT_DIR') . '/RSA/private.key',
-            'passPhrase'
-        );
+        $this->subject = $this->createTestKeyChain();
     }
 
     public function testGetIdentifier(): void
     {
-        $this->assertEquals('identifier', $this->subject->getIdentifier());
+        $this->assertEquals('keyChainIdentifier', $this->subject->getIdentifier());
     }
 
     public function testKeySetName(): void
@@ -54,18 +52,12 @@ class KeyChainTest extends TestCase
 
     public function testGetPublicKey(): void
     {
-        $this->assertEquals(
-            new Key(getenv('TEST_KEYS_ROOT_DIR') . '/RSA/public.key'),
-            $this->subject->getPublicKey()
-        );
+        $this->assertInstanceOf(KeyInterface::class, $this->subject->getPublicKey());
     }
 
     public function testGetPrivateKey(): void
     {
-        $this->assertEquals(
-            new Key(getenv('TEST_KEYS_ROOT_DIR') . '/RSA/private.key', 'passPhrase'),
-            $this->subject->getPrivateKey()
-        );
+        $this->assertInstanceOf(KeyInterface::class, $this->subject->getPrivateKey());
     }
 
     public function testWithoutPrivateKey(): void
@@ -73,7 +65,7 @@ class KeyChainTest extends TestCase
         $subject = new KeyChain(
             'identifier',
             'keySetName',
-            getenv('TEST_KEYS_ROOT_DIR') . '/RSA/public.key'
+            new Key('test')
         );
 
         $this->assertNull($subject->getPrivateKey());

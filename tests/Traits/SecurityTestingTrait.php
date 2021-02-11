@@ -23,21 +23,22 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Traits;
 
 use Carbon\Carbon;
-use Lcobucci\JWT\Builder;
-use Lcobucci\JWT\Parser;
-use Lcobucci\JWT\Signer;
-use Lcobucci\JWT\Signer\Key;
-use Lcobucci\JWT\Signer\Rsa\Sha256;
-use Lcobucci\JWT\Token;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
-use OAT\Library\Lti1p3Core\Security\Jwt\AssociativeDecoder;
-use OAT\Library\Lti1p3Core\Security\Key\KeyChain;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
+use OAT\Library\Lti1p3Core\Security\Jwt\Builder\Builder;
+use OAT\Library\Lti1p3Core\Security\Jwt\Parser\Parser;
+use OAT\Library\Lti1p3Core\Security\Jwt\TokenInterface;
+use OAT\Library\Lti1p3Core\Security\Jwt\Validator\Validator;
+use OAT\Library\Lti1p3Core\Security\Key\KeyChainFactory;
+use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
+use OAT\Library\Lti1p3Core\Security\Key\KeyInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\Nonce;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticationResult;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticationResultInterface;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
+use OAT\Library\Lti1p3Core\Util\Generator\IdGeneratorInterface;
 
 trait SecurityTestingTrait
 {
@@ -47,48 +48,88 @@ trait SecurityTestingTrait
         string $publicKey = null,
         string $privateKey = null,
         string $privateKeyPassPhrase = null
-    ): KeyChain {
-        return new KeyChain(
+    ): KeyChainInterface {
+        return (new KeyChainFactory)->create(
             $identifier,
             $keySetName,
-            $publicKey ?? getenv('TEST_KEYS_ROOT_DIR') . '/RSA/public.key',
-            $privateKey ?? getenv('TEST_KEYS_ROOT_DIR') . '/RSA/private.key',
-            $privateKeyPassPhrase
+            $publicKey ?? getenv('TEST_KEYS_ROOT_DIR') . '/public.key',
+            KeyInterface::DEFAULT_ALGORITHM,
+            $privateKey ?? getenv('TEST_KEYS_ROOT_DIR') . '/private.key',
+            $privateKeyPassPhrase,
+            KeyInterface::DEFAULT_ALGORITHM
         );
     }
 
     private function buildJwt(
         array $headers = [],
         array $claims = [],
-        Key $key = null,
-        Signer $signer = null
-    ): Token {
-        $builder = new Builder();
-
-        foreach ($headers as $headerName => $headerValue) {
-            $builder->withHeader($headerName, $headerValue);
-        }
-
-        foreach ($claims as $claimName => $claimValue) {
-            $builder->withClaim($claimName, $claimValue);
-        };
-
-        $builder->expiresAt(Carbon::now()->addSeconds(MessagePayloadInterface::TTL)->getTimestamp());
-
-        return $builder->getToken(
-            $signer ?? new Sha256(),
+        KeyInterface $key = null
+    ): TokenInterface {
+        return (new Builder(null, $this->createTestIdGenerator()))->build(
+            $headers,
+            $claims,
             $key ?? $this->createTestKeyChain()->getPrivateKey()
         );
     }
 
-    private function parseJwt(string $tokenString): Token
+    private function parseJwt(string $tokenString): TokenInterface
     {
-        return (new Parser(new AssociativeDecoder()))->parse($tokenString);
+        return (new Parser())->parse($tokenString);
     }
 
-    private function verifyJwt(Token $token, Key $key): bool
+    private function verifyJwt(TokenInterface $token, KeyInterface $key): bool
     {
-        return $token->verify(new Sha256(), $key);
+        return (new Validator())->validate($token, $key);
+    }
+
+    private function createTestClientAssertion(RegistrationInterface $registration): string
+    {
+        $assertion = $this->buildJwt(
+            [
+                MessagePayloadInterface::HEADER_KID => $registration->getToolKeyChain()->getIdentifier()
+            ],
+            [
+                MessagePayloadInterface::CLAIM_ISS => $registration->getTool()->getAudience(),
+                MessagePayloadInterface::CLAIM_SUB => $registration->getClientId(),
+                MessagePayloadInterface::CLAIM_AUD => $registration->getPlatform()->getAudience(),
+            ],
+            $registration->getToolKeyChain()->getPrivateKey()
+        );
+
+        return $assertion->toString();
+    }
+
+    private function createTestClientAccessToken(RegistrationInterface $registration, array $scopes = []): string
+    {
+        $accessToken = $this->buildJwt(
+            [],
+            [
+                MessagePayloadInterface::CLAIM_AUD => $registration->getClientId(),
+                'scopes' => $scopes
+            ],
+            $registration->getPlatformKeyChain()->getPrivateKey()
+        );
+
+        return $accessToken->toString();
+    }
+
+    private function createTestIdGenerator(string $generatedId = null): IdGeneratorInterface
+    {
+        return new class ($generatedId) implements IdGeneratorInterface
+        {
+            /** @var string */
+            private $generatedId;
+
+            public function __construct(string $generatedId = null)
+            {
+                $this->generatedId = $generatedId ?? 'id';
+            }
+
+            public function generate(): string
+            {
+                return $this->generatedId;
+            }
+        };
     }
 
     private function createTestUserAuthenticator(
@@ -130,7 +171,7 @@ trait SecurityTestingTrait
 
         return new class ($nonces, $withAutomaticFind) implements NonceRepositoryInterface
         {
-            /** @var NonceRepositoryInterface */
+            /** @var NonceInterface[] */
             private $nonces;
 
             /** @var bool */

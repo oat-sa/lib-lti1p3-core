@@ -73,8 +73,8 @@ use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 /** @var LtiMessageInterface $message */
 
 // Main message properties you can use as you want to offer the launch to the platform users
-echo $message->getUrl();             // url of the launch
-echo $message->getParameters();      // parameters of the launch
+echo $message->getUrl();               // url of the launch
+echo $message->getParameters()->all(); // array of parameters of the launch
 
 // Or use those helpers methods to ease the launch interactions
 echo $message->toUrl();                // url with launch parameters as query parameters
@@ -242,15 +242,20 @@ $userAuthenticator = new class implements UserAuthenticatorInterface
 ```
 
 To then use it to continue OIDC fow:
+
 ```php
 <?php
 
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticator;
+use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /** @var RegistrationRepositoryInterface $registrationRepository */
 $registrationRepository = ...
+
+/** @var UserAuthenticatorInterface $userAuthenticator */
+$userAuthenticator = ...
 
 /** @var ServerRequestInterface $request */
 $request = ...
@@ -291,7 +296,7 @@ $userAuthenticator = ...
 $request = ...
 
 // Create the OIDC server
-$server = new OidcAuthenticationServer(new OidcAuthenticator($registrationRepository));
+$server = new OidcAuthenticationServer(new OidcAuthenticator($registrationRepository, $userAuthenticator));
 
 // Redirect response from OIDC authentication (via form POST)
 $response = $server->handle($request);
@@ -346,8 +351,8 @@ if (!$result->hasError()) {
     echo $result->getPayload()->getUserIdentity()->getName();  // 'userName', see platform during OIDC authentication
     
     // If needed, you can also access the OIDC state (state parameter)
-    echo $result->getState()->getToken()->__toString();    // state JWT
-    echo $result->getState()->getToken()->getClaim('jti'); // state JWT id
+    echo $result->getState()->getToken()->toString();              // state JWT
+    echo $result->getState()->getToken()->getClaims()->get('jti'); // state JWT id
 
     // If needed, you can also access the validation successes
     foreach ($result->getSuccesses() as $success) {

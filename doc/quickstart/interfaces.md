@@ -190,3 +190,26 @@ In order to retrieve and finalize scopes during grants, an implementation of the
 **Notes**:
 - the default `ScopeRepository` will just provide back scopes given at construction.
 
+### JWT interface
+
+**Default implementation**: [Token](../../src/Security/Jwt/Token.php)
+
+To customise JWT handling, an implementation of the [TokenInterface](../../src/Security/Jwt/TokenInterface.php) can be provided.
+
+### JWT builder interface
+
+**Default implementation**: [Builder](../../src/Security/Jwt/Builder/Builder.php)
+
+To customise JWT creation, an implementation of the [BuilderInterface](../../src/Security/Jwt/Builder/BuilderInterface.php) can be provided.
+
+### JWT parser interface
+
+**Default implementation**: [Parser](../../src/Security/Jwt/Parser/Parser.php)
+
+To customise JWT parsing, an implementation of the [ParserInterface](../../src/Security/Jwt/Parser/ParserInterface.php) can be provided.
+
+### JWT validator interface
+
+**Default implementation**: [Validator](../../src/Security/Jwt/Validator/Validator.php)
+
+To customise JWT validation, an implementation of the [ValidatorInterface](../../src/Security/Jwt/Validator/ValidatorInterface.php) can be provided.

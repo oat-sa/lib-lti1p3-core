@@ -22,15 +22,20 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Security\Key;
 
-class KeyChainFactory
+class KeyChainFactory implements KeyChainFactoryInterface
 {
     public function create(
         string $identifier,
         string $keySetName,
-        string $publicKey,
-        string $privateKey = null,
-        string $privateKeyPassPhrase = null
+        $publicKey,
+        string $publicKeyAlgorithm = KeyInterface::DEFAULT_ALGORITHM,
+        $privateKey = null,
+        string $privateKeyPassPhrase = null,
+        string $privateKeyAlgorithm = KeyInterface::DEFAULT_ALGORITHM
     ): KeyChainInterface {
-        return new KeyChain($identifier, $keySetName, $publicKey, $privateKey, $privateKeyPassPhrase);
+            $publicKey = new Key($publicKey, null, $publicKeyAlgorithm);
+            $privateKey = $privateKey !== null ? new Key($privateKey, $privateKeyPassPhrase, $privateKeyAlgorithm) : null;
+
+            return new KeyChain($identifier, $keySetName, $publicKey, $privateKey);
     }
 }

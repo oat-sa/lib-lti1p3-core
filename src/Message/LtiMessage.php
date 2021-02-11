@@ -22,6 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Message;
 
+use OAT\Library\Lti1p3Core\Util\Collection\Collection;
+use OAT\Library\Lti1p3Core\Util\Collection\CollectionInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -34,13 +36,13 @@ class LtiMessage implements LtiMessageInterface
     /** @var string */
     private $url;
 
-    /** @var array */
+    /** @var CollectionInterface */
     private $parameters;
 
     public function __construct(string $url, array $parameters = [])
     {
         $this->url = $url;
-        $this->parameters = $parameters;
+        $this->parameters = (new Collection())->add($parameters);;
     }
 
     public function getUrl(): string
@@ -48,31 +50,9 @@ class LtiMessage implements LtiMessageInterface
         return $this->url;
     }
 
-    public function getParameters(): array
+    public function getParameters(): CollectionInterface
     {
         return $this->parameters;
-    }
-
-    public function hasParameter(string $parameterName): bool
-    {
-        return array_key_exists($parameterName, $this->parameters);
-    }
-
-    /**
-     * @throws LtiExceptionInterface
-     */
-    public function getMandatoryParameter(string $parameterName): string
-    {
-        if (!isset($this->parameters[$parameterName])) {
-            throw new LtiException(sprintf('Mandatory parameter %s cannot be found', $parameterName));
-        }
-
-        return $this->parameters[$parameterName];
-    }
-
-    public function getParameter(string $parameterName, string $default = null): ?string
-    {
-        return $this->parameters[$parameterName] ?? $default;
     }
 
     /**
@@ -97,7 +77,7 @@ class LtiMessage implements LtiMessageInterface
 
     public function toUrl(): string
     {
-        return sprintf('%s?%s', $this->url, http_build_query(array_filter($this->getParameters())));
+        return sprintf('%s?%s', $this->url, http_build_query(array_filter($this->getParameters()->all())));
     }
 
     public function toHtmlLink(string $title, array $attributes = []): string
@@ -114,9 +94,10 @@ class LtiMessage implements LtiMessageInterface
     public function toHtmlRedirectForm(bool $autoSubmit = true): string
     {
         $formInputs = [];
-        $formId = sprintf('launch_%s', md5($this->url . implode('-', $this->getParameters())));
+        $parameters = array_filter($this->getParameters()->all());
+        $formId = sprintf('launch_%s', md5($this->url . implode('-', $parameters)));
 
-        foreach (array_filter($this->parameters) as $name => $value) {
+        foreach ($parameters as $name => $value) {
             $formInputs[] = sprintf('<input type="hidden" name="%s" value="%s"/>', $name, $value);
         }
 

@@ -22,33 +22,28 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Service\Server\Validator;
 
-use Lcobucci\JWT\Token;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
+use OAT\Library\Lti1p3Core\Security\Jwt\TokenInterface;
+use OAT\Library\Lti1p3Core\Util\Result\Result;
 
-class AccessTokenRequestValidationResult
+class AccessTokenRequestValidationResult extends Result
 {
     /** @var RegistrationInterface|null */
     private $registration;
 
-    /** @var Token|null */
+    /** @var TokenInterface|null */
     private $token;
-
-    /** @var string[] */
-    private $successes;
-
-    /** @var string|null */
-    private $error;
 
     public function __construct(
         RegistrationInterface $registration = null,
-        Token $token = null,
+        TokenInterface $token = null,
         array $successes = [],
         string $error = null
     ) {
         $this->registration = $registration;
         $this->token = $token;
-        $this->successes = $successes;
-        $this->error = $error;
+
+        parent::__construct($successes, $error);
     }
 
     public function getRegistration(): ?RegistrationInterface
@@ -56,42 +51,13 @@ class AccessTokenRequestValidationResult
         return $this->registration;
     }
 
-    public function getToken(): ?Token
+    public function getToken(): ?TokenInterface
     {
         return $this->token;
     }
 
     public function getScopes(): array
     {
-        return $this->token->getClaim('scopes', []);
-    }
-
-    public function addSuccess(string $success): self
-    {
-        $this->successes[] = $success;
-
-        return $this;
-    }
-
-    public function getSuccesses(): array
-    {
-        return $this->successes;
-    }
-
-    public function hasError(): bool
-    {
-        return null !== $this->error;
-    }
-
-    public function setError(string $error): self
-    {
-        $this->error = $error;
-
-        return $this;
-    }
-
-    public function getError(): ?string
-    {
-        return $this->error;
+        return $this->token->getClaims()->get('scopes', []);
     }
 }

@@ -22,11 +22,11 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Traits;
 
+use OAT\Library\Lti1p3Core\Platform\Platform;
+use OAT\Library\Lti1p3Core\Platform\PlatformInterface;
 use OAT\Library\Lti1p3Core\Registration\Registration;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
-use OAT\Library\Lti1p3Core\Platform\Platform;
-use OAT\Library\Lti1p3Core\Platform\PlatformInterface;
 use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLink;
 use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLinkInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
@@ -65,7 +65,7 @@ trait DomainTestingTrait
     private function createTestTool(
         string $identifier = 'toolIdentifier',
         string $name = 'toolName',
-        string $audience = 'platformAudience',
+        string $audience = 'toolAudience',
         string $oidcInitiationUrl = 'http://tool.com/oidc-init',
         string $launchUrl = 'http://tool.com/launch',
         string $deepLinkingUrl = 'http://tool.com/deep-launch'

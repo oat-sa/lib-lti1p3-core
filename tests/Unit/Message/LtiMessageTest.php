@@ -22,7 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Message;
 
-use OAT\Library\Lti1p3Core\Exception\LtiException;
+use InvalidArgumentException;
+use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessage;
 use OAT\Library\Lti1p3Core\Tests\Traits\NetworkTestingTrait;
 use PHPUnit\Framework\TestCase;
@@ -51,26 +52,26 @@ class LtiMessageTest extends TestCase
 
     public function testGetParameter(): void
     {
-        $this->assertEquals('value', $this->subject->getParameter('parameter'));
+        $this->assertEquals('value', $this->subject->getParameters()->get('parameter'));
 
-        $this->assertNull($this->subject->getParameter('invalid'));
-        $this->assertEquals('default', $this->subject->getParameter('invalid', 'default'));
+        $this->assertNull($this->subject->getParameters()->get('invalid'));
+        $this->assertEquals('default', $this->subject->getParameters()->get('invalid', 'default'));
     }
 
     public function testHasParameter(): void
     {
-        $this->assertTrue($this->subject->hasParameter('parameter'));
-        $this->assertFalse($this->subject->hasParameter('invalid'));
+        $this->assertTrue($this->subject->getParameters()->has('parameter'));
+        $this->assertFalse($this->subject->getParameters()->has('invalid'));
     }
 
     public function testGetMandatoryParameter(): void
     {
-        $this->assertEquals('value', $this->subject->getMandatoryParameter('parameter'));
+        $this->assertEquals('value', $this->subject->getParameters()->getMandatory('parameter'));
 
-        $this->expectException(LtiException::class);
-        $this->expectExceptionMessage('Mandatory parameter invalid cannot be found');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot find item invalid into collection');
 
-        $this->subject->getMandatoryParameter('invalid');
+        $this->subject->getParameters()->getMandatory('invalid');
     }
 
     public function testFromGetServerRequest(): void
@@ -84,7 +85,7 @@ class LtiMessageTest extends TestCase
 
         $this->assertInstanceOf(LtiMessage::class, $subject);
         $this->assertEquals('http://example.com?parameter=value', $subject->getUrl());
-        $this->assertEquals('value', $subject->getParameter('parameter'));
+        $this->assertEquals('value', $subject->getParameters()->get('parameter'));
     }
 
     public function testFromPostServerRequest(): void
@@ -101,12 +102,12 @@ class LtiMessageTest extends TestCase
 
         $this->assertInstanceOf(LtiMessage::class, $subject);
         $this->assertEquals('http://example.com', $subject->getUrl());
-        $this->assertEquals('value', $subject->getParameter('parameter'));
+        $this->assertEquals('value', $subject->getParameters()->get('parameter'));
     }
 
     public function testFromInvalidServerRequest(): void
     {
-        $this->expectException(LtiException::class);
+        $this->expectException(LtiExceptionInterface::class);
         $this->expectExceptionMessage('Unsupported request method PUT');
 
         $request = $this->createServerRequest('PUT', 'http://example.com');

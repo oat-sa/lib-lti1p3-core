@@ -24,10 +24,10 @@ namespace OAT\Library\Lti1p3Core\Message\Launch\Builder;
 
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
-use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLinkInterface;
+use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
-use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLinkInterface;
 use Throwable;
 
 /**

@@ -25,9 +25,10 @@ namespace OAT\Library\Lti1p3Core\Security\Jwks\Fetcher;
 use CoderCat\JWKToPEM\JWKConverter;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
-use Lcobucci\JWT\Signer\Key;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
+use OAT\Library\Lti1p3Core\Security\Key\Key;
+use OAT\Library\Lti1p3Core\Security\Key\KeyInterface;
 use Psr\Cache\CacheException;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
@@ -66,7 +67,7 @@ class JwksFetcher implements JwksFetcherInterface
     /**
      * @throws LtiExceptionInterface
      */
-    public function fetchKey(string $jwksUrl, string $kId): Key
+    public function fetchKey(string $jwksUrl, string $kId): KeyInterface
     {
         $jwksData = $this->fetchJwksDataFromCache($jwksUrl);
 
@@ -150,20 +151,12 @@ class JwksFetcher implements JwksFetcherInterface
         }
     }
 
-    private function findKeyFromJwksData(string $kId, array $jwksData): ?Key
+    private function findKeyFromJwksData(string $kId, array $jwksData): ?KeyInterface
     {
-        try {
-            foreach ($jwksData['keys'] ?? [] as $data) {
-                if ($data['kid'] === $kId) {
-                    return new Key($this->converter->toPEM($data));
-                }
+        foreach ($jwksData['keys'] ?? [] as $data) {
+            if ($data['kid'] === $kId) {
+                return new Key($data);
             }
-        } catch (Throwable $exception) {
-            throw new LtiException(
-                sprintf('Error during JWKS PEM conversion: %s', $exception->getMessage()),
-                $exception->getCode(),
-                $exception
-            );
         }
 
         return null;

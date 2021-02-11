@@ -22,13 +22,13 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Message\Launch\Validator;
 
-use Lcobucci\JWT\Parser;
-use Lcobucci\JWT\Signer;
-use Lcobucci\JWT\Signer\Rsa\Sha256;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Jwks\Fetcher\JwksFetcher;
 use OAT\Library\Lti1p3Core\Security\Jwks\Fetcher\JwksFetcherInterface;
-use OAT\Library\Lti1p3Core\Security\Jwt\AssociativeDecoder;
+use OAT\Library\Lti1p3Core\Security\Jwt\Parser\Parser;
+use OAT\Library\Lti1p3Core\Security\Jwt\Parser\ParserInterface;
+use OAT\Library\Lti1p3Core\Security\Jwt\Validator\Validator;
+use OAT\Library\Lti1p3Core\Security\Jwt\Validator\ValidatorInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepositoryInterface;
 
 abstract class AbstractLaunchValidator
@@ -42,10 +42,10 @@ abstract class AbstractLaunchValidator
     /** @var JwksFetcherInterface */
     protected $fetcher;
 
-    /** @var Signer */
-    protected $signer;
+    /** @var ValidatorInterface */
+    protected $validator;
 
-    /** @var Parser */
+    /** @var ParserInterface */
     protected $parser;
 
     /** @var string[] */
@@ -55,13 +55,14 @@ abstract class AbstractLaunchValidator
         RegistrationRepositoryInterface $registrationRepository,
         NonceRepositoryInterface $nonceRepository,
         JwksFetcherInterface $jwksFetcher = null,
-        Signer $signer = null
+        ValidatorInterface $validator = null,
+        ParserInterface $parser = null
     ) {
         $this->registrationRepository = $registrationRepository;
         $this->nonceRepository = $nonceRepository;
         $this->fetcher = $jwksFetcher ?? new JwksFetcher();
-        $this->signer = $signer ?? new Sha256();
-        $this->parser = new Parser(new AssociativeDecoder());
+        $this->validator = $validator ?? new Validator();
+        $this->parser = $parser ?? new Parser();
     }
 
     abstract public function getSupportedMessageTypes(): array;

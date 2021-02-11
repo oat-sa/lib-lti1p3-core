@@ -20,30 +20,48 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\Jwt;
+namespace OAT\Library\Lti1p3Core\Util\Result;
 
-use Lcobucci\JWT\Parsing\Decoder;
-use OAT\Library\Lti1p3Core\Security\Jwt\AssociativeDecoder;
-use PHPUnit\Framework\TestCase;
-use RuntimeException;
-
-class AssociativeDecoderTest extends TestCase
+class Result implements ResultInterface
 {
-    public function testItExtendVendorEncoder(): void
+    /** @var string[] */
+    private $successes;
+
+    /** @var string|null */
+    private $error;
+
+    public function __construct(array $successes = [], string $error = null)
     {
-        $this->assertInstanceOf(Decoder::class, new AssociativeDecoder());
+        $this->successes = $successes;
+        $this->error = $error;
     }
 
-    public function testItJsonDecodeAsAssociativeArray(): void
+    public function hasError(): bool
     {
-        $this->assertEquals(['a' => 'b'], (new AssociativeDecoder())->jsonDecode('{"a":"b"}'));
+        return null !== $this->error;
     }
 
-    public function testItThrowARuntimeExceptionOnInvalidJson(): void
+    public function addSuccess(string $success): ResultInterface
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Error while decoding to JSON: Syntax error');
+        $this->successes[] = $success;
 
-        (new AssociativeDecoder())->jsonDecode('invalid');
+        return $this;
+    }
+
+    public function setError(string $error): ResultInterface
+    {
+        $this->error = $error;
+
+        return $this;
+    }
+
+    public function getSuccesses(): array
+    {
+        return $this->successes;
+    }
+
+    public function getError(): ?string
+    {
+        return $this->error;
     }
 }

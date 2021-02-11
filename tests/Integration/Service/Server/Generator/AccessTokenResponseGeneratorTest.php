@@ -23,17 +23,15 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Integration\Service\Server\Generator;
 
 use Cache\Adapter\PHPArray\ArrayCachePool;
-use Carbon\Carbon;
-use Lcobucci\JWT\Builder;
-use Lcobucci\JWT\Parser;
-use Lcobucci\JWT\Signer\Rsa\Sha256;
 use League\OAuth2\Server\Exception\OAuthServerException;
-use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
+use OAT\Library\Lti1p3Core\Security\Key\Key;
+use OAT\Library\Lti1p3Core\Security\Key\KeyChain;
+use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
-use OAT\Library\Lti1p3Core\Service\Server\Generator\AccessTokenResponseGenerator;
 use OAT\Library\Lti1p3Core\Service\Server\Entity\Scope;
 use OAT\Library\Lti1p3Core\Service\Server\Factory\AuthorizationServerFactory;
+use OAT\Library\Lti1p3Core\Service\Server\Generator\AccessTokenResponseGenerator;
 use OAT\Library\Lti1p3Core\Service\Server\Grant\ClientAssertionCredentialsGrant;
 use OAT\Library\Lti1p3Core\Service\Server\Repository\AccessTokenRepository;
 use OAT\Library\Lti1p3Core\Service\Server\Repository\ClientRepository;
@@ -81,7 +79,7 @@ class AccessTokenResponseGeneratorTest extends TestCase
 
     public function testGenerate(): void
     {
-        $keyChain = $this->createTestKeyChain();
+        $keyChain = $this->generateTestKeyChain();
         $this->keyChainRepositoryMock
             ->expects($this->once())
             ->method('find')
@@ -106,15 +104,15 @@ class AccessTokenResponseGeneratorTest extends TestCase
         $this->assertEquals('Bearer', $resultData['token_type']);
         $this->assertEquals(3600, $resultData['expires_in']);
 
-        $token = (new Parser())->parse($resultData['access_token']);
+        $token = $this->parseJwt($resultData['access_token']);
 
-        $this->assertEquals($registration->getClientId(), $token->getClaim('aud'));
-        $this->assertEquals([], $token->getClaim('scopes'));
+        $this->assertEquals($registration->getClientId(), current($token->getClaims()->get('aud')));
+        $this->assertEquals([], $token->getClaims()->get('scopes'));
     }
 
     public function testGenerateWithScopes(): void
     {
-        $keyChain = $this->createTestKeyChain();
+        $keyChain = $this->generateTestKeyChain();
         $this->keyChainRepositoryMock
             ->expects($this->once())
             ->method('find')
@@ -143,15 +141,15 @@ class AccessTokenResponseGeneratorTest extends TestCase
         $this->assertEquals('Bearer', $resultData['token_type']);
         $this->assertEquals(3600, $resultData['expires_in']);
 
-        $token = (new Parser())->parse($resultData['access_token']);
+        $token = $this->parseJwt($resultData['access_token']);
 
-        $this->assertEquals($registration->getClientId(), $token->getClaim('aud'));
-        $this->assertEquals(['scope1', 'scope2'], $token->getClaim('scopes'));
+        $this->assertEquals($registration->getClientId(), current($token->getClaims()->get('aud')));
+        $this->assertEquals(['scope1', 'scope2'], $token->getClaims()->get('scopes'));
     }
 
     public function testGenerateWithPartialScopes(): void
     {
-        $keyChain = $this->createTestKeyChain();
+        $keyChain = $this->generateTestKeyChain();
         $this->keyChainRepositoryMock
             ->expects($this->once())
             ->method('find')
@@ -180,10 +178,10 @@ class AccessTokenResponseGeneratorTest extends TestCase
         $this->assertEquals('Bearer', $resultData['token_type']);
         $this->assertEquals(3600, $resultData['expires_in']);
 
-        $token = (new Parser())->parse($resultData['access_token']);
+        $token = $this->parseJwt($resultData['access_token']);
 
-        $this->assertEquals($registration->getClientId(), $token->getClaim('aud'));
-        $this->assertEquals(['scope1'], $token->getClaim('scopes'));
+        $this->assertEquals($registration->getClientId(), current($token->getClaims()->get('aud')));
+        $this->assertEquals(['scope1'], $token->getClaims()->get('scopes'));
     }
 
     public function testGenerateWithInvalidCredentials(): void
@@ -191,7 +189,7 @@ class AccessTokenResponseGeneratorTest extends TestCase
         $this->expectException(OAuthServerException::class);
         $this->expectExceptionMessage('The user credentials were incorrect');
 
-        $keyChain = $this->createTestKeyChain();
+        $keyChain = $this->generateTestKeyChain();
         $this->keyChainRepositoryMock
             ->expects($this->once())
             ->method('find')
@@ -204,7 +202,7 @@ class AccessTokenResponseGeneratorTest extends TestCase
             [
                 'grant_type' => ClientAssertionCredentialsGrant::GRANT_TYPE,
                 'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
-                'client_assertion' => 'invaid',
+                'client_assertion' => 'invalid',
                 'scope' => ''
             ]
         );
@@ -220,7 +218,7 @@ class AccessTokenResponseGeneratorTest extends TestCase
         $this->expectException(OAuthServerException::class);
         $this->expectExceptionMessage('The requested scope is invalid, unknown, or malformed');
 
-        $keyChain = $this->createTestKeyChain();
+        $keyChain = $this->generateTestKeyChain();
         $this->keyChainRepositoryMock
             ->expects($this->once())
             ->method('find')
@@ -263,20 +261,19 @@ class AccessTokenResponseGeneratorTest extends TestCase
         $this->assertEquals(401, $result->getStatusCode());
     }
 
+    private function generateTestKeyChain(): KeyChainInterface
+    {
+       return new KeyChain(
+            'identifier',
+            'setName',
+            new Key(__DIR__ . '/../../../../Resource/Key/RSA/public.key'),
+            new Key(__DIR__ . '/../../../../Resource/Key/RSA/private.key')
+        );
+    }
+
     private function generateCredentials(RegistrationInterface $registration, array $scopes = []): array
     {
-        $now = Carbon::now();
-
-        $clientAssertion =  (new Builder())
-            ->withHeader(MessagePayloadInterface::HEADER_KID, $registration->getToolKeyChain()->getIdentifier())
-            ->identifiedBy(sprintf('%s-%s', $registration->getIdentifier(), $now->getPreciseTimestamp()))
-            ->issuedBy($registration->getTool()->getAudience())
-            ->relatedTo($registration->getClientId())
-            ->permittedFor($registration->getPlatform()->getAudience())
-            ->issuedAt($now->getTimestamp())
-            ->expiresAt($now->addSeconds(MessagePayloadInterface::TTL)->getTimestamp())
-            ->getToken(new Sha256(), $registration->getToolKeyChain()->getPrivateKey())
-            ->__toString();
+        $clientAssertion = $this->createTestClientAssertion($registration);
 
         return [
             'grant_type' => ClientAssertionCredentialsGrant::GRANT_TYPE,

@@ -1,6 +1,19 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+* Added PHP 8 support (and kept >=7.2)
+* Added algorithms support for RS384/512, HS256/384/512, ES256/384/512 (on top of RS256)
+* Added wrapper interfaces for JWT handling (builder, parser, validator), with default implementation based on [lcobucci/jwt](https://github.com/lcobucci/jwt)
+* Added multiple audiences support in JWT handling
+* Added collection, result and ids generator utils
+* Added [migration guide](https://github.com/oat-sa/lib-lti1p3-core/wiki/Migration-from-3.x-to-4.x) to document breaking changes and migration steps
+* Added more security testing tools 
+* Fixed issue [#74](https://github.com/oat-sa/lib-lti1p3-core/issues/74)
+* Updated documentation
+
 3.3.1
 -----
 
@@ -52,7 +65,7 @@ CHANGELOG
 * Added new core message layer foundations (new interfaces and abstractions)
 * Added core tool originating message layer (builder, validator, result) based on new foundations
 * Reworked (breaking changes) core platform originating message layer (builder, validator, result) based on new foundations
-* Fixed core service client audience for access token requests
+* Fixed issue [#46](https://github.com/oat-sa/lib-lti1p3-core/issues/46)
 * Updated php dependency to >= 7.2.0
 * Updated phpunit dependency to 8.5.8
 * Updated documentation

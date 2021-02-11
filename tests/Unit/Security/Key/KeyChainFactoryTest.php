@@ -24,6 +24,7 @@ namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\Key;
 
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainFactory;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
+use OAT\Library\Lti1p3Core\Security\Key\KeyInterface;
 use OAT\Library\Lti1p3Core\Tests\Traits\SecurityTestingTrait;
 use PHPUnit\Framework\TestCase;
 
@@ -41,8 +42,10 @@ class KeyChainFactoryTest extends TestCase
             $keyChain->getIdentifier(),
             $keyChain->getKeySetName(),
             $keyChain->getPublicKey()->getContent(),
+            KeyInterface::DEFAULT_ALGORITHM,
             $keyChain->getPrivateKey()->getContent(),
-            $keyChain->getPrivateKey()->getPassphrase()
+            $keyChain->getPrivateKey()->getPassphrase(),
+            KeyInterface::DEFAULT_ALGORITHM
         );
 
         $this->assertInstanceOf(KeyChainInterface::class, $result);

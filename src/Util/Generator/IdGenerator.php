@@ -20,24 +20,14 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Security\Jwt;
+namespace OAT\Library\Lti1p3Core\Util\Generator;
 
-use Lcobucci\JWT\Parsing\Decoder;
-use RuntimeException;
+use Ramsey\Uuid\Uuid;
 
-class AssociativeDecoder extends Decoder
+class IdGenerator implements IdGeneratorInterface
 {
-    public function jsonDecode($json)
+    public function generate(): string
     {
-        $data = json_decode($json, true);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new RuntimeException(
-                sprintf('Error while decoding to JSON: %s', json_last_error_msg())
-            );
-        }
-
-        return $data;
+        return Uuid::uuid4()->toString();
     }
-
 }
