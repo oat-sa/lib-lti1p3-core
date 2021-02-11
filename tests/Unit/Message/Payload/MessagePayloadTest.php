@@ -60,7 +60,7 @@ class MessagePayloadTest extends TestCase
         $this->assertEquals($this->claim, $this->subject->getMandatoryClaim(ContextClaim::class));
 
         $this->expectException(LtiException::class);
-        $this->expectExceptionMessage('Cannot read mandatory invalid claim: Requested claim is not configured');
+        $this->expectExceptionMessage('Cannot get mandatory invalid claim');
 
         $this->subject->getMandatoryClaim('invalid');
     }

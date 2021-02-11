@@ -25,14 +25,18 @@ namespace OAT\Library\Lti1p3Core\Service\Server\Repository;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Entities\ScopeEntityInterface;
 use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
+use OAT\Library\Lti1p3Core\Util\Collection\Collection;
+use OAT\Library\Lti1p3Core\Util\Collection\CollectionInterface;
 
 class ScopeRepository implements ScopeRepositoryInterface
 {
-    /** @var ScopeEntityInterface[] */
+    /** @var CollectionInterface|ScopeEntityInterface[] */
     private $scopes;
 
     public function __construct(iterable $scopes = [])
     {
+        $this->scopes = new Collection();
+
         foreach ($scopes as $scope) {
             $this->addScope($scope);
         }
@@ -40,14 +44,14 @@ class ScopeRepository implements ScopeRepositoryInterface
 
     public function addScope(ScopeEntityInterface $scope): self
     {
-        $this->scopes[$scope->getIdentifier()] = $scope;
+        $this->scopes->set($scope->getIdentifier(), $scope);
 
         return $this;
     }
 
     public function getScopeEntityByIdentifier($identifier): ?ScopeEntityInterface
     {
-        return $this->scopes[$identifier] ?? null;
+        return $this->scopes->get($identifier);
     }
 
     public function finalizeScopes(

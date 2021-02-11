@@ -25,8 +25,9 @@ namespace OAT\Library\Lti1p3Core\Message\Launch\Validator\Result;
 use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
+use OAT\Library\Lti1p3Core\Util\Result\Result;
 
-class LaunchValidationResult
+class LaunchValidationResult extends Result
 {
     /** @var RegistrationInterface|null */
     private $registration;
@@ -36,12 +37,6 @@ class LaunchValidationResult
 
     /** @var MessagePayloadInterface|null */
     private $state;
-
-    /** @var string[] */
-    private $successes;
-
-    /** @var string|null */
-    private $error;
 
     public function __construct(
         RegistrationInterface $registration = null,
@@ -53,8 +48,8 @@ class LaunchValidationResult
         $this->registration = $registration;
         $this->payload = $payload;
         $this->state = $state;
-        $this->successes = $successes;
-        $this->error = $error;
+
+        parent::__construct($successes, $error);
     }
 
     public function getRegistration(): ?RegistrationInterface
@@ -70,34 +65,5 @@ class LaunchValidationResult
     public function getState(): ?MessagePayloadInterface
     {
         return $this->state;
-    }
-
-    public function addSuccess(string $success): self
-    {
-        $this->successes[] = $success;
-
-        return $this;
-    }
-
-    public function getSuccesses(): array
-    {
-        return $this->successes;
-    }
-
-    public function hasError(): bool
-    {
-        return null !== $this->error;
-    }
-
-    public function setError(string $error): self
-    {
-        $this->error = $error;
-
-        return $this;
-    }
-
-    public function getError(): ?string
-    {
-        return $this->error;
     }
 }

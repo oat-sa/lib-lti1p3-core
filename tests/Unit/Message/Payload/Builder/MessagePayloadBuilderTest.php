@@ -102,7 +102,7 @@ class MessagePayloadBuilderTest extends TestCase
             ->buildMessagePayload($this->createTestKeyChain());
 
         $newPaylaod = $this->subject
-            ->withMessagePayloadClaims($originalPayload)
+            ->withClaims($originalPayload->getToken()->getClaims()->all())
             ->withClaim('c', 'd')
             ->buildMessagePayload($this->createTestKeyChain());
 
@@ -114,7 +114,7 @@ class MessagePayloadBuilderTest extends TestCase
     public function testItThrowsAnLtiExceptionOnFailure(): void
     {
         $this->expectException(LtiException::class);
-        $this->expectExceptionMessage('Cannot generate message token: It was not possible to parse your key');
+        $this->expectExceptionMessage('Cannot generate message token: Cannot build token');
 
         $this->subject->buildMessagePayload($this->createTestKeyChain('invalid', 'invalid', 'invalid', 'invalid'));
     }

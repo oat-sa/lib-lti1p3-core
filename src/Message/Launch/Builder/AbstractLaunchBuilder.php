@@ -26,7 +26,6 @@ use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilder;
 use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilderInterface;
-use OAT\Library\Lti1p3Core\Message\Payload\Claim\MessagePayloadClaimInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 
 abstract class AbstractLaunchBuilder
@@ -41,13 +40,7 @@ abstract class AbstractLaunchBuilder
 
     protected function applyOptionalClaims(array $optionalClaims): self
     {
-        foreach ($optionalClaims as $claimName => $claim) {
-            if ($claim instanceof MessagePayloadClaimInterface) {
-                $this->builder->withClaim($claim);
-            } else {
-                $this->builder->withClaim($claimName, $claim);
-            }
-        }
+        $this->builder->withClaims($optionalClaims);
 
         return $this;
     }

@@ -22,9 +22,10 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Service\Server\Grant;
 
-use Lcobucci\JWT\Parser;
 use League\OAuth2\Server\Exception\OAuthServerException;
 use League\OAuth2\Server\Grant\ClientCredentialsGrant;
+use OAT\Library\Lti1p3Core\Security\Jwt\Parser\Parser;
+use OAT\Library\Lti1p3Core\Security\Jwt\Parser\ParserInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
 
@@ -37,7 +38,7 @@ class ClientAssertionCredentialsGrant extends ClientCredentialsGrant
     public const GRANT_IDENTIFIER = 'client_assertion_credentials';
     public const CLIENT_ASSERTION_TYPE = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer';
 
-    /** @var Parser */
+    /** @var ParserInterface */
     private $parser;
 
     public function __construct()
@@ -73,7 +74,7 @@ class ClientAssertionCredentialsGrant extends ClientCredentialsGrant
             $token = $this->parser->parse($clientAssertion);
 
             return [
-                $token->getClaim('sub'),
+                $token->getClaims()->getMandatory('sub'),
                 $clientAssertion
             ];
         } catch (Throwable $exception) {

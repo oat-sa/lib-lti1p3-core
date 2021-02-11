@@ -24,16 +24,21 @@ namespace OAT\Library\Lti1p3Core\Security\Nonce;
 
 use Carbon\Carbon;
 use Exception;
-use Ramsey\Uuid\Uuid;
+use OAT\Library\Lti1p3Core\Util\Generator\IdGenerator;
+use OAT\Library\Lti1p3Core\Util\Generator\IdGeneratorInterface;
 
 class NonceGenerator implements NonceGeneratorInterface
 {
     /** @var int */
     private $ttl;
 
-    public function __construct(int $ttl = null)
+    /** @var IdGeneratorInterface */
+    private $generator;
+
+    public function __construct(int $ttl = null, IdGeneratorInterface $generator = null)
     {
         $this->ttl = $ttl ?? static::TTL;
+        $this->generator = $generator ?? new IdGenerator();
     }
 
     /**
@@ -42,7 +47,7 @@ class NonceGenerator implements NonceGeneratorInterface
     public function generate(int $ttl = null): NonceInterface
     {
         return new Nonce(
-            Uuid::uuid4()->toString(),
+            $this->generator->generate(),
             Carbon::now()->addSeconds($ttl ?? $this->ttl)
         );
     }

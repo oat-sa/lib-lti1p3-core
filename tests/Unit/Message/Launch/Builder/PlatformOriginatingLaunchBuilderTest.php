@@ -64,25 +64,67 @@ class PlatformOriginatingLaunchBuilderTest extends TestCase
         $this->assertInstanceOf(LtiMessageInterface::class, $result);
 
         $this->assertEquals($registration->getTool()->getOidcInitiationUrl(), $result->getUrl());
-        $this->assertEquals($registration->getPlatform()->getAudience(), $result->getMandatoryParameter('iss'));
-        $this->assertEquals('loginHint', $result->getMandatoryParameter('login_hint'));
-        $this->assertEquals('targetLinkUri', $result->getMandatoryParameter('target_link_uri'));
-        $this->assertEquals('deploymentIdentifier', $result->getMandatoryParameter('lti_deployment_id'));
-        $this->assertEquals($registration->getClientId(), $result->getMandatoryParameter('client_id'));
+        $this->assertEquals($registration->getPlatform()->getAudience(), $result->getParameters()->getMandatory('iss'));
+        $this->assertEquals('loginHint', $result->getParameters()->getMandatory('login_hint'));
+        $this->assertEquals('targetLinkUri', $result->getParameters()->getMandatory('target_link_uri'));
+        $this->assertEquals('deploymentIdentifier', $result->getParameters()->getMandatory('lti_deployment_id'));
+        $this->assertEquals($registration->getClientId(), $result->getParameters()->getMandatory('client_id'));
 
-        $ltiMessageHintToken = $this->parseJwt($result->getMandatoryParameter('lti_message_hint'));
+        $ltiMessageHintToken = $this->parseJwt($result->getParameters()->getMandatory('lti_message_hint'));
 
         $this->assertTrue($this->verifyJwt($ltiMessageHintToken, $registration->getPlatformKeyChain()->getPublicKey()));
 
         $this->assertEquals(
             ['role'],
-            $ltiMessageHintToken->getClaim(LtiMessagePayloadInterface::CLAIM_LTI_ROLES)
+            $ltiMessageHintToken->getClaims()->get(LtiMessagePayloadInterface::CLAIM_LTI_ROLES)
         );
-        $this->assertEquals('b', $ltiMessageHintToken->getClaim('a'));
+        $this->assertEquals('b', $ltiMessageHintToken->getClaims()->get('a'));
         $this->assertEquals(
             'contextIdentifier',
-            $ltiMessageHintToken->getClaim(LtiMessagePayloadInterface::CLAIM_LTI_CONTEXT)['id'] ?? null
+            $ltiMessageHintToken->getClaims()->get(LtiMessagePayloadInterface::CLAIM_LTI_CONTEXT)['id'] ?? null
         );
+    }
+
+    public function testBuildPlatformOriginatingLaunchSuccessWithUserIdentitySanitization(): void
+    {
+        $registration = $this->createTestRegistration();
+
+        $result = $this->subject->buildPlatformOriginatingLaunch(
+            $registration,
+            LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
+            'targetLinkUri',
+            'loginHint',
+            'deploymentIdentifier',
+            [],
+            [
+                'a' => 'b',
+                LtiMessagePayloadInterface::CLAIM_SUB => 'sub',
+                LtiMessagePayloadInterface::CLAIM_USER_NAME => 'name',
+                LtiMessagePayloadInterface::CLAIM_USER_EMAIL => 'email',
+                LtiMessagePayloadInterface::CLAIM_USER_GIVEN_NAME => 'given_name',
+                LtiMessagePayloadInterface::CLAIM_USER_FAMILY_NAME => 'family_name',
+                LtiMessagePayloadInterface::CLAIM_USER_MIDDLE_NAME => 'middle_name',
+                LtiMessagePayloadInterface::CLAIM_USER_LOCALE => 'locale',
+                LtiMessagePayloadInterface::CLAIM_USER_PICTURE => 'picture',
+            ]
+        );
+
+        $this->assertInstanceOf(LtiMessageInterface::class, $result);
+
+        $ltiMessageHintToken = $this->parseJwt($result->getParameters()->getMandatory('lti_message_hint'));
+
+        $this->assertTrue($this->verifyJwt($ltiMessageHintToken, $registration->getPlatformKeyChain()->getPublicKey()));
+
+        $this->assertEquals('b', $ltiMessageHintToken->getClaims()->get('a'));
+
+        $this->assertFalse($ltiMessageHintToken->getClaims()->has(LtiMessagePayloadInterface::CLAIM_SUB));
+        $this->assertFalse($ltiMessageHintToken->getClaims()->has(LtiMessagePayloadInterface::CLAIM_USER_NAME));
+        $this->assertFalse($ltiMessageHintToken->getClaims()->has(LtiMessagePayloadInterface::CLAIM_USER_EMAIL));
+        $this->assertFalse($ltiMessageHintToken->getClaims()->has(LtiMessagePayloadInterface::CLAIM_USER_GIVEN_NAME));
+        $this->assertFalse($ltiMessageHintToken->getClaims()->has(LtiMessagePayloadInterface::CLAIM_USER_FAMILY_NAME));
+        $this->assertFalse($ltiMessageHintToken->getClaims()->has(LtiMessagePayloadInterface::CLAIM_USER_MIDDLE_NAME));
+        $this->assertFalse($ltiMessageHintToken->getClaims()->has(LtiMessagePayloadInterface::CLAIM_USER_LOCALE));
+        $this->assertFalse($ltiMessageHintToken->getClaims()->has(LtiMessagePayloadInterface::CLAIM_USER_PICTURE));
     }
 
     public function testBuildPlatformOriginatingLaunchErrorOnInvalidDeploymentId(): void

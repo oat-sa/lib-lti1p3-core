@@ -25,6 +25,7 @@ namespace OAT\Library\Lti1p3Core\Tests\Unit\Service\Server\Factory;
 use Cache\Adapter\PHPArray\ArrayCachePool;
 use InvalidArgumentException;
 use League\OAuth2\Server\AuthorizationServer;
+use OAT\Library\Lti1p3Core\Security\Key\Key;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChain;
 use OAT\Library\Lti1p3Core\Service\Server\Factory\AuthorizationServerFactory;
 use OAT\Library\Lti1p3Core\Service\Server\Repository\AccessTokenRepository;
@@ -52,7 +53,13 @@ class AuthorizationServerFactoryTest extends TestCase
 
     public function testCreate(): void
     {
-        $result = $this->subject->create($this->createTestKeyChain());
+        $keyChain = new KeyChain(
+            'identifier',
+            'setName',
+            new Key(__DIR__ . '/../../../../Resource/Key/RSA/public.key'),
+            new Key(__DIR__ . '/../../../../Resource/Key/RSA/private.key')
+        );
+        $result = $this->subject->create($keyChain);
 
         $this->assertInstanceOf(AuthorizationServer::class, $result);
     }
@@ -65,7 +72,7 @@ class AuthorizationServerFactoryTest extends TestCase
         $invalidKeyChain = new KeyChain(
             'identifier',
             'setName',
-            $publicKey ?? getenv('TEST_KEYS_ROOT_DIR') . '/RSA/public.key'
+            new Key(__DIR__ . '/../../../../Resource/Key/RSA/public.key')
         );
 
         $this->subject->create($invalidKeyChain);

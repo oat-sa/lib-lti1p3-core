@@ -23,8 +23,7 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Integration\Service\Server\Validator;
 
 use Carbon\Carbon;
-use Lcobucci\JWT\Builder;
-use Lcobucci\JWT\Signer\Rsa\Sha256;
+use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Service\Server\Validator\AccessTokenRequestValidationResult;
 use OAT\Library\Lti1p3Core\Service\Server\Validator\AccessTokenRequestValidator;
@@ -54,18 +53,6 @@ class AccessTokenRequestValidatorTest extends TestCase
             $this->createTestRegistrationWithoutPlatformKeyChain(
                 'missingKeyIdentifier',
                 'missingKeyClientId'
-            ),
-            $this->createTestRegistration(
-                'invalidKeyIdentifier',
-                'invalidKeyClientId',
-                $this->createTestPlatform(),
-                $this->createTestTool(),
-                ['deploymentIdentifier'],
-                $this->createTestKeyChain(
-                    'keyChainIdentifier',
-                    'keySetName',
-                    getenv('TEST_KEYS_ROOT_DIR') . '/RSA/public2.key'
-                )
             )
         ];
 
@@ -83,7 +70,7 @@ class AccessTokenRequestValidatorTest extends TestCase
             'GET',
             '/example',
             [],
-            ['Authorization' => 'Bearer ' . $this->generateCredentials($registration)]
+            ['Authorization' => 'Bearer ' . $this->generateTestClientAccessToken($registration, ['allowed-scope'])]
         );
 
         $result = $this->subject->validate($request, ['allowed-scope']);
@@ -93,15 +80,14 @@ class AccessTokenRequestValidatorTest extends TestCase
         $this->assertNull($result->getError());
         $this->assertEquals(
             [
-                'JWT access token is not expired',
                 'Registration found for client_id: registrationClientId',
                 'Platform key chain found for registration: registrationIdentifier',
-                'JWT access token signature is valid',
+                'JWT access token is valid',
                 'JWT access token scopes are valid',
             ],
             $result->getSuccesses()
         );
-        $this->assertEquals($registration->getClientId(), $result->getToken()->getClaim('aud'));
+        $this->assertEquals($registration->getClientId(), current($result->getToken()->getClaims()->get('aud')));
     }
 
     public function testValidationFailureWithMissingAuthorizationHeader(): void
@@ -120,33 +106,6 @@ class AccessTokenRequestValidatorTest extends TestCase
         );
     }
 
-    public function testValidationFailureWithExpiredToken(): void
-    {
-        $registration = $this->createTestRegistration();
-
-        $now = Carbon::now();
-        Carbon::setTestNow($now->subHour());
-
-        $request = $this->createServerRequest(
-            'GET',
-            '/example',
-            [],
-            ['Authorization' => 'Bearer ' . $this->generateCredentials($registration)]
-        );
-
-        Carbon::setTestNow();
-
-        $result = $this->subject->validate($request);
-
-        $this->assertInstanceOf(AccessTokenRequestValidationResult::class, $result);
-        $this->assertTrue($result->hasError());
-        $this->assertEquals('JWT access token is expired', $result->getError());
-
-        $this->assertTrue(
-            $this->logger->hasLog(LogLevel::ERROR, 'Access token validation error: JWT access token is expired')
-        );
-    }
-
     public function testValidationFailureWithInvalidAudience(): void
     {
         $registration = $this->createTestRegistration();
@@ -155,24 +114,24 @@ class AccessTokenRequestValidatorTest extends TestCase
             'GET',
             '/example',
             [],
-            ['Authorization' => 'Bearer ' . $this->generateCredentials($registration, 'invalid')]
+            ['Authorization' => 'Bearer ' . $this->generateTestClientAccessToken($registration, ['allowed-scope'], 'invalid')]
         );
 
         $result = $this->subject->validate($request);
 
         $this->assertInstanceOf(AccessTokenRequestValidationResult::class, $result);
         $this->assertTrue($result->hasError());
-        $this->assertEquals('No registration found for client_id: invalid', $result->getError());
+        $this->assertEquals('No registration found with client_id for audience(s) invalid', $result->getError());
 
         $this->assertTrue(
             $this->logger->hasLog(
                 LogLevel::ERROR,
-                'Access token validation error: No registration found for client_id: invalid'
+                'Access token validation error: No registration found with client_id for audience(s) invalid'
             )
         );
     }
 
-    public function testValidationFailureWithInvalidRegistration(): void
+    public function testValidationFailureWithInvalidRegistrationPlatformKeyChain(): void
     {
         $registration = $this->createTestRegistration();
 
@@ -180,7 +139,7 @@ class AccessTokenRequestValidatorTest extends TestCase
             'GET',
             '/example',
             [],
-            ['Authorization' => 'Bearer ' . $this->generateCredentials($registration, 'missingKeyClientId')]
+            ['Authorization' => 'Bearer ' . $this->generateTestClientAccessToken($registration, ['allowed-scope'], 'missingKeyClientId')]
         );
 
         $result = $this->subject->validate($request);
@@ -197,28 +156,30 @@ class AccessTokenRequestValidatorTest extends TestCase
         );
     }
 
-    public function testValidationFailureWithInvalidSignature(): void
+    public function testValidationFailureWithInvalidToken(): void
     {
         $registration = $this->createTestRegistration();
+
+        $now = Carbon::now();
+        Carbon::setTestNow($now->subHour());
 
         $request = $this->createServerRequest(
             'GET',
             '/example',
             [],
-            ['Authorization' => 'Bearer ' . $this->generateCredentials($registration, 'invalidKeyClientId')]
+            ['Authorization' => 'Bearer ' . $this->generateTestClientAccessToken($registration, ['allowed-scope'])]
         );
+
+        Carbon::setTestNow();
 
         $result = $this->subject->validate($request);
 
         $this->assertInstanceOf(AccessTokenRequestValidationResult::class, $result);
         $this->assertTrue($result->hasError());
-        $this->assertEquals('JWT access token signature is invalid', $result->getError());
+        $this->assertEquals('JWT access token is invalid', $result->getError());
 
         $this->assertTrue(
-            $this->logger->hasLog(
-                LogLevel::ERROR,
-                'Access token validation error: JWT access token signature is invalid'
-            )
+            $this->logger->hasLog(LogLevel::ERROR, 'Access token validation error: JWT access token is invalid')
         );
     }
 
@@ -230,7 +191,7 @@ class AccessTokenRequestValidatorTest extends TestCase
             'GET',
             '/example',
             [],
-            ['Authorization' => 'Bearer ' . $this->generateCredentials($registration, null, ['invalid-scope'])]
+            ['Authorization' => 'Bearer ' . $this->generateTestClientAccessToken($registration, ['invalid-scope'])]
         );
 
         $result = $this->subject->validate($request, ['allowed-scope']);
@@ -247,20 +208,20 @@ class AccessTokenRequestValidatorTest extends TestCase
         );
     }
 
-    private function generateCredentials(
+    private function generateTestClientAccessToken(
         RegistrationInterface $registration,
-        string $audience = null,
-        array $scopes = ['allowed-scope']
+        array $scopes = [],
+        string $audience = null
     ): string {
-        $now = Carbon::now();
+        $accessToken = $this->buildJwt(
+            [],
+            [
+                MessagePayloadInterface::CLAIM_AUD => $audience ?? $registration->getClientId(),
+                'scopes' => $scopes
+            ],
+            $registration->getPlatformKeyChain()->getPrivateKey()
+        );
 
-        return (new Builder())
-            ->permittedFor($audience ?? $registration->getClientId())
-            ->identifiedBy(uniqid())
-            ->issuedAt($now->getTimestamp())
-            ->expiresAt($now->addSeconds(3600)->getTimestamp())
-            ->withClaim('scopes', $scopes)
-            ->getToken(new Sha256(), $registration->getPlatformKeyChain()->getPrivateKey())
-            ->__toString();
+        return $accessToken->toString();
     }
 }

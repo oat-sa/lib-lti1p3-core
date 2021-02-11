@@ -121,19 +121,19 @@ class LtiMessagePayload extends MessagePayload implements LtiMessagePayloadInter
 
     public function getUserIdentity(): ?UserIdentityInterface
     {
-        if (null === $this->getClaim('sub')) {
+        if (null === $this->getClaim(self::CLAIM_SUB)) {
             return null;
         }
 
         return new UserIdentity(
-            (string)$this->getClaim('sub'),
-            $this->getClaim('name'),
-            $this->getClaim('email'),
-            $this->getClaim('given_name'),
-            $this->getClaim('family_name'),
-            $this->getClaim('middle_name'),
-            $this->getClaim('locale'),
-            $this->getClaim('picture')
+            (string)$this->getClaim(self::CLAIM_SUB),
+            $this->getClaim(self::CLAIM_USER_NAME),
+            $this->getClaim(self::CLAIM_USER_EMAIL),
+            $this->getClaim(self::CLAIM_USER_GIVEN_NAME),
+            $this->getClaim(self::CLAIM_USER_FAMILY_NAME),
+            $this->getClaim(self::CLAIM_USER_MIDDLE_NAME),
+            $this->getClaim(self::CLAIM_USER_LOCALE),
+            $this->getClaim(self::CLAIM_USER_PICTURE)
         );
     }
 

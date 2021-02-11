@@ -24,12 +24,12 @@ namespace OAT\Library\Lti1p3Core\Tests\Integration\Security\Jwks\Fetcher;
 
 use Cache\Adapter\PHPArray\ArrayCachePool;
 use GuzzleHttp\ClientInterface;
-use Lcobucci\JWT\Signer\Key;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Security\Jwks\Exporter\JwksExporter;
 use OAT\Library\Lti1p3Core\Security\Jwks\Fetcher\JwksFetcher;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepository;
+use OAT\Library\Lti1p3Core\Security\Key\KeyInterface;
 use OAT\Library\Lti1p3Core\Tests\Traits\NetworkTestingTrait;
 use OAT\Library\Lti1p3Core\Tests\Traits\SecurityTestingTrait;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -70,57 +70,47 @@ class JwksFetcherTest extends TestCase
 
     public function testItCanFetchAJwksFromJwksUrlKeyAndSaveItInCache(): void
     {
+        $jwksData = $this->exporter->export($this->keyChain->getKeySetName());
+
         $this->clientMock
             ->expects($this->once())
             ->method('request')
             ->with('GET', 'http://test.com', ['headers' => ['Accept' => 'application/json']])
             ->willReturn(
-                $this->createResponse(json_encode($this->exporter->export($this->keyChain->getKeySetName())))
+                $this->createResponse(json_encode($jwksData))
             );
 
         $key = $this->subject->fetchKey('http://test.com', $this->keyChain->getIdentifier());
 
-        $this->assertInstanceOf(Key::class, $key);
+        $this->assertInstanceOf(KeyInterface::class, $key);
 
-        $expectedDetails = openssl_pkey_get_details(
-            openssl_pkey_get_public($this->keyChain->getPublicKey()->getContent())
-        );
-
-        $jwksDetails = openssl_pkey_get_details(
-            openssl_pkey_get_public($key->getContent())
-        );
-
-        $this->assertEquals($expectedDetails, $jwksDetails);
+        $this->assertEquals(current($jwksData['keys']), $key->getContent());
 
         $this->assertTrue($this->cache->has('lti1p3-jwks-' . base64_encode('http://test.com')));
     }
 
     public function testItCanFetchAJwksKeyFromExistingCache(): void
     {
+        $jwksData = $this->exporter->export($this->keyChain->getKeySetName());
+
         $this->cache->set(
             'lti1p3-jwks-' . base64_encode('http://test.com'),
-            $this->exporter->export($this->keyChain->getKeySetName())
+            $jwksData
         );
 
         $this->clientMock->expects($this->never())->method('request');
 
         $key = $this->subject->fetchKey('http://test.com', $this->keyChain->getIdentifier());
 
-        $this->assertInstanceOf(Key::class, $key);
+        $this->assertInstanceOf(KeyInterface::class, $key);
 
-        $expectedDetails = openssl_pkey_get_details(
-            openssl_pkey_get_public($this->keyChain->getPublicKey()->getContent())
-        );
-
-        $jwksDetails = openssl_pkey_get_details(
-            openssl_pkey_get_public($key->getContent())
-        );
-
-        $this->assertEquals($expectedDetails, $jwksDetails);
+        $this->assertEquals(current($jwksData['keys']), $key->getContent());
     }
 
     public function testItCanFetchAJwksKeyFromUrlIfCacheIsMissingKey(): void
     {
+        $jwksData = $this->exporter->export($this->keyChain->getKeySetName());
+
         $this->cache->set(
             'lti1p3-jwks-' . base64_encode('http://test.com'),
             ['keys' => []]
@@ -131,22 +121,14 @@ class JwksFetcherTest extends TestCase
             ->method('request')
             ->with('GET', 'http://test.com', ['headers' => ['Accept' => 'application/json']])
             ->willReturn(
-                $this->createResponse(json_encode($this->exporter->export($this->keyChain->getKeySetName())))
+                $this->createResponse(json_encode($jwksData))
             );
 
         $key = $this->subject->fetchKey('http://test.com', $this->keyChain->getIdentifier());
 
-        $this->assertInstanceOf(Key::class, $key);
+        $this->assertInstanceOf(KeyInterface::class, $key);
 
-        $expectedDetails = openssl_pkey_get_details(
-            openssl_pkey_get_public($this->keyChain->getPublicKey()->getContent())
-        );
-
-        $jwksDetails = openssl_pkey_get_details(
-            openssl_pkey_get_public($key->getContent())
-        );
-
-        $this->assertEquals($expectedDetails, $jwksDetails);
+        $this->assertEquals(current($jwksData['keys']), $key->getContent());
     }
 
     public function testItThrowAnLtiExceptionOnMissingKeyFromBothCacheAndJwksUrl(): void
@@ -159,22 +141,6 @@ class JwksFetcherTest extends TestCase
             ->method('request')
             ->with('GET', 'http://test.com', ['headers' => ['Accept' => 'application/json']])
             ->willReturn($this->createResponse(json_encode([])));
-
-        $this->subject->fetchKey('http://test.com', 'invalid');
-    }
-
-    public function testItThrowAnLtiExceptionOnPemConversionError(): void
-    {
-        $this->expectException(LtiException::class);
-        $this->expectExceptionMessage("Error during JWKS PEM conversion: Illegal string offset 'kid'");
-
-        $this->clientMock
-            ->expects($this->once())
-            ->method('request')
-            ->with('GET', 'http://test.com', ['headers' => ['Accept' => 'application/json']])
-            ->willReturn(
-                $this->createResponse(json_encode(['keys' => ['invalid']]))
-            );
 
         $this->subject->fetchKey('http://test.com', 'invalid');
     }

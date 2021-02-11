@@ -24,10 +24,10 @@ namespace OAT\Library\Lti1p3Core\Message\Launch\Builder;
 
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessage;
+use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
-use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 
 /**
  * @see https://www.imsglobal.org/spec/security/v1p0/#tool-originating-messages
@@ -60,7 +60,7 @@ class ToolOriginatingLaunchBuilder extends AbstractLaunchBuilder
         return new LtiMessage(
             $platformUrl,
             [
-                'JWT' => $payload->getToken()->__toString(),
+                'JWT' => $payload->getToken()->toString(),
             ]
         );
     }

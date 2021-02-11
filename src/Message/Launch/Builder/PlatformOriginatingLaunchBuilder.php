@@ -24,9 +24,9 @@ namespace OAT\Library\Lti1p3Core\Message\Launch\Builder;
 
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessage;
+use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
-use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 
 /**
  * @see https://www.imsglobal.org/spec/security/v1p0/#platform-originating-messages
@@ -55,7 +55,7 @@ class PlatformOriginatingLaunchBuilder extends AbstractLaunchBuilder
             ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_ROLES, $roles)
             ->withClaim(LtiMessagePayloadInterface::CLAIM_REGISTRATION_ID, $registration->getIdentifier());
 
-        $this->applyOptionalClaims($optionalClaims);
+        $this->applyOptionalClaims($this->sanitizeClaims($optionalClaims));
 
         $ltiMessageHintPayload = $this->builder->buildMessagePayload($registration->getPlatformKeyChain());
 
@@ -65,10 +65,19 @@ class PlatformOriginatingLaunchBuilder extends AbstractLaunchBuilder
                 'iss' => $registration->getPlatform()->getAudience(),
                 'login_hint' => $loginHint,
                 'target_link_uri' => $targetLinkUri,
-                'lti_message_hint' => $ltiMessageHintPayload->getToken()->__toString(),
+                'lti_message_hint' => $ltiMessageHintPayload->getToken()->toString(),
                 'lti_deployment_id' => $deploymentId,
                 'client_id' => $registration->getClientId(),
             ]
         );
+    }
+
+    private function sanitizeClaims(array $claims): array
+    {
+        foreach (LtiMessagePayloadInterface::RESERVED_USER_CLAIMS as $reservedClaim) {
+            unset($claims[$reservedClaim]);
+        }
+
+        return $claims;
     }
 }

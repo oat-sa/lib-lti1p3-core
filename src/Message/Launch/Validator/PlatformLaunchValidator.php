@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Message\Launch\Validator;
 
 use Carbon\Carbon;
+use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\Launch\Validator\Result\LaunchValidationResult;
 use OAT\Library\Lti1p3Core\Message\LtiMessage;
@@ -31,7 +32,6 @@ use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayload;
 use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
-use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Security\Nonce\Nonce;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceGeneratorInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -57,23 +57,33 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
         try {
             $message = LtiMessage::fromServerRequest($request);
 
-            $payload = new LtiMessagePayload($this->parser->parse($message->getMandatoryParameter('JWT')));
+            $payload = new LtiMessagePayload($this->parser->parse($message->getParameters()->getMandatory('JWT')));
 
-            $registration = $this->registrationRepository->findByPlatformIssuer(
-                $payload->getMandatoryClaim(MessagePayloadInterface::CLAIM_AUD),
-                $payload->getMandatoryClaim(MessagePayloadInterface::CLAIM_ISS)
-            );
+            $audiences = $payload->getMandatoryClaim(MessagePayloadInterface::CLAIM_AUD);
+            $audiences = is_array($audiences) ? $audiences : [$audiences];
+
+            $registration = null;
+
+            foreach ($audiences as $audience) {
+                $registration = $this->registrationRepository->findByPlatformIssuer(
+                    $audience,
+                    $payload->getMandatoryClaim(MessagePayloadInterface::CLAIM_ISS)
+                );
+
+                if (null !== $registration) {
+                    break;
+                }
+            }
 
             if (null === $registration) {
                 throw new LtiException('No matching registration found platform side');
             }
 
             $this
-                ->validatePayloadExpiry($payload)
+                ->validatePayload($registration, $payload)
                 ->validatePayloadKid($payload)
                 ->validatePayloadVersion($payload)
                 ->validatePayloadMessageType($payload)
-                ->validatePayloadSignature($registration, $payload)
                 ->validatePayloadNonce($payload)
                 ->validatePayloadDeploymentId($registration, $payload)
                 ->validatePayloadLaunchMessageTypeSpecifics($registration, $payload);
@@ -90,7 +100,7 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
      */
     private function validatePayloadKid(LtiMessagePayloadInterface $payload): self
     {
-        if (!$payload->getToken()->hasHeader(LtiMessagePayloadInterface::HEADER_KID)) {
+        if (!$payload->getToken()->getHeaders()->has(LtiMessagePayloadInterface::HEADER_KID)) {
             throw new LtiException('JWT kid header is missing');
         }
 
@@ -130,34 +140,22 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
     /**
      * @throws LtiExceptionInterface
      */
-    private function validatePayloadSignature(RegistrationInterface $registration, LtiMessagePayloadInterface $payload): self
+    private function validatePayload(RegistrationInterface $registration, LtiMessagePayloadInterface $payload): self
     {
         if (null === $registration->getToolKeyChain()) {
             $key = $this->fetcher->fetchKey(
                 $registration->getToolJwksUrl(),
-                $payload->getToken()->getHeader(LtiMessagePayloadInterface::HEADER_KID)
+                $payload->getToken()->getHeaders()->get(LtiMessagePayloadInterface::HEADER_KID)
             );
         } else {
             $key = $registration->getToolKeyChain()->getPublicKey();
         }
 
-        if (!$payload->getToken()->verify($this->signer, $key)) {
-            throw new LtiException('JWT signature validation failure');
+        if (!$this->validator->validate($payload->getToken(), $key)) {
+            throw new LtiException('JWT validation failure');
         }
 
-        return $this->addSuccess('JWT signature validation success');
-    }
-
-    /**
-     * @throws LtiExceptionInterface
-     */
-    private function validatePayloadExpiry(LtiMessagePayloadInterface $payload): self
-    {
-        if ($payload->getToken()->isExpired()) {
-            throw new LtiException('JWT is expired');
-        }
-
-        return $this->addSuccess('JWT is not expired');
+        return $this->addSuccess('JWT validation success');
     }
 
     /**
@@ -165,7 +163,7 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
      */
     private function validatePayloadNonce(LtiMessagePayloadInterface $payload): self
     {
-        if (empty($payload->getToken()->getClaim(LtiMessagePayloadInterface::CLAIM_NONCE))) {
+        if (empty($payload->getToken()->getClaims()->get(LtiMessagePayloadInterface::CLAIM_NONCE))) {
             throw new LtiException('JWT nonce claim is missing');
         }
 
@@ -210,8 +208,8 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
 
             $dataToken = $this->parser->parse($payload->getDeepLinkingData());
 
-            if (!$dataToken->verify($this->signer, $registration->getPlatformKeyChain()->getPublicKey())) {
-                throw new LtiException('JWT data deep linking claim signature validation failure');
+            if (!$this->validator->validate($dataToken, $registration->getPlatformKeyChain()->getPublicKey())) {
+                throw new LtiException('JWT data deep linking claim validation failure');
             }
         }
 

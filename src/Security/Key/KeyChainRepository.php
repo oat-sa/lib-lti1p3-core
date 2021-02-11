@@ -22,13 +22,18 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Security\Key;
 
+use OAT\Library\Lti1p3Core\Util\Collection\Collection;
+use OAT\Library\Lti1p3Core\Util\Collection\CollectionInterface;
+
 class KeyChainRepository implements KeyChainRepositoryInterface
 {
-    /** @var KeyChainInterface[] */
+    /** @var CollectionInterface|KeyChainInterface[] */
     private $keyChains;
 
     public function __construct(array $keyChains = [])
     {
+        $this->keyChains = new Collection();
+
         foreach ($keyChains as $keyChain) {
             $this->addKeyChain($keyChain);
         }
@@ -36,14 +41,14 @@ class KeyChainRepository implements KeyChainRepositoryInterface
 
     public function addKeyChain(KeyChainInterface $keyChain): self
     {
-        $this->keyChains[$keyChain->getIdentifier()] = $keyChain;
+        $this->keyChains->set($keyChain->getIdentifier(), $keyChain);
 
         return $this;
     }
 
     public function find(string $identifier): ?KeyChainInterface
     {
-        return $this->keyChains[$identifier] ?? null;
+        return $this->keyChains->get($identifier);
     }
 
     /**
@@ -51,14 +56,14 @@ class KeyChainRepository implements KeyChainRepositoryInterface
      */
     public function findByKeySetName(string $keySetName): array
     {
-        $keyChains = [];
+        $foundKeyChains = [];
 
-        foreach ($this->keyChains as $keyChain) {
+        foreach ($this->keyChains->all() as $keyChain) {
             if ($keyChain->getKeySetName() === $keySetName) {
-                $keyChains[$keyChain->getIdentifier()] = $keyChain;
+                $foundKeyChains[$keyChain->getIdentifier()] = $keyChain;
             }
         }
 
-        return $keyChains;
+        return $foundKeyChains;
     }
 }

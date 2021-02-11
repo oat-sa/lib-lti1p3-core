@@ -22,41 +22,43 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Service\Server\Validator;
 
-use Lcobucci\JWT\Token;
-use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Service\Server\Validator\AccessTokenRequestValidationResult;
+use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
 use PHPUnit\Framework\TestCase;
 
 class AccessTokenRequestValidationResultTest extends TestCase
 {
+    use DomainTestingTrait;
+
     public function testGetRegistration(): void
     {
-        $registrationMock = $this->createMock(RegistrationInterface::class);
+        $registration = $this->createTestRegistration();
 
-        $subject = new AccessTokenRequestValidationResult($registrationMock);
+        $subject = new AccessTokenRequestValidationResult($registration);
 
-        $this->assertEquals($registrationMock, $subject->getRegistration());
+        $this->assertEquals($registration, $subject->getRegistration());
     }
 
     public function testGetToken(): void
     {
-        $tokenMock = $this->createMock(Token::class);
+        $token = $this->buildJwt([], [], $this->createTestRegistration()->getPlatformKeyChain()->getPrivateKey());
 
-        $subject = new AccessTokenRequestValidationResult(null, $tokenMock);
+        $subject = new AccessTokenRequestValidationResult(null, $token);
 
-        $this->assertEquals($tokenMock, $subject->getToken());
+        $this->assertEquals($token, $subject->getToken());
     }
 
     public function testGetScopes(): void
     {
-        $tokenMock = $this->createMock(Token::class);
-        $tokenMock
-            ->expects($this->once())
-            ->method('getClaim')
-            ->with('scopes')
-            ->willReturn(['scope1', 'scope2']);
+        $token = $this->buildJwt(
+            [],
+            [
+                'scopes' => ['scope1', 'scope2']
+            ],
+            $this->createTestRegistration()->getPlatformKeyChain()->getPrivateKey()
+        );
 
-        $subject = new AccessTokenRequestValidationResult(null, $tokenMock);
+        $subject = new AccessTokenRequestValidationResult(null, $token);
 
         $this->assertEquals(['scope1', 'scope2'], $subject->getScopes());
     }

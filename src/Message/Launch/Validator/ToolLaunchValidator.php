@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Message\Launch\Validator;
 
 use Carbon\Carbon;
+use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\Launch\Validator\Result\LaunchValidationResult;
 use OAT\Library\Lti1p3Core\Message\LtiMessage;
@@ -32,7 +33,6 @@ use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayload;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
-use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Security\Nonce\Nonce;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceGeneratorInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -59,31 +59,36 @@ class ToolLaunchValidator extends AbstractLaunchValidator
         try {
             $message = LtiMessage::fromServerRequest($request);
 
-            $payload = new LtiMessagePayload($this->parser->parse($message->getMandatoryParameter('id_token')));
-            $state = new MessagePayload($this->parser->parse($message->getMandatoryParameter('state')));
+            $payload = new LtiMessagePayload($this->parser->parse($message->getParameters()->getMandatory('id_token')));
+            $state = new MessagePayload($this->parser->parse($message->getParameters()->getMandatory('state')));
 
-            $registration = $this->registrationRepository->findByPlatformIssuer(
-                $payload->getMandatoryClaim(MessagePayloadInterface::CLAIM_ISS),
-                $payload->getMandatoryClaim(MessagePayloadInterface::CLAIM_AUD)
-            );
+            $audiences = $payload->getMandatoryClaim(MessagePayloadInterface::CLAIM_AUD);
+            $audiences = is_array($audiences) ? $audiences : [$audiences];
+
+            $registration = null;
+
+            foreach ($audiences as $audience) {
+                $registration = $this->registrationRepository->findByPlatformIssuer(
+                    $payload->getMandatoryClaim(MessagePayloadInterface::CLAIM_ISS),
+                    $audience
+                );
+            }
 
             if (null === $registration) {
                 throw new LtiException('No matching registration found tool side');
             }
 
             $this
-                ->validatePayloadExpiry($payload)
+                ->validatePayloadToken($registration, $payload)
                 ->validatePayloadKid($payload)
                 ->validatePayloadVersion($payload)
                 ->validatePayloadMessageType($payload)
                 ->validatePayloadRoles($payload)
                 ->validatePayloadUserIdentifier($payload)
-                ->validatePayloadSignature($registration, $payload)
                 ->validatePayloadNonce($payload)
                 ->validatePayloadDeploymentId($registration, $payload)
                 ->validatePayloadLaunchMessageTypeSpecifics($payload)
-                ->validateStateExpiry($state)
-                ->validateStateSignature($registration, $state);
+                ->validateStateToken($registration, $state);
 
             return new LaunchValidationResult($registration, $payload, $state, $this->successes);
 
@@ -95,9 +100,30 @@ class ToolLaunchValidator extends AbstractLaunchValidator
     /**
      * @throws LtiExceptionInterface
      */
+    private function validatePayloadToken(RegistrationInterface $registration, LtiMessagePayloadInterface $payload): self
+    {
+        if (null === $registration->getPlatformKeyChain()) {
+            $key = $this->fetcher->fetchKey(
+                $registration->getPlatformJwksUrl(),
+                $payload->getToken()->getHeaders()->get(LtiMessagePayloadInterface::HEADER_KID)
+            );
+        } else {
+            $key = $registration->getPlatformKeyChain()->getPublicKey();
+        }
+
+        if (!$this->validator->validate($payload->getToken(), $key)) {
+            throw new LtiException('ID token validation failure');
+        }
+
+        return $this->addSuccess('ID token validation success');
+    }
+
+    /**
+     * @throws LtiExceptionInterface
+     */
     private function validatePayloadKid(LtiMessagePayloadInterface $payload): self
     {
-        if (!$payload->getToken()->hasHeader(LtiMessagePayloadInterface::HEADER_KID)) {
+        if (!$payload->getToken()->getHeaders()->has(LtiMessagePayloadInterface::HEADER_KID)) {
             throw new LtiException('ID token kid header is missing');
         }
 
@@ -163,42 +189,9 @@ class ToolLaunchValidator extends AbstractLaunchValidator
     /**
      * @throws LtiExceptionInterface
      */
-    private function validatePayloadSignature(RegistrationInterface $registration, LtiMessagePayloadInterface $payload): self
-    {
-        if (null === $registration->getPlatformKeyChain()) {
-            $key = $this->fetcher->fetchKey(
-                $registration->getPlatformJwksUrl(),
-                $payload->getToken()->getHeader(LtiMessagePayloadInterface::HEADER_KID)
-            );
-        } else {
-            $key = $registration->getPlatformKeyChain()->getPublicKey();
-        }
-
-        if (!$payload->getToken()->verify($this->signer, $key)) {
-            throw new LtiException('ID token signature validation failure');
-        }
-
-        return $this->addSuccess('ID token signature validation success');
-    }
-
-    /**
-     * @throws LtiExceptionInterface
-     */
-    private function validatePayloadExpiry(LtiMessagePayloadInterface $payload): self
-    {
-        if ($payload->getToken()->isExpired()) {
-            throw new LtiException('ID token is expired');
-        }
-
-        return $this->addSuccess('ID token is not expired');
-    }
-
-    /**
-     * @throws LtiExceptionInterface
-     */
     private function validatePayloadNonce(LtiMessagePayloadInterface $payload): self
     {
-        if (empty($payload->getToken()->getClaim(LtiMessagePayloadInterface::CLAIM_NONCE))) {
+        if (empty($payload->getToken()->getClaims()->get(LtiMessagePayloadInterface::CLAIM_NONCE))) {
             throw new LtiException('ID token nonce claim is missing');
         }
 
@@ -274,28 +267,16 @@ class ToolLaunchValidator extends AbstractLaunchValidator
     /**
      * @throws LtiExceptionInterface
      */
-    private function validateStateSignature(RegistrationInterface $registration, MessagePayloadInterface $state): self
+    private function validateStateToken(RegistrationInterface $registration, MessagePayloadInterface $state): self
     {
         if (null === $registration->getToolKeyChain()) {
             throw new LtiException('Tool key chain not configured');
         }
 
-        if (!$state->getToken()->verify($this->signer, $registration->getToolKeyChain()->getPublicKey())) {
-            throw new LtiException('State signature validation failure');
+        if (!$this->validator->validate($state->getToken(), $registration->getToolKeyChain()->getPublicKey())) {
+            throw new LtiException('State validation failure');
         }
 
-        return $this->addSuccess('State signature validation success');
-    }
-
-    /**
-     * @throws LtiExceptionInterface
-     */
-    private function validateStateExpiry(MessagePayloadInterface $state): self
-    {
-        if ($state->getToken()->isExpired()) {
-            throw new LtiException('State is expired');
-        }
-
-        return $this->addSuccess('State is not expired');
+        return $this->addSuccess('State validation success');
     }
 }

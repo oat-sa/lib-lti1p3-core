@@ -22,13 +22,12 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Service\Server\Validator;
 
-use Carbon\Carbon;
-use Lcobucci\JWT\Parser;
-use Lcobucci\JWT\Signer;
-use Lcobucci\JWT\Signer\Rsa\Sha256;
-use League\OAuth2\Server\Exception\OAuthServerException;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
+use OAT\Library\Lti1p3Core\Security\Jwt\Parser\Parser;
+use OAT\Library\Lti1p3Core\Security\Jwt\Parser\ParserInterface;
+use OAT\Library\Lti1p3Core\Security\Jwt\Validator\Validator;
+use OAT\Library\Lti1p3Core\Security\Jwt\Validator\ValidatorInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -42,10 +41,10 @@ class AccessTokenRequestValidator
     /** @var LoggerInterface */
     private $logger;
 
-    /** @var Signer */
-    private $signer;
+    /** @var ValidatorInterface */
+    private $validator;
 
-    /** @var Parser */
+    /** @var ParserInterface */
     private $parser;
 
     /** @var string[] */
@@ -54,12 +53,13 @@ class AccessTokenRequestValidator
     public function __construct(
         RegistrationRepositoryInterface $repository,
         LoggerInterface $logger = null,
-        Signer $signer = null
+        ValidatorInterface $validator = null,
+        ParserInterface $parser = null
     ) {
         $this->repository = $repository;
         $this->logger = $logger ?? new NullLogger();
-        $this->signer = $signer ?? new Sha256();
-        $this->parser = new Parser();
+        $this->validator = $validator ?? new Validator();
+        $this->parser = $parser ?? new Parser();
     }
 
     public function validate(ServerRequestInterface $request, array $allowedScopes = []): AccessTokenRequestValidationResult
@@ -75,21 +75,25 @@ class AccessTokenRequestValidator
                 substr($request->getHeaderLine('Authorization'), strlen('Bearer '))
             );
 
-            if ($token->isExpired(Carbon::now())) {
-                throw new LtiException('JWT access token is expired');
+            $registration = null;
+
+            $audiences = $token->getClaims()->getMandatory('aud');
+            $audiences = is_array($audiences) ? $audiences : [$audiences];
+
+            foreach ($audiences as $audience) {
+                $registration = $this->repository->findByClientId($audience);
+
+                if (null !== $registration) {
+                    $this->addSuccess('Registration found for client_id: ' . $audience);
+                    break;
+                }
             }
-
-            $this->addSuccess('JWT access token is not expired');
-
-            $clientId = $token->getClaim('aud');
-
-            $registration = $this->repository->findByClientId($clientId);
 
             if (null === $registration) {
-                throw new LtiException('No registration found for client_id: ' . $clientId);
+                throw new LtiException(
+                    sprintf('No registration found with client_id for audience(s) %s', implode(', ', $audiences))
+                );
             }
-
-            $this->addSuccess('Registration found for client_id: ' . $clientId);
 
             if (null === $registration->getPlatformKeyChain()) {
                 throw new LtiException('Missing platform key chain for registration: ' . $registration->getIdentifier());
@@ -97,13 +101,13 @@ class AccessTokenRequestValidator
 
             $this->addSuccess('Platform key chain found for registration: ' . $registration->getIdentifier());
 
-            if (!$token->verify($this->signer, $registration->getPlatformKeyChain()->getPublicKey())) {
-                throw new LtiException('JWT access token signature is invalid');
+            if (!$this->validator->validate($token, $registration->getPlatformKeyChain()->getPublicKey())) {
+                throw new LtiException('JWT access token is invalid');
             }
 
-            $this->addSuccess('JWT access token signature is valid');
+            $this->addSuccess('JWT access token is valid');
 
-            if (empty(array_intersect($token->getClaim('scopes', []), $allowedScopes))) {
+            if (empty(array_intersect($token->getClaims()->get('scopes', []), $allowedScopes))) {
                 throw new LtiException('JWT access token scopes are invalid');
             }
 

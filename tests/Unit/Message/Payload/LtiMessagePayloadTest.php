@@ -93,7 +93,7 @@ class LtiMessagePayloadTest extends TestCase
             ->withClaim(new BasicOutcomeClaim('sourcedId', 'serviceUrl'))
             ->buildMessagePayload($this->createTestRegistration()->getPlatformKeyChain());
 
-        $this->subject = new LtiMessagePayload($this->parseJwt($payload->getToken()->__toString()));
+        $this->subject = new LtiMessagePayload($this->parseJwt($payload->getToken()->toString()));
     }
 
     public function testClaims(): void
@@ -138,7 +138,7 @@ class LtiMessagePayloadTest extends TestCase
             ->withClaim('email', 'user@example.com')
             ->buildMessagePayload($this->createTestRegistration()->getPlatformKeyChain());
 
-        $this->subject = new LtiMessagePayload($this->parseJwt($payload->getToken()->__toString()));
+        $this->subject = new LtiMessagePayload($this->parseJwt($payload->getToken()->toString()));
 
         $this->assertEquals('userIdentifier', $this->subject->getUserIdentity()->getIdentifier());
         $this->assertEquals('userName', $this->subject->getUserIdentity()->getName());

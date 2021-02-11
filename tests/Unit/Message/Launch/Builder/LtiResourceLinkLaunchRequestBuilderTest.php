@@ -66,31 +66,31 @@ class LtiResourceLinkLaunchRequestBuilderTest extends TestCase
         $this->assertInstanceOf(LtiMessageInterface::class, $result);
 
         $this->assertEquals($registration->getTool()->getOidcInitiationUrl(), $result->getUrl());
-        $this->assertEquals($registration->getPlatform()->getAudience(), $result->getMandatoryParameter('iss'));
-        $this->assertEquals('loginHint', $result->getMandatoryParameter('login_hint'));
-        $this->assertEquals($registration->getTool()->getLaunchUrl(), $result->getMandatoryParameter('target_link_uri'));
-        $this->assertEquals('deploymentIdentifier', $result->getMandatoryParameter('lti_deployment_id'));
-        $this->assertEquals($registration->getClientId(), $result->getMandatoryParameter('client_id'));
+        $this->assertEquals($registration->getPlatform()->getAudience(), $result->getParameters()->getMandatory('iss'));
+        $this->assertEquals('loginHint', $result->getParameters()->getMandatory('login_hint'));
+        $this->assertEquals($registration->getTool()->getLaunchUrl(), $result->getParameters()->getMandatory('target_link_uri'));
+        $this->assertEquals('deploymentIdentifier', $result->getParameters()->getMandatory('lti_deployment_id'));
+        $this->assertEquals($registration->getClientId(), $result->getParameters()->getMandatory('client_id'));
 
-        $ltiMessageHintToken = $this->parseJwt($result->getMandatoryParameter('lti_message_hint'));
+        $ltiMessageHintToken = $this->parseJwt($result->getParameters()->getMandatory('lti_message_hint'));
 
         $this->assertTrue($this->verifyJwt($ltiMessageHintToken, $registration->getPlatformKeyChain()->getPublicKey()));
 
         $this->assertEquals(
             LtiMessageInterface::LTI_VERSION,
-            $ltiMessageHintToken->getClaim(LtiMessagePayloadInterface::CLAIM_LTI_VERSION)
+            $ltiMessageHintToken->getClaims()->get(LtiMessagePayloadInterface::CLAIM_LTI_VERSION)
         );
         $this->assertEquals(
             LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
-            $ltiMessageHintToken->getClaim(LtiMessagePayloadInterface::CLAIM_LTI_MESSAGE_TYPE)
+            $ltiMessageHintToken->getClaims()->get(LtiMessagePayloadInterface::CLAIM_LTI_MESSAGE_TYPE)
         );
         $this->assertEquals(
             ['role'],
-            $ltiMessageHintToken->getClaim(LtiMessagePayloadInterface::CLAIM_LTI_ROLES)
+            $ltiMessageHintToken->getClaims()->get(LtiMessagePayloadInterface::CLAIM_LTI_ROLES)
         );
         $this->assertEquals(
             'contextIdentifier',
-            $ltiMessageHintToken->getClaim(LtiMessagePayloadInterface::CLAIM_LTI_CONTEXT)['id'] ?? null
+            $ltiMessageHintToken->getClaims()->get(LtiMessagePayloadInterface::CLAIM_LTI_CONTEXT)['id'] ?? null
         );
     }
 
