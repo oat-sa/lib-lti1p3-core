@@ -23,14 +23,17 @@ To extract the JWK (JSON Web Key) properties, you can use the [JwkRS256Exporter]
 <?php
 
 use OAT\Library\Lti1p3Core\Security\Jwks\Exporter\Jwk\JwkRS256Exporter;
-use OAT\Library\Lti1p3Core\Security\Key\KeyChain;
+use OAT\Library\Lti1p3Core\Security\Key\KeyChainFactory;
+use OAT\Library\Lti1p3Core\Security\Key\KeyInterface;
 
-$keyChain = new KeyChain(
+$keyChain = (new KeyChainFactory)->create(
     '1',
     'mySetName',
     'file://home/user/.ssh/id_rsa.pub',
+     KeyInterface::DEFAULT_ALGORITHM,
     'file://home/user/.ssh/id_rsa',
-    'test'
+    'test',
+     KeyInterface::DEFAULT_ALGORITHM
 );
 
 $jwkExport = (new JwkRS256Exporter())->export($keyChain);
@@ -57,33 +60,40 @@ Considering you have for example on your side those key chains:
 Chain 1:
 - public key path: `/home/user/.ssh/chain1/id_rsa.pub`
 - private key path: `/home/user/.ssh/chain1/id_rsa`
+- private key passphrase: `test1`
 
 Chain 2:
 - public key path: `/home/user/.ssh/chain2/id_rsa.pub`
 - private key path: `/home/user/.ssh/chain2/id_rsa`
+- private key passphrase: `test2`
 
 You can then use the [KeyChainRepository](../../src/Security/Key/KeyChainRepository.php):
 
 ```php
 <?php
 
-use OAT\Library\Lti1p3Core\Security\Key\KeyChain;
+use OAT\Library\Lti1p3Core\Security\Key\KeyChainFactory;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepository;
+use OAT\Library\Lti1p3Core\Security\Key\KeyInterface;
 
-$keyChain1 = new KeyChain(
+$keyChain1 = (new KeyChainFactory)->create(
     'kid1',
     'myKeySetName',
     'file://home/user/.ssh/chain1/id_rsa.pub',
+     KeyInterface::DEFAULT_ALGORITHM,
     'file://home/user/.ssh/chain1/id_rsa',
-    'test'
+    'test1',
+     KeyInterface::DEFAULT_ALGORITHM
 );
 
-$keyChain2 = new KeyChain(
+$keyChain2 = (new KeyChainFactory)->create(
     'kid2',
     'myKeySetName',
     'file://home/user/.ssh/chain2/id_rsa.pub',
+     KeyInterface::DEFAULT_ALGORITHM,
     'file://home/user/.ssh/chain2/id_rsa',
-    'test'
+    'test2',
+     KeyInterface::DEFAULT_ALGORITHM
 );
 
 $keyChainRepository = new KeyChainRepository();

@@ -111,7 +111,9 @@ if (!$result->hasError()) {
     echo $result->getRegistration()->getIdentifier();
 
     // And to the JWT
-    echo $result->getToken()->getClaims(); 
+    var_dump($result->getToken()->getHeaders()->all()); 
+    var_dump($result->getToken()->getClaims()->all()); 
+    echo ($result->getToken()->toString()); 
 
     // And to the oauth2 scopes
     echo $result->getScopes();

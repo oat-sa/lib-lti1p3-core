@@ -1,6 +1,18 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+* Added PHP 8 support (>=7.2)
+* Added algorithms support for RS384/512, HS256/384/512, ES256/384/512 (on top of RS256)
+* Added wrapper interfaces for JWT handling (builder, parser, validator), with default implementation still based on [lcobucci/jwt](https://github.com/lcobucci/jwt)
+* Added multiple audiences support in JWT handling
+* Added collection, result and ids generator utils
+* Added [migration guide](https://github.com/oat-sa/lib-lti1p3-core/wiki/Migration-from-3.x-to-4.x) to document breaking changes and migration steps
+* Added related tests  
+* Updated documentation
+
 3.3.1
 -----
 

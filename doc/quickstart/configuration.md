@@ -19,21 +19,42 @@ Considering you have for example on your side this key chain:
 - private key path: `/home/user/.ssh/id_rsa`
 - private key passphrase: `test`
 
-You can then provide the following [key chain](../../src/Security/Key/KeyChainInterface.php):
+You can then use the provided [KeyChainFactory](../../src/Security/Key/KeyChainFactory.php) to build your security keys:
+
 ```php
 <?php
 
-use OAT\Library\Lti1p3Core\Security\Key\KeyChain;
+use OAT\Library\Lti1p3Core\Security\Key\KeyChainFactory;
+use OAT\Library\Lti1p3Core\Security\Key\KeyInterface;
 
-$keyChain = new KeyChain(
+$keyChain = (new KeyChainFactory)->create(
     '1',                                // [required] identifier (used for JWT kid header)
     'mySetName',                        // [required] key set name (for grouping)
     'file://home/user/.ssh/id_rsa.pub', // [required] public key (file or content)
+     KeyInterface::DEFAULT_ALGORITHM,   // [optional] public key algorithm (default: RS256)
     'file://home/user/.ssh/id_rsa',     // [optional] private key (file or content)
-    'test'                              // [optional] private key passphrase (if existing)
+    'test',                             // [optional] private key passphrase (if existing)
+     KeyInterface::DEFAULT_ALGORITHM    // [optional] private key algorithm (default: RS256)
 );
 ```
-**Note**: given example deals with local key files, automatically done when prefixed by `file://`. You can provide the public / private key contents by passing them as a constructor argument instead (if you want to fetch your keys from a bucket or a database by example).
+**Notes**:
+- given example deals with local key files, automatically done when prefixed by `file://`
+- you can provide the public / private key stream content or [JWK array values](https://auth0.com/docs/tokens/json-web-tokens/json-web-key-set-properties) by passing them as a constructor argument instead (if you want to fetch your keys from a bucket file or a JWKS endpoint for example)
+- by default the `RS256` will be used, but you can provide others listed [here](../../src/Security/Jwt/Signer/SignerFactory.php)
+
+As a result, you'll get a [KeyChainInterface](../../src/Security/Key/KeyChainInterface.php) instance:
+
+```php
+<?php
+
+use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
+
+/** @var KeyChainInterface $keyChain */
+echo $keyChain->getIdentifier();                   // '1'
+echo $keyChain->getPublicKey()->getContent();      // public key content
+echo $keyChain->getPublicKey()->getAlgorithm();    // 'RS256'
+var_dump($keyChain->getPublicKey()->isFromFile()); // true
+```
 
 ## Configure a platform
 
