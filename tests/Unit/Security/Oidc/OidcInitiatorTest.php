@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\Oidc;
 
+use Exception;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Oidc\OidcInitiator;
@@ -104,7 +105,7 @@ class OidcInitiatorTest extends TestCase
             ->expects($this->once())
             ->method('findByPlatformIssuer')
             ->with('iss', 'client_id')
-            ->willThrowException(new \Exception('custom error'));
+            ->willThrowException(new Exception('custom error'));
 
         $request = $this->createServerRequest(
             'GET',

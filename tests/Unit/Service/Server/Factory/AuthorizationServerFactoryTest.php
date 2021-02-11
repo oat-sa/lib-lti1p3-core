@@ -27,7 +27,6 @@ use InvalidArgumentException;
 use League\OAuth2\Server\AuthorizationServer;
 use OAT\Library\Lti1p3Core\Security\Key\Key;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChain;
-use OAT\Library\Lti1p3Core\Security\Key\KeyInterface;
 use OAT\Library\Lti1p3Core\Service\Server\Factory\AuthorizationServerFactory;
 use OAT\Library\Lti1p3Core\Service\Server\Repository\AccessTokenRepository;
 use OAT\Library\Lti1p3Core\Service\Server\Repository\ClientRepository;
