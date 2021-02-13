@@ -28,13 +28,12 @@ class KeyChainFactory implements KeyChainFactoryInterface
         string $identifier,
         string $keySetName,
         $publicKey,
-        string $publicKeyAlgorithm = KeyInterface::DEFAULT_ALGORITHM,
         $privateKey = null,
         string $privateKeyPassPhrase = null,
-        string $privateKeyAlgorithm = KeyInterface::DEFAULT_ALGORITHM
+        string $algorithm = KeyInterface::ALG_RS256
     ): KeyChainInterface {
-            $publicKey = new Key($publicKey, null, $publicKeyAlgorithm);
-            $privateKey = $privateKey !== null ? new Key($privateKey, $privateKeyPassPhrase, $privateKeyAlgorithm) : null;
+            $publicKey = new Key($publicKey, null, $algorithm);
+            $privateKey = $privateKey !== null ? new Key($privateKey, $privateKeyPassPhrase, $algorithm) : null;
 
             return new KeyChain($identifier, $keySetName, $publicKey, $privateKey);
     }

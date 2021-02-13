@@ -24,7 +24,16 @@ namespace OAT\Library\Lti1p3Core\Security\Key;
 
 interface KeyInterface
 {
-    public const DEFAULT_ALGORITHM = 'RS256';
+    public const ALG_ES256 = 'ES256';
+    public const ALG_ES384 = 'ES384';
+    public const ALG_ES512 = 'ES512';
+    public const ALG_HS256 = 'HS256';
+    public const ALG_HS384 = 'HS384';
+    public const ALG_HS512 = 'HS512';
+    public const ALG_RS256 = 'RS256';
+    public const ALG_RS384 = 'RS384';
+    public const ALG_RS512 = 'RS512';
+
     public const FILE_PREFIX = 'file://';
 
     public function getContent();

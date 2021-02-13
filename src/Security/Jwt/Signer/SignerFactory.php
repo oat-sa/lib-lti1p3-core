@@ -26,6 +26,7 @@ use Lcobucci\JWT\Signer;
 use Lcobucci\JWT\Signer\Ecdsa\MultibyteStringConverter;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
+use OAT\Library\Lti1p3Core\Security\Key\KeyInterface;
 
 class SignerFactory
 {
@@ -35,23 +36,23 @@ class SignerFactory
     public function create(string $algorithm): Signer
     {
         switch ($algorithm) {
-            case 'ES256';
+            case KeyInterface::ALG_ES256;
                 return new Signer\Ecdsa\Sha256(new MultibyteStringConverter());
-            case 'ES384';
+            case KeyInterface::ALG_ES384;
                 return new Signer\Ecdsa\Sha384(new MultibyteStringConverter());
-            case 'ES512';
+            case KeyInterface::ALG_ES512;
                 return new Signer\Ecdsa\Sha512(new MultibyteStringConverter());
-            case 'HS256';
+            case KeyInterface::ALG_HS256;
                 return new Signer\Hmac\Sha256();
-            case 'HS384';
+            case KeyInterface::ALG_HS384;
                 return new Signer\Hmac\Sha384();
-            case 'HS512';
+            case KeyInterface::ALG_HS512;
                 return new Signer\Hmac\Sha512();
-            case 'RS256';
+            case KeyInterface::ALG_RS256;
                 return new Signer\Rsa\Sha256();
-            case 'RS384';
+            case KeyInterface::ALG_RS384;
                 return new Signer\Rsa\Sha384();
-            case 'RS512';
+            case KeyInterface::ALG_RS512;
                 return new Signer\Rsa\Sha512();
             default:
                 throw new LtiException(sprintf('Unhandled algorithm %s', $algorithm));

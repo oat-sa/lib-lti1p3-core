@@ -22,14 +22,14 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Security\Oidc;
 
+use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessage;
+use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilder;
 use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilderInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
-use OAT\Library\Lti1p3Core\Exception\LtiException;
-use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceGenerator;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceGeneratorInterface;
 use Psr\Http\Message\ServerRequestInterface;

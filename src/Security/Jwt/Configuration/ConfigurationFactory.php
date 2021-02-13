@@ -79,7 +79,7 @@ class ConfigurationFactory
             return $verificationKey->getAlgorithm();
         }
 
-        return KeyInterface::DEFAULT_ALGORITHM;
+        return KeyInterface::ALG_RS256;
     }
 
     private function convertKey(KeyInterface $key = null): Key

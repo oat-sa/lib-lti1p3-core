@@ -28,7 +28,6 @@ use OAT\Library\Lti1p3Core\Security\Jwks\Exporter\JwksExporter;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use RuntimeException;
 use Throwable;
 
 /**

@@ -47,16 +47,16 @@ trait SecurityTestingTrait
         string $keySetName = 'keySetName',
         string $publicKey = null,
         string $privateKey = null,
-        string $privateKeyPassPhrase = null
+        string $privateKeyPassPhrase = null,
+        string $algorithm = KeyInterface::ALG_RS256
     ): KeyChainInterface {
         return (new KeyChainFactory)->create(
             $identifier,
             $keySetName,
             $publicKey ?? getenv('TEST_KEYS_ROOT_DIR') . '/public.key',
-            KeyInterface::DEFAULT_ALGORITHM,
             $privateKey ?? getenv('TEST_KEYS_ROOT_DIR') . '/private.key',
             $privateKeyPassPhrase,
-            KeyInterface::DEFAULT_ALGORITHM
+            $algorithm
         );
     }
 
