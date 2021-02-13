@@ -28,9 +28,8 @@ interface KeyChainFactoryInterface
         string $identifier,
         string $keySetName,
         $publicKey,
-        string $publicKeyAlgorithm = KeyInterface::DEFAULT_ALGORITHM,
         $privateKey = null,
         string $privateKeyPassPhrase = null,
-        string $privateKeyAlgorithm = KeyInterface::DEFAULT_ALGORITHM
+        string $algorithm = KeyInterface::ALG_RS256
     ): KeyChainInterface;
 }

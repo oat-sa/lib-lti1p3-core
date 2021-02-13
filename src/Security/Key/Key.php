@@ -37,7 +37,7 @@ class Key implements KeyInterface
     {
         $this->content = $content;
         $this->passPhrase = $passPhrase;
-        $this->algorithm = $algorithm ?? self::DEFAULT_ALGORITHM;
+        $this->algorithm = $algorithm ?? self::ALG_RS256;
     }
 
     public function getContent()

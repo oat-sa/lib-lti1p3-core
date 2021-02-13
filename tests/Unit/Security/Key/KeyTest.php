@@ -35,7 +35,7 @@ class KeyTest extends TestCase
         $this->assertInstanceOf(KeyInterface::class, $subject);
         $this->assertEquals('key', $subject->getContent());
         $this->assertEquals('secret', $subject->getPassPhrase());
-        $this->assertEquals(KeyInterface::DEFAULT_ALGORITHM, $subject->getAlgorithm());
+        $this->assertEquals(KeyInterface::ALG_RS256, $subject->getAlgorithm());
         $this->assertTrue($subject->isFromString());
         $this->assertFalse($subject->isFromArray());
         $this->assertFalse($subject->isFromFile());
@@ -61,7 +61,7 @@ class KeyTest extends TestCase
         $this->assertInstanceOf(KeyInterface::class, $subject);
         $this->assertEquals('file://path/to/key', $subject->getContent());
         $this->assertEquals('secret', $subject->getPassPhrase());
-        $this->assertEquals(KeyInterface::DEFAULT_ALGORITHM, $subject->getAlgorithm());
+        $this->assertEquals(KeyInterface::ALG_RS256, $subject->getAlgorithm());
         $this->assertFalse($subject->isFromString());
         $this->assertFalse($subject->isFromArray());
         $this->assertTrue($subject->isFromFile());
@@ -74,7 +74,7 @@ class KeyTest extends TestCase
         $this->assertInstanceOf(KeyInterface::class, $subject);
         $this->assertEquals(['use' => 'sig'], $subject->getContent());
         $this->assertEquals('secret', $subject->getPassPhrase());
-        $this->assertEquals(KeyInterface::DEFAULT_ALGORITHM, $subject->getAlgorithm());
+        $this->assertEquals(KeyInterface::ALG_RS256, $subject->getAlgorithm());
         $this->assertFalse($subject->isFromString());
         $this->assertTrue($subject->isFromArray());
         $this->assertFalse($subject->isFromFile());

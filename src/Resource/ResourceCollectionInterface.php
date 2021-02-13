@@ -24,7 +24,6 @@ namespace OAT\Library\Lti1p3Core\Resource;
 
 use Countable;
 use IteratorAggregate;
-use JsonSerializable;
 
 interface ResourceCollectionInterface extends Countable, IteratorAggregate
 {
