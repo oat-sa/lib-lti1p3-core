@@ -24,7 +24,6 @@ namespace OAT\Library\Lti1p3Core\Security\Jwks\Exporter\Jwk;
 
 use InvalidArgumentException;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainInterface;
-
 use const OPENSSL_KEYTYPE_RSA;
 
 /**

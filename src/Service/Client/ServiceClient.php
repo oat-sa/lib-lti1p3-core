@@ -24,10 +24,10 @@ namespace OAT\Library\Lti1p3Core\Service\Client;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
-use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
-use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
+use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Security\Jwt\Builder\Builder;
 use OAT\Library\Lti1p3Core\Security\Jwt\Builder\BuilderInterface;
 use OAT\Library\Lti1p3Core\Service\Server\Grant\ClientAssertionCredentialsGrant;

@@ -22,10 +22,10 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Message;
 
-use OAT\Library\Lti1p3Core\Util\Collection\Collection;
-use OAT\Library\Lti1p3Core\Util\Collection\CollectionInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
+use OAT\Library\Lti1p3Core\Util\Collection\Collection;
+use OAT\Library\Lti1p3Core\Util\Collection\CollectionInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**

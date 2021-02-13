@@ -30,10 +30,9 @@ $keyChain = (new KeyChainFactory)->create(
     '1',
     'mySetName',
     'file://home/user/.ssh/id_rsa.pub',
-     KeyInterface::DEFAULT_ALGORITHM,
     'file://home/user/.ssh/id_rsa',
     'test',
-     KeyInterface::DEFAULT_ALGORITHM
+     KeyInterface::ALG_RS256
 );
 
 $jwkExport = (new JwkRS256Exporter())->export($keyChain);
@@ -51,7 +50,7 @@ $jwkExport = (new JwkRS256Exporter())->export($keyChain);
         "kid": "1"
     }
     ```
-- If you want to support other algorithms than RS SHA256, you can implement the [JwkExporterInterface](../../src/Security/Jwks/Exporter/Jwk/JwkExporterInterface.php).
+- If you want to support other algorithms than RS256, you can implement the [JwkExporterInterface](../../src/Security/Jwks/Exporter/Jwk/JwkExporterInterface.php).
 
 ## Export a JWKS from multiple key chains
 
@@ -80,20 +79,18 @@ $keyChain1 = (new KeyChainFactory)->create(
     'kid1',
     'myKeySetName',
     'file://home/user/.ssh/chain1/id_rsa.pub',
-     KeyInterface::DEFAULT_ALGORITHM,
     'file://home/user/.ssh/chain1/id_rsa',
     'test1',
-     KeyInterface::DEFAULT_ALGORITHM
+     KeyInterface::ALG_RS256
 );
 
 $keyChain2 = (new KeyChainFactory)->create(
     'kid2',
     'myKeySetName',
     'file://home/user/.ssh/chain2/id_rsa.pub',
-     KeyInterface::DEFAULT_ALGORITHM,
     'file://home/user/.ssh/chain2/id_rsa',
     'test2',
-     KeyInterface::DEFAULT_ALGORITHM
+     KeyInterface::ALG_RS256
 );
 
 $keyChainRepository = new KeyChainRepository();
