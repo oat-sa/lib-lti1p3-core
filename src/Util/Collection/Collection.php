@@ -96,4 +96,9 @@ class Collection implements CollectionInterface
     {
         return $this->getIterator()->count();
     }
+
+    public function jsonSerialize(): array
+    {
+        return array_filter($this->items);
+    }
 }

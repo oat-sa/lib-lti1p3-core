@@ -39,7 +39,7 @@ class Image extends Resource implements ImageInterface
         parent::__construct(
             $identifier,
             self::TYPE,
-            ['url' => $this->url] + $properties
+            array_merge($properties, ['url' => $this->url])
         );
     }
 
@@ -50,21 +50,21 @@ class Image extends Resource implements ImageInterface
 
     public function getIcon(): ?array
     {
-        return $this->getProperty('icon');
+        return $this->getProperties()->get('icon');
     }
 
     public function getThumbnail(): ?array
     {
-        return $this->getProperty('thumbnail');
+        return $this->getProperties()->get('thumbnail');
     }
 
     public function getWidth(): ?string
     {
-        return $this->getProperty('width');
+        return $this->getProperties()->get('width');
     }
 
     public function getHeight(): ?string
     {
-        return $this->getProperty('height');
+        return $this->getProperties()->get('height');
     }
 }

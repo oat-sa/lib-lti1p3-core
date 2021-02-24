@@ -22,6 +22,8 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\User;
 
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
+use OAT\Library\Lti1p3Core\Util\Collection\Collection;
+use OAT\Library\Lti1p3Core\Util\Collection\CollectionInterface;
 
 /**
  * @see http://www.imsglobal.org/spec/lti/v1p3/#user-identity-claims-0
@@ -52,7 +54,7 @@ class UserIdentity implements UserIdentityInterface
     /** @var string|null */
     private $picture;
 
-    /** @var string[] */
+    /** @var CollectionInterface */
     private $additionalProperties;
 
     public function __construct(
@@ -74,7 +76,7 @@ class UserIdentity implements UserIdentityInterface
         $this->middleName = $middleName;
         $this->locale = $locale;
         $this->picture = $picture;
-        $this->additionalProperties = $additionalProperties;
+        $this->additionalProperties = (new Collection())->add($additionalProperties);
     }
 
     public function getIdentifier(): string
@@ -117,30 +119,27 @@ class UserIdentity implements UserIdentityInterface
         return $this->picture;
     }
 
-    public function getAdditionalProperties(): array
+    public function getAdditionalProperties(): CollectionInterface
     {
         return $this->additionalProperties;
-    }
-
-    public function getAdditionalProperty(string $propertyName, ?string $default = null): ?string
-    {
-        return $this->additionalProperties[$propertyName] ?? $default;
     }
 
     public function normalize(): array
     {
         return array_filter(
-            [
-                MessagePayloadInterface::CLAIM_SUB => $this->getIdentifier(),
-                MessagePayloadInterface::CLAIM_USER_NAME => $this->getName(),
-                MessagePayloadInterface::CLAIM_USER_EMAIL => $this->getEmail(),
-                MessagePayloadInterface::CLAIM_USER_GIVEN_NAME => $this->getGivenName(),
-                MessagePayloadInterface::CLAIM_USER_FAMILY_NAME => $this->getFamilyName(),
-                MessagePayloadInterface::CLAIM_USER_MIDDLE_NAME => $this->getMiddleName(),
-                MessagePayloadInterface::CLAIM_USER_LOCALE => $this->getLocale(),
-                MessagePayloadInterface::CLAIM_USER_PICTURE => $this->getPicture(),
-            ]
-            + $this->additionalProperties
+            array_merge(
+                $this->additionalProperties->all(),
+                [
+                    MessagePayloadInterface::CLAIM_SUB => $this->getIdentifier(),
+                    MessagePayloadInterface::CLAIM_USER_NAME => $this->getName(),
+                    MessagePayloadInterface::CLAIM_USER_EMAIL => $this->getEmail(),
+                    MessagePayloadInterface::CLAIM_USER_GIVEN_NAME => $this->getGivenName(),
+                    MessagePayloadInterface::CLAIM_USER_FAMILY_NAME => $this->getFamilyName(),
+                    MessagePayloadInterface::CLAIM_USER_MIDDLE_NAME => $this->getMiddleName(),
+                    MessagePayloadInterface::CLAIM_USER_LOCALE => $this->getLocale(),
+                    MessagePayloadInterface::CLAIM_USER_PICTURE => $this->getPicture(),
+                ]
+            )
         );
     }
 }

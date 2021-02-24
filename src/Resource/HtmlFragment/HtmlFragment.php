@@ -39,7 +39,7 @@ class HtmlFragment extends Resource implements HtmlFragmentInterface
         parent::__construct(
             $identifier,
             self::TYPE,
-            ['html' => $this->html] + $properties
+            array_merge($properties, ['html' => $this->html])
         );
     }
 

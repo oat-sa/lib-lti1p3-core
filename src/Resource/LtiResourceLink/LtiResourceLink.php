@@ -36,41 +36,41 @@ class LtiResourceLink extends Resource implements LtiResourceLinkInterface
 
     public function getUrl(): ?string
     {
-        return $this->getProperty('url');
+        return $this->getProperties()->get('url');
     }
 
     public function getIcon(): ?array
     {
-        return $this->getProperty('icon');
+        return $this->getProperties()->get('icon');
     }
 
     public function getThumbnail(): ?array
     {
-        return $this->getProperty('thumbnail');
+        return $this->getProperties()->get('thumbnail');
     }
 
     public function getIframe(): ?array
     {
-        return $this->getProperty('iframe');
+        return $this->getProperties()->get('iframe');
     }
 
     public function getCustom(): ?array
     {
-        return $this->getProperty('custom');
+        return $this->getProperties()->get('custom');
     }
 
     public function getLineItem(): ?array
     {
-        return $this->getProperty('lineItem');
+        return $this->getProperties()->get('lineItem');
     }
 
     public function getAvailability(): ?array
     {
-        return $this->getProperty('available');
+        return $this->getProperties()->get('available');
     }
 
     public function getSubmission(): ?array
     {
-        return $this->getProperty('submission');
+        return $this->getProperties()->get('submission');
     }
 }

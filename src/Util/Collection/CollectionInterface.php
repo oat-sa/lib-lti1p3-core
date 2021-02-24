@@ -25,8 +25,9 @@ namespace OAT\Library\Lti1p3Core\Util\Collection;
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;
+use JsonSerializable;
 
-interface CollectionInterface extends IteratorAggregate, Countable
+interface CollectionInterface extends IteratorAggregate, Countable, JsonSerializable
 {
     public function all(): array;
 

@@ -22,6 +22,9 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Resource;
 
+use OAT\Library\Lti1p3Core\Util\Collection\Collection;
+use OAT\Library\Lti1p3Core\Util\Collection\CollectionInterface;
+
 class Resource implements ResourceInterface
 {
     /** @var string */
@@ -30,14 +33,14 @@ class Resource implements ResourceInterface
     /** @var string */
     private $type;
 
-    /** @var array */
+    /** @var CollectionInterface */
     private $properties;
 
     public function __construct(string $identifier, string $type, array $properties = [])
     {
         $this->identifier = $identifier;
         $this->type = $type;
-        $this->properties = $properties;
+        $this->properties = (new Collection())->add($properties);
     }
 
     public function getIdentifier(): string
@@ -52,31 +55,26 @@ class Resource implements ResourceInterface
 
     public function getTitle(): ?string
     {
-        return $this->getProperty('title');
+        return $this->getProperties()->get('title');
     }
 
     public function getText(): ?string
     {
-        return $this->getProperty('text');
+        return $this->getProperties()->get('text');
     }
 
-    public function getProperties(): array
+    public function getProperties(): CollectionInterface
     {
         return $this->properties;
     }
 
-    public function hasProperty(string $propertyName): bool
-    {
-        return array_key_exists($propertyName, $this->properties);
-    }
-
-    public function getProperty(string $propertyName, $default = null)
-    {
-        return $this->properties[$propertyName] ?? $default;
-    }
-
     public function normalize(): array
     {
-        return array_filter(['type' => $this->type] + $this->properties);
+        return array_filter(
+            array_merge(
+                $this->properties->all(),
+                ['type' => $this->type]
+            )
+        );
     }
 }
