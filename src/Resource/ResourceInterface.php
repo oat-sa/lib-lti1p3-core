@@ -22,6 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Resource;
 
+use OAT\Library\Lti1p3Core\Util\Collection\CollectionInterface;
+
 interface ResourceInterface
 {
     public function getIdentifier(): string;
@@ -32,11 +34,7 @@ interface ResourceInterface
 
     public function getText(): ?string;
 
-    public function getProperties(): array;
-
-    public function hasProperty(string $propertyName): bool;
-
-    public function getProperty(string $propertyName, $default = null);
+    public function getProperties(): CollectionInterface;
     
     public function normalize(): array;
 }

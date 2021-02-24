@@ -68,23 +68,23 @@ class ResourceTest extends TestCase
         $this->assertEquals('text', $this->subject->getText());
     }
 
-    public function testGetProperties(): void
+    public function testProperties(): void
     {
+        $this->assertTrue($this->subject->getProperties()->has('title'));
+        $this->assertTrue($this->subject->getProperties()->has('text'));
+        $this->assertEquals('title', $this->subject->getProperties()->getMandatory('title'));
+        $this->assertEquals('text', $this->subject->getProperties()->getMandatory('text'));
+
+        $this->assertFalse($this->subject->getProperties()->has('missing'));
+        $this->assertEquals('default', $this->subject->getProperties()->get('missing', 'default'));
+
         $this->assertEquals(
             [
                 'title' => 'title',
                 'text' => 'text'
             ],
-            $this->subject->getProperties()
+            $this->subject->getProperties()->all()
         );
-    }
-
-    public function testHasProperty(): void
-    {
-        $this->assertTrue($this->subject->hasProperty('title'));
-        $this->assertTrue($this->subject->hasProperty('text'));
-
-        $this->assertFalse($this->subject->hasProperty('invalid'));
     }
 
     public function testNormalize(): void

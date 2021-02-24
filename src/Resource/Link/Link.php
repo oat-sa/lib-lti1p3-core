@@ -39,7 +39,7 @@ class Link extends Resource implements LinkInterface
         parent::__construct(
             $identifier,
             self::TYPE,
-            ['url' => $this->url] + $properties
+            array_merge($properties, ['url' => $this->url])
         );
     }
 
@@ -50,26 +50,26 @@ class Link extends Resource implements LinkInterface
 
     public function getIcon(): ?array
     {
-        return $this->getProperty('icon');
+        return $this->getProperties()->get('icon');
     }
 
     public function getThumbnail(): ?array
     {
-        return $this->getProperty('thumbnail');
+        return $this->getProperties()->get('thumbnail');
     }
 
     public function getEmbed(): ?string
     {
-        return $this->getProperty('embed');
+        return $this->getProperties()->get('embed');
     }
 
     public function getWindow(): ?array
     {
-        return $this->getProperty('window');
+        return $this->getProperties()->get('window');
     }
 
     public function getIframe(): ?array
     {
-        return $this->getProperty('iframe');
+        return $this->getProperties()->get('iframe');
     }
 }

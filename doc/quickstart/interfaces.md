@@ -187,8 +187,17 @@ In order to store service calls access tokens, an implementation of the [AccessT
 
 In order to retrieve and finalize scopes during grants, an implementation of the [ScopeRepositoryInterface](https://github.com/thephpleague/oauth2-server/blob/master/src/Repositories/ScopeRepositoryInterface.php) can be provided.
 
-**Notes**:
+**Note**:
 - the default `ScopeRepository` will just provide back scopes given at construction.
+
+### Id generator interface
+
+**Default implementation**: [IdGenerator](../../src/Util/Generator/IdGenerator.php)
+
+To customise overall id generation, an implementation of the [IdGeneratorInterface](../../src/Util/Generator/IdGeneratorInterface.php) can be provided.
+
+**Note**:
+- the default `IdGenerator` generates [UUIDv4](https://en.wikipedia.org/wiki/Universally_unique_identifier#Version_4_(random)).
 
 ### JWT interface
 
