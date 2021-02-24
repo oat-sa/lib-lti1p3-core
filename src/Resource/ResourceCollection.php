@@ -23,14 +23,18 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Resource;
 
 use ArrayIterator;
+use OAT\Library\Lti1p3Core\Util\Collection\Collection;
+use OAT\Library\Lti1p3Core\Util\Collection\CollectionInterface;
 
 class ResourceCollection implements ResourceCollectionInterface
 {
-    /** @var ResourceInterface[] */
+    /** @var CollectionInterface|ResourceInterface[] */
     private $resources = [];
 
     public function __construct(iterable $resources = [])
     {
+        $this->resources = new Collection();
+
         foreach ($resources as $resource) {
             $this->add($resource);
         }
@@ -38,7 +42,7 @@ class ResourceCollection implements ResourceCollectionInterface
 
     public function add(ResourceInterface $resource): ResourceCollectionInterface
     {
-        $this->resources[] = $resource;
+        $this->resources->set($resource->getIdentifier(), $resource);
 
         return $this;
     }
@@ -46,7 +50,7 @@ class ResourceCollection implements ResourceCollectionInterface
     public function getByType(string $type): array
     {
         return array_filter(
-            $this->resources,
+            $this->resources->all(),
             static function (ResourceInterface $resource) use ($type) {
                 return $resource->getType() === $type;
             }
@@ -55,7 +59,7 @@ class ResourceCollection implements ResourceCollectionInterface
 
     public function count(): int
     {
-        return $this->getIterator()->count();
+        return $this->resources->count();
     }
 
     /**
@@ -63,7 +67,7 @@ class ResourceCollection implements ResourceCollectionInterface
      */
     public function getIterator(): ArrayIterator
     {
-        return new ArrayIterator($this->resources);
+        return $this->resources->getIterator();
     }
 
     public function normalize(): array
@@ -72,7 +76,7 @@ class ResourceCollection implements ResourceCollectionInterface
             static function(ResourceInterface $resource) {
                 return $resource->normalize();
             },
-            $this->resources
+            array_values($this->resources->all())
         );
     }
 }

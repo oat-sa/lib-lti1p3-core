@@ -39,7 +39,7 @@ class File extends Resource implements FileInterface
         parent::__construct(
             $identifier,
             self::TYPE,
-            ['url' => $this->url] + $properties
+            array_merge($properties, ['url' => $this->url])
         );
     }
 
@@ -50,16 +50,16 @@ class File extends Resource implements FileInterface
 
     public function getIcon(): ?array
     {
-        return $this->getProperty('icon');
+        return $this->getProperties()->get('icon');
     }
 
     public function getThumbnail(): ?array
     {
-        return $this->getProperty('thumbnail');
+        return $this->getProperties()->get('thumbnail');
     }
 
     public function expiresAt(): ?string
     {
-        return $this->getProperty('expiresAt');
+        return $this->getProperties()->get('expiresAt');
     }
 }

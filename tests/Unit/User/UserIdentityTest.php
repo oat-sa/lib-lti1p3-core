@@ -75,14 +75,14 @@ class UserIdentityTest extends TestCase
                 'property1' => 'value1',
                 'property2' => 'value2'
             ],
-            $subject->getAdditionalProperties()
+            $subject->getAdditionalProperties()->all()
         );
 
-        $this->assertEquals('value1', $subject->getAdditionalProperty('property1'));
-        $this->assertEquals('value2', $subject->getAdditionalProperty('property2'));
+        $this->assertEquals('value1', $subject->getAdditionalProperties()->getMandatory('property1'));
+        $this->assertEquals('value2', $subject->getAdditionalProperties()->getMandatory('property2'));
 
-        $this->assertNull($subject->getAdditionalProperty('missingProperty'));
-        $this->assertEquals('default', $subject->getAdditionalProperty('missingProperty', 'default'));
+        $this->assertFalse($subject->getAdditionalProperties()->has('missingProperty'));
+        $this->assertEquals('default', $subject->getAdditionalProperties()->get('missingProperty', 'default'));
     }
 
     private function createTestUserIdentityWithAdditionalProperties(): UserIdentityInterface

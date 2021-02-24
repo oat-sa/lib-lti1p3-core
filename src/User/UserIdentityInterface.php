@@ -21,6 +21,8 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\User;
 
+use OAT\Library\Lti1p3Core\Util\Collection\CollectionInterface;
+
 /**
  * @see http://www.imsglobal.org/spec/lti/v1p3/#user-identity-claims-0
  */
@@ -42,9 +44,7 @@ interface UserIdentityInterface
 
     public function getPicture(): ?string;
 
-    public function getAdditionalProperties(): array;
-
-    public function getAdditionalProperty(string $propertyName, string $default = null): ?string;
+    public function getAdditionalProperties(): CollectionInterface;
 
     public function normalize(): array;
 }
