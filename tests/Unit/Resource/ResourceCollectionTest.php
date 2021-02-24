@@ -25,6 +25,7 @@ namespace OAT\Library\Lti1p3Core\Tests\Unit\Resource;
 use OAT\Library\Lti1p3Core\Resource\Resource;
 use OAT\Library\Lti1p3Core\Resource\ResourceCollection;
 use OAT\Library\Lti1p3Core\Resource\ResourceCollectionInterface;
+use OAT\Library\Lti1p3Core\Resource\ResourceInterface;
 use PHPUnit\Framework\TestCase;
 
 class ResourceCollectionTest extends TestCase
@@ -43,6 +44,13 @@ class ResourceCollectionTest extends TestCase
     public function testItImplementsResourceCollectionInterface(): void
     {
         $this->assertInstanceOf(ResourceCollectionInterface::class, $this->subject);
+    }
+
+    public function testIterator(): void
+    {
+        foreach ($this->subject as $resource) {
+            $this->assertInstanceOf(ResourceInterface::class, $resource);
+        }
     }
 
     public function testCount(): void
