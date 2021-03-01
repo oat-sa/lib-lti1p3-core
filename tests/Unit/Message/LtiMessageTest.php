@@ -69,7 +69,7 @@ class LtiMessageTest extends TestCase
         $this->assertEquals('value', $this->subject->getParameters()->getMandatory('parameter'));
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot find item invalid into collection');
+        $this->expectExceptionMessage('Missing mandatory invalid');
 
         $this->subject->getParameters()->getMandatory('invalid');
     }

@@ -118,6 +118,47 @@ class ServiceClientTest extends TestCase
         $this->assertEquals('access_token', $this->cache->getItem($cacheKey)->get());
     }
 
+    public function testItCanPerformAServiceCallFromEmptyTokenCacheWith201Response(): void
+    {
+        $this->clientMock
+            ->expects($this->exactly(2))
+            ->method('request')
+            ->withConsecutive(
+                [
+                    'POST',
+                    $this->registration->getPlatform()->getOAuth2AccessTokenUrl(),
+                    [
+                        'form_params' => [
+                            'grant_type' => ServiceClientInterface::GRANT_TYPE,
+                            'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
+                            'client_assertion' => $this->createTestClientAssertion($this->registration),
+                            'scope' => ''
+                        ]
+                    ]
+                ],
+                [
+                    'GET',
+                    'http://example.com',
+                    [
+                        'headers' => ['Authorization' => 'Bearer access_token']
+                    ]
+                ]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $this->createResponse(json_encode(['access_token'=> 'access_token', 'expires_in' => 3600]), 201),
+                $this->createResponse('service response')
+            );
+
+        $result = $this->subject->request($this->registration, 'GET', 'http://example.com');
+
+        $this->assertInstanceOf(ResponseInterface::class, $result);
+        $this->assertEquals('service response', $result->getBody()->__toString());
+
+        $cacheKey = $this->generateAccessTokenCacheKey($this->registration);
+        $this->assertTrue($this->cache->hasItem($cacheKey));
+        $this->assertEquals('access_token', $this->cache->getItem($cacheKey)->get());
+    }
+
     public function testItCanPerformAServiceCallFromPopulatedTokenCacheWithoutScopes(): void
     {
         $cacheKey = $this->generateAccessTokenCacheKey($this->registration);

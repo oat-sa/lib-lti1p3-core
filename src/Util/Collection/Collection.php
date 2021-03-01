@@ -62,7 +62,7 @@ class Collection implements CollectionInterface
     public function getMandatory(string $key)
     {
         if (!$this->has($key)) {
-            throw new InvalidArgumentException(sprintf('Cannot find item %s into collection', $key));
+            throw new InvalidArgumentException(sprintf('Missing mandatory %s', $key));
         }
 
         return $this->items[$key];

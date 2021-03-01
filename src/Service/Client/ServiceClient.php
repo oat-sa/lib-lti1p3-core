@@ -121,7 +121,7 @@ class ServiceClient implements ServiceClientInterface
                 ]
             ]);
 
-            if ($response->getStatusCode() !== 200) {
+            if (!in_array($response->getStatusCode(), [200, 201])) {
                 throw new RuntimeException('invalid response http status code');
             }
 

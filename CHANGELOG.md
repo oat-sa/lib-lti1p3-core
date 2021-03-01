@@ -12,6 +12,7 @@ CHANGELOG
 * Added [migration guide](https://github.com/oat-sa/lib-lti1p3-core/wiki/Migration-from-3.x-to-4.x) to document breaking changes and migration steps
 * Added more security testing tools 
 * Fixed issue [#74](https://github.com/oat-sa/lib-lti1p3-core/issues/74)
+* Fixed ServiceClient to work with 201 access token endpoint response  
 * Updated documentation
 
 3.3.1

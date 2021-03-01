@@ -153,8 +153,8 @@ class CollectionTest extends TestCase
     public function testItThrowsAnInvalidArgumentExceptionOnGetMissingMandatoryItem(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot find item missing into collection');
+        $this->expectExceptionMessage('Missing mandatory invalid');
 
-        (new Collection())->getMandatory('missing');
+        (new Collection())->getMandatory('invalid');
     }
 }
