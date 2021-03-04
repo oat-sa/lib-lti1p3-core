@@ -440,7 +440,7 @@ class ServiceClientTest extends TestCase
                         $this->createMock(ServerRequestInterface::class),
                         $this->createResponse('internal server error', 500)
                     )
-                ),
+                )
             );
 
         $this->subject->request($this->registration, 'GET', 'http://example.com');
