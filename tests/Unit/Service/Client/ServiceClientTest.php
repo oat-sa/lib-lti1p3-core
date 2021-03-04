@@ -213,6 +213,60 @@ class ServiceClientTest extends TestCase
         $this->assertEquals('service response', $result->getBody()->__toString());
     }
 
+    public function testItCanPerformAServiceCallFromPopulatedInvalidTokenCacheAndAutoRetry(): void
+    {
+        $scopes = ['scope1', 'scope2'];
+
+        $cacheKey = $this->generateAccessTokenCacheKey($this->registration, $scopes);
+        $cacheItem = $this->cache->getItem($cacheKey)->set('invalid_access_token');
+        $this->cache->save($cacheItem);
+
+        $this->clientMock
+            ->expects($this->exactly(3))
+            ->method('request')
+            ->withConsecutive(
+                [
+                    'GET',
+                    'http://example.com',
+                    [
+                        'headers' => ['Authorization' => 'Bearer invalid_access_token']
+                    ]
+                ],
+                [
+                    'POST',
+                    $this->registration->getPlatform()->getOAuth2AccessTokenUrl(),
+                    [
+                        'form_params' => [
+                            'grant_type' => ServiceClientInterface::GRANT_TYPE,
+                            'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
+                            'client_assertion' => $this->createTestClientAssertion($this->registration),
+                            'scope' => 'scope1 scope2'
+                        ]
+                    ]
+                ],
+                [
+                    'GET',
+                    'http://example.com',
+                    [
+                        'headers' => ['Authorization' => 'Bearer valid_access_token']
+                    ]
+                ]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $this->createResponse('invalid token', 401),
+                $this->createResponse(json_encode(['access_token'=> 'valid_access_token', 'expires_in' => 3600]), 201),
+                $this->createResponse('service response')
+            );
+
+        $result = $this->subject->request($this->registration, 'GET', 'http://example.com', [], $scopes);
+
+        $this->assertInstanceOf(ResponseInterface::class, $result);
+        $this->assertEquals('service response', $result->getBody()->__toString());
+
+        $this->assertTrue($this->cache->hasItem($cacheKey));
+        $this->assertEquals('valid_access_token', $this->cache->getItem($cacheKey)->get());
+    }
+
     public function testItThrowAnLtiExceptionOnMissingToolKeyChain(): void
     {
         $this->expectException(LtiException::class);

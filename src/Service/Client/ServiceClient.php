@@ -74,11 +74,27 @@ class ServiceClient implements ServiceClientInterface
         array $scopes = []
     ): ResponseInterface {
         try {
-            $options = array_merge_recursive($options, [
-                'headers' => ['Authorization' => sprintf('Bearer %s', $this->getAccessToken($registration, $scopes))]
-            ]);
+            $options = array_merge_recursive(
+                $options,
+                [
+                    'headers' => [
+                        'Authorization' => sprintf('Bearer %s', $this->getAccessToken($registration, $scopes))
+                    ]
+                ]
+            );
 
-            return $this->client->request($method, $uri, $options);
+            $response = $this->client->request($method, $uri, $options);
+
+            if ($response->getStatusCode() === 401) {
+                $options['headers']['Authorization'] = sprintf(
+                    'Bearer %s',
+                    $this->getAccessToken($registration, $scopes, true)
+                );
+
+                $response = $this->client->request($method, $uri, $options);
+            }
+
+            return $response;
 
         } catch (LtiExceptionInterface $exception) {
             throw $exception;
@@ -94,8 +110,11 @@ class ServiceClient implements ServiceClientInterface
     /**
      * @throws LtiExceptionInterface
      */
-    private function getAccessToken(RegistrationInterface $registration, array $scopes): string
-    {
+    private function getAccessToken(
+        RegistrationInterface $registration,
+        array $scopes,
+        bool $forceRefresh = false
+    ): string {
         try {
             $cacheKey = sprintf(
                 '%s-%s-%s',
@@ -108,7 +127,11 @@ class ServiceClient implements ServiceClientInterface
                 $item = $this->cache->getItem($cacheKey);
 
                 if ($item->isHit()) {
-                    return $item->get();
+                    if (!$forceRefresh) {
+                        return $item->get();
+                    }
+
+                    $this->cache->deleteItem($cacheKey);
                 }
             }
 
