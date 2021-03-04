@@ -24,6 +24,7 @@ namespace OAT\Library\Lti1p3Core\Service\Client;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\ClientException;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
@@ -74,12 +75,30 @@ class ServiceClient implements ServiceClientInterface
         array $scopes = []
     ): ResponseInterface {
         try {
-            $options = array_merge_recursive($options, [
-                'headers' => ['Authorization' => sprintf('Bearer %s', $this->getAccessToken($registration, $scopes))]
-            ]);
+            $options = array_merge_recursive(
+                $options,
+                [
+                    'headers' => [
+                        'Authorization' => sprintf('Bearer %s', $this->getAccessToken($registration, $scopes))
+                    ],
+                    'http_errors' => true
+                ]
+            );
 
-            return $this->client->request($method, $uri, $options);
+            try {
+                return $this->client->request($method, $uri, $options);
+            } catch (ClientException $exception) {
+                if ($exception->getResponse()->getStatusCode() === 401) {
+                    $options['headers']['Authorization'] = sprintf(
+                        'Bearer %s',
+                        $this->getAccessToken($registration, $scopes, true)
+                    );
 
+                    return $this->client->request($method, $uri, $options);
+                }
+
+                throw $exception;
+            }
         } catch (LtiExceptionInterface $exception) {
             throw $exception;
         } catch (Throwable $exception) {
@@ -94,8 +113,11 @@ class ServiceClient implements ServiceClientInterface
     /**
      * @throws LtiExceptionInterface
      */
-    private function getAccessToken(RegistrationInterface $registration, array $scopes): string
-    {
+    private function getAccessToken(
+        RegistrationInterface $registration,
+        array $scopes,
+        bool $forceRefresh = false
+    ): string {
         try {
             $cacheKey = sprintf(
                 '%s-%s-%s',
@@ -108,7 +130,11 @@ class ServiceClient implements ServiceClientInterface
                 $item = $this->cache->getItem($cacheKey);
 
                 if ($item->isHit()) {
-                    return $item->get();
+                    if (!$forceRefresh) {
+                        return $item->get();
+                    }
+
+                    $this->cache->deleteItem($cacheKey);
                 }
             }
 
