@@ -24,6 +24,7 @@ namespace OAT\Library\Lti1p3Core\Service\Client;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\ClientException;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
@@ -83,19 +84,20 @@ class ServiceClient implements ServiceClientInterface
                 ]
             );
 
-            $response = $this->client->request($method, $uri, $options);
+            try {
+                return $this->client->request($method, $uri, $options);
+            } catch (ClientException $exception) {
+                if ($exception->getResponse()->getStatusCode() === 401) {
+                    $options['headers']['Authorization'] = sprintf(
+                        'Bearer %s',
+                        $this->getAccessToken($registration, $scopes, true)
+                    );
 
-            if ($response->getStatusCode() === 401) {
-                $options['headers']['Authorization'] = sprintf(
-                    'Bearer %s',
-                    $this->getAccessToken($registration, $scopes, true)
-                );
+                    return $this->client->request($method, $uri, $options);
+                }
 
-                $response = $this->client->request($method, $uri, $options);
+                throw $exception;
             }
-
-            return $response;
-
         } catch (LtiExceptionInterface $exception) {
             throw $exception;
         } catch (Throwable $exception) {

@@ -25,6 +25,7 @@ namespace OAT\Library\Lti1p3Core\Tests\Unit\Service\Client;
 use Cache\Adapter\PHPArray\ArrayCachePool;
 use Carbon\Carbon;
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\ClientException;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Security\Jwt\Builder\Builder;
@@ -36,6 +37,7 @@ use OAT\Library\Lti1p3Core\Tests\Traits\NetworkTestingTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class ServiceClientTest extends TestCase
 {
@@ -253,7 +255,13 @@ class ServiceClientTest extends TestCase
                 ]
             )
             ->willReturnOnConsecutiveCalls(
-                $this->createResponse('invalid token', 401),
+                $this->throwException(
+                    new ClientException(
+                        'invalid token',
+                        $this->createMock(ServerRequestInterface::class),
+                        $this->createResponse('invalid token', 401)
+                    )
+                ),
                 $this->createResponse(json_encode(['access_token'=> 'valid_access_token', 'expires_in' => 3600]), 201),
                 $this->createResponse('service response')
             );
@@ -390,6 +398,49 @@ class ServiceClientTest extends TestCase
             ->willReturnOnConsecutiveCalls(
                 $this->createResponse(json_encode(['access_token'=> 'access_token', 'expires_in' => 3600])),
                 'invalid output'
+            );
+
+        $this->subject->request($this->registration, 'GET', 'http://example.com');
+    }
+
+    public function testItThrowAnLtiExceptionOnInvalidPlatformEndpointResponse(): void
+    {
+        $this->expectException(LtiException::class);
+        $this->expectExceptionMessage('Cannot perform request');
+
+        $this->clientMock
+            ->expects($this->exactly(2))
+            ->method('request')
+            ->withConsecutive(
+                [
+                    'POST',
+                    $this->registration->getPlatform()->getOAuth2AccessTokenUrl(),
+                    [
+                        'form_params' => [
+                            'grant_type' => ServiceClientInterface::GRANT_TYPE,
+                            'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
+                            'client_assertion' => $this->createTestClientAssertion($this->registration),
+                            'scope' => ''
+                        ]
+                    ]
+                ],
+                [
+                    'GET',
+                    'http://example.com',
+                    [
+                        'headers' => ['Authorization' => 'Bearer access_token']
+                    ]
+                ]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $this->createResponse(json_encode(['access_token'=> 'access_token', 'expires_in' => 3600])),
+                $this->throwException(
+                    new ClientException(
+                        'invalid token',
+                        $this->createMock(ServerRequestInterface::class),
+                        $this->createResponse('internal server error', 500)
+                    )
+                ),
             );
 
         $this->subject->request($this->registration, 'GET', 'http://example.com');
