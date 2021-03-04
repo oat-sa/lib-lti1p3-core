@@ -436,7 +436,7 @@ class ServiceClientTest extends TestCase
                 $this->createResponse(json_encode(['access_token'=> 'access_token', 'expires_in' => 3600])),
                 $this->throwException(
                     new ClientException(
-                        'invalid token',
+                        'internal server error',
                         $this->createMock(ServerRequestInterface::class),
                         $this->createResponse('internal server error', 500)
                     )
