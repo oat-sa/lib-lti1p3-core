@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+* Added invalid access token cache busting on 401 LTI service response (with auto retry)
+
 4.0.0
 -----
 
