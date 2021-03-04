@@ -101,7 +101,8 @@ class ServiceClientTest extends TestCase
                     'GET',
                     'http://example.com',
                     [
-                        'headers' => ['Authorization' => 'Bearer access_token']
+                        'headers' => ['Authorization' => 'Bearer access_token'],
+                        'http_errors' => true
                     ]
                 ]
             )
@@ -142,7 +143,8 @@ class ServiceClientTest extends TestCase
                     'GET',
                     'http://example.com',
                     [
-                        'headers' => ['Authorization' => 'Bearer access_token']
+                        'headers' => ['Authorization' => 'Bearer access_token'],
+                        'http_errors' => true
                     ]
                 ]
             )
@@ -174,7 +176,8 @@ class ServiceClientTest extends TestCase
                 'GET',
                 'http://example.com',
                 [
-                    'headers' => ['Authorization' => 'Bearer cached_access_token']
+                    'headers' => ['Authorization' => 'Bearer cached_access_token'],
+                    'http_errors' => true
                 ]
             )
             ->willReturn(
@@ -202,7 +205,8 @@ class ServiceClientTest extends TestCase
                 'GET',
                 'http://example.com',
                 [
-                    'headers' => ['Authorization' => 'Bearer cached_access_token']
+                    'headers' => ['Authorization' => 'Bearer cached_access_token'],
+                    'http_errors' => true
                 ]
             )
             ->willReturn(
@@ -231,7 +235,8 @@ class ServiceClientTest extends TestCase
                     'GET',
                     'http://example.com',
                     [
-                        'headers' => ['Authorization' => 'Bearer invalid_access_token']
+                        'headers' => ['Authorization' => 'Bearer invalid_access_token'],
+                        'http_errors' => true
                     ]
                 ],
                 [
@@ -250,7 +255,8 @@ class ServiceClientTest extends TestCase
                     'GET',
                     'http://example.com',
                     [
-                        'headers' => ['Authorization' => 'Bearer valid_access_token']
+                        'headers' => ['Authorization' => 'Bearer valid_access_token'],
+                        'http_errors' => true
                     ]
                 ]
             )
@@ -391,7 +397,8 @@ class ServiceClientTest extends TestCase
                     'GET',
                     'http://example.com',
                     [
-                        'headers' => ['Authorization' => 'Bearer access_token']
+                        'headers' => ['Authorization' => 'Bearer access_token'],
+                        'http_errors' => true
                     ]
                 ]
             )
@@ -428,7 +435,8 @@ class ServiceClientTest extends TestCase
                     'GET',
                     'http://example.com',
                     [
-                        'headers' => ['Authorization' => 'Bearer access_token']
+                        'headers' => ['Authorization' => 'Bearer access_token'],
+                        'http_errors' => true
                     ]
                 ]
             )

@@ -80,7 +80,8 @@ class ServiceClient implements ServiceClientInterface
                 [
                     'headers' => [
                         'Authorization' => sprintf('Bearer %s', $this->getAccessToken($registration, $scopes))
-                    ]
+                    ],
+                    'http_errors' => true
                 ]
             );
 
