@@ -372,7 +372,7 @@ class ServiceClientTest extends TestCase
         $this->subject->request($this->registration, 'GET', 'http://example.com');
     }
 
-    public function testItThrowAnLtiExceptionOnPlatformEndpointFailure(): void
+    public function testItThrowAnLtiExceptionOnInvalidPlatformEndpointResponse(): void
     {
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage('Cannot perform request');
@@ -404,13 +404,13 @@ class ServiceClientTest extends TestCase
             )
             ->willReturnOnConsecutiveCalls(
                 $this->createResponse(json_encode(['access_token'=> 'access_token', 'expires_in' => 3600])),
-                'invalid output'
+                'invalid response'
             );
 
         $this->subject->request($this->registration, 'GET', 'http://example.com');
     }
 
-    public function testItThrowAnLtiExceptionOnInvalidPlatformEndpointResponse(): void
+    public function testItThrowAnLtiExceptionOnPlatformEndpointFailure(): void
     {
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage('Cannot perform request');
@@ -452,6 +452,71 @@ class ServiceClientTest extends TestCase
             );
 
         $this->subject->request($this->registration, 'GET', 'http://example.com');
+    }
+
+    public function testItThrowAnLtiExceptionOnPlatformEndpointFailureAfterAutoRetry(): void
+    {
+        $this->expectException(LtiException::class);
+        $this->expectExceptionMessage('Cannot perform request: internal server error after retry');
+
+        $scopes = ['scope1', 'scope2'];
+
+        $cacheKey = $this->generateAccessTokenCacheKey($this->registration, $scopes);
+        $cacheItem = $this->cache->getItem($cacheKey)->set('invalid_access_token');
+        $this->cache->save($cacheItem);
+
+        $this->clientMock
+            ->expects($this->exactly(3))
+            ->method('request')
+            ->withConsecutive(
+                [
+                    'GET',
+                    'http://example.com',
+                    [
+                        'headers' => ['Authorization' => 'Bearer invalid_access_token'],
+                        'http_errors' => true
+                    ]
+                ],
+                [
+                    'POST',
+                    $this->registration->getPlatform()->getOAuth2AccessTokenUrl(),
+                    [
+                        'form_params' => [
+                            'grant_type' => ServiceClientInterface::GRANT_TYPE,
+                            'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
+                            'client_assertion' => $this->createTestClientAssertion($this->registration),
+                            'scope' => 'scope1 scope2'
+                        ]
+                    ]
+                ],
+                [
+                    'GET',
+                    'http://example.com',
+                    [
+                        'headers' => ['Authorization' => 'Bearer valid_access_token'],
+                        'http_errors' => true
+                    ]
+                ]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $this->throwException(
+                    new ClientException(
+                        'invalid token',
+                        $this->createMock(ServerRequestInterface::class),
+                        $this->createResponse('invalid token', 401)
+                    )
+                ),
+                $this->createResponse(json_encode(['access_token'=> 'valid_access_token', 'expires_in' => 3600]), 201),
+                $this->throwException(
+                    new ClientException(
+                        'internal server error after retry',
+                        $this->createMock(ServerRequestInterface::class),
+                        $this->createResponse('internal server error after retry', 500)
+                    )
+                )
+            );
+
+        $this->subject->request($this->registration, 'GET', 'http://example.com', [], $scopes);
     }
 
     private function generateAccessTokenCacheKey(RegistrationInterface $registration, array $scopes = []): string
