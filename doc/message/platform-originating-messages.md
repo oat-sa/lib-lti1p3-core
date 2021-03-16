@@ -365,7 +365,7 @@ if (!$result->hasError()) {
 
 The [LtiMessagePayloadInterface](../../src/Message/Payload/LtiMessagePayloadInterface.php) provides the `getValidatedRoleCollection()` getter to allow you to work easily with [the LTI specification roles](http://www.imsglobal.org/spec/lti/v1p3/#role-vocabularies) as a [RoleCollection](../../src/Role/Collection/RoleCollection.php).
 
-You can base yourself on this collection if you need to perform role based ACL management on tool side, for example:
+You can base yourself on this collection if you need to perform RBAC on tool side, for example:
 
 ```php
 <?php
