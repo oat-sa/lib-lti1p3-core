@@ -24,6 +24,9 @@ namespace OAT\Library\Lti1p3Core\Role\Type;
 
 use OAT\Library\Lti1p3Core\Role\AbstractRole;
 
+/**
+ * @see http://www.imsglobal.org/spec/lti/v1p3/#lis-vocabulary-for-institution-roles
+ */
 class InstitutionRole extends AbstractRole
 {
     public static function getType(): string

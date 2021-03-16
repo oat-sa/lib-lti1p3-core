@@ -22,6 +22,9 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Role;
 
+/**
+ * @see http://www.imsglobal.org/spec/lti/v1p3/#role-vocabularies
+ */
 interface RoleInterface
 {
     public const TYPE_SYSTEM = 'system';
