@@ -67,7 +67,7 @@ class RoleCollection
         return $this->roles->getMandatory($name);
     }
 
-    public function canFindBy(string $type = null, bool $core = null): bool
+    public function canFindBy(?string $type = null, ?bool $core = null): bool
     {
         return !empty($this->findBy($type, $core));
     }
@@ -75,7 +75,7 @@ class RoleCollection
     /**
      * @return RoleInterface[]
      */
-    public function findBy(string $type = null, bool $core = null): array
+    public function findBy(?string $type = null, ?bool $core = null): array
     {
         $roles = [];
 
