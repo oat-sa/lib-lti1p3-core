@@ -360,3 +360,39 @@ if (!$result->hasError()) {
     }
 } 
 ```
+
+### Working with launch roles
+
+The [LtiMessagePayloadInterface](../../src/Message/Payload/LtiMessagePayloadInterface.php) provides the `getValidatedRoleCollection()` getter to allow you to work easily with [the LTI specification roles](http://www.imsglobal.org/spec/lti/v1p3/#role-vocabularies) as a [RoleCollection](../../src/Role/Collection/RoleCollection.php).
+
+You can base yourself on this collection if you need to perform role based ACL management on tool side, for example:
+
+```php
+<?php
+
+use OAT\Library\Lti1p3Core\Message\Launch\Validator\Result\LaunchValidationResult;
+use OAT\Library\Lti1p3Core\Role\RoleInterface;
+
+/** @var LaunchValidationResult $result */
+$result = $validator->validatePlatformOriginatingLaunch(...);
+
+// Result exploitation
+if (!$result->hasError()) {
+
+    // Access the validated role collection
+    $roles = $result->getPayload()->getValidatedRoleCollection();
+    
+    // Check if a role of type context (core or not) has been provided (our case for http://purl.imsglobal.org/vocab/lis/v2/membership#Learner)
+    if ($roles->canFindBy(RoleInterface::TYPE_CONTEXT)) {
+        // Authorized launch
+        ...
+    } else {
+        // Unauthorized launch
+        ...
+    }
+} 
+```
+
+**Notes**: 
+- if the launch contains invalid (non respecting LTI specification) roles, the getter will throw an [LtiException](../../src/Exception/LtiException.php)
+- the [LtiMessagePayloadInterface](../../src/Message/Payload/LtiMessagePayloadInterface.php) offers the `getRoles()` getter to work with plain roles values (no validation)

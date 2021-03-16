@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+* Added enhanced role management: type (system, institution, context), core / non core, long / short names & automatic validation
+* Updated LtiMessagePayloadInterface with getValidatedRoleCollection() method (allows easy access to validated roles from launches)
+* Updated documentation
+
 4.1.0
 -----
 

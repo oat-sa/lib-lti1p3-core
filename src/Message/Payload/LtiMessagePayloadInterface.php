@@ -35,6 +35,7 @@ use OAT\Library\Lti1p3Core\Message\Payload\Claim\PlatformInstanceClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ProctoringSettingsClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ProctoringVerifiedUserClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
+use OAT\Library\Lti1p3Core\Role\Collection\RoleCollection;
 use OAT\Library\Lti1p3Core\User\UserIdentityInterface;
 
 /**
@@ -94,6 +95,8 @@ interface LtiMessagePayloadInterface extends MessagePayloadInterface
     public function getTargetLinkUri(): string;
 
     public function getRoles(): array;
+
+    public function getValidatedRoleCollection(): RoleCollection;
 
     public function getRoleScopeMentor(): array;
 
