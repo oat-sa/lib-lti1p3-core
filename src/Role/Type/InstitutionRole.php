@@ -58,6 +58,4 @@ class InstitutionRole extends AbstractRole
             'ProspectiveStudent' => false
         ];
     }
-
-
 }
