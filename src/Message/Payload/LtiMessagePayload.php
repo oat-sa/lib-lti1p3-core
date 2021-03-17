@@ -36,6 +36,9 @@ use OAT\Library\Lti1p3Core\Message\Payload\Claim\PlatformInstanceClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ProctoringSettingsClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ProctoringVerifiedUserClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
+use OAT\Library\Lti1p3Core\Role\Collection\RoleCollection;
+use OAT\Library\Lti1p3Core\Role\Collection\RoleCollectionInterface;
+use OAT\Library\Lti1p3Core\Role\Factory\RoleFactory;
 use OAT\Library\Lti1p3Core\User\UserIdentity;
 use OAT\Library\Lti1p3Core\User\UserIdentityInterface;
 
@@ -82,6 +85,20 @@ class LtiMessagePayload extends MessagePayload implements LtiMessagePayloadInter
     public function getRoles(): array
     {
         return $this->getMandatoryClaim(static::CLAIM_LTI_ROLES);
+    }
+
+    /**
+     * @throws LtiExceptionInterface
+     */
+    public function getValidatedRoleCollection(): RoleCollection
+    {
+        $collection = new RoleCollection();
+
+        foreach ($this->getMandatoryClaim(static::CLAIM_LTI_ROLES) as $role) {
+            $collection->add(RoleFactory::create($role));
+        }
+
+        return $collection;
     }
 
     public function getResourceLink(): ?ResourceLinkClaim
