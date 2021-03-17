@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2020 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2021 (original work) Open Assessment Technologies SA;
  */
 
 declare(strict_types=1);
@@ -37,10 +37,12 @@ class RoleFactory
     {
         if (strpos($name, SystemRole::getNameSpace()) === 0) {
             return new SystemRole($name);
-        } elseif (strpos($name, InstitutionRole::getNameSpace()) === 0) {
-            return new InstitutionRole($name);
-        } else {
-            return new ContextRole($name);
         }
+
+        if (strpos($name, InstitutionRole::getNameSpace()) === 0) {
+            return new InstitutionRole($name);
+        }
+
+        return new ContextRole($name);
     }
 }
