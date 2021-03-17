@@ -30,7 +30,7 @@ class Result implements ResultInterface
     /** @var string|null */
     private $error;
 
-    public function __construct(array $successes = [], string $error = null)
+    public function __construct(array $successes = [], ?string $error = null)
     {
         $this->successes = $successes;
         $this->error = $error;
@@ -48,20 +48,27 @@ class Result implements ResultInterface
         return $this;
     }
 
-    public function setError(string $error): ResultInterface
-    {
-        $this->error = $error;
-
-        return $this;
-    }
-
     public function getSuccesses(): array
     {
         return $this->successes;
     }
 
+    public function setSuccesses(array $successes = []): ResultInterface
+    {
+        $this->successes = $successes;
+
+        return $this;
+    }
+
     public function getError(): ?string
     {
         return $this->error;
+    }
+
+    public function setError(?string $error): ResultInterface
+    {
+        $this->error = $error;
+
+        return $this;
     }
 }

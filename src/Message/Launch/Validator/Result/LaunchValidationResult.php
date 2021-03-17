@@ -43,7 +43,7 @@ class LaunchValidationResult extends Result
         LtiMessagePayloadInterface $payload = null,
         MessagePayloadInterface $state = null,
         array $successes = [],
-        string $error = null
+        ?string $error = null
     ) {
         $this->registration = $registration;
         $this->payload = $payload;

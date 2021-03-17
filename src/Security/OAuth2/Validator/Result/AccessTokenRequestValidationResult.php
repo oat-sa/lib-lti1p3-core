@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Security\OAuth2\Validator;
+namespace OAT\Library\Lti1p3Core\Security\OAuth2\Validator\Result;
 
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Security\Jwt\TokenInterface;
@@ -38,7 +38,7 @@ class AccessTokenRequestValidationResult extends Result
         RegistrationInterface $registration = null,
         TokenInterface $token = null,
         array $successes = [],
-        string $error = null
+        ?string $error = null
     ) {
         $this->registration = $registration;
         $this->token = $token;

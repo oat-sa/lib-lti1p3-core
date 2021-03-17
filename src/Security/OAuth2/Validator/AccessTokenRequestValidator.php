@@ -28,6 +28,7 @@ use OAT\Library\Lti1p3Core\Security\Jwt\Parser\Parser;
 use OAT\Library\Lti1p3Core\Security\Jwt\Parser\ParserInterface;
 use OAT\Library\Lti1p3Core\Security\Jwt\Validator\Validator;
 use OAT\Library\Lti1p3Core\Security\Jwt\Validator\ValidatorInterface;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\Result\AccessTokenRequestValidationResult;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;

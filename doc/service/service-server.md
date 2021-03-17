@@ -84,7 +84,7 @@ Once a tool has been granted with an access token, it can perform LTI service au
 To be able to protect your platform endpoints, you can use the provided [AccessTokenRequestValidator](../../src/Security/OAuth2/Validator/AccessTokenRequestValidator.php):
 - it requires a registration repository implementation [as explained here](../quickstart/interfaces.md) to automate the token signature checks
 - it expects a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface) to validate
-- it will output a [AccessTokenRequestValidationResult](../../src/Security/OAuth2/Validator/AccessTokenRequestValidationResult.php) representing the token validation, the related registration, the token itself and associated scopes.
+- it will output a [AccessTokenRequestValidationResult](../../src/Security/OAuth2/Validator/Result/AccessTokenRequestValidationResult.php) representing the token validation, the related registration, the token itself and associated scopes.
 
 For example,
 ```php

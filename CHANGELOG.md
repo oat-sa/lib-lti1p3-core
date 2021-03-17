@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+* Added support of nullable error for Result based classes
+* Added [migration guide](https://github.com/oat-sa/lib-lti1p3-core/wiki/Migration-from-4.x-to-5.x) to document breaking changes and migration steps
+* Updated Service\Server namespace into Security\OAuth2
+* Updated documentation
+
 4.2.0
 -----
 

@@ -20,9 +20,9 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\OAuth2\Validator;
+namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\OAuth2\Validator\Result;
 
-use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\AccessTokenRequestValidationResult;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\Result\AccessTokenRequestValidationResult;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
 use PHPUnit\Framework\TestCase;
 

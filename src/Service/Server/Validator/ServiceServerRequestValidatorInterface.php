@@ -15,24 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2020 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2021 (original work) Open Assessment Technologies SA;
  */
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Util\Result;
+namespace OAT\Library\Lti1p3Core\Service\Server\Validator;
 
-interface ResultInterface
+use OAT\Library\Lti1p3Core\Service\Server\Validator\Result\ServiceServerRequestValidationResult;
+use Psr\Http\Message\ServerRequestInterface;
+
+interface ServiceServerRequestValidatorInterface
 {
-    public function hasError(): bool;
-
-    public function addSuccess(string $success): ResultInterface;
-
-    public function getSuccesses(): array;
-
-    public function setSuccesses(array $successes = []): ResultInterface;
-
-    public function getError(): ?string;
-
-    public function setError(?string $error): ResultInterface;
+    public function validate(ServerRequestInterface $request): ServiceServerRequestValidationResult;
 }
