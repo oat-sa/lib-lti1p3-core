@@ -27,20 +27,20 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class ServiceServerRequestContentTypeValidator implements ServiceServerRequestValidatorInterface
 {
-    /** @var string[] */
-    private $allowedContentTypes;
+    /** @var string*/
+    private $allowedContentType;
 
-    public function __construct(array $allowedContentTypes)
+    public function __construct(string $allowedContentType)
     {
-        $this->allowedContentTypes = $allowedContentTypes;
+        $this->allowedContentType = $allowedContentType;
     }
 
     public function validate(ServerRequestInterface $request): ServiceServerRequestValidationResult
     {
         $result = new ServiceServerRequestValidationResult();
 
-        if (false === strpos($request->getHeaderLine('Accept'), $this->allowedContentTypes)) {
-            $message = sprintf('Not acceptable content type, accepts: %s', $this->allowedContentTypes);
+        if (false === strpos($request->getHeaderLine('Accept'), $this->allowedContentType)) {
+            $message = sprintf('Not acceptable content type, accepts: %s', $this->allowedContentType);
 
             $result
                 ->setErrorHttpStatusCode(406)
