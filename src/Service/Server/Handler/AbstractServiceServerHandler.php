@@ -44,8 +44,11 @@ abstract class AbstractServiceServerHandler implements RequestHandlerInterface
     /** @var LoggerInterface */
     protected $logger;
 
-    public function __construct(ServiceServerRequestValidatorCollectionInterface $validators = null)
-    {
+    public function __construct(
+        ServiceServerRequestValidatorCollectionInterface $validators = null,
+        ResponseFactory $factory = null,
+        LoggerInterface $logger = null
+    ) {
         $this->validators = $validators ?? new ServiceServerRequestValidatorCollection();
         $this->factory = $factory ?? new HttplugFactory();
         $this->logger = $logger ?? new NullLogger();
