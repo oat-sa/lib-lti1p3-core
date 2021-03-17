@@ -66,7 +66,7 @@ class LtiMessagePayloadTest extends TestCase
             ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_VERSION, LtiMessageInterface::LTI_VERSION)
             ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_DEPLOYMENT_ID, 'deploymentIdentifier')
             ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_TARGET_LINK_URI, 'targetLinkUri')
-            ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_ROLES, ['role'])
+            ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_ROLES, ['Learner'])
             ->withClaim(new ResourceLinkClaim('resourceLinkIdentifier'))
             ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_ROLE_SCOPE_MENTOR, ['mentor'])
             ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_CUSTOM, ['custom'])
@@ -102,7 +102,7 @@ class LtiMessagePayloadTest extends TestCase
         $this->assertEquals(LtiMessageInterface::LTI_VERSION, $this->subject->getVersion());
         $this->assertEquals('deploymentIdentifier', $this->subject->getDeploymentId());
         $this->assertEquals('targetLinkUri', $this->subject->getTargetLinkUri());
-        $this->assertEquals(['role'], $this->subject->getRoles());
+        $this->assertEquals(['Learner'], $this->subject->getRoles());
         $this->assertEquals('resourceLinkIdentifier', $this->subject->getResourceLink()->getIdentifier());
         $this->assertEquals(['mentor'], $this->subject->getRoleScopeMentor());
         $this->assertEquals(['custom'], $this->subject->getCustom());
@@ -143,5 +143,23 @@ class LtiMessagePayloadTest extends TestCase
         $this->assertEquals('userIdentifier', $this->subject->getUserIdentity()->getIdentifier());
         $this->assertEquals('userName', $this->subject->getUserIdentity()->getName());
         $this->assertEquals('user@example.com', $this->subject->getUserIdentity()->getEmail());
+    }
+
+    public function testGetValidatedRoleCollection(): void
+    {
+        $payload = $this->builder
+            ->withClaim(
+                LtiMessagePayloadInterface::CLAIM_LTI_ROLES,
+                [
+                    'http://purl.imsglobal.org/vocab/lis/v2/system/person#Administrator',
+                    'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator',
+                    'Learner'
+                ]
+            )
+            ->buildMessagePayload($this->createTestRegistration()->getPlatformKeyChain());
+
+        $this->subject = new LtiMessagePayload($this->parseJwt($payload->getToken()->toString()));
+
+        $this->assertEquals(3, $this->subject->getValidatedRoleCollection()->count());
     }
 }
