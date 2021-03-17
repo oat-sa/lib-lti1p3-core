@@ -124,11 +124,11 @@ For example:
 <?php
 
 use OAT\Library\Lti1p3Core\Security\Jwks\Fetcher\JwksFetcherInterface;
-use Lcobucci\JWT\Signer\Key;
+use OAT\Library\Lti1p3Core\Security\Key\KeyInterface;
 
 $fetcher = new class implements JwksFetcherInterface
 {
-    public function fetchKey(string $jwksUrl, string $kId) : Key
+    public function fetchKey(string $jwksUrl, string $kId) : KeyInterface
     {
         // TODO: Implement fetchKey() method to find a Key via an HTTP call to the $jwksUrl, for the kid $kId.
     }
@@ -165,7 +165,7 @@ $client = new class implements ServiceClientInterface
 
 ### Service server client repository interface
 
-**Default implementation**: [ClientRepository](../../src/Service/Server/Repository/ClientRepository.php)  
+**Default implementation**: [ClientRepository](../../src/Security/OAuth2/Repository/ClientRepository.php)  
 
 In order to retrieve and validate clients involved in authenticated service calls, an implementation of the [ClientRepositoryInterface](https://github.com/thephpleague/oauth2-server/blob/master/src/Repositories/ClientRepositoryInterface.php) can be provided.
 
@@ -175,7 +175,7 @@ In order to retrieve and validate clients involved in authenticated service call
 
 ### Service server access token repository interface
 
-**Default implementation**: [AccessTokenRepository](../../src/Service/Server/Repository/AccessTokenRepository.php)  
+**Default implementation**: [AccessTokenRepository](../../src/Security/OAuth2/Repository/AccessTokenRepository.php)  
 
 In order to store service calls access tokens, an implementation of the [AccessTokenRepositoryInterface](https://github.com/thephpleague/oauth2-server/blob/master/src/Repositories/AccessTokenRepositoryInterface.php) can be provided.
 
@@ -183,7 +183,7 @@ In order to store service calls access tokens, an implementation of the [AccessT
 
 ### Service server scope repository interface
 
-**Default implementation**: [ScopeRepository](../../src/Service/Server/Repository/ScopeRepository.php)  
+**Default implementation**: [ScopeRepository](../../src/Security/OAuth2/Repository/ScopeRepository.php)  
 
 In order to retrieve and finalize scopes during grants, an implementation of the [ScopeRepositoryInterface](https://github.com/thephpleague/oauth2-server/blob/master/src/Repositories/ScopeRepositoryInterface.php) can be provided.
 

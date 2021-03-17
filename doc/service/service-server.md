@@ -19,13 +19,13 @@ The server feature rely on the [PHP League OAuth2 server](https://oauth2.thephpl
 - a [AccessTokenRepositoryInterface](https://github.com/thephpleague/oauth2-server/blob/master/src/Repositories/AccessTokenRepositoryInterface.php) implementation (to store the created access tokens)
 - a [ScopeRepositoryInterface](https://github.com/thephpleague/oauth2-server/blob/master/src/Repositories/ScopeRepositoryInterface.php) implementation (to retrieve your scopes)
 
-or you can simply use the available [library repositories](../../src/Service/Server/Repository) for this.
+or you can simply use the available [library repositories](../../src/Security/OAuth2/Repository) for this.
 
 Your will also need to provide an encryption key (random string with enough entropy).
 
 ## Generation of access token response for a key chain
 
-This library provides a ready to use [AccessTokenGenerator](../../src/Service/Server/Generator/AccessTokenResponseGenerator.php) to generate access tokens responses for a given key chain:
+This library provides a ready to use [AccessTokenGenerator](../../src/Security/OAuth2/Generator/AccessTokenResponseGenerator.php) to generate access tokens responses for a given key chain:
 - it requires a key chain repository implementation [as explained here](../quickstart/interfaces.md) to automate signature logic against a key chain private key
 - it complies to the `client_credentials` grant type with `client_assertion` to follow [IMS security specifications](https://www.imsglobal.org/spec/security/v1p0/#using-json-web-tokens-with-oauth-2-0-client-credentials-grant)
 - it expects a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface), a [PSR7 ResponseInterface](https://www.php-fig.org/psr/psr-7/#33-psrhttpmessageresponseinterface) and a key chain identifier to be easily exposed behind any PSR7 compliant controller
@@ -37,11 +37,11 @@ For example, to expose an LTI service server your application endpoint `[POST] /
 
 use League\OAuth2\Server\Exception\OAuthServerException;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
-use OAT\Library\Lti1p3Core\Service\Server\Generator\AccessTokenResponseGenerator;
-use OAT\Library\Lti1p3Core\Service\Server\Factory\AuthorizationServerFactory;
-use OAT\Library\Lti1p3Core\Service\Server\Repository\AccessTokenRepository;
-use OAT\Library\Lti1p3Core\Service\Server\Repository\ClientRepository;
-use OAT\Library\Lti1p3Core\Service\Server\Repository\ScopeRepository;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Generator\AccessTokenResponseGenerator;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Factory\AuthorizationServerFactory;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\AccessTokenRepository;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\ClientRepository;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\ScopeRepository;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -81,17 +81,17 @@ Once a tool has been granted with an access token, it can perform LTI service au
 
 (with header `Authorization: Bearer <token>`).
 
-To be able to protect your platform endpoints, you can use the provided [AccessTokenRequestValidator](../../src/Service/Server/Validator/AccessTokenRequestValidator.php):
+To be able to protect your platform endpoints, you can use the provided [AccessTokenRequestValidator](../../src/Security/OAuth2/Validator/AccessTokenRequestValidator.php):
 - it requires a registration repository implementation [as explained here](../quickstart/interfaces.md) to automate the token signature checks
 - it expects a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface) to validate
-- it will output a [AccessTokenRequestValidationResult](../../src/Service/Server/Validator/AccessTokenRequestValidationResult.php) representing the token validation, the related registration, the token itself and associated scopes.
+- it will output a [AccessTokenRequestValidationResult](../../src/Security/OAuth2/Validator/AccessTokenRequestValidationResult.php) representing the token validation, the related registration, the token itself and associated scopes.
 
 For example,
 ```php
 <?php
 
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
-use OAT\Library\Lti1p3Core\Service\Server\Validator\AccessTokenRequestValidator;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\AccessTokenRequestValidator;
 use Psr\Http\Message\ServerRequestInterface;
 
 /** @var RegistrationRepositoryInterface $repository */
