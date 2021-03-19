@@ -33,7 +33,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Throwable;
 
-abstract class AbstractServiceServerHandler implements RequestHandlerInterface
+abstract class AbstractServiceServerRequestHandler implements RequestHandlerInterface
 {
     /** @var ServiceServerRequestValidatorCollectionInterface */
     private $validators;
