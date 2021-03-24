@@ -196,6 +196,38 @@ class PlatformLaunchValidatorTest extends TestCase
         $this->assertEquals($expectedErrorMessage, $result->getError());
     }
 
+    public function testValidateToolOriginatingLaunchFailureOnMissingPlatformKeyChain(): void
+    {
+        $registration = $this->createTestRegistrationWithoutPlatformKeyChain();
+
+        $repository = $this->createTestRegistrationRepository([$registration]);
+
+        $subject = new PlatformLaunchValidator($repository, $this->nonceRepository);
+
+        $dataToken = $this
+            ->buildJwt([], [], $this->registration->getPlatformKeyChain()->getPrivateKey())
+            ->toString();
+
+        $message = $this->builder->buildToolOriginatingLaunch(
+            $registration,
+            LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE,
+            'http://platform.com/launch',
+            null,
+            [
+                LtiMessagePayloadInterface::CLAIM_LTI_DEEP_LINKING_DATA => $dataToken
+            ]
+        );
+
+        $result = $subject->validateToolOriginatingLaunch($this->createServerRequest('GET', $message->toUrl()));
+
+        $this->assertInstanceOf(LaunchValidationResult::class, $result);
+        $this->assertTrue($result->hasError());
+        $this->assertEquals(
+            'JWT data deep linking claim validation failure: platform key chain is not configured',
+            $result->getError()
+        );
+    }
+
     public function provideValidationFailureContexts(): array
     {
         $registration = $this->createTestRegistration();
@@ -329,6 +361,23 @@ class PlatformLaunchValidatorTest extends TestCase
                     LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_SESSION_DATA => 'data',
                 ],
                 'JWT attempt_number proctoring claim is invalid'
+            ],
+            'Missing JWT resource link for start assessment' => [
+                [
+                    MessagePayloadInterface::HEADER_KID => $registration->getPlatformKeyChain()->getIdentifier()
+                ],
+                [
+                    MessagePayloadInterface::CLAIM_ISS => $registration->getClientId(),
+                    MessagePayloadInterface::CLAIM_AUD => $registration->getPlatform()->getAudience(),
+                    LtiMessagePayloadInterface::CLAIM_LTI_VERSION => LtiMessageInterface::LTI_VERSION,
+                    LtiMessagePayloadInterface::CLAIM_LTI_MESSAGE_TYPE => LtiMessageInterface::LTI_MESSAGE_TYPE_START_ASSESSMENT,
+                    LtiMessagePayloadInterface::CLAIM_LTI_ROLES => ['Learner'],
+                    LtiMessagePayloadInterface::CLAIM_NONCE => 'value',
+                    LtiMessagePayloadInterface::CLAIM_LTI_DEPLOYMENT_ID => $registration->getDefaultDeploymentId(),
+                    LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_SESSION_DATA => 'data',
+                    LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_ATTEMPT_NUMBER => '1'
+                ],
+                'JWT resource_link claim is missing'
             ],
             'Invalid JWT resource link for start assessment' => [
                 [
