@@ -43,7 +43,7 @@ class AgsClaim implements MessagePayloadClaimInterface
         return LtiMessagePayloadInterface::CLAIM_LTI_AGS;
     }
 
-    public function __construct(array $scopes, string $lineItemsContainerUrl, string $lineItemUrl = null)
+    public function __construct(array $scopes, string $lineItemsContainerUrl, ?string $lineItemUrl = null)
     {
         $this->scopes = $scopes;
         $this->lineItemsContainerUrl = $lineItemsContainerUrl;

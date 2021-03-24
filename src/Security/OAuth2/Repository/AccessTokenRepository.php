@@ -42,7 +42,7 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
     /** @var LoggerInterface */
     private $logger;
 
-    public function __construct(CacheItemPoolInterface $cache, LoggerInterface $logger = null)
+    public function __construct(CacheItemPoolInterface $cache, ?LoggerInterface $logger = null)
     {
         $this->cache = $cache;
         $this->logger = $logger ?? new NullLogger();

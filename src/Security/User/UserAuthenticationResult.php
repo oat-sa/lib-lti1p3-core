@@ -31,7 +31,7 @@ class UserAuthenticationResult implements UserAuthenticationResultInterface
     /** @var UserIdentityInterface|null */
     private $userIdentity;
 
-    public function __construct(bool $success, UserIdentityInterface $userIdentity = null)
+    public function __construct(bool $success, ?UserIdentityInterface $userIdentity = null)
     {
         $this->success = $success;
         $this->userIdentity = $userIdentity;

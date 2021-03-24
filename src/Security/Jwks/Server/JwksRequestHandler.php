@@ -46,8 +46,8 @@ class JwksRequestHandler
 
     public function __construct(
         JwksExporter $exporter,
-        ResponseFactory $factory = null,
-        LoggerInterface $logger = null
+        ?ResponseFactory $factory = null,
+        ?LoggerInterface $logger = null
     ) {
         $this->exporter = $exporter;
         $this->factory = $factory ?? new HttplugFactory();

@@ -51,7 +51,7 @@ class ContextClaim implements MessagePayloadClaimInterface
         return LtiMessagePayloadInterface::CLAIM_LTI_CONTEXT;
     }
 
-    public function __construct(string $id, array $types = [], string $label = null, string $title = null)
+    public function __construct(string $id, array $types = [], ?string $label = null, ?string $title = null)
     {
         $this->id = $id;
         $this->types = $types;

@@ -28,8 +28,8 @@ class PlatformFactory
         string $identifier,
         string $name,
         string $audience,
-        string $oidcAuthenticationUrl = null,
-        string $oAuth2AccessTokenUrl = null
+        ?string $oidcAuthenticationUrl = null,
+        ?string $oAuth2AccessTokenUrl = null
     ): PlatformInterface {
         return new Platform($identifier, $name, $audience, $oidcAuthenticationUrl, $oAuth2AccessTokenUrl);
     }

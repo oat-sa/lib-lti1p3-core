@@ -33,7 +33,7 @@ class Nonce implements NonceInterface
     /** @var DateTimeInterface|null */
     private $expiredAt;
 
-    public function __construct(string $value, DateTimeInterface $expiredAt = null)
+    public function __construct(string $value, ?DateTimeInterface $expiredAt = null)
     {
         $this->value = $value;
         $this->expiredAt = $expiredAt;

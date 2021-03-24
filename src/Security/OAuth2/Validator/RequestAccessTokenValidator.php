@@ -53,9 +53,9 @@ class RequestAccessTokenValidator
 
     public function __construct(
         RegistrationRepositoryInterface $repository,
-        LoggerInterface $logger = null,
-        ValidatorInterface $validator = null,
-        ParserInterface $parser = null
+        ?LoggerInterface $logger = null,
+        ?ValidatorInterface $validator = null,
+        ?ParserInterface $parser = null
     ) {
         $this->repository = $repository;
         $this->logger = $logger ?? new NullLogger();

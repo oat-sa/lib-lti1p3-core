@@ -55,9 +55,9 @@ class ServiceClient implements ServiceClientInterface
     private $builder;
 
     public function __construct(
-        CacheItemPoolInterface $cache = null,
-        ClientInterface $client = null,
-        BuilderInterface $builder = null
+        ?CacheItemPoolInterface $cache = null,
+        ?ClientInterface $client = null,
+        ?BuilderInterface $builder = null
     ) {
         $this->cache = $cache;
         $this->client = $client ?? new Client();
@@ -191,20 +191,22 @@ class ServiceClient implements ServiceClientInterface
     private function generateCredentials(RegistrationInterface $registration): string
     {
         try {
-            if (null === $registration->getToolKeyChain()) {
+            $toolKeyChain = $registration->getToolKeyChain();
+
+            if (null === $toolKeyChain) {
                 throw new LtiException('Tool key chain is not configured');
             }
 
             $token = $this->builder->build(
                 [
-                    MessagePayloadInterface::HEADER_KID => $registration->getToolKeyChain()->getIdentifier()
+                    MessagePayloadInterface::HEADER_KID => $toolKeyChain->getIdentifier()
                 ],
                 [
                     MessagePayloadInterface::CLAIM_ISS => $registration->getTool()->getAudience(),
                     MessagePayloadInterface::CLAIM_SUB => $registration->getClientId(),
                     MessagePayloadInterface::CLAIM_AUD => $registration->getPlatform()->getAudience(),
                 ],
-                $registration->getToolKeyChain()->getPrivateKey()
+                $toolKeyChain->getPrivateKey()
             );
 
             return $token->toString();

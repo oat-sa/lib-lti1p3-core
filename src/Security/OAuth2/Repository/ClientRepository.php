@@ -60,10 +60,10 @@ class ClientRepository implements ClientRepositoryInterface
 
     public function __construct(
         RegistrationRepositoryInterface $registrationRepository,
-        JwksFetcherInterface $jwksFetcher = null,
-        LoggerInterface $logger = null,
-        ValidatorInterface $validator = null,
-        ParserInterface $parser = null
+        ?JwksFetcherInterface $jwksFetcher = null,
+        ?LoggerInterface $logger = null,
+        ?ValidatorInterface $validator = null,
+        ?ParserInterface $parser = null
     ) {
         $this->repository = $registrationRepository;
         $this->fetcher = $jwksFetcher ?? new JwksFetcher();

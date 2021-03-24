@@ -57,12 +57,12 @@ class PlatformInstanceClaim implements MessagePayloadClaimInterface
 
     public function __construct(
         string $guid,
-        string $contactEmail = null,
-        string $description = null,
-        string $name = null,
-        string $url = null,
-        string $productFamilyCode = null,
-        string $version = null
+        ?string $contactEmail = null,
+        ?string $description = null,
+        ?string $name = null,
+        ?string $url = null,
+        ?string $productFamilyCode = null,
+        ?string $version = null
     ) {
         $this->guid = $guid;
         $this->contactEmail = $contactEmail;

@@ -283,7 +283,7 @@ class ToolLaunchValidatorTest extends TestCase
 
         $this->assertInstanceOf(LaunchValidationResult::class, $result);
         $this->assertTrue($result->hasError());
-        $this->assertEquals('Tool key chain not configured', $result->getError());
+        $this->assertEquals('State validation failure: tool key chain not configured', $result->getError());
     }
 
     public function testValidatePlatformOriginatingLaunchFailureWithExpiredPayload(): void
@@ -513,7 +513,7 @@ class ToolLaunchValidatorTest extends TestCase
                     LtiMessagePayloadInterface::CLAIM_NONCE => 'value',
                     LtiMessagePayloadInterface::CLAIM_LTI_DEPLOYMENT_ID => $registration->getDefaultDeploymentId(),
                 ],
-                'ID token resource_link id claim is invalid'
+                'ID token resource_link claim is missing'
             ],
             'Invalid ID token for resource launch without resource link id' => [
                 [

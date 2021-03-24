@@ -42,7 +42,7 @@ class LtiResourceLinkLaunchRequestBuilder extends PlatformOriginatingLaunchBuild
         LtiResourceLinkInterface $ltiResourceLink,
         RegistrationInterface $registration,
         string $loginHint,
-        string $deploymentId = null,
+        ?string $deploymentId = null,
         array $roles = [],
         array $optionalClaims = []
     ): LtiMessageInterface {

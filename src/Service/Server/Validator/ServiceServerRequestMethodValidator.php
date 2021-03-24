@@ -30,7 +30,7 @@ class ServiceServerRequestMethodValidator implements ServiceServerRequestValidat
     /** @var string[] */
     private $allowedHttpMethods;
 
-    public function __construct(array $allowedHttpMethods)
+    public function __construct(array $allowedHttpMethods = [])
     {
         $this->allowedHttpMethods = array_map(
             static function (string $allowedHttpMethod): string {
@@ -44,7 +44,7 @@ class ServiceServerRequestMethodValidator implements ServiceServerRequestValidat
     {
         $result = new ServiceServerRequestValidationResult();
 
-        if (!in_array(strtolower($request->getMethod()), $this->allowedHttpMethods ?? [])) {
+        if (!in_array(strtolower($request->getMethod()), $this->allowedHttpMethods)) {
             $message = sprintf('Not acceptable request HTTP method, accepts: %s', implode(', ', $this->allowedHttpMethods));
 
             $result

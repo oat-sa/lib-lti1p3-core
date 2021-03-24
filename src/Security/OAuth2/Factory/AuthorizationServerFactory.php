@@ -60,13 +60,15 @@ class AuthorizationServerFactory
 
     public function create(KeyChainInterface $keyChain): AuthorizationServer
     {
-        if (null === $keyChain->getPrivateKey()) {
+        $privateKey = $keyChain->getPrivateKey();
+
+        if (null === $privateKey) {
             throw new InvalidArgumentException('Missing private key');
         }
 
-        $privateKey = new CryptKey(
-            $keyChain->getPrivateKey()->getContent(),
-            $keyChain->getPrivateKey()->getPassphrase(),
+        $cryptKey = new CryptKey(
+            $privateKey->getContent(),
+            $privateKey->getPassphrase(),
             false
         );
 
@@ -74,7 +76,7 @@ class AuthorizationServerFactory
             $this->clientRepository,
             $this->accessTokenRepository,
             $this->scopeRepository,
-            $privateKey,
+            $cryptKey,
             $this->encryptionKey,
             new ScopedBearerTokenResponse()
         );

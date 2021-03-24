@@ -102,13 +102,15 @@ class ToolLaunchValidator extends AbstractLaunchValidator
      */
     private function validatePayloadToken(RegistrationInterface $registration, LtiMessagePayloadInterface $payload): self
     {
-        if (null === $registration->getPlatformKeyChain()) {
+        $platformKeyChain = $registration->getPlatformKeyChain();
+
+        if (null === $platformKeyChain) {
             $key = $this->fetcher->fetchKey(
                 $registration->getPlatformJwksUrl(),
                 $payload->getToken()->getHeaders()->get(LtiMessagePayloadInterface::HEADER_KID)
             );
         } else {
-            $key = $registration->getPlatformKeyChain()->getPublicKey();
+            $key = $platformKeyChain->getPublicKey();
         }
 
         if (!$this->validator->validate($payload->getToken(), $key)) {
@@ -246,7 +248,14 @@ class ToolLaunchValidator extends AbstractLaunchValidator
     private function validatePayloadLaunchMessageTypeSpecifics(LtiMessagePayloadInterface $payload): self
     {
         if ($payload->getMessageType() === LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST) {
-            if (empty($payload->getResourceLink()) || empty($payload->getResourceLink()->getIdentifier())) {
+
+            $resourceLink = $payload->getResourceLink();
+
+            if (null === $resourceLink) {
+                throw new LtiException('ID token resource_link claim is missing');
+            }
+
+            if (empty($resourceLink->getIdentifier())) {
                 throw new LtiException('ID token resource_link id claim is invalid');
             }
         }
@@ -287,11 +296,13 @@ class ToolLaunchValidator extends AbstractLaunchValidator
      */
     private function validateStateToken(RegistrationInterface $registration, MessagePayloadInterface $state): self
     {
-        if (null === $registration->getToolKeyChain()) {
-            throw new LtiException('Tool key chain not configured');
+        $toolKeyChain = $registration->getToolKeyChain();
+
+        if (null === $toolKeyChain) {
+            throw new LtiException('State validation failure: tool key chain not configured');
         }
 
-        if (!$this->validator->validate($state->getToken(), $registration->getToolKeyChain()->getPublicKey())) {
+        if (!$this->validator->validate($state->getToken(), $toolKeyChain->getPublicKey())) {
             throw new LtiException('State validation failure');
         }
 

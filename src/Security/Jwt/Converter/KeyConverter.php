@@ -41,7 +41,7 @@ class KeyConverter
     /** @var CollectionInterface|Key[] */
     private $collection;
 
-    public function __construct(JWKConverter $converter = null)
+    public function __construct(?JWKConverter $converter = null)
     {
         $this->converter = $converter ?? new JWKConverter();
         $this->collection = new Collection();

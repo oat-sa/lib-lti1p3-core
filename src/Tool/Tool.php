@@ -50,8 +50,8 @@ class Tool implements ToolInterface
         string $name,
         string $audience,
         string $oidcInitiationUrl,
-        string $launchUrl = null,
-        string $deepLinkingUrl = null
+        ?string $launchUrl = null,
+        ?string $deepLinkingUrl = null
     ) {
         $this->identifier = $identifier;
         $this->name = $name;

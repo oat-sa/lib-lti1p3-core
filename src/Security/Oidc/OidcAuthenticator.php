@@ -61,9 +61,9 @@ class OidcAuthenticator
     public function __construct(
         RegistrationRepositoryInterface $repository,
         UserAuthenticatorInterface $authenticator,
-        MessagePayloadBuilderInterface $builder = null,
-        ValidatorInterface $validator = null,
-        ParserInterface $parser = null
+        ?MessagePayloadBuilderInterface $builder = null,
+        ?ValidatorInterface $validator = null,
+        ?ParserInterface $parser = null
     ) {
         $this->repository = $repository;
         $this->authenticator = $authenticator;

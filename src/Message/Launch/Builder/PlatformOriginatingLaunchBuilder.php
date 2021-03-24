@@ -41,7 +41,7 @@ class PlatformOriginatingLaunchBuilder extends AbstractLaunchBuilder
         string $messageType,
         string $targetLinkUri,
         string $loginHint,
-        string $deploymentId = null,
+        ?string $deploymentId = null,
         array $roles = [],
         array $optionalClaims = []
     ): LtiMessageInterface {

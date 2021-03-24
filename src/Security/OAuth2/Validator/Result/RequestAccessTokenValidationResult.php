@@ -35,8 +35,8 @@ class RequestAccessTokenValidationResult extends Result
     private $token;
 
     public function __construct(
-        RegistrationInterface $registration = null,
-        TokenInterface $token = null,
+        ?RegistrationInterface $registration = null,
+        ?TokenInterface $token = null,
         array $successes = [],
         ?string $error = null
     ) {

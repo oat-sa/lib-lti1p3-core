@@ -225,7 +225,7 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
             $platformKeyChain = $registration->getPlatformKeyChain();
 
             if (null === $platformKeyChain) {
-                throw new LtiException('JWT data deep linking claim validation failure: missing platform key');
+                throw new LtiException('JWT data deep linking claim validation failure: platform key chain is not configured');
             }
 
             if (!$this->validator->validate($dataToken, $platformKeyChain->getPublicKey())) {

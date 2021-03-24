@@ -48,8 +48,8 @@ class OidcAuthenticationRequestHandler implements RequestHandlerInterface
 
     public function __construct(
         OidcAuthenticator $authenticator,
-        ResponseFactory $factory = null,
-        LoggerInterface $logger = null
+        ?ResponseFactory $factory = null,
+        ?LoggerInterface $logger = null
     ) {
         $this->authenticator = $authenticator;
         $this->factory = $factory ?? new HttplugFactory();

@@ -46,8 +46,8 @@ class Platform implements PlatformInterface
         string $identifier,
         string $name,
         string $audience,
-        string $oidcAuthenticationUrl = null,
-        string $oAuth2AccessTokenUrl = null
+        ?string $oidcAuthenticationUrl = null,
+        ?string $oAuth2AccessTokenUrl = null
     ) {
         $this->identifier = $identifier;
         $this->name = $name;

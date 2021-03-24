@@ -35,5 +35,8 @@
         "psr-4": {
             "OAT\\Library\\Lti1p3Core\\Tests\\": "tests/"
         }
+    },
+    "config": {
+        "sort-packages": true
     }
 }

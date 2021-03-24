@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<psalm
+        autoloader="vendor/autoload.php"
+        errorLevel="3"
+        hideExternalErrors="true"
+        useDocblockTypes="false"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="https://getpsalm.org/schema/config"
+        xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+>
+    <projectFiles>
+        <directory name="src"/>
+        <ignoreFiles>
+            <directory name="coverage"/>
+            <directory name="doc"/>
+            <directory name="tests"/>
+            <directory name="vendor"/>
+        </ignoreFiles>
+    </projectFiles>
+    <issueHandlers>
+        <InternalClass>
+            <errorLevel type="suppress">
+                <file name="src/Security/Jwt/Signer/SignerFactory.php"/>
+            </errorLevel>
+        </InternalClass>
+        <InvalidArgument>
+            <errorLevel type="suppress">
+                <file name="src/Security/Jwt/Configuration/ConfigurationFactory.php"/>
+            </errorLevel>
+        </InvalidArgument>
+        <InvalidCatch>
+            <errorLevel type="suppress">
+                <referencedClass name="Psr\Cache\CacheException"/>
+                <file name="src/Security/Jwks/Fetcher/JwksFetcher.php"/>
+                <file name="src/Security/OAuth2/Repository/AccessTokenRepository.php"/>
+                <file name="src/Service/Client/ServiceClient.php"/>
+            </errorLevel>
+        </InvalidCatch>
+        <InvalidThrow>
+            <errorLevel type="suppress">
+                <referencedClass name="Psr\Cache\CacheException"/>
+                <file name="src/Security/Nonce/NonceRepository.php"/>
+            </errorLevel>
+        </InvalidThrow>
+        <MissingDependency>
+            <errorLevel type="suppress">
+                <file name="src/Security/Jwt/Configuration/ConfigurationFactory.php"/>
+            </errorLevel>
+        </MissingDependency>
+        <TypeDoesNotContainType>
+            <errorLevel type="suppress">
+                <file name="src/Service/Server/Validator/ServiceServerRequestContentTypeValidator.php"/>
+            </errorLevel>
+        </TypeDoesNotContainType>
+        <UndefinedClass>
+            <errorLevel type="suppress">
+                <file name="src/Security/Jwt/Decoder/AssociativeDecoder.php"/>
+            </errorLevel>
+        </UndefinedClass>
+    </issueHandlers>
+    <mockClasses>
+        <class name="PHPUnit\Framework\MockObject\MockObject"/>
+    </mockClasses>
+    <plugins>
+        <pluginClass class="Psalm\PhpUnitPlugin\Plugin"/>
+    </plugins>
+</psalm>

@@ -48,8 +48,8 @@ class OidcInitiationRequestHandler implements RequestHandlerInterface
 
     public function __construct(
         OidcInitiator $initiator,
-        ResponseFactory $factory = null,
-        LoggerInterface $logger = null
+        ?ResponseFactory $factory = null,
+        ?LoggerInterface $logger = null
     ) {
         $this->initiator = $initiator;
         $this->factory = $factory ?? new HttplugFactory();
