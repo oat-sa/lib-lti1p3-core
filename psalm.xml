@@ -56,6 +56,11 @@
                 <file name="src/Security/Jwt/Decoder/AssociativeDecoder.php"/>
             </errorLevel>
         </UndefinedClass>
+        <UndefinedConstant>
+            <errorLevel type="suppress">
+                <file name="src/Security/Jwt/Decoder/AssociativeDecoder.php"/>
+            </errorLevel>
+        </UndefinedConstant>
     </issueHandlers>
     <mockClasses>
         <class name="PHPUnit\Framework\MockObject\MockObject"/>
