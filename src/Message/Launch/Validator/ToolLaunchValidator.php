@@ -115,7 +115,9 @@ class ToolLaunchValidator extends AbstractLaunchValidator
             throw new LtiException('ID token validation failure');
         }
 
-        return $this->addSuccess('ID token validation success');
+        $this->addSuccess('ID token validation success');
+
+        return $this;
     }
 
     /**
@@ -127,7 +129,9 @@ class ToolLaunchValidator extends AbstractLaunchValidator
             throw new LtiException('ID token kid header is missing');
         }
 
-        return $this->addSuccess('ID token kid header is provided');
+        $this->addSuccess('ID token kid header is provided');
+
+        return $this;
     }
 
     /**
@@ -139,7 +143,9 @@ class ToolLaunchValidator extends AbstractLaunchValidator
             throw new LtiException('ID token version claim is invalid');
         }
 
-        return $this->addSuccess('ID token version claim is valid');
+        $this->addSuccess('ID token version claim is valid');
+
+        return $this;
     }
 
     /**
@@ -156,7 +162,9 @@ class ToolLaunchValidator extends AbstractLaunchValidator
             throw new LtiException('ID token message_type claim is not supported');
         }
 
-        return $this->addSuccess('ID token message_type claim is valid');
+        $this->addSuccess('ID token message_type claim is valid');
+
+        return $this;
     }
 
     /**
@@ -168,7 +176,9 @@ class ToolLaunchValidator extends AbstractLaunchValidator
             throw new LtiException('ID token roles claim is invalid');
         }
 
-        return $this->addSuccess('ID token roles claim is valid');
+        $this->addSuccess('ID token roles claim is valid');
+
+        return $this;
     }
 
     /**
@@ -183,7 +193,9 @@ class ToolLaunchValidator extends AbstractLaunchValidator
             throw new LtiException('ID token user identifier (sub) claim is invalid');
         }
 
-        return $this->addSuccess('ID token user identifier (sub) claim is valid');
+        $this->addSuccess('ID token user identifier (sub) claim is valid');
+
+        return $this;
     }
 
     /**
@@ -209,7 +221,9 @@ class ToolLaunchValidator extends AbstractLaunchValidator
             );
         }
 
-        return $this->addSuccess('ID token nonce claim is valid');
+        $this->addSuccess('ID token nonce claim is valid');
+
+        return $this;
     }
 
     /**
@@ -221,7 +235,9 @@ class ToolLaunchValidator extends AbstractLaunchValidator
             throw new LtiException('ID token deployment_id claim not valid for this registration');
         }
 
-        return $this->addSuccess('ID token deployment_id claim valid for this registration');
+        $this->addSuccess('ID token deployment_id claim valid for this registration');
+
+        return $this;
     }
 
     /**
@@ -259,9 +275,11 @@ class ToolLaunchValidator extends AbstractLaunchValidator
             }
         }
 
-        return $this->addSuccess(
+        $this->addSuccess(
             sprintf('ID token message type claim %s requirements are valid', $payload->getMessageType())
         );
+
+        return $this;
     }
 
     /**
@@ -277,6 +295,8 @@ class ToolLaunchValidator extends AbstractLaunchValidator
             throw new LtiException('State validation failure');
         }
 
-        return $this->addSuccess('State validation success');
+        $this->addSuccess('State validation success');
+
+        return $this;
     }
 }

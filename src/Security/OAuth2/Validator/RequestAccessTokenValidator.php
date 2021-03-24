@@ -28,13 +28,13 @@ use OAT\Library\Lti1p3Core\Security\Jwt\Parser\Parser;
 use OAT\Library\Lti1p3Core\Security\Jwt\Parser\ParserInterface;
 use OAT\Library\Lti1p3Core\Security\Jwt\Validator\Validator;
 use OAT\Library\Lti1p3Core\Security\Jwt\Validator\ValidatorInterface;
-use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\Result\AccessTokenRequestValidationResult;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\Result\RequestAccessTokenValidationResult;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Throwable;
 
-class AccessTokenRequestValidator
+class RequestAccessTokenValidator
 {
     /** @var RegistrationRepositoryInterface */
     private $repository;
@@ -63,7 +63,7 @@ class AccessTokenRequestValidator
         $this->parser = $parser ?? new Parser();
     }
 
-    public function validate(ServerRequestInterface $request, array $allowedScopes = []): AccessTokenRequestValidationResult
+    public function validate(ServerRequestInterface $request, array $allowedScopes = []): RequestAccessTokenValidationResult
     {
         $this->reset();
 
@@ -114,12 +114,12 @@ class AccessTokenRequestValidator
 
             $this->addSuccess('JWT access token scopes are valid');
 
-            return new AccessTokenRequestValidationResult($registration, $token, $this->successes);
+            return new RequestAccessTokenValidationResult($registration, $token, $this->successes);
 
         } catch (Throwable $exception) {
             $this->logger->error('Access token validation error: ' . $exception->getMessage());
 
-            return new AccessTokenRequestValidationResult(null, null, $this->successes, $exception->getMessage());
+            return new RequestAccessTokenValidationResult(null, null, $this->successes, $exception->getMessage());
         }
     }
 

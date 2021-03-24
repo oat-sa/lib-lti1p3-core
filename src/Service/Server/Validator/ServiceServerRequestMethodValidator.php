@@ -44,15 +44,15 @@ class ServiceServerRequestMethodValidator implements ServiceServerRequestValidat
     {
         $result = new ServiceServerRequestValidationResult();
 
-        if (!in_array(strtolower($request->getMethod()), $this->allowedHttpMethods)) {
-            $message = sprintf('Not acceptable HTTP method, accepts: %s', implode(', ', $this->allowedHttpMethods));
+        if (!in_array(strtolower($request->getMethod()), $this->allowedHttpMethods ?? [])) {
+            $message = sprintf('Not acceptable request HTTP method, accepts: %s', implode(', ', $this->allowedHttpMethods));
 
             $result
                 ->setErrorHttpStatusCode(405)
                 ->setError($message);
         }
 
-        $result->addSuccess('Acceptable HTTP method');
+        $result->addSuccess('Acceptable request HTTP method');
 
         return $result;
     }

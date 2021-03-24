@@ -33,7 +33,7 @@ use Throwable;
 /**
  * @see https://auth0.com/docs/tokens/concepts/jwks
  */
-class JwksServer
+class JwksRequestHandler
 {
     /** @var JwksExporter */
     private $exporter;

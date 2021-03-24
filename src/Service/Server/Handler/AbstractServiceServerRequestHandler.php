@@ -45,9 +45,9 @@ abstract class AbstractServiceServerRequestHandler implements RequestHandlerInte
     protected $logger;
 
     public function __construct(
-        ServiceServerRequestValidatorCollectionInterface $validators = null,
-        ResponseFactory $factory = null,
-        LoggerInterface $logger = null
+        ?ServiceServerRequestValidatorCollectionInterface $validators = null,
+        ?ResponseFactory $factory = null,
+        ?LoggerInterface $logger = null
     ) {
         $this->validators = $validators ?? new ServiceServerRequestValidatorCollection();
         $this->factory = $factory ?? new HttplugFactory();
@@ -70,6 +70,10 @@ abstract class AbstractServiceServerRequestHandler implements RequestHandlerInte
                     [],
                     $validationResult->getError()
                 );
+            }
+
+            foreach ($validationResult->getSuccesses() as $success) {
+                $this->logger->debug($success);
             }
         }
 

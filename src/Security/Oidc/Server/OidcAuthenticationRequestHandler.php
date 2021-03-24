@@ -24,7 +24,7 @@ namespace OAT\Library\Lti1p3Core\Security\Oidc\Server;
 
 use Http\Message\ResponseFactory;
 use Nyholm\Psr7\Factory\HttplugFactory;
-use OAT\Library\Lti1p3Core\Security\Oidc\OidcInitiator;
+use OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -33,12 +33,12 @@ use Psr\Log\NullLogger;
 use Throwable;
 
 /**
- * @see https://www.imsglobal.org/spec/security/v1p0/#step-2-authentication-request
+ * @see https://www.imsglobal.org/spec/security/v1p0/#step-3-authentication-response
  */
-class OidcInitiationServer implements RequestHandlerInterface
+class OidcAuthenticationRequestHandler implements RequestHandlerInterface
 {
-    /** @var OidcInitiator */
-    private $initiator;
+    /** @var OidcAuthenticator */
+    private $authenticator;
 
     /** @var ResponseFactory */
     private $factory;
@@ -47,11 +47,11 @@ class OidcInitiationServer implements RequestHandlerInterface
     private $logger;
 
     public function __construct(
-        OidcInitiator $initiator,
+        OidcAuthenticator $authenticator,
         ResponseFactory $factory = null,
         LoggerInterface $logger = null
     ) {
-        $this->initiator = $initiator;
+        $this->authenticator = $authenticator;
         $this->factory = $factory ?? new HttplugFactory();
         $this->logger = $logger ?? new NullLogger();
     }
@@ -59,14 +59,14 @@ class OidcInitiationServer implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         try {
-            $message = $this->initiator->initiate($request);
+            $message = $this->authenticator->authenticate($request);
 
-            return $this->factory->createResponse(302, null, ['Location' => $message->toUrl()]);
+            return $this->factory->createResponse(200, null, [], $message->toHtmlRedirectForm());
 
         } catch (Throwable $exception) {
             $this->logger->error($exception->getMessage());
 
-            return $this->factory->createResponse(500, null, [], 'Internal OIDC initiation server error');
+            return $this->factory->createResponse(500, null, [], 'Internal OIDC authentication server error');
         }
     }
 }

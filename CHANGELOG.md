@@ -4,9 +4,13 @@ CHANGELOG
 5.0.0
 -----
 
-* Added support of nullable error for Result based classes
 * Added [migration guide](https://github.com/oat-sa/lib-lti1p3-core/wiki/Migration-from-4.x-to-5.x) to document breaking changes and migration steps
-* Updated Service\Server namespace into Security\OAuth2
+* Added support of nullable error for Result based classes
+* Reworked LTI service layer by providing reusable abstraction for libraries based on core
+* Renamed Service\Server namespace into Security\OAuth2
+* Renamed JwksServer namespace into JwksRequestHandler
+* Renamed OidcInitiationServer namespace into OidcInitiationRequestHandler
+* Renamed OidcAuthenticationServer namespace into OidcAuthenticationRequestHandler
 * Updated documentation
 
 4.2.0
@@ -24,12 +28,12 @@ CHANGELOG
 4.0.0
 -----
 
+* Added [migration guide](https://github.com/oat-sa/lib-lti1p3-core/wiki/Migration-from-3.x-to-4.x) to document breaking changes and migration steps
 * Added PHP 8 support (and kept >=7.2)
 * Added algorithms support for RS384/512, HS256/384/512, ES256/384/512 (on top of RS256)
 * Added wrapper interfaces for JWT handling (builder, parser, validator), with default implementation based on [lcobucci/jwt](https://github.com/lcobucci/jwt)
 * Added multiple audiences support in JWT handling
 * Added collection, result and ids generator utils
-* Added [migration guide](https://github.com/oat-sa/lib-lti1p3-core/wiki/Migration-from-3.x-to-4.x) to document breaking changes and migration steps
 * Added more security testing tools 
 * Fixed issue [#74](https://github.com/oat-sa/lib-lti1p3-core/issues/74)
 * Fixed ServiceClient to work with 201 access token endpoint response  

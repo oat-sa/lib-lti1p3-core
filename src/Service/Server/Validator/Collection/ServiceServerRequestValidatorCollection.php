@@ -40,7 +40,7 @@ class ServiceServerRequestValidatorCollection implements ServiceServerRequestVal
         }
     }
 
-    public function add(ServiceServerRequestValidatorInterface $validator): self
+    public function add(ServiceServerRequestValidatorInterface $validator): ServiceServerRequestValidatorCollectionInterface
     {
         $this->validators->set(get_class($validator), $validator);
 

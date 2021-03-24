@@ -25,15 +25,15 @@ namespace OAT\Library\Lti1p3Core\Tests\Integration\Security\OAuth2\Validator;
 use Carbon\Carbon;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
-use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\AccessTokenRequestValidator;
-use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\Result\AccessTokenRequestValidationResult;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\RequestAccessTokenValidator;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\Result\RequestAccessTokenValidationResult;
 use OAT\Library\Lti1p3Core\Tests\Resource\Logger\TestLogger;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
 use OAT\Library\Lti1p3Core\Tests\Traits\NetworkTestingTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 
-class AccessTokenRequestValidatorTest extends TestCase
+class RequestAccessTokenValidatorTest extends TestCase
 {
     use DomainTestingTrait;
     use NetworkTestingTrait;
@@ -41,7 +41,7 @@ class AccessTokenRequestValidatorTest extends TestCase
     /** @var TestLogger */
     private $logger;
 
-    /** @var AccessTokenRequestValidator */
+    /** @var RequestAccessTokenValidator */
     private $subject;
 
     protected function setUp(): void
@@ -56,7 +56,7 @@ class AccessTokenRequestValidatorTest extends TestCase
             )
         ];
 
-        $this->subject = new AccessTokenRequestValidator(
+        $this->subject = new RequestAccessTokenValidator(
             $this->createTestRegistrationRepository($registrations),
             $this->logger
         );
@@ -75,7 +75,7 @@ class AccessTokenRequestValidatorTest extends TestCase
 
         $result = $this->subject->validate($request, ['allowed-scope']);
 
-        $this->assertInstanceOf(AccessTokenRequestValidationResult::class, $result);
+        $this->assertInstanceOf(RequestAccessTokenValidationResult::class, $result);
         $this->assertFalse($result->hasError());
         $this->assertNull($result->getError());
         $this->assertEquals(
@@ -94,7 +94,7 @@ class AccessTokenRequestValidatorTest extends TestCase
     {
         $result = $this->subject->validate($this->createServerRequest('GET', '/example', []));
 
-        $this->assertInstanceOf(AccessTokenRequestValidationResult::class, $result);
+        $this->assertInstanceOf(RequestAccessTokenValidationResult::class, $result);
         $this->assertTrue($result->hasError());
         $this->assertEquals('Missing Authorization header', $result->getError());
 
@@ -119,7 +119,7 @@ class AccessTokenRequestValidatorTest extends TestCase
 
         $result = $this->subject->validate($request);
 
-        $this->assertInstanceOf(AccessTokenRequestValidationResult::class, $result);
+        $this->assertInstanceOf(RequestAccessTokenValidationResult::class, $result);
         $this->assertTrue($result->hasError());
         $this->assertEquals('No registration found with client_id for audience(s) invalid', $result->getError());
 
@@ -144,7 +144,7 @@ class AccessTokenRequestValidatorTest extends TestCase
 
         $result = $this->subject->validate($request);
 
-        $this->assertInstanceOf(AccessTokenRequestValidationResult::class, $result);
+        $this->assertInstanceOf(RequestAccessTokenValidationResult::class, $result);
         $this->assertTrue($result->hasError());
         $this->assertEquals('Missing platform key chain for registration: missingKeyIdentifier', $result->getError());
 
@@ -174,7 +174,7 @@ class AccessTokenRequestValidatorTest extends TestCase
 
         $result = $this->subject->validate($request);
 
-        $this->assertInstanceOf(AccessTokenRequestValidationResult::class, $result);
+        $this->assertInstanceOf(RequestAccessTokenValidationResult::class, $result);
         $this->assertTrue($result->hasError());
         $this->assertEquals('JWT access token is invalid', $result->getError());
 
@@ -196,7 +196,7 @@ class AccessTokenRequestValidatorTest extends TestCase
 
         $result = $this->subject->validate($request, ['allowed-scope']);
 
-        $this->assertInstanceOf(AccessTokenRequestValidationResult::class, $result);
+        $this->assertInstanceOf(RequestAccessTokenValidationResult::class, $result);
         $this->assertTrue($result->hasError());
         $this->assertEquals('JWT access token scopes are invalid', $result->getError());
 

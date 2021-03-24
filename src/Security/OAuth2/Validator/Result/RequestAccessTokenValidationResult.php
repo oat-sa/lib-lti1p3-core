@@ -26,7 +26,7 @@ use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Security\Jwt\TokenInterface;
 use OAT\Library\Lti1p3Core\Util\Result\Result;
 
-class AccessTokenRequestValidationResult extends Result
+class RequestAccessTokenValidationResult extends Result
 {
     /** @var RegistrationInterface|null */
     private $registration;

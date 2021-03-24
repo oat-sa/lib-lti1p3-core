@@ -177,17 +177,18 @@ die;
 
 ### OIDC initiation redirection automation
 
-This library provides the [OidcInitiationServer](../../src/Security/Oidc/Server/OidcInitiationServer.php), implementing the [PSR15 RequestHandlerInterface](https://www.php-fig.org/psr/psr-15/#21-psrhttpserverrequesthandlerinterface), that can be exposed in an application controller to automate a redirect response creation from the [OidcInitiator](../../src/Security/Oidc/OidcInitiator.php) output:
+This library provides the [OidcInitiationRequestHandler](../../src/Security/Oidc/Server/OidcInitiationRequestHandler.php), implementing the [PSR15 RequestHandlerInterface](https://www.php-fig.org/psr/psr-15/#21-psrhttpserverrequesthandlerinterface), that can be exposed in an application controller to automate a redirect response creation from the [OidcInitiator](../../src/Security/Oidc/OidcInitiator.php) output:
 - it expects a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface) to handle
 - it will return a [PSR7 ResponseInterface](https://www.php-fig.org/psr/psr-7/#33-psrhttpmessageresponseinterface) instance to make the redirection to the platform.
 
 For example:
+
 ```php
 <?php
 
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Oidc\OidcInitiator;
-use OAT\Library\Lti1p3Core\Security\Oidc\Server\OidcInitiationServer;
+use OAT\Library\Lti1p3Core\Security\Oidc\Server\OidcInitiationRequestHandler;
 use Psr\Http\Message\ServerRequestInterface;
 
 /** @var RegistrationRepositoryInterface $registrationRepository */
@@ -196,11 +197,11 @@ $registrationRepository = ...
 /** @var ServerRequestInterface $request */
 $request = ...
 
-// Create the OIDC server
-$server = new OidcInitiationServer(new OidcInitiator($registrationRepository));
+// Create the OIDC initiation handler
+$handler = new OidcInitiationRequestHandler(new OidcInitiator($registrationRepository));
 
 // Redirect response from OIDC initiation (including state & nonce generation, via 302)
-$response = $server->handle($request);
+$response = $handler->handle($request);
 ```
 
 ## 3 - Platform side: OIDC authentication
@@ -272,17 +273,18 @@ echo $message->toHtmlRedirectForm();
 
 ### OIDC authentication redirection automation
 
-This library provides the [OidcAuthenticationServer](../../src/Security/Oidc/Server/OidcAuthenticationServer.php), implementing the [PSR15 RequestHandlerInterface](https://www.php-fig.org/psr/psr-15/#21-psrhttpserverrequesthandlerinterface), that can be exposed in an application controller to automate a redirect form response creation from the [OidcAuthenticator](../../src/Security/Oidc/OidcAuthenticator.php) output:
+This library provides the [OidcAuthenticationRequestHandler](../../src/Security/Oidc/Server/OidcAuthenticationRequestHandler.php), implementing the [PSR15 RequestHandlerInterface](https://www.php-fig.org/psr/psr-15/#21-psrhttpserverrequesthandlerinterface), that can be exposed in an application controller to automate a redirect form response creation from the [OidcAuthenticator](../../src/Security/Oidc/OidcAuthenticator.php) output:
 - it expects a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface) to handle
 - it will return a [PSR7 ResponseInterface](https://www.php-fig.org/psr/psr-7/#33-psrhttpmessageresponseinterface) instance to make the redirection to the tool via a form POST.
 
 For example:
+
 ```php
 <?php
 
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticator;
-use OAT\Library\Lti1p3Core\Security\Oidc\Server\OidcAuthenticationServer;
+use OAT\Library\Lti1p3Core\Security\Oidc\Server\OidcAuthenticationRequestHandler;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -295,11 +297,11 @@ $userAuthenticator = ...
 /** @var ServerRequestInterface $request */
 $request = ...
 
-// Create the OIDC server
-$server = new OidcAuthenticationServer(new OidcAuthenticator($registrationRepository, $userAuthenticator));
+// Create the OIDC authentication handler
+$handler = new OidcAuthenticationRequestHandler(new OidcAuthenticator($registrationRepository, $userAuthenticator));
 
 // Redirect response from OIDC authentication (via form POST)
-$response = $server->handle($request);
+$response = $handler->handle($request);
 ```
 
 ## 4 - Tool side: launch validation

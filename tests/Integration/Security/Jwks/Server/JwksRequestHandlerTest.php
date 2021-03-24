@@ -24,14 +24,14 @@ namespace OAT\Library\Lti1p3Core\Tests\Integration\Security\Jwks\Server;
 
 use Exception;
 use OAT\Library\Lti1p3Core\Security\Jwks\Exporter\JwksExporter;
-use OAT\Library\Lti1p3Core\Security\Jwks\Server\JwksServer;
+use OAT\Library\Lti1p3Core\Security\Jwks\Server\JwksRequestHandler;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepository;
 use OAT\Library\Lti1p3Core\Tests\Resource\Logger\TestLogger;
 use OAT\Library\Lti1p3Core\Tests\Traits\SecurityTestingTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 
-class JwksServerTest extends TestCase
+class JwksRequestHandlerTest extends TestCase
 {
     use SecurityTestingTrait;
 
@@ -41,7 +41,7 @@ class JwksServerTest extends TestCase
             $this->createTestKeyChain('keyChainIdentifier', 'keySetName')
         ]);
 
-        $subject = new JwksServer(new JwksExporter($repository));
+        $subject = new JwksRequestHandler(new JwksExporter($repository));
 
         $this->assertEquals(
             [
@@ -71,7 +71,7 @@ class JwksServerTest extends TestCase
 
         $logger = new TestLogger();
 
-        $subject = new JwksServer($exporterMock, null, $logger);
+        $subject = new JwksRequestHandler($exporterMock, null, $logger);
 
         $response = $subject->handle('keySetName');
 

@@ -81,23 +81,24 @@ Once a tool has been granted with an access token, it can perform LTI service au
 
 (with header `Authorization: Bearer <token>`).
 
-To be able to protect your platform endpoints, you can use the provided [AccessTokenRequestValidator](../../src/Security/OAuth2/Validator/AccessTokenRequestValidator.php):
+To be able to protect your platform endpoints, you can use the provided [RequestAccessTokenValidator](../../src/Security/OAuth2/Validator/RequestAccessTokenValidator.php):
 - it requires a registration repository implementation [as explained here](../quickstart/interfaces.md) to automate the token signature checks
 - it expects a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface) to validate
-- it will output a [AccessTokenRequestValidationResult](../../src/Security/OAuth2/Validator/Result/AccessTokenRequestValidationResult.php) representing the token validation, the related registration, the token itself and associated scopes.
+- it will output a [RequestAccessTokenValidationResult](../../src/Security/OAuth2/Validator/Result/RequestAccessTokenValidationResult.php) representing the token validation, the related registration, the token itself and associated scopes.
 
 For example,
+
 ```php
 <?php
 
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
-use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\AccessTokenRequestValidator;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\RequestAccessTokenValidator;
 use Psr\Http\Message\ServerRequestInterface;
 
 /** @var RegistrationRepositoryInterface $repository */
 $repository = ...
 
-$validator = new AccessTokenRequestValidator($repository);
+$validator = new RequestAccessTokenValidator($repository);
 
 /** @var ServerRequestInterface $request */
 $request = ...

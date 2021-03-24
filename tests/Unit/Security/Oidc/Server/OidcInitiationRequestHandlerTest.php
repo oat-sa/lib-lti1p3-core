@@ -24,65 +24,62 @@ namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\Oidc\Server;
 
 use Exception;
 use OAT\Library\Lti1p3Core\Message\LtiMessage;
-use OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticator;
-use OAT\Library\Lti1p3Core\Security\Oidc\Server\OidcAuthenticationServer;
+use OAT\Library\Lti1p3Core\Security\Oidc\OidcInitiator;
+use OAT\Library\Lti1p3Core\Security\Oidc\Server\OidcInitiationRequestHandler;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
 use OAT\Library\Lti1p3Core\Tests\Traits\NetworkTestingTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class OidcAuthenticationServerTest extends TestCase
+class OidcInitiationRequestHandlerTest extends TestCase
 {
     use DomainTestingTrait;
     use NetworkTestingTrait;
 
-    /** @var OidcAuthenticator|MockObject */
-    private $authenticatorMock;
+    /** @var OidcInitiator|MockObject */
+    private $initiatorMock;
 
-    /** @var OidcAuthenticationServer */
+    /** @var OidcInitiationRequestHandler */
     private $subject;
 
     protected function setUp(): void
     {
-        $this->authenticatorMock = $this->createMock(OidcAuthenticator::class);
+        $this->initiatorMock = $this->createMock(OidcInitiator::class);
 
-        $this->subject= new OidcAuthenticationServer($this->authenticatorMock);
+        $this->subject= new OidcInitiationRequestHandler($this->initiatorMock);
     }
 
-    public function testAuthenticationSuccessResponse(): void
+    public function testInitiationSuccessResponse(): void
     {
         $request = $this->createServerRequest('GET', 'http://example.com');
 
         $message = new LtiMessage('http://example.com', ['parameter' => 'value']);
 
-        $this->authenticatorMock
+        $this->initiatorMock
             ->expects($this->once())
-            ->method('authenticate')
+            ->method('initiate')
             ->with($request)
             ->willReturn($message);
 
         $response = $this->subject->handle($request);
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals(
-            '<form id="launch_0e7d4b4c23fd7b077aba0602246820ff" action="http://example.com" method="POST"><input type="hidden" name="parameter" value="value"/></form><script>document.getElementById("launch_0e7d4b4c23fd7b077aba0602246820ff").submit();</script>',
-            (string)$response->getBody()
-        );
+        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertEquals('http://example.com?parameter=value', $response->getHeaderLine('Location'));
     }
 
     public function testInitiationErrorResponse(): void
     {
         $request = $this->createServerRequest('GET', 'http://example.com');
 
-        $this->authenticatorMock
+        $this->initiatorMock
             ->expects($this->once())
-            ->method('authenticate')
+            ->method('initiate')
             ->with($request)
             ->willThrowException(new Exception('custom error'));
 
         $response = $this->subject->handle($request);
 
         $this->assertEquals(500, $response->getStatusCode());
-        $this->assertEquals('Internal OIDC authentication server error', (string)$response->getBody());
+        $this->assertEquals('Internal OIDC initiation server error', (string)$response->getBody());
     }
 }

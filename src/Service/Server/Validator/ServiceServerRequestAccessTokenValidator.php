@@ -22,19 +22,19 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Service\Server\Validator;
 
-use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\AccessTokenRequestValidator;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\RequestAccessTokenValidator;
 use OAT\Library\Lti1p3Core\Service\Server\Validator\Result\ServiceServerRequestValidationResult;
 use Psr\Http\Message\ServerRequestInterface;
 
 class ServiceServerRequestAccessTokenValidator implements ServiceServerRequestValidatorInterface
 {
-    /** @var AccessTokenRequestValidator */
+    /** @var RequestAccessTokenValidator */
     protected $validator;
 
     /** @var string[] */
     private $allowedScopes;
 
-    public function __construct(AccessTokenRequestValidator $validator, array $allowedScopes = [])
+    public function __construct(RequestAccessTokenValidator $validator, array $allowedScopes = [])
     {
         $this->validator = $validator;
         $this->allowedScopes = $allowedScopes;

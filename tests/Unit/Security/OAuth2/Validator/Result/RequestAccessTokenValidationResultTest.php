@@ -22,11 +22,11 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\OAuth2\Validator\Result;
 
-use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\Result\AccessTokenRequestValidationResult;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\Result\RequestAccessTokenValidationResult;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
 use PHPUnit\Framework\TestCase;
 
-class AccessTokenRequestValidationResultTest extends TestCase
+class RequestAccessTokenValidationResultTest extends TestCase
 {
     use DomainTestingTrait;
 
@@ -34,7 +34,7 @@ class AccessTokenRequestValidationResultTest extends TestCase
     {
         $registration = $this->createTestRegistration();
 
-        $subject = new AccessTokenRequestValidationResult($registration);
+        $subject = new RequestAccessTokenValidationResult($registration);
 
         $this->assertEquals($registration, $subject->getRegistration());
     }
@@ -43,7 +43,7 @@ class AccessTokenRequestValidationResultTest extends TestCase
     {
         $token = $this->buildJwt([], [], $this->createTestRegistration()->getPlatformKeyChain()->getPrivateKey());
 
-        $subject = new AccessTokenRequestValidationResult(null, $token);
+        $subject = new RequestAccessTokenValidationResult(null, $token);
 
         $this->assertEquals($token, $subject->getToken());
     }
@@ -58,14 +58,14 @@ class AccessTokenRequestValidationResultTest extends TestCase
             $this->createTestRegistration()->getPlatformKeyChain()->getPrivateKey()
         );
 
-        $subject = new AccessTokenRequestValidationResult(null, $token);
+        $subject = new RequestAccessTokenValidationResult(null, $token);
 
         $this->assertEquals(['scope1', 'scope2'], $subject->getScopes());
     }
 
     public function testBehavior(): void
     {
-        $subject = new AccessTokenRequestValidationResult();
+        $subject = new RequestAccessTokenValidationResult();
 
         $this->assertFalse($subject->hasError());
 
