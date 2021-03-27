@@ -19,7 +19,7 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Security\User;
+namespace OAT\Library\Lti1p3Core\Security\User\Result;
 
 use OAT\Library\Lti1p3Core\User\UserIdentityInterface;
 

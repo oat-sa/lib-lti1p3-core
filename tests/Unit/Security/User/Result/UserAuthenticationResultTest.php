@@ -20,9 +20,9 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\User;
+namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\User\Result;
 
-use OAT\Library\Lti1p3Core\Security\User\UserAuthenticationResult;
+use OAT\Library\Lti1p3Core\Security\User\Result\UserAuthenticationResult;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
 use PHPUnit\Framework\TestCase;
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,36 +20,23 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Security\User;
+namespace OAT\Library\Lti1p3Core\Service\Client;
 
-use OAT\Library\Lti1p3Core\User\UserIdentityInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
+use Psr\Http\Message\ResponseInterface;
 
-class UserAuthenticationResult implements UserAuthenticationResultInterface
+/**
+ * @see https://www.imsglobal.org/spec/security/v1p0#securing_web_services
+ */
+interface LtiServiceClientInterface
 {
-    /** @var bool */
-    private $success;
+    public const GRANT_TYPE = 'client_credentials';
 
-    /** @var UserIdentityInterface|null */
-    private $userIdentity;
-
-    public function __construct(bool $success, ?UserIdentityInterface $userIdentity = null)
-    {
-        $this->success = $success;
-        $this->userIdentity = $userIdentity;
-    }
-
-    public function isSuccess(): bool
-    {
-        return $this->success;
-    }
-
-    public function isAnonymous(): bool
-    {
-        return null === $this->userIdentity;
-    }
-
-    public function getUserIdentity(): ?UserIdentityInterface
-    {
-        return $this->userIdentity;
-    }
+    public function request(
+        RegistrationInterface $registration,
+        string $method,
+        string $uri,
+        array $options = [],
+        array $scopes = []
+    ): ResponseInterface;
 }

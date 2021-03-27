@@ -41,7 +41,7 @@ use Throwable;
 /**
  * @see https://www.imsglobal.org/spec/security/v1p0#securing_web_services
  */
-class ServiceClient implements ServiceClientInterface
+class LtiServiceClient implements LtiServiceClientInterface
 {
     private const CACHE_PREFIX = 'lti1p3-service-client-token';
 

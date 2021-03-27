@@ -30,8 +30,8 @@ use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Security\Jwt\Builder\Builder;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Grant\ClientAssertionCredentialsGrant;
-use OAT\Library\Lti1p3Core\Service\Client\ServiceClient;
-use OAT\Library\Lti1p3Core\Service\Client\ServiceClientInterface;
+use OAT\Library\Lti1p3Core\Service\Client\LtiServiceClient;
+use OAT\Library\Lti1p3Core\Service\Client\LtiServiceClientInterface;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
 use OAT\Library\Lti1p3Core\Tests\Traits\NetworkTestingTrait;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -39,7 +39,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class ServiceClientTest extends TestCase
+class LtiServiceClientTest extends TestCase
 {
     use DomainTestingTrait;
     use NetworkTestingTrait;
@@ -53,7 +53,7 @@ class ServiceClientTest extends TestCase
     /** @var ClientInterface|MockObject */
     private $clientMock;
 
-    /** @var ServiceClient */
+    /** @var LtiServiceClient */
     private $subject;
 
     protected function setUp(): void
@@ -63,7 +63,7 @@ class ServiceClientTest extends TestCase
         $this->cache = new ArrayCachePool();
         $this->clientMock = $this->createMock(ClientInterface::class);
 
-        $this->subject = new ServiceClient(
+        $this->subject = new LtiServiceClient(
             $this->cache,
             $this->clientMock,
             new Builder(null, $this->createTestIdGenerator())
@@ -90,7 +90,7 @@ class ServiceClientTest extends TestCase
                     $this->registration->getPlatform()->getOAuth2AccessTokenUrl(),
                     [
                         'form_params' => [
-                            'grant_type' => ServiceClientInterface::GRANT_TYPE,
+                            'grant_type' => LtiServiceClientInterface::GRANT_TYPE,
                             'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
                             'client_assertion' => $this->createTestClientAssertion($this->registration),
                             'scope' => ''
@@ -132,7 +132,7 @@ class ServiceClientTest extends TestCase
                     $this->registration->getPlatform()->getOAuth2AccessTokenUrl(),
                     [
                         'form_params' => [
-                            'grant_type' => ServiceClientInterface::GRANT_TYPE,
+                            'grant_type' => LtiServiceClientInterface::GRANT_TYPE,
                             'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
                             'client_assertion' => $this->createTestClientAssertion($this->registration),
                             'scope' => ''
@@ -244,7 +244,7 @@ class ServiceClientTest extends TestCase
                     $this->registration->getPlatform()->getOAuth2AccessTokenUrl(),
                     [
                         'form_params' => [
-                            'grant_type' => ServiceClientInterface::GRANT_TYPE,
+                            'grant_type' => LtiServiceClientInterface::GRANT_TYPE,
                             'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
                             'client_assertion' => $this->createTestClientAssertion($this->registration),
                             'scope' => 'scope1 scope2'
@@ -304,7 +304,7 @@ class ServiceClientTest extends TestCase
                 $this->registration->getPlatform()->getOAuth2AccessTokenUrl(),
                 [
                     'form_params' => [
-                        'grant_type' => ServiceClientInterface::GRANT_TYPE,
+                        'grant_type' => LtiServiceClientInterface::GRANT_TYPE,
                         'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
                         'client_assertion' => $this->createTestClientAssertion($this->registration),
                         'scope' => '',
@@ -331,7 +331,7 @@ class ServiceClientTest extends TestCase
                 $this->registration->getPlatform()->getOAuth2AccessTokenUrl(),
                 [
                     'form_params' => [
-                        'grant_type' => ServiceClientInterface::GRANT_TYPE,
+                        'grant_type' => LtiServiceClientInterface::GRANT_TYPE,
                         'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
                         'client_assertion' => $this->createTestClientAssertion($this->registration),
                         'scope' => '',
@@ -358,7 +358,7 @@ class ServiceClientTest extends TestCase
                 $this->registration->getPlatform()->getOAuth2AccessTokenUrl(),
                 [
                     'form_params' => [
-                        'grant_type' => ServiceClientInterface::GRANT_TYPE,
+                        'grant_type' => LtiServiceClientInterface::GRANT_TYPE,
                         'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
                         'client_assertion' => $this->createTestClientAssertion($this->registration),
                         'scope' => '',
@@ -386,7 +386,7 @@ class ServiceClientTest extends TestCase
                     $this->registration->getPlatform()->getOAuth2AccessTokenUrl(),
                     [
                         'form_params' => [
-                            'grant_type' => ServiceClientInterface::GRANT_TYPE,
+                            'grant_type' => LtiServiceClientInterface::GRANT_TYPE,
                             'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
                             'client_assertion' => $this->createTestClientAssertion($this->registration),
                             'scope' => ''
@@ -424,7 +424,7 @@ class ServiceClientTest extends TestCase
                     $this->registration->getPlatform()->getOAuth2AccessTokenUrl(),
                     [
                         'form_params' => [
-                            'grant_type' => ServiceClientInterface::GRANT_TYPE,
+                            'grant_type' => LtiServiceClientInterface::GRANT_TYPE,
                             'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
                             'client_assertion' => $this->createTestClientAssertion($this->registration),
                             'scope' => ''
@@ -482,7 +482,7 @@ class ServiceClientTest extends TestCase
                     $this->registration->getPlatform()->getOAuth2AccessTokenUrl(),
                     [
                         'form_params' => [
-                            'grant_type' => ServiceClientInterface::GRANT_TYPE,
+                            'grant_type' => LtiServiceClientInterface::GRANT_TYPE,
                             'client_assertion_type' => ClientAssertionCredentialsGrant::CLIENT_ASSERTION_TYPE,
                             'client_assertion' => $this->createTestClientAssertion($this->registration),
                             'scope' => 'scope1 scope2'

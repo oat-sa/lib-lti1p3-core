@@ -19,17 +19,36 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Security\User;
+namespace OAT\Library\Lti1p3Core\Security\User\Result;
 
-use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
-use OAT\Library\Lti1p3Core\Security\User\Result\UserAuthenticationResultInterface;
-use Psr\Http\Message\ServerRequestInterface;
+use OAT\Library\Lti1p3Core\User\UserIdentityInterface;
 
-interface UserAuthenticatorInterface
+class UserAuthenticationResult implements UserAuthenticationResultInterface
 {
-    public function authenticate(
-        RegistrationInterface $registration,
-        ServerRequestInterface $request,
-        string $loginHint
-    ): UserAuthenticationResultInterface;
+    /** @var bool */
+    private $success;
+
+    /** @var UserIdentityInterface|null */
+    private $userIdentity;
+
+    public function __construct(bool $success, ?UserIdentityInterface $userIdentity = null)
+    {
+        $this->success = $success;
+        $this->userIdentity = $userIdentity;
+    }
+
+    public function isSuccess(): bool
+    {
+        return $this->success;
+    }
+
+    public function isAnonymous(): bool
+    {
+        return null === $this->userIdentity;
+    }
+
+    public function getUserIdentity(): ?UserIdentityInterface
+    {
+        return $this->userIdentity;
+    }
 }

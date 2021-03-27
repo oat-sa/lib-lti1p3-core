@@ -15,28 +15,24 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2020 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2021 (original work) Open Assessment Technologies SA;
  */
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Service\Client;
+namespace OAT\Library\Lti1p3Core\Service\Server\Handler;
 
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
-/**
- * @see https://www.imsglobal.org/spec/security/v1p0#securing_web_services
- */
-interface ServiceClientInterface
+interface LtiServiceServerRequestHandlerInterface
 {
-    public const GRANT_TYPE = 'client_credentials';
+    public function handleServiceRequest(RegistrationInterface $registration, ServerRequestInterface $request): ResponseInterface;
 
-    public function request(
-        RegistrationInterface $registration,
-        string $method,
-        string $uri,
-        array $options = [],
-        array $scopes = []
-    ): ResponseInterface;
+    public function getName(): string;
+
+    public function getAcceptedRequestMethods(): array;
+
+    public function getAcceptedRequestContentTypes(): array;
 }

@@ -63,23 +63,29 @@ $registrationRepository = new class implements RegistrationRepositoryInterface
 During the [OIDC authentication handling](https://www.imsglobal.org/spec/security/v1p0#step-3-authentication-response) on the platform side, you need to define how to delegate the user authentication by providing an implementation of the [UserAuthenticatorInterface](../../src/Security/User/UserAuthenticatorInterface.php).
 
 For example:
+
 ```php
 <?php
 
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
-use OAT\Library\Lti1p3Core\Security\User\UserAuthenticationResultInterface;
+use OAT\Library\Lti1p3Core\Security\User\Result\UserAuthenticationResultInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 $userAuthenticator = new class implements UserAuthenticatorInterface
 {
-   public function authenticate(string $loginHint): UserAuthenticationResultInterface
-   {
+   public function authenticate(
+       RegistrationInterface $registration,
+       ServerRequestInterface $request,
+       string $loginHint
+   ): UserAuthenticationResultInterface {
        // TODO: Implement authenticate() method to perform user authentication (ex: session, LDAP, etc)
    }
 };
 ```
 **Notes**:
 - you can find a simple implementation example of this interface in the method `createTestUserAuthenticator()` of the [SecurityTestingTrait](../../tests/Traits/SecurityTestingTrait.php).
-- you can find a ready to use `UserAuthenticationResultInterface` implementation is available in [UserAuthenticationResult](../../src/Security/User/UserAuthenticationResult.php)
+- you can find a ready to use `UserAuthenticationResultInterface` implementation is available in [UserAuthenticationResult](../../src/Security/User/Result/UserAuthenticationResult.php)
 
 ## Optional interfaces
 
@@ -138,21 +144,22 @@ $fetcher = new class implements JwksFetcherInterface
 - it is recommended to put in cache the JWKS endpoint responses, to improve performances since they don't change often. Your implementation can then rely on a cache by example.
 - the ready to use [JwksFetcher](../../src/Security/Jwks/Fetcher/JwksFetcher.php) works with a [guzzle](http://docs.guzzlephp.org/en/stable/) client to request JWKS data, a [PSR6 cache](https://www.php-fig.org/psr/psr-6/#cacheitempoolinterface) to cache them, and a [PSR3 logger](https://www.php-fig.org/psr/psr-3/#3-psrlogloggerinterface) to log this process.
 
-### Service client interface
+### LTI Service client interface
 
-**Default implementation**: [ServiceClient](../../src/Service/Client/ServiceClient.php) 
+**Default implementation**: [LtiServiceClient](../../src/Service/Client/LtiServiceClient.php) 
 
-In order to send authenticated service calls, an implementation of the [ServiceClientInterface](../../src/Service/Client/ServiceClientInterface.php) can be provided.
+In order to send authenticated service calls, an implementation of the [LtiServiceClientInterface](../../src/Service/Client/LtiServiceClientInterface.php) can be provided.
 
 For example:
+
 ```php
 <?php
 
-use OAT\Library\Lti1p3Core\Service\Client\ServiceClientInterface;
+use OAT\Library\Lti1p3Core\Service\Client\LtiServiceClientInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;  
 use Psr\Http\Message\ResponseInterface;
 
-$client = new class implements ServiceClientInterface
+$client = new class implements LtiServiceClientInterface
 {
     public function request(RegistrationInterface $registration, string $method, string $uri, array $options = [], array $scopes = []) : ResponseInterface
     {
@@ -163,7 +170,7 @@ $client = new class implements ServiceClientInterface
 **Notes**:                                                                                                                                                                                                                                                                            
 - it is recommended to put in cache the service access tokens, to improve performances. Your implementation can then rely on an injected [PSR6 cache](https://www.php-fig.org/psr/psr-6/#cacheitempoolinterface) by example.
 
-### Service server client repository interface
+### LTI Service server client repository interface
 
 **Default implementation**: [ClientRepository](../../src/Security/OAuth2/Repository/ClientRepository.php)  
 
@@ -173,7 +180,7 @@ In order to retrieve and validate clients involved in authenticated service call
 - the default `ClientRepository` injects the `RegistrationRepositoryInterface` to be able to expose your platforms as oauth2 providers and tools as consumers.
 - in case of the consumer tool public key is not given in the registration, it will automatically fallback to a JWKS call.
 
-### Service server access token repository interface
+### LTI Service server access token repository interface
 
 **Default implementation**: [AccessTokenRepository](../../src/Security/OAuth2/Repository/AccessTokenRepository.php)  
 
@@ -181,7 +188,7 @@ In order to store service calls access tokens, an implementation of the [AccessT
 
 **Note**: the default `AccessTokenRepository` implementation rely on a [PSR6 cache](https://www.php-fig.org/psr/psr-6/#cacheitempoolinterface) to store generated access tokens.
 
-### Service server scope repository interface
+### LTI Service server scope repository interface
 
 **Default implementation**: [ScopeRepository](../../src/Security/OAuth2/Repository/ScopeRepository.php)  
 

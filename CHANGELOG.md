@@ -7,10 +7,16 @@ CHANGELOG
 * Added [migration guide](https://github.com/oat-sa/lib-lti1p3-core/wiki/Migration-from-4.x-to-5.x) to document breaking changes and migration steps
 * Added support of nullable error for Result based classes
 * Reworked LTI service layer by providing reusable abstraction for libraries based on core
-* Renamed Service\Server namespace into Security\OAuth2
-* Renamed JwksServer namespace into JwksRequestHandler
-* Renamed OidcInitiationServer namespace into OidcInitiationRequestHandler
-* Renamed OidcAuthenticationServer namespace into OidcAuthenticationRequestHandler
+* Moved Service\Server namespace into Security\OAuth2
+* Moved UserAuthenticationResultInterface in Result sub namespace
+* Moved UserAuthenticationResult in Result sub namespace
+* Renamed JwksServer into JwksRequestHandler
+* Renamed OidcInitiationServer into OidcInitiationRequestHandler
+* Renamed OidcAuthenticationServer into OidcAuthenticationRequestHandler
+* Renamed AccessTokenRequestValidator into RequestAccessTokenValidator
+* Renamed AccessTokenRequestValidatorResult into RequestAccessTokenValidatorResult
+* Renamed ServiceClientInterface into LtiServiceClientInterface
+* Renamed ServiceClient into LtiServiceClient
 * Updated documentation
 
 4.2.0

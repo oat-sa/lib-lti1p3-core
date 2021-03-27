@@ -32,7 +32,7 @@
                 <referencedClass name="Psr\Cache\CacheException"/>
                 <file name="src/Security/Jwks/Fetcher/JwksFetcher.php"/>
                 <file name="src/Security/OAuth2/Repository/AccessTokenRepository.php"/>
-                <file name="src/Service/Client/ServiceClient.php"/>
+                <file name="src/Service/Client/LtiServiceClient.php"/>
             </errorLevel>
         </InvalidCatch>
         <InvalidThrow>
