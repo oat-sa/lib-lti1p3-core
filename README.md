@@ -76,7 +76,7 @@ You can find below some tutorials, presented by topics.
 
 ## Wiki
 
-You can more information about this library in the [library wiki](https://github.com/oat-sa/lib-lti1p3-core/wiki). 
+You can find more information in the [library wiki](https://github.com/oat-sa/lib-lti1p3-core/wiki). 
 
 ## Tests
 
