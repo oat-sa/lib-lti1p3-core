@@ -48,7 +48,7 @@
         </MissingDependency>
         <TypeDoesNotContainType>
             <errorLevel type="suppress">
-                <file name="src/Service/Server/Validator/ServiceServerRequestContentTypeValidator.php"/>
+                <file name="src/Service/Server/LtiServiceServer.php"/>
             </errorLevel>
         </TypeDoesNotContainType>
         <UndefinedClass>

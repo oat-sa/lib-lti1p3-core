@@ -96,7 +96,6 @@ class OidcAuthenticator
 
             $authenticationResult = $this->authenticator->authenticate(
                 $registration,
-                $request,
                 $oidcRequest->getParameters()->getMandatory('login_hint')
             );
 

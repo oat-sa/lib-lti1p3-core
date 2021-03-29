@@ -227,13 +227,11 @@ use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use OAT\Library\Lti1p3Core\Security\User\Result\UserAuthenticationResult;
 use OAT\Library\Lti1p3Core\Security\User\Result\UserAuthenticationResultInterface;
 use OAT\Library\Lti1p3Core\User\UserIdentity;
-use Psr\Http\Message\ServerRequestInterface;
 
 $userAuthenticator = new class implements UserAuthenticatorInterface
 {
    public function authenticate(
        RegistrationInterface $registration,
-       ServerRequestInterface $request,
        string $loginHint
    ): UserAuthenticationResultInterface {
        // Perform user authentication based on the registration, request or login hint

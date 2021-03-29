@@ -70,13 +70,11 @@ For example:
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use OAT\Library\Lti1p3Core\Security\User\Result\UserAuthenticationResultInterface;
-use Psr\Http\Message\ServerRequestInterface;
 
 $userAuthenticator = new class implements UserAuthenticatorInterface
 {
    public function authenticate(
        RegistrationInterface $registration,
-       ServerRequestInterface $request,
        string $loginHint
    ): UserAuthenticationResultInterface {
        // TODO: Implement authenticate() method to perform user authentication (ex: session, LDAP, etc)

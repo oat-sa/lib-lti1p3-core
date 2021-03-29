@@ -265,7 +265,7 @@ class OidcAuthenticatorTest extends TestCase
         $this->authenticatorMock
             ->expects($this->once())
             ->method('authenticate')
-            ->with($registration, $request, 'login_hint')
+            ->with($registration, 'login_hint')
             ->willReturn(new UserAuthenticationResult(false));
 
         $this->subject->authenticate($request);

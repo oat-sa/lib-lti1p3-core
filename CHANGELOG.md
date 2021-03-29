@@ -5,8 +5,9 @@ CHANGELOG
 -----
 
 * Added [migration guide](https://github.com/oat-sa/lib-lti1p3-core/wiki/Migration-from-4.x-to-5.x) to document breaking changes and migration steps
+* Added psalm support
 * Added support of nullable error for Result based classes
-* Reworked LTI service layer by providing reusable abstraction for libraries based on core
+* Added LtiServiceServer component to ease providing LTI services
 * Moved Service\Server namespace into Security\OAuth2
 * Moved UserAuthenticationResultInterface in Result sub namespace
 * Moved UserAuthenticationResult in Result sub namespace
@@ -17,6 +18,8 @@ CHANGELOG
 * Renamed AccessTokenRequestValidatorResult into RequestAccessTokenValidatorResult
 * Renamed ServiceClientInterface into LtiServiceClientInterface
 * Renamed ServiceClient into LtiServiceClient
+* Fixed globally nullable parameters for classes constructors  
+* Updated UserAuthenticatorInterface signature  
 * Updated documentation
 
 4.2.0

@@ -39,7 +39,6 @@ use OAT\Library\Lti1p3Core\Security\User\Result\UserAuthenticationResult;
 use OAT\Library\Lti1p3Core\Security\User\Result\UserAuthenticationResultInterface;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use OAT\Library\Lti1p3Core\Util\Generator\IdGeneratorInterface;
-use Psr\Http\Message\ServerRequestInterface;
 
 trait SecurityTestingTrait
 {
@@ -155,7 +154,6 @@ trait SecurityTestingTrait
 
             public function authenticate(
                 RegistrationInterface $registration,
-                ServerRequestInterface $request,
                 string $loginHint
             ): UserAuthenticationResultInterface {
                 return new UserAuthenticationResult(

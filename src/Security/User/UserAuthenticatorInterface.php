@@ -23,13 +23,8 @@ namespace OAT\Library\Lti1p3Core\Security\User;
 
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Security\User\Result\UserAuthenticationResultInterface;
-use Psr\Http\Message\ServerRequestInterface;
 
 interface UserAuthenticatorInterface
 {
-    public function authenticate(
-        RegistrationInterface $registration,
-        ServerRequestInterface $request,
-        string $loginHint
-    ): UserAuthenticationResultInterface;
+    public function authenticate(RegistrationInterface $registration, string $loginHint): UserAuthenticationResultInterface;
 }

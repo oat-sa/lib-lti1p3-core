@@ -28,11 +28,16 @@ use Psr\Http\Message\ServerRequestInterface;
 
 interface LtiServiceServerRequestHandlerInterface
 {
-    public function handleServiceRequest(RegistrationInterface $registration, ServerRequestInterface $request): ResponseInterface;
+    public function getServiceName(): string;
 
-    public function getName(): string;
+    public function getAllowedContentType(): ?string;
 
-    public function getAcceptedRequestMethods(): array;
+    public function getAllowedMethods(): array;
 
-    public function getAcceptedRequestContentTypes(): array;
+    public function getAllowedScopes(): array;
+
+    public function handleServiceRequest(
+        RegistrationInterface $registration,
+        ServerRequestInterface $request
+    ): ResponseInterface;
 }
