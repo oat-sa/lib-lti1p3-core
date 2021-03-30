@@ -179,6 +179,8 @@ class ToolLaunchValidatorTest extends TestCase
 
     public function testValidatePlatformOriginatingLaunchForStartProctoringSuccess(): void
     {
+        $validProctoringData = $this->buildJwt([], [], $this->registration->getPlatformKeyChain()->getPrivateKey());
+
         $message = $this->builder->buildPlatformOriginatingLaunch(
             $this->registration,
             LtiMessageInterface::LTI_MESSAGE_TYPE_START_PROCTORING,
@@ -188,9 +190,8 @@ class ToolLaunchValidatorTest extends TestCase
             [],
             [
                 LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_START_ASSESSMENT_URL => 'http://tool.com/start',
-                LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_SESSION_DATA => 'data',
+                LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_SESSION_DATA => $validProctoringData->toString(),
                 LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_ATTEMPT_NUMBER => '1',
-                LtiMessagePayloadInterface::CLAIM_LTI_LEGACY_USER_ID => 'legacyUserId',
             ]
         );
 
@@ -219,9 +220,8 @@ class ToolLaunchValidatorTest extends TestCase
         );
 
         $this->assertEquals('http://tool.com/start', $result->getPayload()->getProctoringStartAssessmentUrl());
-        $this->assertEquals('data', $result->getPayload()->getProctoringSessionData());
+        $this->assertEquals($validProctoringData->toString(), $result->getPayload()->getProctoringSessionData());
         $this->assertEquals('1', $result->getPayload()->getProctoringAttemptNumber());
-        $this->assertEquals('legacyUserId', $result->getPayload()->getLegacyUserIdentifier());
     }
 
     public function testValidatePlatformOriginatingLaunchFallbackOnJwks(): void
@@ -598,25 +598,6 @@ class ToolLaunchValidatorTest extends TestCase
                     LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_SESSION_DATA => 'sessionData',
                 ],
                 'ID token attempt_number proctoring claim is invalid'
-            ],
-            'Invalid ID token for proctoring without legacy user id' => [
-                [
-                    MessagePayloadInterface::HEADER_KID => $registration->getPlatformKeyChain()->getIdentifier()
-                ],
-                [
-                    MessagePayloadInterface::CLAIM_ISS => $registration->getPlatform()->getAudience(),
-                    MessagePayloadInterface::CLAIM_AUD => $registration->getClientId(),
-                    LtiMessagePayloadInterface::CLAIM_LTI_VERSION => LtiMessageInterface::LTI_VERSION,
-                    LtiMessagePayloadInterface::CLAIM_LTI_MESSAGE_TYPE => LtiMessageInterface::LTI_MESSAGE_TYPE_START_PROCTORING,
-                    LtiMessagePayloadInterface::CLAIM_LTI_ROLES => ['Learner'],
-                    LtiMessagePayloadInterface::CLAIM_SUB => 'user',
-                    LtiMessagePayloadInterface::CLAIM_NONCE => 'value',
-                    LtiMessagePayloadInterface::CLAIM_LTI_DEPLOYMENT_ID => $registration->getDefaultDeploymentId(),
-                    LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_START_ASSESSMENT_URL => 'startAssessmentUrl',
-                    LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_SESSION_DATA => 'sessionData',
-                    LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_ATTEMPT_NUMBER => '1',
-                ],
-                'ID token lti11_legacy_user_id claim is invalid'
             ]
         ];
     }

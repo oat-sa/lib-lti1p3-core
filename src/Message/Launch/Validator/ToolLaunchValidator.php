@@ -278,10 +278,6 @@ class ToolLaunchValidator extends AbstractLaunchValidator
             if (empty($payload->getProctoringAttemptNumber())) {
                 throw new LtiException('ID token attempt_number proctoring claim is invalid');
             }
-
-            if (empty($payload->getLegacyUserIdentifier())) {
-                throw new LtiException('ID token lti11_legacy_user_id claim is invalid');
-            }
         }
 
         $this->addSuccess(

@@ -235,7 +235,19 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
 
         if ($payload->getMessageType() === LtiMessageInterface::LTI_MESSAGE_TYPE_START_ASSESSMENT) {
             if (empty($payload->getProctoringSessionData())) {
-                throw new LtiException('JWT session_data proctoring claim is invalid');
+                throw new LtiException('JWT session_data proctoring claim is missing');
+            }
+
+            $dataToken = $this->parser->parse($payload->getProctoringSessionData());
+
+            $platformKeyChain = $registration->getPlatformKeyChain();
+
+            if (null === $platformKeyChain) {
+                throw new LtiException('JWT session_data proctoring claim validation failure: platform key chain is not configured');
+            }
+
+            if (!$this->validator->validate($dataToken, $platformKeyChain->getPublicKey())) {
+                throw new LtiException('JWT session_data proctoring claim validation failure');
             }
 
             if (empty($payload->getProctoringAttemptNumber())) {

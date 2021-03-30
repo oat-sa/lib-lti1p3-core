@@ -19,6 +19,7 @@ CHANGELOG
 * Renamed ServiceClientInterface into LtiServiceClientInterface
 * Renamed ServiceClient into LtiServiceClient
 * Fixed globally nullable parameters for classes constructors  
+* Fixed deprecated legacy user identifier claim  
 * Updated UserAuthenticatorInterface signature  
 * Updated documentation
 

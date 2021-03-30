@@ -154,11 +154,6 @@ class LtiMessagePayload extends MessagePayload implements LtiMessagePayloadInter
         );
     }
 
-    public function getLegacyUserIdentifier(): ?string
-    {
-        return $this->getClaim(static::CLAIM_LTI_LEGACY_USER_ID);
-    }
-
     public function getDeepLinkingSettings(): ?DeepLinkingSettingsClaim
     {
         return $this->getClaim(DeepLinkingSettingsClaim::class);
