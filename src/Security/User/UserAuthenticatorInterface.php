@@ -21,7 +21,13 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Security\User;
 
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
+use OAT\Library\Lti1p3Core\Security\User\Result\UserAuthenticationResultInterface;
+
 interface UserAuthenticatorInterface
 {
-    public function authenticate(string $loginHint): UserAuthenticationResultInterface;
+    public function authenticate(
+        RegistrationInterface $registration,
+        string $loginHint
+    ): UserAuthenticationResultInterface;
 }

@@ -34,10 +34,10 @@ class RegistrationFactory
         PlatformInterface $platform,
         ToolInterface $tool,
         array $deploymentIds,
-        KeyChainInterface $platformKeyChain = null,
-        KeyChainInterface $toolKeyChain = null,
-        string $platformJwksUrl = null,
-        string $toolJwksUrl = null
+        ?KeyChainInterface $platformKeyChain = null,
+        ?KeyChainInterface $toolKeyChain = null,
+        ?string $platformJwksUrl = null,
+        ?string $toolJwksUrl = null
     ): RegistrationInterface {
         return new Registration(
             $identifier,

@@ -50,11 +50,11 @@ class LisClaim implements MessagePayloadClaimInterface
     }
 
     public function __construct(
-        string $courseOfferingSourcedId = null,
-        string $courseSectionSourcedId = null,
-        string $outcomeServiceUrl = null,
-        string $personSourcedId = null,
-        string $resultSourcedId = null
+        ?string $courseOfferingSourcedId = null,
+        ?string $courseSectionSourcedId = null,
+        ?string $outcomeServiceUrl = null,
+        ?string $personSourcedId = null,
+        ?string $resultSourcedId = null
     ) {
         $this->courseOfferingSourcedId = $courseOfferingSourcedId;
         $this->courseSectionSourcedId = $courseSectionSourcedId;

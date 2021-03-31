@@ -1,6 +1,28 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+* Added [migration guide](https://github.com/oat-sa/lib-lti1p3-core/wiki/Migration-from-4.x-to-5.x) to document breaking changes and migration steps
+* Added psalm support
+* Added support of nullable error for Result based classes
+* Added LtiServiceServer component to ease providing LTI services
+* Moved Service\Server namespace into Security\OAuth2
+* Moved UserAuthenticationResultInterface in Result sub namespace
+* Moved UserAuthenticationResult in Result sub namespace
+* Renamed JwksServer into JwksRequestHandler
+* Renamed OidcInitiationServer into OidcInitiationRequestHandler
+* Renamed OidcAuthenticationServer into OidcAuthenticationRequestHandler
+* Renamed AccessTokenRequestValidator into RequestAccessTokenValidator
+* Renamed AccessTokenRequestValidatorResult into RequestAccessTokenValidatorResult
+* Renamed ServiceClientInterface into LtiServiceClientInterface
+* Renamed ServiceClient into LtiServiceClient
+* Fixed globally nullable parameters for classes constructors  
+* Fixed deprecated legacy user identifier claim  
+* Updated UserAuthenticatorInterface signature  
+* Updated documentation
+
 4.2.0
 -----
 
@@ -16,12 +38,12 @@ CHANGELOG
 4.0.0
 -----
 
+* Added [migration guide](https://github.com/oat-sa/lib-lti1p3-core/wiki/Migration-from-3.x-to-4.x) to document breaking changes and migration steps
 * Added PHP 8 support (and kept >=7.2)
 * Added algorithms support for RS384/512, HS256/384/512, ES256/384/512 (on top of RS256)
 * Added wrapper interfaces for JWT handling (builder, parser, validator), with default implementation based on [lcobucci/jwt](https://github.com/lcobucci/jwt)
 * Added multiple audiences support in JWT handling
 * Added collection, result and ids generator utils
-* Added [migration guide](https://github.com/oat-sa/lib-lti1p3-core/wiki/Migration-from-3.x-to-4.x) to document breaking changes and migration steps
 * Added more security testing tools 
 * Fixed issue [#74](https://github.com/oat-sa/lib-lti1p3-core/issues/74)
 * Fixed ServiceClient to work with 201 access token endpoint response  

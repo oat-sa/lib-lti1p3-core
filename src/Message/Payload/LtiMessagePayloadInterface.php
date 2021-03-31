@@ -56,7 +56,6 @@ interface LtiMessagePayloadInterface extends MessagePayloadInterface
     public const CLAIM_LTI_CUSTOM = 'https://purl.imsglobal.org/spec/lti/claim/custom';
     public const CLAIM_LTI_TARGET_LINK_URI = 'https://purl.imsglobal.org/spec/lti/claim/target_link_uri';
     public const CLAIM_LTI_RESOURCE_LINK = 'https://purl.imsglobal.org/spec/lti/claim/resource_link';
-    public const CLAIM_LTI_LEGACY_USER_ID = 'https://purl.imsglobal.org/spec/lti/claim/lti11_legacy_user_id';
 
     // Deep Linking claims
     public const CLAIM_LTI_DEEP_LINKING_SETTINGS = 'https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings';
@@ -113,8 +112,6 @@ interface LtiMessagePayloadInterface extends MessagePayloadInterface
     public function getLis(): ?LisClaim;
 
     public function getUserIdentity(): ?UserIdentityInterface;
-
-    public function getLegacyUserIdentifier(): ?string ;
 
     public function getDeepLinkingSettings(): ?DeepLinkingSettingsClaim;
 

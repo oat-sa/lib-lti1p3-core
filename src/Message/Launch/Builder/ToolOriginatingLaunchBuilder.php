@@ -41,7 +41,7 @@ class ToolOriginatingLaunchBuilder extends AbstractLaunchBuilder
         RegistrationInterface $registration,
         string $messageType,
         string $platformUrl,
-        string $deploymentId = null,
+        ?string $deploymentId = null,
         array $optionalClaims = []
     ): LtiMessageInterface {
         $deploymentId = $this->resolveDeploymentId($registration, $deploymentId);

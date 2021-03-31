@@ -42,7 +42,7 @@ class Builder implements BuilderInterface
     /** @var IdGeneratorInterface */
     private $generator;
 
-    public function __construct(ConfigurationFactory $factory = null, IdGeneratorInterface $generator = null)
+    public function __construct(?ConfigurationFactory $factory = null, ?IdGeneratorInterface $generator = null)
     {
         $this->factory = $factory ?? new ConfigurationFactory();
         $this->generator = $generator ?? new IdGenerator();

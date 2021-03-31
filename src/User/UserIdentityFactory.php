@@ -25,13 +25,13 @@ class UserIdentityFactory implements UserIdentityFactoryInterface
 {
     public function create(
         string $identifier,
-        string $name = null,
-        string $email = null,
-        string $givenName = null,
-        string $familyName = null,
-        string $middleName = null,
-        string $locale = null,
-        string $picture = null,
+        ?string $name = null,
+        ?string $email = null,
+        ?string $givenName = null,
+        ?string $familyName = null,
+        ?string $middleName = null,
+        ?string $locale = null,
+        ?string $picture = null,
         array $additionalProperties = []
     ): UserIdentityInterface {
         return new UserIdentity(

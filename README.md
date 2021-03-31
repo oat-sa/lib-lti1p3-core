@@ -14,6 +14,7 @@
 - [Installation](#installation)
 - [Concepts](#concepts)
 - [Tutorials](#tutorials)
+- [Wiki](#wiki)
 - [Tests](#tests)
 
 ## Specifications
@@ -72,6 +73,10 @@ You can find below some tutorials, presented by topics.
 
 - how to [set up an LTI service server](doc/service/service-server.md)
 - how to [use the LTI service client](doc/service/service-client.md)
+
+## Wiki
+
+You can find more information in the [library wiki](https://github.com/oat-sa/lib-lti1p3-core/wiki). 
 
 ## Tests
 

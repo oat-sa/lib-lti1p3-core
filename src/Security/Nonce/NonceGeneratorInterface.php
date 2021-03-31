@@ -27,5 +27,5 @@ interface NonceGeneratorInterface
     // Default TTL (in seconds)
     public const TTL = 600;
 
-    public function generate(int $ttl = null): NonceInterface;
+    public function generate(?int $ttl = null): NonceInterface;
 }

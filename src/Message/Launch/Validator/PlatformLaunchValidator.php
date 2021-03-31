@@ -104,7 +104,9 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
             throw new LtiException('JWT kid header is missing');
         }
 
-        return $this->addSuccess('JWT kid header is provided');
+        $this->addSuccess('JWT kid header is provided');
+
+        return $this;
     }
 
     /**
@@ -116,7 +118,9 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
             throw new LtiException('JWT version claim is invalid');
         }
 
-        return $this->addSuccess('JWT version claim is valid');
+        $this->addSuccess('JWT version claim is valid');
+
+        return $this;
     }
 
     /**
@@ -133,7 +137,9 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
             throw new LtiException('JWT message_type claim is not supported');
         }
 
-        return $this->addSuccess('JWT message_type claim is valid');
+        $this->addSuccess('JWT message_type claim is valid');
+
+        return $this;
     }
 
 
@@ -142,20 +148,22 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
      */
     private function validatePayload(RegistrationInterface $registration, LtiMessagePayloadInterface $payload): self
     {
-        if (null === $registration->getToolKeyChain()) {
-            $key = $this->fetcher->fetchKey(
+        $toolKeyChain = $registration->getToolKeyChain();
+
+        $key = $toolKeyChain
+            ? $toolKeyChain->getPublicKey()
+            : $this->fetcher->fetchKey(
                 $registration->getToolJwksUrl(),
                 $payload->getToken()->getHeaders()->get(LtiMessagePayloadInterface::HEADER_KID)
             );
-        } else {
-            $key = $registration->getToolKeyChain()->getPublicKey();
-        }
 
         if (!$this->validator->validate($payload->getToken(), $key)) {
             throw new LtiException('JWT validation failure');
         }
 
-        return $this->addSuccess('JWT validation success');
+        $this->addSuccess('JWT validation success');
+
+        return $this;
     }
 
     /**
@@ -181,7 +189,9 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
             );
         }
 
-        return $this->addSuccess('JWT nonce claim is valid');
+        $this->addSuccess('JWT nonce claim is valid');
+
+        return $this;
     }
 
     /**
@@ -193,7 +203,9 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
             throw new LtiException('JWT deployment_id claim not valid for this registration');
         }
 
-        return $this->addSuccess('JWT deployment_id claim valid for this registration');
+        $this->addSuccess('JWT deployment_id claim valid for this registration');
+
+        return $this;
     }
 
     /**
@@ -208,27 +220,53 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
 
             $dataToken = $this->parser->parse($payload->getDeepLinkingData());
 
-            if (!$this->validator->validate($dataToken, $registration->getPlatformKeyChain()->getPublicKey())) {
+            $platformKeyChain = $registration->getPlatformKeyChain();
+
+            if (null === $platformKeyChain) {
+                throw new LtiException('JWT data deep linking claim validation failure: platform key chain is not configured');
+            }
+
+            if (!$this->validator->validate($dataToken, $platformKeyChain->getPublicKey())) {
                 throw new LtiException('JWT data deep linking claim validation failure');
             }
         }
 
         if ($payload->getMessageType() === LtiMessageInterface::LTI_MESSAGE_TYPE_START_ASSESSMENT) {
             if (empty($payload->getProctoringSessionData())) {
-                throw new LtiException('JWT session_data proctoring claim is invalid');
+                throw new LtiException('JWT session_data proctoring claim is missing');
+            }
+
+            $dataToken = $this->parser->parse($payload->getProctoringSessionData());
+
+            $platformKeyChain = $registration->getPlatformKeyChain();
+
+            if (null === $platformKeyChain) {
+                throw new LtiException('JWT session_data proctoring claim validation failure: platform key chain is not configured');
+            }
+
+            if (!$this->validator->validate($dataToken, $platformKeyChain->getPublicKey())) {
+                throw new LtiException('JWT session_data proctoring claim validation failure');
             }
 
             if (empty($payload->getProctoringAttemptNumber())) {
                 throw new LtiException('JWT attempt_number proctoring claim is invalid');
             }
 
-            if (empty($payload->getResourceLink()) || empty($payload->getResourceLink()->getIdentifier())) {
+            $resourceLink = $payload->getResourceLink();
+
+            if (null === $resourceLink) {
+                throw new LtiException('JWT resource_link claim is missing');
+            }
+
+            if (empty($resourceLink->getIdentifier())) {
                 throw new LtiException('JWT resource_link id claim is invalid');
             }
         }
 
-        return $this->addSuccess(
+        $this->addSuccess(
             sprintf('JWT message type claim %s requirements are valid', $payload->getMessageType())
         );
+
+        return $this;
     }
 }

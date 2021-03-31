@@ -47,7 +47,7 @@ class ConfigurationFactory
         $this->converter = new KeyConverter();
     }
 
-    public function create(KeyInterface $signingKey = null, KeyInterface $verificationKey = null): Configuration
+    public function create(?KeyInterface $signingKey = null, ?KeyInterface $verificationKey = null): Configuration
     {
         $algorithm = $this->findAlgorithm($signingKey, $verificationKey);
 
@@ -69,7 +69,7 @@ class ConfigurationFactory
         return $configuration;
     }
 
-    private function findAlgorithm(KeyInterface $signingKey = null, KeyInterface $verificationKey = null): string
+    private function findAlgorithm(?KeyInterface $signingKey = null, ?KeyInterface $verificationKey = null): string
     {
         if (null !== $signingKey) {
             return $signingKey->getAlgorithm();
@@ -82,7 +82,7 @@ class ConfigurationFactory
         return KeyInterface::ALG_RS256;
     }
 
-    private function convertKey(KeyInterface $key = null): Key
+    private function convertKey(?KeyInterface $key = null): Key
     {
         if (null === $key) {
             return InMemory::plainText('');

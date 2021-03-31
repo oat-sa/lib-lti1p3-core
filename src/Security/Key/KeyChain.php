@@ -40,7 +40,7 @@ class KeyChain implements KeyChainInterface
         string $identifier,
         string $keySetName,
         Key $publicKey,
-        Key $privateKey = null
+        ?Key $privateKey = null
     ) {
         $this->identifier = $identifier;
         $this->keySetName = $keySetName;

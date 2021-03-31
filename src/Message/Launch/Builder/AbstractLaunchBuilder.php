@@ -33,7 +33,7 @@ abstract class AbstractLaunchBuilder
     /** @var MessagePayloadBuilderInterface */
     protected $builder;
 
-    public function __construct(MessagePayloadBuilderInterface $builder = null)
+    public function __construct(?MessagePayloadBuilderInterface $builder = null)
     {
         $this->builder = $builder ?? new MessagePayloadBuilder();
     }
@@ -48,7 +48,7 @@ abstract class AbstractLaunchBuilder
     /**
      * @throws LtiExceptionInterface
      */
-    protected function resolveDeploymentId(RegistrationInterface $registration, string $deploymentId = null): string
+    protected function resolveDeploymentId(RegistrationInterface $registration, ?string $deploymentId = null): string
     {
         if (null !== $deploymentId) {
             if (!$registration->hasDeploymentId($deploymentId)) {

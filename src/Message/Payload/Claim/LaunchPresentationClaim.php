@@ -50,11 +50,11 @@ class LaunchPresentationClaim implements MessagePayloadClaimInterface
     }
 
     public function __construct(
-        string $documentTarget = null,
-        string $height = null,
-        string $width = null,
-        string $returnUrl = null,
-        string $locale = null
+        ?string $documentTarget = null,
+        ?string $height = null,
+        ?string $width = null,
+        ?string $returnUrl = null,
+        ?string $locale = null
     ) {
         $this->documentTarget = $documentTarget;
         $this->height = $height;

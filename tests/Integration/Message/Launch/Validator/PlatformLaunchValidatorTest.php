@@ -196,12 +196,79 @@ class PlatformLaunchValidatorTest extends TestCase
         $this->assertEquals($expectedErrorMessage, $result->getError());
     }
 
+    public function testValidateToolOriginatingDeepLinkingResponseLaunchFailureOnMissingPlatformKeyChain(): void
+    {
+        $registration = $this->createTestRegistrationWithoutPlatformKeyChain();
+
+        $repository = $this->createTestRegistrationRepository([$registration]);
+
+        $subject = new PlatformLaunchValidator($repository, $this->nonceRepository);
+
+        $dataToken = $this
+            ->buildJwt([], [], $this->registration->getPlatformKeyChain()->getPrivateKey())
+            ->toString();
+
+        $message = $this->builder->buildToolOriginatingLaunch(
+            $registration,
+            LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE,
+            'http://platform.com/launch',
+            null,
+            [
+                LtiMessagePayloadInterface::CLAIM_LTI_DEEP_LINKING_DATA => $dataToken
+            ]
+        );
+
+        $result = $subject->validateToolOriginatingLaunch($this->createServerRequest('GET', $message->toUrl()));
+
+        $this->assertInstanceOf(LaunchValidationResult::class, $result);
+        $this->assertTrue($result->hasError());
+        $this->assertEquals(
+            'JWT data deep linking claim validation failure: platform key chain is not configured',
+            $result->getError()
+        );
+    }
+
+    public function testValidateToolOriginatingStartAssessmentLaunchFailureOnMissingPlatformKeyChain(): void
+    {
+        $registration = $this->createTestRegistrationWithoutPlatformKeyChain();
+
+        $repository = $this->createTestRegistrationRepository([$registration]);
+
+        $subject = new PlatformLaunchValidator($repository, $this->nonceRepository);
+
+        $dataToken = $this
+            ->buildJwt([], [], $this->registration->getPlatformKeyChain()->getPrivateKey())
+            ->toString();
+
+        $message = $this->builder->buildToolOriginatingLaunch(
+            $registration,
+            LtiMessageInterface::LTI_MESSAGE_TYPE_START_ASSESSMENT,
+            'http://platform.com/launch',
+            null,
+            [
+                LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_SESSION_DATA => $dataToken
+            ]
+        );
+
+        $result = $subject->validateToolOriginatingLaunch($this->createServerRequest('GET', $message->toUrl()));
+
+        $this->assertInstanceOf(LaunchValidationResult::class, $result);
+        $this->assertTrue($result->hasError());
+        $this->assertEquals(
+            'JWT session_data proctoring claim validation failure: platform key chain is not configured',
+            $result->getError()
+        );
+    }
+
     public function provideValidationFailureContexts(): array
     {
         $registration = $this->createTestRegistration();
 
+        $validProctoringData = $this->buildJwt([], [], $registration->getPlatformKeyChain()->getPrivateKey());
+
         Carbon::setTestNow(Carbon::now()->subSeconds(MessagePayloadInterface::TTL + 1));
         $invalidDeepLinkingData = $this->buildJwt([], [], $registration->getPlatformKeyChain()->getPrivateKey());
+        $invalidProctoringData = $this->buildJwt([], [], $registration->getPlatformKeyChain()->getPrivateKey());
         Carbon::setTestNow();
 
         return [
@@ -299,7 +366,7 @@ class PlatformLaunchValidatorTest extends TestCase
                 ],
                 'JWT deployment_id claim not valid for this registration'
             ],
-            'Invalid JWT proctoring session data for start assessment' => [
+            'Missing JWT proctoring session data for start assessment' => [
                 [
                     MessagePayloadInterface::HEADER_KID => $registration->getPlatformKeyChain()->getIdentifier()
                 ],
@@ -312,7 +379,23 @@ class PlatformLaunchValidatorTest extends TestCase
                     LtiMessagePayloadInterface::CLAIM_NONCE => 'value',
                     LtiMessagePayloadInterface::CLAIM_LTI_DEPLOYMENT_ID => $registration->getDefaultDeploymentId(),
                 ],
-                'JWT session_data proctoring claim is invalid'
+                'JWT session_data proctoring claim is missing'
+            ],
+            'Invalid JWT proctoring session data for start assessment' => [
+                [
+                    MessagePayloadInterface::HEADER_KID => $registration->getPlatformKeyChain()->getIdentifier()
+                ],
+                [
+                    MessagePayloadInterface::CLAIM_ISS => $registration->getClientId(),
+                    MessagePayloadInterface::CLAIM_AUD => $registration->getPlatform()->getAudience(),
+                    LtiMessagePayloadInterface::CLAIM_LTI_VERSION => LtiMessageInterface::LTI_VERSION,
+                    LtiMessagePayloadInterface::CLAIM_LTI_MESSAGE_TYPE => LtiMessageInterface::LTI_MESSAGE_TYPE_START_ASSESSMENT,
+                    LtiMessagePayloadInterface::CLAIM_LTI_ROLES => ['Learner'],
+                    LtiMessagePayloadInterface::CLAIM_NONCE => 'value',
+                    LtiMessagePayloadInterface::CLAIM_LTI_DEPLOYMENT_ID => $registration->getDefaultDeploymentId(),
+                    LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_SESSION_DATA => $invalidProctoringData->toString(),
+                ],
+                'JWT session_data proctoring claim validation failure'
             ],
             'Invalid JWT proctoring attempt number for start assessment' => [
                 [
@@ -326,9 +409,26 @@ class PlatformLaunchValidatorTest extends TestCase
                     LtiMessagePayloadInterface::CLAIM_LTI_ROLES => ['Learner'],
                     LtiMessagePayloadInterface::CLAIM_NONCE => 'value',
                     LtiMessagePayloadInterface::CLAIM_LTI_DEPLOYMENT_ID => $registration->getDefaultDeploymentId(),
-                    LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_SESSION_DATA => 'data',
+                    LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_SESSION_DATA => $validProctoringData->toString(),
                 ],
                 'JWT attempt_number proctoring claim is invalid'
+            ],
+            'Missing JWT resource link for start assessment' => [
+                [
+                    MessagePayloadInterface::HEADER_KID => $registration->getPlatformKeyChain()->getIdentifier()
+                ],
+                [
+                    MessagePayloadInterface::CLAIM_ISS => $registration->getClientId(),
+                    MessagePayloadInterface::CLAIM_AUD => $registration->getPlatform()->getAudience(),
+                    LtiMessagePayloadInterface::CLAIM_LTI_VERSION => LtiMessageInterface::LTI_VERSION,
+                    LtiMessagePayloadInterface::CLAIM_LTI_MESSAGE_TYPE => LtiMessageInterface::LTI_MESSAGE_TYPE_START_ASSESSMENT,
+                    LtiMessagePayloadInterface::CLAIM_LTI_ROLES => ['Learner'],
+                    LtiMessagePayloadInterface::CLAIM_NONCE => 'value',
+                    LtiMessagePayloadInterface::CLAIM_LTI_DEPLOYMENT_ID => $registration->getDefaultDeploymentId(),
+                    LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_SESSION_DATA => $validProctoringData->toString(),
+                    LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_ATTEMPT_NUMBER => '1'
+                ],
+                'JWT resource_link claim is missing'
             ],
             'Invalid JWT resource link for start assessment' => [
                 [
@@ -342,7 +442,7 @@ class PlatformLaunchValidatorTest extends TestCase
                     LtiMessagePayloadInterface::CLAIM_LTI_ROLES => ['Learner'],
                     LtiMessagePayloadInterface::CLAIM_NONCE => 'value',
                     LtiMessagePayloadInterface::CLAIM_LTI_DEPLOYMENT_ID => $registration->getDefaultDeploymentId(),
-                    LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_SESSION_DATA => 'data',
+                    LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_SESSION_DATA => $validProctoringData->toString(),
                     LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_ATTEMPT_NUMBER => '1',
                     LtiMessagePayloadInterface::CLAIM_LTI_RESOURCE_LINK => ['id' => ''],
                 ],

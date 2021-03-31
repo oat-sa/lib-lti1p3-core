@@ -102,20 +102,22 @@ class ToolLaunchValidator extends AbstractLaunchValidator
      */
     private function validatePayloadToken(RegistrationInterface $registration, LtiMessagePayloadInterface $payload): self
     {
-        if (null === $registration->getPlatformKeyChain()) {
-            $key = $this->fetcher->fetchKey(
+        $platformKeyChain = $registration->getPlatformKeyChain();
+
+        $key = $platformKeyChain
+            ? $platformKeyChain->getPublicKey()
+            : $this->fetcher->fetchKey(
                 $registration->getPlatformJwksUrl(),
                 $payload->getToken()->getHeaders()->get(LtiMessagePayloadInterface::HEADER_KID)
             );
-        } else {
-            $key = $registration->getPlatformKeyChain()->getPublicKey();
-        }
 
         if (!$this->validator->validate($payload->getToken(), $key)) {
             throw new LtiException('ID token validation failure');
         }
 
-        return $this->addSuccess('ID token validation success');
+        $this->addSuccess('ID token validation success');
+
+        return $this;
     }
 
     /**
@@ -127,7 +129,9 @@ class ToolLaunchValidator extends AbstractLaunchValidator
             throw new LtiException('ID token kid header is missing');
         }
 
-        return $this->addSuccess('ID token kid header is provided');
+        $this->addSuccess('ID token kid header is provided');
+
+        return $this;
     }
 
     /**
@@ -139,7 +143,9 @@ class ToolLaunchValidator extends AbstractLaunchValidator
             throw new LtiException('ID token version claim is invalid');
         }
 
-        return $this->addSuccess('ID token version claim is valid');
+        $this->addSuccess('ID token version claim is valid');
+
+        return $this;
     }
 
     /**
@@ -156,7 +162,9 @@ class ToolLaunchValidator extends AbstractLaunchValidator
             throw new LtiException('ID token message_type claim is not supported');
         }
 
-        return $this->addSuccess('ID token message_type claim is valid');
+        $this->addSuccess('ID token message_type claim is valid');
+
+        return $this;
     }
 
     /**
@@ -168,7 +176,9 @@ class ToolLaunchValidator extends AbstractLaunchValidator
             throw new LtiException('ID token roles claim is invalid');
         }
 
-        return $this->addSuccess('ID token roles claim is valid');
+        $this->addSuccess('ID token roles claim is valid');
+
+        return $this;
     }
 
     /**
@@ -183,7 +193,9 @@ class ToolLaunchValidator extends AbstractLaunchValidator
             throw new LtiException('ID token user identifier (sub) claim is invalid');
         }
 
-        return $this->addSuccess('ID token user identifier (sub) claim is valid');
+        $this->addSuccess('ID token user identifier (sub) claim is valid');
+
+        return $this;
     }
 
     /**
@@ -209,7 +221,9 @@ class ToolLaunchValidator extends AbstractLaunchValidator
             );
         }
 
-        return $this->addSuccess('ID token nonce claim is valid');
+        $this->addSuccess('ID token nonce claim is valid');
+
+        return $this;
     }
 
     /**
@@ -221,7 +235,9 @@ class ToolLaunchValidator extends AbstractLaunchValidator
             throw new LtiException('ID token deployment_id claim not valid for this registration');
         }
 
-        return $this->addSuccess('ID token deployment_id claim valid for this registration');
+        $this->addSuccess('ID token deployment_id claim valid for this registration');
+
+        return $this;
     }
 
     /**
@@ -230,7 +246,14 @@ class ToolLaunchValidator extends AbstractLaunchValidator
     private function validatePayloadLaunchMessageTypeSpecifics(LtiMessagePayloadInterface $payload): self
     {
         if ($payload->getMessageType() === LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST) {
-            if (empty($payload->getResourceLink()) || empty($payload->getResourceLink()->getIdentifier())) {
+
+            $resourceLink = $payload->getResourceLink();
+
+            if (null === $resourceLink) {
+                throw new LtiException('ID token resource_link claim is missing');
+            }
+
+            if (empty($resourceLink->getIdentifier())) {
                 throw new LtiException('ID token resource_link id claim is invalid');
             }
         }
@@ -253,15 +276,13 @@ class ToolLaunchValidator extends AbstractLaunchValidator
             if (empty($payload->getProctoringAttemptNumber())) {
                 throw new LtiException('ID token attempt_number proctoring claim is invalid');
             }
-
-            if (empty($payload->getLegacyUserIdentifier())) {
-                throw new LtiException('ID token lti11_legacy_user_id claim is invalid');
-            }
         }
 
-        return $this->addSuccess(
+        $this->addSuccess(
             sprintf('ID token message type claim %s requirements are valid', $payload->getMessageType())
         );
+
+        return $this;
     }
 
     /**
@@ -269,14 +290,18 @@ class ToolLaunchValidator extends AbstractLaunchValidator
      */
     private function validateStateToken(RegistrationInterface $registration, MessagePayloadInterface $state): self
     {
-        if (null === $registration->getToolKeyChain()) {
-            throw new LtiException('Tool key chain not configured');
+        $toolKeyChain = $registration->getToolKeyChain();
+
+        if (null === $toolKeyChain) {
+            throw new LtiException('State validation failure: tool key chain not configured');
         }
 
-        if (!$this->validator->validate($state->getToken(), $registration->getToolKeyChain()->getPublicKey())) {
+        if (!$this->validator->validate($state->getToken(), $toolKeyChain->getPublicKey())) {
             throw new LtiException('State validation failure');
         }
 
-        return $this->addSuccess('State validation success');
+        $this->addSuccess('State validation success');
+
+        return $this;
     }
 }
