@@ -88,7 +88,7 @@ class LtiServiceServer implements RequestHandlerInterface
         }
 
         try {
-            $response =  $this->handler->handleServiceRequest($validationResult->getRegistration(), $request);
+            $response = $this->handler->handleServiceRequest($validationResult->getRegistration(), $request);
 
             $this->logger->info(sprintf('%s service success', $this->handler->getServiceName()));
 
