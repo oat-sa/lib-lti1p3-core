@@ -28,11 +28,13 @@ use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\RequestAccessTokenValidator;
 use OAT\Library\Lti1p3Core\Service\Server\Handler\LtiServiceServerRequestHandlerInterface;
 use OAT\Library\Lti1p3Core\Service\Server\LtiServiceServer;
+use OAT\Library\Lti1p3Core\Tests\Resource\Logger\TestLogger;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
 use OAT\Library\Lti1p3Core\Tests\Traits\NetworkTestingTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
 
 class LtiServiceServerTest extends TestCase
 {
@@ -42,9 +44,13 @@ class LtiServiceServerTest extends TestCase
     /** @var RequestAccessTokenValidator */
     private $validator;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     protected function setUp(): void
     {
         $this->validator = new RequestAccessTokenValidator($this->createTestRegistrationRepository());
+        $this->logger = new TestLogger();
     }
 
     public function testServiceServerSuccess(): void
@@ -72,12 +78,14 @@ class LtiServiceServerTest extends TestCase
             ['scope']
         );
 
-        $subject = new LtiServiceServer($this->validator, $handler);
+        $subject = new LtiServiceServer($this->validator, $handler, null, $this->logger);
 
         $response = $subject->handle($serviceRequest);
 
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('Service success', (string)$response->getBody());
+
+        $this->assertTrue($this->logger->hasLog('info', 'test-service service success'));
     }
 
     public function testServiceServerFailureOnInvalidMethod(): void
@@ -93,12 +101,14 @@ class LtiServiceServerTest extends TestCase
             ['GET']
         );
 
-        $subject = new LtiServiceServer($this->validator, $handler);
+        $subject = new LtiServiceServer($this->validator, $handler, null, $this->logger);
 
         $response = $subject->handle($serviceRequest);
 
         $this->assertEquals(405, $response->getStatusCode());
         $this->assertEquals('Not acceptable request method, accepts: [get]', (string)$response->getBody());
+
+        $this->assertTrue($this->logger->hasLog('error', 'Not acceptable request method, accepts: [get]'));
     }
 
     public function testServiceServerFailureOnInvalidContentType(): void
@@ -118,12 +128,14 @@ class LtiServiceServerTest extends TestCase
             ['POST']
         );
 
-        $subject = new LtiServiceServer($this->validator, $handler);
+        $subject = new LtiServiceServer($this->validator, $handler, null, $this->logger);
 
         $response = $subject->handle($serviceRequest);
 
         $this->assertEquals(406, $response->getStatusCode());
         $this->assertEquals('Not acceptable request content type, accepts: application/json', (string)$response->getBody());
+
+        $this->assertTrue($this->logger->hasLog('error', 'Not acceptable request content type, accepts: application/json'));
     }
 
     public function testServiceServerFailureOnInvalidAccessToken(): void
@@ -152,12 +164,14 @@ class LtiServiceServerTest extends TestCase
             ['scope']
         );
 
-        $subject = new LtiServiceServer($this->validator, $handler);
+        $subject = new LtiServiceServer($this->validator, $handler, null, $this->logger);
 
         $response = $subject->handle($serviceRequest);
 
         $this->assertEquals(401, $response->getStatusCode());
         $this->assertEquals('JWT access token is invalid', (string)$response->getBody());
+
+        $this->assertTrue($this->logger->hasLog('error', 'JWT access token is invalid'));
     }
 
     public function testServiceServerFailureOnFailingHandler(): void
@@ -183,12 +197,14 @@ class LtiServiceServerTest extends TestCase
             ['scope']
         );
 
-        $subject = new LtiServiceServer($this->validator, $handler);
+        $subject = new LtiServiceServer($this->validator, $handler, null, $this->logger);
 
         $response = $subject->handle($serviceRequest);
 
         $this->assertEquals(500, $response->getStatusCode());
         $this->assertEquals('Internal test-service service error', (string)$response->getBody());
+
+        $this->assertTrue($this->logger->hasLog('error', 'handler error'));
     }
 
     private function createTestRequestHandler(
