@@ -150,14 +150,12 @@ class PlatformLaunchValidator extends AbstractLaunchValidator
     {
         $toolKeyChain = $registration->getToolKeyChain();
 
-        if (null === $toolKeyChain) {
-            $key = $this->fetcher->fetchKey(
+        $key = $toolKeyChain
+            ? $toolKeyChain->getPublicKey()
+            : $this->fetcher->fetchKey(
                 $registration->getToolJwksUrl(),
                 $payload->getToken()->getHeaders()->get(LtiMessagePayloadInterface::HEADER_KID)
             );
-        } else {
-            $key = $toolKeyChain->getPublicKey();
-        }
 
         if (!$this->validator->validate($payload->getToken(), $key)) {
             throw new LtiException('JWT validation failure');

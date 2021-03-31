@@ -109,7 +109,7 @@ class LtiResourceLinkLaunchRequestBuilderTest extends TestCase
     public function testBuildLtiResourceLinkLaunchRequestErrorWithInvalidLaunchUrls(): void
     {
         $this->expectException(LtiException::class);
-        $this->expectExceptionMessage('Neither resource link url nor tool default url can be used for launch');
+        $this->expectExceptionMessage('Neither resource link url nor tool default url were presented');
 
         $this->subject->buildLtiResourceLinkLaunchRequest(
             new LtiResourceLink('identifier'),

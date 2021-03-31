@@ -24,6 +24,7 @@ namespace OAT\Library\Lti1p3Core\Security\OAuth2\Repository;
 
 use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Jwks\Fetcher\JwksFetcher;
@@ -126,14 +127,14 @@ class ClientRepository implements ClientRepositoryInterface
         }
 
         try {
-            if (null === $registration->getToolKeyChain()) {
-                $key = $this->fetcher->fetchKey(
+            $toolKeyChain = $registration->getToolKeyChain();
+
+            $key = $toolKeyChain
+                ? $toolKeyChain->getPublicKey()
+                : $this->fetcher->fetchKey(
                     $registration->getToolJwksUrl(),
-                    $token->getHeaders()->get(MessagePayloadInterface::HEADER_KID)
+                    $token->getHeaders()->get(LtiMessagePayloadInterface::HEADER_KID)
                 );
-            } else {
-                $key = $registration->getToolKeyChain()->getPublicKey();
-            }
         } catch (Throwable $exception) {
             $this->logger->error(sprintf('Cannot find tool public key: %s', $exception->getMessage()));
 

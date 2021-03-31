@@ -104,14 +104,12 @@ class ToolLaunchValidator extends AbstractLaunchValidator
     {
         $platformKeyChain = $registration->getPlatformKeyChain();
 
-        if (null === $platformKeyChain) {
-            $key = $this->fetcher->fetchKey(
+        $key = $platformKeyChain
+            ? $platformKeyChain->getPublicKey()
+            : $this->fetcher->fetchKey(
                 $registration->getPlatformJwksUrl(),
                 $payload->getToken()->getHeaders()->get(LtiMessagePayloadInterface::HEADER_KID)
             );
-        } else {
-            $key = $platformKeyChain->getPublicKey();
-        }
 
         if (!$this->validator->validate($payload->getToken(), $key)) {
             throw new LtiException('ID token validation failure');

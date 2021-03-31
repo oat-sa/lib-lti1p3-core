@@ -58,7 +58,7 @@ class LtiResourceLinkLaunchRequestBuilder extends PlatformOriginatingLaunchBuild
             $launchUrl = $ltiResourceLink->getUrl() ?? $registration->getTool()->getLaunchUrl();
 
             if (null === $launchUrl) {
-                throw new LtiException('Neither resource link url nor tool default url can be used for launch');
+                throw new LtiException('Neither resource link url nor tool default url were presented');
             }
 
             return $this->buildPlatformOriginatingLaunch(
