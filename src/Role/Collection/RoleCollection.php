@@ -83,7 +83,7 @@ class RoleCollection
              $add = true;
 
             if (null !== $type) {
-                $add =  $role::getType() === $type;
+                $add = $role::getType() === $type;
             }
 
             if (null !== $core) {
