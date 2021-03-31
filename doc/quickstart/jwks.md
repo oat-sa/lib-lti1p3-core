@@ -2,7 +2,7 @@
 
 > How to expose a [JWKS endpoint](https://auth0.com/docs/tokens/concepts/jwks) (JSON Web Key Set) with this library.
 
-**Note**: The algorithm `RSSHA256` is used by default, library wide.
+**Note**: The algorithm `RS256` is used by default.
 
 ## Table of contents
 
