@@ -62,6 +62,12 @@ class ResultTest extends TestCase
         $this->assertFalse($subject->hasError());
         $this->assertNull($subject->getError());
 
+        $subject->setSuccesses(['success3', 'success4']);
+
+        $this->assertEquals(['success3', 'success4'], $subject->getSuccesses());
+        $this->assertFalse($subject->hasError());
+        $this->assertNull($subject->getError());
+
         $subject->setError('error');
 
         $this->assertTrue($subject->hasError());

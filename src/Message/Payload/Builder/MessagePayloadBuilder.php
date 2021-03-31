@@ -48,7 +48,7 @@ class MessagePayloadBuilder implements MessagePayloadBuilderInterface
     /** @var CollectionInterface */
     private $claims;
 
-    public function __construct(NonceGeneratorInterface $generator = null, BuilderInterface $builder = null)
+    public function __construct(?NonceGeneratorInterface $generator = null, ?BuilderInterface $builder = null)
     {
         $this->generator = $generator ?? new NonceGenerator();
         $this->builder = $builder ?? new Builder();
@@ -65,7 +65,7 @@ class MessagePayloadBuilder implements MessagePayloadBuilderInterface
     public function withClaims(array $claims): MessagePayloadBuilderInterface
     {
         foreach ($claims as $claimName => $claimValue){
-            if (is_a($claimValue, MessagePayloadClaimInterface::class, true)) {
+            if (is_a($claimValue, MessagePayloadClaimInterface::class)) {
                 $this->withClaim($claimValue);
             } else {
                 $this->withClaim((string)$claimName, $claimValue);
@@ -77,7 +77,7 @@ class MessagePayloadBuilder implements MessagePayloadBuilderInterface
 
     public function withClaim($claim, $claimValue = null): MessagePayloadBuilderInterface
     {
-        if (is_a($claim, MessagePayloadClaimInterface::class, true)) {
+        if (is_a($claim, MessagePayloadClaimInterface::class)) {
             $this->claims->set($claim::getClaimName(), $claim->normalize());
         } else {
             $this->claims->set((string)$claim, $claimValue);

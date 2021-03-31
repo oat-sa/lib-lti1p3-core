@@ -28,9 +28,11 @@ interface ResultInterface
 
     public function addSuccess(string $success): ResultInterface;
 
-    public function setError(string $error): ResultInterface;
-
     public function getSuccesses(): array;
 
+    public function setSuccesses(array $successes = []): ResultInterface;
+
     public function getError(): ?string;
+
+    public function setError(?string $error): ResultInterface;
 }

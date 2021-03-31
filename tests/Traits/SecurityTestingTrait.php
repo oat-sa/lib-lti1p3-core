@@ -35,8 +35,8 @@ use OAT\Library\Lti1p3Core\Security\Key\KeyInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\Nonce;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepositoryInterface;
-use OAT\Library\Lti1p3Core\Security\User\UserAuthenticationResult;
-use OAT\Library\Lti1p3Core\Security\User\UserAuthenticationResultInterface;
+use OAT\Library\Lti1p3Core\Security\User\Result\UserAuthenticationResult;
+use OAT\Library\Lti1p3Core\Security\User\Result\UserAuthenticationResultInterface;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use OAT\Library\Lti1p3Core\Util\Generator\IdGeneratorInterface;
 
@@ -152,8 +152,10 @@ trait SecurityTestingTrait
                 $this->withAnonymous = $withAnonymous;
             }
 
-            public function authenticate(string $loginHint): UserAuthenticationResultInterface
-            {
+            public function authenticate(
+                RegistrationInterface $registration,
+                string $loginHint
+            ): UserAuthenticationResultInterface {
                 return new UserAuthenticationResult(
                     $this->withAuthenticationSuccess,
                     $this->withAnonymous ? null : $this->createTestUserIdentity()

@@ -30,7 +30,7 @@ use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticator;
-use OAT\Library\Lti1p3Core\Security\User\UserAuthenticationResult;
+use OAT\Library\Lti1p3Core\Security\User\Result\UserAuthenticationResult;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
 use OAT\Library\Lti1p3Core\Tests\Traits\NetworkTestingTrait;
@@ -62,7 +62,7 @@ class OidcAuthenticatorTest extends TestCase
 
     public function testAuthenticationSuccess(): void
     {
-        $this->subject= new OidcAuthenticator($this->createTestRegistrationRepository(), $this->createTestUserAuthenticator());
+        $this->subject = new OidcAuthenticator($this->createTestRegistrationRepository(), $this->createTestUserAuthenticator());
 
         $registration = $this->createTestRegistration();
 
@@ -110,7 +110,7 @@ class OidcAuthenticatorTest extends TestCase
 
     public function testAuthenticationSuccessWithUserIdentityClaimsSanitization(): void
     {
-        $this->subject= new OidcAuthenticator($this->createTestRegistrationRepository(), $this->createTestUserAuthenticator());
+        $this->subject = new OidcAuthenticator($this->createTestRegistrationRepository(), $this->createTestUserAuthenticator());
 
         $registration = $this->createTestRegistration();
 
@@ -254,12 +254,6 @@ class OidcAuthenticatorTest extends TestCase
             ->with($registration->getIdentifier())
             ->willReturn($registration);
 
-        $this->authenticatorMock
-            ->expects($this->once())
-            ->method('authenticate')
-            ->with('login_hint')
-            ->willReturn(new UserAuthenticationResult(false));
-
         $request = $this->createServerRequest(
             'GET',
             sprintf('http://platform.com/init?%s', http_build_query([
@@ -267,6 +261,12 @@ class OidcAuthenticatorTest extends TestCase
                 'login_hint' => 'login_hint'
             ]))
         );
+
+        $this->authenticatorMock
+            ->expects($this->once())
+            ->method('authenticate')
+            ->with($registration, 'login_hint')
+            ->willReturn(new UserAuthenticationResult(false));
 
         $this->subject->authenticate($request);
     }

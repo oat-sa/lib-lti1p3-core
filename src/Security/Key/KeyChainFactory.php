@@ -29,7 +29,7 @@ class KeyChainFactory implements KeyChainFactoryInterface
         string $keySetName,
         $publicKey,
         $privateKey = null,
-        string $privateKeyPassPhrase = null,
+        ?string $privateKeyPassPhrase = null,
         string $algorithm = KeyInterface::ALG_RS256
     ): KeyChainInterface {
             $publicKey = new Key($publicKey, null, $algorithm);

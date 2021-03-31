@@ -51,8 +51,8 @@ class OidcInitiator
 
     public function __construct(
         RegistrationRepositoryInterface $repository,
-        NonceGeneratorInterface $generator = null,
-        MessagePayloadBuilderInterface $builder = null
+        ?NonceGeneratorInterface $generator = null,
+        ?MessagePayloadBuilderInterface $builder = null
     ) {
         $this->repository = $repository;
         $this->generator = $generator ?? new NonceGenerator();

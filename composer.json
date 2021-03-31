@@ -22,7 +22,9 @@
     "require-dev": {
         "cache/array-adapter": "^1.1",
         "phpunit/phpunit": "8.5.14",
-        "php-coveralls/php-coveralls": "^2.4"
+        "php-coveralls/php-coveralls": "^2.4",
+        "vimeo/psalm": "^4.6",
+        "psalm/plugin-phpunit": "^0.15.1"
     },
     "autoload": {
         "psr-4": {
@@ -33,5 +35,8 @@
         "psr-4": {
             "OAT\\Library\\Lti1p3Core\\Tests\\": "tests/"
         }
+    },
+    "config": {
+        "sort-packages": true
     }
 }

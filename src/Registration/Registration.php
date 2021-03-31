@@ -64,10 +64,10 @@ class Registration implements RegistrationInterface
         PlatformInterface $platform,
         ToolInterface $tool,
         array $deploymentIds,
-        KeyChainInterface $platformKeyChain = null,
-        KeyChainInterface $toolKeyChain = null,
-        string $platformJwksUrl = null,
-        string $toolJwksUrl = null
+        ?KeyChainInterface $platformKeyChain = null,
+        ?KeyChainInterface $toolKeyChain = null,
+        ?string $platformJwksUrl = null,
+        ?string $toolJwksUrl = null
     ) {
         $this->identifier = $identifier;
         $this->clientId = $clientId;

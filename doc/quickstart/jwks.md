@@ -2,7 +2,7 @@
 
 > How to expose a [JWKS endpoint](https://auth0.com/docs/tokens/concepts/jwks) (JSON Web Key Set) with this library.
 
-**Note**: The algorithm `RSSHA256` is used by default, library wide.
+**Note**: The algorithm `RS256` is used by default.
 
 ## Table of contents
 
@@ -140,17 +140,17 @@ Now the `$jwksExport` array contains the needed [JWKS properties](https://auth0.
 
 ## Provide a JWKS response
 
-You can expose the [JwksServer](../../src/Security/Jwks/Server/JwksServer.php) in an application controller to provide a ready to use JWKS [PSR7 response](https://www.php-fig.org/psr/psr-7/#33-psrhttpmessageresponseinterface) for a given key set name:
+You can expose the [JwksRequestHandler](../../src/Security/Jwks/Server/JwksRequestHandler.php) in an application controller to provide a ready to use JWKS [PSR7 response](https://www.php-fig.org/psr/psr-7/#33-psrhttpmessageresponseinterface) for a given key set name:
 
 ```php
 <?php
 
 use OAT\Library\Lti1p3Core\Security\Jwks\Exporter\JwksExporter;
-use OAT\Library\Lti1p3Core\Security\Jwks\Server\JwksServer;
+use OAT\Library\Lti1p3Core\Security\Jwks\Server\JwksRequestHandler;
 
-$jwksServer = new JwksServer(new JwksExporter($keyChainRepository));
+$handler = new JwksRequestHandler(new JwksExporter($keyChainRepository));
 
-$response = $jwksServer->handle('myKeySetName');
+$response = $handler->handle('myKeySetName');
 ```
 
 **Note**: Up to you to provide the logic to retrieve the key set name to expose.

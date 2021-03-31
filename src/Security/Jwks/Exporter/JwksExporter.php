@@ -38,7 +38,7 @@ class JwksExporter
     /** @var JwkExporterInterface */
     private $exporter;
 
-    public function __construct(KeyChainRepositoryInterface $repository, JwkExporterInterface $exporter = null)
+    public function __construct(KeyChainRepositoryInterface $repository, ?JwkExporterInterface $exporter = null)
     {
         $this->repository = $repository;
         $this->exporter = $exporter ?? new JwkRS256Exporter();

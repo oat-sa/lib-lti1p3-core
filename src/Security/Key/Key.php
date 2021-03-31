@@ -33,7 +33,7 @@ class Key implements KeyInterface
     /** @var string|null */
     private $algorithm;
 
-    public function __construct($content, string $passPhrase = null, string $algorithm = null)
+    public function __construct($content, ?string $passPhrase = null, ?string $algorithm = null)
     {
         $this->content = $content;
         $this->passPhrase = $passPhrase;

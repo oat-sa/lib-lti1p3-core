@@ -54,9 +54,9 @@ abstract class AbstractLaunchValidator
     public function __construct(
         RegistrationRepositoryInterface $registrationRepository,
         NonceRepositoryInterface $nonceRepository,
-        JwksFetcherInterface $jwksFetcher = null,
-        ValidatorInterface $validator = null,
-        ParserInterface $parser = null
+        ?JwksFetcherInterface $jwksFetcher = null,
+        ?ValidatorInterface $validator = null,
+        ?ParserInterface $parser = null
     ) {
         $this->registrationRepository = $registrationRepository;
         $this->nonceRepository = $nonceRepository;

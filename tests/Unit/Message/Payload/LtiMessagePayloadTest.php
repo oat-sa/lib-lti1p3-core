@@ -74,7 +74,6 @@ class LtiMessagePayloadTest extends TestCase
             ->withClaim(new PlatformInstanceClaim('platformIdentifier'))
             ->withClaim(new LaunchPresentationClaim('window'))
             ->withClaim(new LisClaim('lisIdentifier'))
-            ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_LEGACY_USER_ID, 'legacyUserId')
             ->withClaim(new DeepLinkingSettingsClaim('deepLinkingReturnUrl', ['ltiResourceLink'], ['window']))
             ->withClaim(new DeepLinkingContentItemsClaim(['item']))
             ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_DEEP_LINKING_DATA, 'deepLinkingData')
@@ -110,7 +109,6 @@ class LtiMessagePayloadTest extends TestCase
         $this->assertEquals('platformIdentifier', $this->subject->getPlatformInstance()->getGuid());
         $this->assertEquals('window', $this->subject->getLaunchPresentation()->getDocumentTarget());
         $this->assertEquals('lisIdentifier', $this->subject->getLis()->getCourseOfferingSourcedId());
-        $this->assertEquals('legacyUserId', $this->subject->getLegacyUserIdentifier());
         $this->assertEquals('deepLinkingReturnUrl', $this->subject->getDeepLinkingSettings()->getDeepLinkingReturnUrl());
         $this->assertEquals(['item'], $this->subject->getDeepLinkingContentItems()->getContentItems());
         $this->assertEquals('deepLinkingData', $this->subject->getDeepLinkingData());

@@ -32,9 +32,6 @@ class ProctoringSettingsClaim implements MessagePayloadClaimInterface
     /** @var string|null */
     private $data;
 
-    /** @var string */
-    private $assessmentControlUrl;
-
     public static function getClaimName(): string
     {
         return LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_SETTINGS;

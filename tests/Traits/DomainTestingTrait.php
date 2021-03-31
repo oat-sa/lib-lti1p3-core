@@ -175,6 +175,28 @@ trait DomainTestingTrait
         );
     }
 
+    private function createTestRegistrationWithoutToolLaunchUrl(
+        string $identifier = 'registrationIdentifier',
+        string $clientId = 'registrationClientId',
+        string $platformJwksUrl = 'http://platform.com/jwks',
+        string $toolJwksUrl = 'http://tool.com/jwks'
+    ): Registration {
+
+        $tool = $this->createTestTool();
+
+        return new Registration(
+            $identifier,
+            $clientId,
+            $this->createTestPlatform(),
+            new Tool($tool->getIdentifier(), $tool->getName(), $tool->getAudience(), $tool->getOidcInitiationUrl()),
+            ['deploymentIdentifier'],
+            null,
+            $this->createTestKeyChain('toolKeyChain'),
+            $platformJwksUrl,
+            $toolJwksUrl
+        );
+    }
+
     private function createTestRegistrationRepository(array $registrations = []): RegistrationRepositoryInterface
     {
         $registrations = !empty($registrations)

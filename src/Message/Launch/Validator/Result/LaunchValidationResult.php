@@ -39,11 +39,11 @@ class LaunchValidationResult extends Result
     private $state;
 
     public function __construct(
-        RegistrationInterface $registration = null,
-        LtiMessagePayloadInterface $payload = null,
-        MessagePayloadInterface $state = null,
+        ?RegistrationInterface $registration = null,
+        ?LtiMessagePayloadInterface $payload = null,
+        ?MessagePayloadInterface $state = null,
         array $successes = [],
-        string $error = null
+        ?string $error = null
     ) {
         $this->registration = $registration;
         $this->payload = $payload;

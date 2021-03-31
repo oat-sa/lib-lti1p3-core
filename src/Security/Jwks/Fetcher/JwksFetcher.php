@@ -53,10 +53,10 @@ class JwksFetcher implements JwksFetcherInterface
     private $logger;
 
     public function __construct(
-        CacheItemPoolInterface $cache = null,
-        ClientInterface $client = null,
-        JWKConverter $converter = null,
-        LoggerInterface $logger = null
+        ?CacheItemPoolInterface $cache = null,
+        ?ClientInterface $client = null,
+        ?JWKConverter $converter = null,
+        ?LoggerInterface $logger = null
     ) {
         $this->cache = $cache;
         $this->client = $client ?? new Client();

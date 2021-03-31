@@ -35,7 +35,7 @@ class NonceGenerator implements NonceGeneratorInterface
     /** @var IdGeneratorInterface */
     private $generator;
 
-    public function __construct(int $ttl = null, IdGeneratorInterface $generator = null)
+    public function __construct(?int $ttl = null, ?IdGeneratorInterface $generator = null)
     {
         $this->ttl = $ttl ?? static::TTL;
         $this->generator = $generator ?? new IdGenerator();
@@ -44,7 +44,7 @@ class NonceGenerator implements NonceGeneratorInterface
     /**
      * @throws Exception
      */
-    public function generate(int $ttl = null): NonceInterface
+    public function generate(?int $ttl = null): NonceInterface
     {
         return new Nonce(
             $this->generator->generate(),

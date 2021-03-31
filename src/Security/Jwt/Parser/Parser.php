@@ -34,7 +34,7 @@ class Parser implements ParserInterface
     /** @var ConfigurationFactory */
     private $factory;
 
-    public function __construct(ConfigurationFactory $factory = null)
+    public function __construct(?ConfigurationFactory $factory = null)
     {
         $this->factory = $factory ?? new ConfigurationFactory();
     }

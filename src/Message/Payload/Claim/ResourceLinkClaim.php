@@ -43,7 +43,7 @@ class ResourceLinkClaim implements MessagePayloadClaimInterface
         return LtiMessagePayloadInterface::CLAIM_LTI_RESOURCE_LINK;
     }
 
-    public function __construct(string $id, string $title = null, string $description = null)
+    public function __construct(string $id, ?string $title = null, ?string $description = null)
     {
         $this->id = $id;
         $this->title = $title;
