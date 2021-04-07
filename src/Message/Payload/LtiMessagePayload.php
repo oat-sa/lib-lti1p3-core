@@ -204,9 +204,13 @@ class LtiMessagePayload extends MessagePayload implements LtiMessagePayloadInter
         return $this->getClaim(static::CLAIM_LTI_PROCTORING_SESSION_DATA);
     }
 
-    public function getProctoringAttemptNumber(): ?string
+    public function getProctoringAttemptNumber(): ?int
     {
-        return $this->getClaim(static::CLAIM_LTI_PROCTORING_ATTEMPT_NUMBER);
+        if ($this->hasClaim(static::CLAIM_LTI_PROCTORING_ATTEMPT_NUMBER)) {
+            return intval($this->getClaim(static::CLAIM_LTI_PROCTORING_ATTEMPT_NUMBER));
+        }
+
+        return null;
     }
 
     public function getProctoringVerifiedUser(): ?ProctoringVerifiedUserClaim
