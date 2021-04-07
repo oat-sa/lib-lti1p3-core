@@ -133,7 +133,7 @@ interface LtiMessagePayloadInterface extends MessagePayloadInterface
 
     public function getProctoringSessionData(): ?string;
 
-    public function getProctoringAttemptNumber(): ?string ;
+    public function getProctoringAttemptNumber(): ?int;
 
     public function getProctoringVerifiedUser(): ?ProctoringVerifiedUserClaim;
 
