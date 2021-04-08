@@ -14,13 +14,15 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Install dependencies
-      uses: php-actions/composer@v5
+    - name: Setup PHP & Composer
+      uses: shivammathur/setup-php@v2
       with:
-        php_version: ${{ matrix.php }}
-        version: 2
-        args: --no-interaction
-    
+        php-version: ${{ matrix.php }}
+        tools: composer:v2
+
+    - name: Install dependencies
+      run: composer install --no-interaction --no-suggest
+
     - name: Unit tests
       run: |
         mkdir -p build/logs
