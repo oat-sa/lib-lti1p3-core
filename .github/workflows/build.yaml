@@ -35,6 +35,6 @@ jobs:
     
     - name: Coveralls report
       env:
-        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+        COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         ./vendor/bin/php-coveralls -v
