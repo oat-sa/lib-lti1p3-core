@@ -4,11 +4,12 @@ on: push
 
 jobs:
   build:
-    runs-on: ubuntu-20.04    
+    runs-on: ubuntu-20.04
 
     strategy:
       matrix:
-        php: [7.2, 7.3, 7.4, 8.0]
+        php: [7.2]
+        # php: [7.2, 7.3, 7.4, 8.0]
 
     steps:
     - name: Checkout
@@ -26,17 +27,14 @@ jobs:
     - name: Unit tests
       run: |
         mkdir -p build/logs
-        ./vendor/bin/phpunit --coverage-clover build/logs/clover.xml  
+        ./vendor/bin/phpunit --coverage-clover build/logs/clover.xml
 
     - name: Static code analysis
       run: |
         ./vendor/bin/psalm --shepherd
     
     - name: Coveralls report
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
       run: |
         ./vendor/bin/php-coveralls -v
-
-
-
-
-
