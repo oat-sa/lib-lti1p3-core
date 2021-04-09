@@ -28,8 +28,7 @@ jobs:
     - name: Install dependencies
       run: composer install --no-interaction --no-suggest
 
-    - name: Unit tests
-      id: unit_tests
+    - name: PHPUnit
       env:
         COVERAGE: ${{ matrix.coverage }}
       run: |
@@ -37,11 +36,11 @@ jobs:
           && mkdir -p build/logs && ./vendor/bin/phpunit --coverage-clover build/logs/clover.xml \
           || ./vendor/bin/phpunit
 
-    - name: Static code analysis
+    - name: Psalm
       run: |
         ./vendor/bin/psalm --shepherd
     
-    - name: Coveralls report
+    - name: Coveralls
       if: ${{ matrix.coverage == 'true' }}
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
