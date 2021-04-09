@@ -2,9 +2,7 @@
 
 [![Latest Version](https://img.shields.io/github/tag/oat-sa/lib-lti1p3-core.svg?style=flat&label=release)](https://github.com/oat-sa/lib-lti1p3-core/tags)
 [![License GPL2](http://img.shields.io/badge/licence-GPL%202.0-blue.svg)](http://www.gnu.org/licenses/gpl-2.0.html)
-[![Build Status](https://travis-ci.org/oat-sa/lib-lti1p3-core.svg?branch=master)](https://travis-ci.org/oat-sa/lib-lti1p3-core)
-[![Build Status Travis](https://travis-ci.org/oat-sa/lib-lti1p3-core.svg?branch=master)](https://travis-ci.org/oat-sa/lib-lti1p3-core)
-[![Build Status GH Action](https://github.com/oat-sa/lib-lti1p3-core/actions/workflows/build.yaml/badge.svg?branch=master)](https://github.com/oat-sa/lib-lti1p3-core/actions)
+[![Build Status](https://github.com/oat-sa/lib-lti1p3-core/actions/workflows/build.yaml/badge.svg?branch=master)](https://github.com/oat-sa/lib-lti1p3-core/actions)
 [![Tests Coverage Status](https://coveralls.io/repos/github/oat-sa/lib-lti1p3-core/badge.svg?branch=master)](https://coveralls.io/github/oat-sa/lib-lti1p3-core?branch=master)
 [![Psalm Level Status](https://shepherd.dev/github/oat-sa/lib-lti1p3-core/level.svg)](https://shepherd.dev/github/oat-sa/lib-lti1p3-core)
 [![Packagist Downloads](http://img.shields.io/packagist/dt/oat-sa/lib-lti1p3-core.svg)](https://packagist.org/packages/oat-sa/lib-lti1p3-core)
