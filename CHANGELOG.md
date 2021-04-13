@@ -4,7 +4,7 @@ CHANGELOG
 5.0.1
 -----
 
-* Fixed [phpseclib/phpseclib CVE-2021-30130 issue](https://github.com/advisories/GHSA-vf4w-fg7r-5v94)
+* Fixed [CVE-2021-30130 issue](https://github.com/advisories/GHSA-vf4w-fg7r-5v94)
 
 5.0.0
 -----
