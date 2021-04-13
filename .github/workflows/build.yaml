@@ -1,0 +1,48 @@
+name: Build
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [7.2, 7.3, 7.4]
+        coverage: ["true"]
+        include:
+        - php: 8.0
+          coverage: "false" # PHPUnit 8.5.14 doesn't support code coverage under PHP 8
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup PHP & Composer
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php }}
+        tools: composer:v2
+
+    - name: Install dependencies
+      run: composer install --no-interaction --no-suggest
+
+    - name: PHPUnit
+      env:
+        COVERAGE: ${{ matrix.coverage }}
+      run: |
+        [ $COVERAGE = "true" ] \
+          && mkdir -p build/logs && ./vendor/bin/phpunit --coverage-clover build/logs/clover.xml \
+          || ./vendor/bin/phpunit
+
+    - name: Psalm
+      run: |
+        ./vendor/bin/psalm --shepherd
+    
+    - name: Coveralls
+      if: ${{ matrix.coverage == 'true' }}
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        ./vendor/bin/php-coveralls -v
