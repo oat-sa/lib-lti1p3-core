@@ -20,12 +20,13 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Tests\Integration\Message\Launch\Validator;
+namespace OAT\Library\Lti1p3Core\Tests\Integration\Message\Launch\Validator\Platform;
 
 use Carbon\Carbon;
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\ToolOriginatingLaunchBuilder;
-use OAT\Library\Lti1p3Core\Message\Launch\Validator\PlatformLaunchValidator;
+use OAT\Library\Lti1p3Core\Message\Launch\Validator\Platform\PlatformLaunchValidator;
 use OAT\Library\Lti1p3Core\Message\Launch\Validator\Result\LaunchValidationResult;
+use OAT\Library\Lti1p3Core\Message\Launch\Validator\Result\LaunchValidationResultInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
@@ -98,7 +99,7 @@ class PlatformLaunchValidatorTest extends TestCase
 
         $result = $this->subject->validateToolOriginatingLaunch($this->createServerRequest('GET', $message->toUrl()));
 
-        $this->assertInstanceOf(LaunchValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchValidationResultInterface::class, $result);
         $this->assertFalse($result->hasError());
 
         $this->verifyJwt($result->getPayload()->getToken(), $this->registration->getToolKeyChain()->getPublicKey());
@@ -129,7 +130,7 @@ class PlatformLaunchValidatorTest extends TestCase
 
         $result = $this->subject->validateToolOriginatingLaunch($this->createServerRequest('GET', $message->toUrl()));
 
-        $this->assertInstanceOf(LaunchValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchValidationResultInterface::class, $result);
         $this->assertTrue($result->hasError());
         $this->assertEquals('JWT validation failure', $result->getError());
     }
@@ -191,7 +192,7 @@ class PlatformLaunchValidatorTest extends TestCase
 
         $result = $this->subject->validateToolOriginatingLaunch($request);
 
-        $this->assertInstanceOf(LaunchValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchValidationResultInterface::class, $result);
         $this->assertTrue($result->hasError());
         $this->assertEquals($expectedErrorMessage, $result->getError());
     }
@@ -252,7 +253,7 @@ class PlatformLaunchValidatorTest extends TestCase
 
         $result = $subject->validateToolOriginatingLaunch($this->createServerRequest('GET', $message->toUrl()));
 
-        $this->assertInstanceOf(LaunchValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchValidationResultInterface::class, $result);
         $this->assertTrue($result->hasError());
         $this->assertEquals(
             'JWT session_data proctoring claim validation failure: platform key chain is not configured',

@@ -15,7 +15,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *  Copyright (c) 2020 (original work) Open Assessment Technologies S.A.
+ *  Copyright (c) 2021 (original work) Open Assessment Technologies S.A.
  */
 
 declare(strict_types=1);
@@ -29,12 +29,13 @@ use OAT\Library\Lti1p3Core\Security\Jwt\Parser\ParserInterface;
 use OAT\Library\Lti1p3Core\Security\Jwt\Validator\Validator;
 use OAT\Library\Lti1p3Core\Security\Jwt\Validator\ValidatorInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\Result\RequestAccessTokenValidationResult;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\Result\RequestAccessTokenValidationResultInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Throwable;
 
-class RequestAccessTokenValidator
+class RequestAccessTokenValidator implements RequestAccessTokenValidatorInterface
 {
     /** @var RegistrationRepositoryInterface */
     private $repository;
@@ -63,8 +64,10 @@ class RequestAccessTokenValidator
         $this->parser = $parser ?? new Parser();
     }
 
-    public function validate(ServerRequestInterface $request, array $allowedScopes = []): RequestAccessTokenValidationResult
-    {
+    public function validate(
+        ServerRequestInterface $request,
+        array $allowedScopes = []
+    ): RequestAccessTokenValidationResultInterface {
         $this->reset();
 
         try {

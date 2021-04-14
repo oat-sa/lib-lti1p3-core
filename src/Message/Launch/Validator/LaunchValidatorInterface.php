@@ -20,25 +20,9 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Service\Server\Handler;
+namespace OAT\Library\Lti1p3Core\Message\Launch\Validator;
 
-use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\Result\RequestAccessTokenValidationResultInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-
-interface LtiServiceServerRequestHandlerInterface
+interface LaunchValidatorInterface
 {
-    public function getServiceName(): string;
-
-    public function getAllowedContentType(): ?string;
-
-    public function getAllowedMethods(): array;
-
-    public function getAllowedScopes(): array;
-
-    public function handleValidatedServiceRequest(
-        RequestAccessTokenValidationResultInterface $validationResult,
-        ServerRequestInterface $request,
-        array $options = []
-    ): ResponseInterface;
+    public function getSupportedMessageTypes(): array;
 }

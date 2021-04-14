@@ -316,16 +316,16 @@ You can find below required steps to validate a platform originating message lau
 
 As a tool, you'll receive an HTTP request containing the launch message after OIDC flow completion.
 
-The [ToolLaunchValidator](../../src/Message/Launch/Validator/ToolLaunchValidator.php) can be used for this:
+The [ToolLaunchValidator](../../src/Message/Launch/Validator/Tool/ToolLaunchValidator.php) can be used for this:
 - it requires a registration repository and a nonce repository implementations [as explained here](../quickstart/interfaces.md)
 - it expects a [PSR7 ServerRequestInterface](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface) to validate
-- it will output a [LaunchValidationResult](../../src/Message/Launch/Validator/Result/LaunchValidationResult.php) representing the launch validation, the related registration and the message payload itself.
+- it will output a [LaunchValidationResultInterface](../../src/Message/Launch/Validator/Result/LaunchValidationResultInterface.php) representing the launch validation, the related registration and the message payload itself.
 
 For example:
 ```php
 <?php
 
-use OAT\Library\Lti1p3Core\Message\Launch\Validator\ToolLaunchValidator;
+use OAT\Library\Lti1p3Core\Message\Launch\Validator\Tool\ToolLaunchValidator;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepositoryInterface;
 use Psr\Http\Message\ServerRequestInterface;

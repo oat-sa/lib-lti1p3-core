@@ -31,7 +31,7 @@ use OAT\Library\Lti1p3Core\Security\Jwt\Validator\Validator;
 use OAT\Library\Lti1p3Core\Security\Jwt\Validator\ValidatorInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepositoryInterface;
 
-abstract class AbstractLaunchValidator
+abstract class AbstractLaunchValidator implements LaunchValidatorInterface
 {
     /** @var RegistrationRepositoryInterface */
     protected $registrationRepository;
@@ -64,8 +64,6 @@ abstract class AbstractLaunchValidator
         $this->validator = $validator ?? new Validator();
         $this->parser = $parser ?? new Parser();
     }
-
-    abstract public function getSupportedMessageTypes(): array;
 
     protected function addSuccess(string $message): self
     {
