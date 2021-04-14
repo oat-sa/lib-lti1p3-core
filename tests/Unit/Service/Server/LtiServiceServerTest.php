@@ -24,8 +24,8 @@ namespace OAT\Library\Lti1p3Core\Tests\Unit\Service\Server;
 
 use Carbon\Carbon;
 use Exception;
-use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\RequestAccessTokenValidator;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\Result\RequestAccessTokenValidationResultInterface;
 use OAT\Library\Lti1p3Core\Service\Server\Handler\LtiServiceServerRequestHandlerInterface;
 use OAT\Library\Lti1p3Core\Service\Server\LtiServiceServer;
 use OAT\Library\Lti1p3Core\Tests\Resource\Logger\TestLogger;
@@ -255,11 +255,12 @@ class LtiServiceServerTest extends TestCase
                 return $this->scopes;
             }
 
-            public function handleServiceRequest(
-                RegistrationInterface $registration,
-                ServerRequestInterface $request
+            public function handleValidatedServiceRequest(
+                RequestAccessTokenValidationResultInterface $validationResult,
+                ServerRequestInterface $request,
+                array $options = []
             ): ResponseInterface {
-                return call_user_func($this->func, $registration, $request);
+                return call_user_func($this->func, $validationResult, $request);
             }
         };
     }

@@ -20,25 +20,16 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Service\Server\Handler;
+namespace OAT\Library\Lti1p3Core\Message\Launch\Validator\Platform;
 
-use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\Result\RequestAccessTokenValidationResultInterface;
-use Psr\Http\Message\ResponseInterface;
+use OAT\Library\Lti1p3Core\Message\Launch\Validator\LaunchValidatorInterface;
+use OAT\Library\Lti1p3Core\Message\Launch\Validator\Result\LaunchValidationResultInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-interface LtiServiceServerRequestHandlerInterface
+/**
+ * @see https://www.imsglobal.org/spec/security/v1p0/#authentication-response-validation-0
+ */
+interface PlatformLaunchValidatorInterface extends LaunchValidatorInterface
 {
-    public function getServiceName(): string;
-
-    public function getAllowedContentType(): ?string;
-
-    public function getAllowedMethods(): array;
-
-    public function getAllowedScopes(): array;
-
-    public function handleValidatedServiceRequest(
-        RequestAccessTokenValidationResultInterface $validationResult,
-        ServerRequestInterface $request,
-        array $options = []
-    ): ResponseInterface;
+    public function validateToolOriginatingLaunch(ServerRequestInterface $request): LaunchValidationResultInterface;
 }

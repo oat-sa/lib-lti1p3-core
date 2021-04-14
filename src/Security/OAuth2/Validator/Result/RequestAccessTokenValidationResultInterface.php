@@ -20,25 +20,17 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Service\Server\Handler;
+namespace OAT\Library\Lti1p3Core\Security\OAuth2\Validator\Result;
 
-use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\Result\RequestAccessTokenValidationResultInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
+use OAT\Library\Lti1p3Core\Security\Jwt\TokenInterface;
+use OAT\Library\Lti1p3Core\Util\Result\ResultInterface;
 
-interface LtiServiceServerRequestHandlerInterface
+interface RequestAccessTokenValidationResultInterface extends ResultInterface
 {
-    public function getServiceName(): string;
+    public function getRegistration(): ?RegistrationInterface;
 
-    public function getAllowedContentType(): ?string;
+    public function getToken(): ?TokenInterface;
 
-    public function getAllowedMethods(): array;
-
-    public function getAllowedScopes(): array;
-
-    public function handleValidatedServiceRequest(
-        RequestAccessTokenValidationResultInterface $validationResult,
-        ServerRequestInterface $request,
-        array $options = []
-    ): ResponseInterface;
+    public function getScopes(): array;
 }

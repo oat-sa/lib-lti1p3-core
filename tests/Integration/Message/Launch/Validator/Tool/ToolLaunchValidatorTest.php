@@ -20,12 +20,12 @@
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Tests\Integration\Message\Launch\Validator;
+namespace OAT\Library\Lti1p3Core\Tests\Integration\Message\Launch\Validator\Tool;
 
 use Carbon\Carbon;
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuilder;
-use OAT\Library\Lti1p3Core\Message\Launch\Validator\Result\LaunchValidationResult;
-use OAT\Library\Lti1p3Core\Message\Launch\Validator\ToolLaunchValidator;
+use OAT\Library\Lti1p3Core\Message\Launch\Validator\Result\LaunchValidationResultInterface;
+use OAT\Library\Lti1p3Core\Message\Launch\Validator\Tool\ToolLaunchValidator;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\DeepLinkingSettingsClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
@@ -108,7 +108,7 @@ class ToolLaunchValidatorTest extends TestCase
 
         $result = $this->subject->validatePlatformOriginatingLaunch($this->buildOidcFlowRequest($message));
 
-        $this->assertInstanceOf(LaunchValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchValidationResultInterface::class, $result);
         $this->assertFalse($result->hasError());
 
         $this->verifyJwt($result->getPayload()->getToken(), $this->registration->getPlatformKeyChain()->getPublicKey());
@@ -149,7 +149,7 @@ class ToolLaunchValidatorTest extends TestCase
 
         $result = $this->subject->validatePlatformOriginatingLaunch($this->buildOidcFlowRequest($message));
 
-        $this->assertInstanceOf(LaunchValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchValidationResultInterface::class, $result);
         $this->assertFalse($result->hasError());
 
         $this->verifyJwt($result->getPayload()->getToken(), $this->registration->getPlatformKeyChain()->getPublicKey());
@@ -197,7 +197,7 @@ class ToolLaunchValidatorTest extends TestCase
 
         $result = $this->subject->validatePlatformOriginatingLaunch($this->buildOidcFlowRequest($message));
 
-        $this->assertInstanceOf(LaunchValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchValidationResultInterface::class, $result);
         $this->assertFalse($result->hasError());
 
         $this->verifyJwt($result->getPayload()->getToken(), $this->registration->getPlatformKeyChain()->getPublicKey());
@@ -254,7 +254,7 @@ class ToolLaunchValidatorTest extends TestCase
 
         $result =$subject->validatePlatformOriginatingLaunch($this->buildOidcFlowRequest($message));
 
-        $this->assertInstanceOf(LaunchValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchValidationResultInterface::class, $result);
         $this->assertFalse($result->hasError());
     }
 
@@ -281,7 +281,7 @@ class ToolLaunchValidatorTest extends TestCase
 
         $result =$subject->validatePlatformOriginatingLaunch($this->buildOidcFlowRequest($message));
 
-        $this->assertInstanceOf(LaunchValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchValidationResultInterface::class, $result);
         $this->assertTrue($result->hasError());
         $this->assertEquals('State validation failure: tool key chain not configured', $result->getError());
     }
@@ -299,7 +299,7 @@ class ToolLaunchValidatorTest extends TestCase
         $result = $this->subject->validatePlatformOriginatingLaunch($this->buildOidcFlowRequest($message));
         Carbon::setTestNow();
 
-        $this->assertInstanceOf(LaunchValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchValidationResultInterface::class, $result);
         $this->assertTrue($result->hasError());
         $this->assertEquals('ID token validation failure', $result->getError());
     }
@@ -337,7 +337,7 @@ class ToolLaunchValidatorTest extends TestCase
 
         $result = $this->subject->validatePlatformOriginatingLaunch($request);
 
-        $this->assertInstanceOf(LaunchValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchValidationResultInterface::class, $result);
         $this->assertTrue($result->hasError());
         $this->assertEquals('State validation failure', $result->getError());
     }
@@ -365,7 +365,7 @@ class ToolLaunchValidatorTest extends TestCase
 
         $result = $this->subject->validatePlatformOriginatingLaunch($request);
 
-        $this->assertInstanceOf(LaunchValidationResult::class, $result);
+        $this->assertInstanceOf(LaunchValidationResultInterface::class, $result);
         $this->assertTrue($result->hasError());
         $this->assertEquals($expectedErrorMessage, $result->getError());
     }
