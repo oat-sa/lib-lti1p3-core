@@ -24,7 +24,7 @@ namespace OAT\Library\Lti1p3Core\Service\Server;
 
 use Http\Message\ResponseFactory;
 use Nyholm\Psr7\Factory\HttplugFactory;
-use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\RequestAccessTokenValidator;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\RequestAccessTokenValidatorInterface;
 use OAT\Library\Lti1p3Core\Service\Server\Handler\LtiServiceServerRequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -35,7 +35,7 @@ use Throwable;
 
 class LtiServiceServer implements RequestHandlerInterface
 {
-    /** @var RequestAccessTokenValidator */
+    /** @var RequestAccessTokenValidatorInterface */
     private $validator;
 
     /** @var LtiServiceServerRequestHandlerInterface */
@@ -48,7 +48,7 @@ class LtiServiceServer implements RequestHandlerInterface
     private $logger;
 
     public function __construct(
-        RequestAccessTokenValidator $validator,
+        RequestAccessTokenValidatorInterface $validator,
         LtiServiceServerRequestHandlerInterface $handler,
         ?ResponseFactory $factory = null,
         ?LoggerInterface $logger = null
@@ -88,7 +88,7 @@ class LtiServiceServer implements RequestHandlerInterface
         }
 
         try {
-            $response = $this->handler->handleServiceRequest($validationResult->getRegistration(), $request);
+            $response = $this->handler->handleValidatedServiceRequest($validationResult, $request);
 
             $this->logger->info(sprintf('%s service success', $this->handler->getServiceName()));
 

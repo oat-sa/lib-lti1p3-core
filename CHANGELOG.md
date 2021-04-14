@@ -1,6 +1,18 @@
 CHANGELOG
 =========
 
+6.0.0
+-----
+
+* Added [migration guide](https://github.com/oat-sa/lib-lti1p3-core/wiki/Migration-from-5.x-to-6.x) to document breaking changes and migration steps
+* Added LaunchValidatorInterface, PlatformLaunchValidatorInterface and ToolLaunchValidatorInterface
+* Added AccessTokenResponseGeneratorInterface
+* Added RequestAccessTokenValidatorInterface and RequestAccessTokenValidationResultInterface
+* Moved PlatformLaunchValidator in Platform sub namespace  
+* Moved ToolLaunchValidator in Tool sub namespace  
+* Updated LtiServiceServerRequestHandlerInterface signature
+* Updated documentation
+
 5.0.1
 -----
 

@@ -142,7 +142,19 @@ $fetcher = new class implements JwksFetcherInterface
 - it is recommended to put in cache the JWKS endpoint responses, to improve performances since they don't change often. Your implementation can then rely on a cache by example.
 - the ready to use [JwksFetcher](../../src/Security/Jwks/Fetcher/JwksFetcher.php) works with a [guzzle](http://docs.guzzlephp.org/en/stable/) client to request JWKS data, a [PSR6 cache](https://www.php-fig.org/psr/psr-6/#cacheitempoolinterface) to cache them, and a [PSR3 logger](https://www.php-fig.org/psr/psr-3/#3-psrlogloggerinterface) to log this process.
 
-### LTI Service client interface
+### LTI platform message launch validator interface
+
+**Default implementation**: [PlatformLaunchValidator](../../src/Message/Launch/Validator/Platform/PlatformLaunchValidator.php)
+
+To customise platform message launch validation, an implementation of the [PlatformLaunchValidatorInterface](../../src/Message/Launch/Validator/Platform/PlatformLaunchValidatorInterface.php) can be provided.
+
+### LTI tool message launch validator interface
+
+**Default implementation**: [ToolLaunchValidator](../../src/Message/Launch/Validator/Tool/ToolLaunchValidator.php)
+
+To customise tool message launch validation, an implementation of the [ToolLaunchValidatorInterface](../../src/Message/Launch/Validator/Tool/ToolLaunchValidatorInterface.php) can be provided.
+
+### LTI service client interface
 
 **Default implementation**: [LtiServiceClient](../../src/Service/Client/LtiServiceClient.php) 
 
@@ -168,7 +180,19 @@ $client = new class implements LtiServiceClientInterface
 **Notes**:                                                                                                                                                                                                                                                                            
 - it is recommended to put in cache the service access tokens, to improve performances. Your implementation can then rely on an injected [PSR6 cache](https://www.php-fig.org/psr/psr-6/#cacheitempoolinterface) by example.
 
-### LTI Service server client repository interface
+### LTI tool service server access token generator interface
+
+**Default implementation**: [AccessTokenResponseGenerator](../../src/Security/OAuth2/Generator/AccessTokenResponseGenerator.php)
+
+To customise access token generation, an implementation of the [AccessTokenResponseGeneratorInterface](../../src/Security/OAuth2/Generator/AccessTokenResponseGeneratorInterface.php) can be provided.
+
+### LTI tool service server access token validator interface
+
+**Default implementation**: [RequestAccessTokenValidator](../../src/Security/OAuth2/Validator/RequestAccessTokenValidator.php)
+
+To customise access token validation, an implementation of the [RequestAccessTokenValidatorInterface](../../src/Security/OAuth2/Validator/RequestAccessTokenValidatorInterface.php) can be provided.
+
+### LTI service server client repository interface
 
 **Default implementation**: [ClientRepository](../../src/Security/OAuth2/Repository/ClientRepository.php)  
 
@@ -178,7 +202,7 @@ In order to retrieve and validate clients involved in authenticated service call
 - the default `ClientRepository` injects the `RegistrationRepositoryInterface` to be able to expose your platforms as oauth2 providers and tools as consumers.
 - in case of the consumer tool public key is not given in the registration, it will automatically fallback to a JWKS call.
 
-### LTI Service server access token repository interface
+### LTI service server access token repository interface
 
 **Default implementation**: [AccessTokenRepository](../../src/Security/OAuth2/Repository/AccessTokenRepository.php)  
 
@@ -186,7 +210,7 @@ In order to store service calls access tokens, an implementation of the [AccessT
 
 **Note**: the default `AccessTokenRepository` implementation rely on a [PSR6 cache](https://www.php-fig.org/psr/psr-6/#cacheitempoolinterface) to store generated access tokens.
 
-### LTI Service server scope repository interface
+### LTI service server scope repository interface
 
 **Default implementation**: [ScopeRepository](../../src/Security/OAuth2/Repository/ScopeRepository.php)  
 

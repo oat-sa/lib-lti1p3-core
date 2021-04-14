@@ -15,17 +15,19 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2020 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2021 (original work) Open Assessment Technologies SA;
  */
 
 declare(strict_types=1);
 
-namespace OAT\Library\Lti1p3Core\Message\Launch\Validator;
+namespace OAT\Library\Lti1p3Core\Message\Launch\Validator\Tool;
 
 use Carbon\Carbon;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
+use OAT\Library\Lti1p3Core\Message\Launch\Validator\AbstractLaunchValidator;
 use OAT\Library\Lti1p3Core\Message\Launch\Validator\Result\LaunchValidationResult;
+use OAT\Library\Lti1p3Core\Message\Launch\Validator\Result\LaunchValidationResultInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessage;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayload;
@@ -41,7 +43,7 @@ use Throwable;
 /**
  * @see https://www.imsglobal.org/spec/security/v1p0/#authentication-response-validation
  */
-class ToolLaunchValidator extends AbstractLaunchValidator
+class ToolLaunchValidator extends AbstractLaunchValidator implements ToolLaunchValidatorInterface
 {
     public function getSupportedMessageTypes(): array
     {
@@ -52,7 +54,7 @@ class ToolLaunchValidator extends AbstractLaunchValidator
         ];
     }
 
-    public function validatePlatformOriginatingLaunch(ServerRequestInterface $request): LaunchValidationResult
+    public function validatePlatformOriginatingLaunch(ServerRequestInterface $request): LaunchValidationResultInterface
     {
         $this->reset();
 

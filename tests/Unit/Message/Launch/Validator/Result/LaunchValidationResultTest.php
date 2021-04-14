@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Message\Launch\Validator\Result;
 
 use OAT\Library\Lti1p3Core\Message\Launch\Validator\Result\LaunchValidationResult;
+use OAT\Library\Lti1p3Core\Message\Launch\Validator\Result\LaunchValidationResultInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
@@ -30,6 +31,13 @@ use PHPUnit\Framework\TestCase;
 
 class LaunchValidationResultTest extends TestCase
 {
+    public function testImplementation(): void
+    {
+        $subject = new LaunchValidationResult($this->createMock(RegistrationInterface::class));
+
+        $this->assertInstanceOf(LaunchValidationResultInterface::class, $subject);
+    }
+
     public function testGetRegistration(): void
     {
         $registrationMock = $this->createMock(RegistrationInterface::class);

@@ -24,40 +24,13 @@ namespace OAT\Library\Lti1p3Core\Security\OAuth2\Validator\Result;
 
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Security\Jwt\TokenInterface;
-use OAT\Library\Lti1p3Core\Util\Result\Result;
+use OAT\Library\Lti1p3Core\Util\Result\ResultInterface;
 
-class RequestAccessTokenValidationResult extends Result implements RequestAccessTokenValidationResultInterface
+interface RequestAccessTokenValidationResultInterface extends ResultInterface
 {
-    /** @var RegistrationInterface|null */
-    private $registration;
+    public function getRegistration(): ?RegistrationInterface;
 
-    /** @var TokenInterface|null */
-    private $token;
+    public function getToken(): ?TokenInterface;
 
-    public function __construct(
-        ?RegistrationInterface $registration = null,
-        ?TokenInterface $token = null,
-        array $successes = [],
-        ?string $error = null
-    ) {
-        $this->registration = $registration;
-        $this->token = $token;
-
-        parent::__construct($successes, $error);
-    }
-
-    public function getRegistration(): ?RegistrationInterface
-    {
-        return $this->registration;
-    }
-
-    public function getToken(): ?TokenInterface
-    {
-        return $this->token;
-    }
-
-    public function getScopes(): array
-    {
-        return $this->token->getClaims()->get('scopes', []);
-    }
+    public function getScopes(): array;
 }

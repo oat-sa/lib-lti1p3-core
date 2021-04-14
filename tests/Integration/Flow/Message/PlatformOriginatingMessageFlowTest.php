@@ -23,7 +23,7 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Integration\Flow\Message;
 
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\LtiResourceLinkLaunchRequestBuilder;
-use OAT\Library\Lti1p3Core\Message\Launch\Validator\ToolLaunchValidator;
+use OAT\Library\Lti1p3Core\Message\Launch\Validator\Tool\ToolLaunchValidator;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
