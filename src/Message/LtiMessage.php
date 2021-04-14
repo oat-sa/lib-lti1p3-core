@@ -42,7 +42,7 @@ class LtiMessage implements LtiMessageInterface
     public function __construct(string $url, array $parameters = [])
     {
         $this->url = $url;
-        $this->parameters = (new Collection())->add($parameters);;
+        $this->parameters = (new Collection())->add($parameters);
     }
 
     public function getUrl(): string
