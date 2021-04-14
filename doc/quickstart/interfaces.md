@@ -180,13 +180,13 @@ $client = new class implements LtiServiceClientInterface
 **Notes**:                                                                                                                                                                                                                                                                            
 - it is recommended to put in cache the service access tokens, to improve performances. Your implementation can then rely on an injected [PSR6 cache](https://www.php-fig.org/psr/psr-6/#cacheitempoolinterface) by example.
 
-### LTI tool service server access token generator interface
+### LTI service server access token generator interface
 
 **Default implementation**: [AccessTokenResponseGenerator](../../src/Security/OAuth2/Generator/AccessTokenResponseGenerator.php)
 
 To customise access token generation, an implementation of the [AccessTokenResponseGeneratorInterface](../../src/Security/OAuth2/Generator/AccessTokenResponseGeneratorInterface.php) can be provided.
 
-### LTI tool service server access token validator interface
+### LTI service server access token validator interface
 
 **Default implementation**: [RequestAccessTokenValidator](../../src/Security/OAuth2/Validator/RequestAccessTokenValidator.php)
 
