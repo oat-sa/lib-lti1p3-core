@@ -9,7 +9,8 @@ CHANGELOG
 * Added AccessTokenResponseGeneratorInterface
 * Added RequestAccessTokenValidatorInterface and RequestAccessTokenValidationResultInterface
 * Moved PlatformLaunchValidator in Platform sub namespace  
-* Moved ToolLaunchValidator in Tool sub namespace  
+* Moved ToolLaunchValidator in Tool sub namespace
+* Fixed LtiServiceServer media type handling
 * Updated LtiServiceServerRequestHandlerInterface signature
 * Updated documentation
 
@@ -36,7 +37,7 @@ CHANGELOG
 * Renamed ServiceClientInterface into LtiServiceClientInterface
 * Renamed ServiceClient into LtiServiceClient
 * Fixed globally nullable parameters for classes constructors  
-* Fixed deprecated legacy user identifier claim  
+* Fixed deprecated legacy user identifier claim
 * Updated UserAuthenticatorInterface signature  
 * Updated documentation
 
