@@ -4,7 +4,7 @@ CHANGELOG
 6.0.1
 -----
 
-* Guzzle ^6.5 allowed to make LTI core lib compatible with TAO CGEN
+* Updated Guzzle dependency to ^6.5 || ^7.2 to make LTI core lib compatible with TAO CGEN which requires Guzzle:6
 
 6.0.0
 -----
