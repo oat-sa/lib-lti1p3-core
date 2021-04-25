@@ -12,7 +12,7 @@ CHANGELOG
 * Moved ToolLaunchValidator in Tool sub namespace
 * Fixed LtiServiceServer media type handling
 * Updated LtiServiceServerRequestHandlerInterface signature
-* Updated Guzzle dependency to ^6.5 || ^7.0
+* Updated Guzzle dependency to ^6.5 || ^7.0 
 * Updated documentation
 
 5.0.1
