@@ -55,9 +55,7 @@ class ContextRole extends AbstractRole
     public function isCore(): bool
     {
         if (strpos($this->name, static::getNamespace() . '/') === 0) {
-            $exp = explode('#', substr($this->name, strlen(static::getNamespace() . '/')));
-
-            return $this->getMap()[current($exp)];
+            return false;
         }
 
         if (strpos($this->name, static::getNamespace()) === 0) {
