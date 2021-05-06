@@ -140,142 +140,142 @@ class ContextRoleTest extends TestCase
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Administrator#Administrator',
                 'subName' => 'Administrator',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Administrator#Developer',
                 'subName' => 'Developer',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Administrator#ExternalDeveloper',
                 'subName' => 'ExternalDeveloper',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Administrator#ExternalSupport',
                 'subName' => 'ExternalSupport',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Administrator#ExternalSystemAdministrator',
                 'subName' => 'ExternalSystemAdministrator',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Administrator#Support',
                 'subName' => 'Support',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Administrator#SystemAdministrator',
                 'subName' => 'SystemAdministrator',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/ContentDeveloper#ContentDeveloper',
                 'subName' => 'ContentDeveloper',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/ContentDeveloper#ContentExpert',
                 'subName' => 'ContentExpert',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/ContentDeveloper#ExternalContentExpert',
                 'subName' => 'ExternalContentExpert',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/ContentDeveloper#Librarian',
                 'subName' => 'Librarian',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#ExternalInstructor',
                 'subName' => 'ExternalInstructor',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#Grader',
                 'subName' => 'Grader',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#GuestInstructor',
                 'subName' => 'GuestInstructor',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#Lecturer',
                 'subName' => 'Lecturer',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#PrimaryInstructor',
                 'subName' => 'PrimaryInstructor',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#SecondaryInstructor',
                 'subName' => 'SecondaryInstructor',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistant',
                 'subName' => 'TeachingAssistant',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistantGroup',
                 'subName' => 'TeachingAssistantGroup',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistantOffering',
                 'subName' => 'TeachingAssistantOffering',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistantSection',
                 'subName' => 'TeachingAssistantSection',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistantSectionAssociation',
                 'subName' => 'TeachingAssistantSectionAssociation',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistantTemplate',
                 'subName' => 'TeachingAssistantTemplate',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Learner#ExternalLearner',
                 'subName' => 'ExternalLearner',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Learner#GuestLearner',
                 'subName' => 'GuestLearner',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Learner#Instructor',
                 'subName' => 'Instructor',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Learner#Learner',
                 'subName' => 'Learner',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Learner#NonCreditLearner',
                 'subName' => 'NonCreditLearner',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Manager#AreaManager',
@@ -310,62 +310,62 @@ class ContextRoleTest extends TestCase
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Mentor#Advisor',
                 'subName' => 'Advisor',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Mentor#Auditor',
                 'subName' => 'Auditor',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Mentor#ExternalAdvisor',
                 'subName' => 'ExternalAdvisor',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Mentor#ExternalAuditor',
                 'subName' => 'ExternalAuditor',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Mentor#ExternalLearningFacilitator',
                 'subName' => 'ExternalLearningFacilitator',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Mentor#ExternalMentor',
                 'subName' => 'ExternalMentor',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Mentor#ExternalReviewer',
                 'subName' => 'ExternalReviewer',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Mentor#ExternalTutor',
                 'subName' => 'ExternalTutor',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Mentor#LearningFacilitator',
                 'subName' => 'LearningFacilitator',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Mentor#Mentor',
                 'subName' => 'Mentor',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Mentor#Reviewer',
                 'subName' => 'Reviewer',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Mentor#Tutor',
                 'subName' => 'Tutor',
-                'isCore' => true
+                'isCore' => false
             ],
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lis/v2/membership/Officer#Chair',

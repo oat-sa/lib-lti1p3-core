@@ -53,12 +53,32 @@ class RoleFactoryTest extends TestCase
 
     public function testCreateContextRole(): void
     {
+        $result = RoleFactory::create('http://purl.imsglobal.org/vocab/lis/v2/membership#Administrator');
+
+        $this->assertInstanceOf(ContextRole::class, $result);
+        $this->assertEquals('http://purl.imsglobal.org/vocab/lis/v2/membership#Administrator', $result->getName());
+        $this->assertNull($result->getSubName());
+        $this->assertTrue($result->isCore());
+    }
+
+    public function testCreateContextShortRole(): void
+    {
+        $result = RoleFactory::create('Administrator');
+
+        $this->assertInstanceOf(ContextRole::class, $result);
+        $this->assertEquals('Administrator', $result->getName());
+        $this->assertNull($result->getSubName());
+        $this->assertTrue($result->isCore());
+    }
+
+    public function testCreateContextSubRole(): void
+    {
         $result = RoleFactory::create('http://purl.imsglobal.org/vocab/lis/v2/membership/Administrator#Administrator');
 
         $this->assertInstanceOf(ContextRole::class, $result);
         $this->assertEquals('http://purl.imsglobal.org/vocab/lis/v2/membership/Administrator#Administrator', $result->getName());
         $this->assertEquals('Administrator', $result->getSubName());
-        $this->assertTrue($result->isCore());
+        $this->assertFalse($result->isCore());
     }
 
     public function testCreateFailure(): void
