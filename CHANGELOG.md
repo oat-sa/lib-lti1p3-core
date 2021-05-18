@@ -11,6 +11,7 @@ CHANGELOG
 * Moved PlatformLaunchValidator in Platform sub namespace  
 * Moved ToolLaunchValidator in Tool sub namespace
 * Fixed LtiServiceServer media type handling
+* Fixed LtiServiceClient grant assertion aud claim  
 * Updated LtiServiceServerRequestHandlerInterface signature
 * Updated Guzzle dependency to ^6.5 || ^7.0 
 * Updated documentation
