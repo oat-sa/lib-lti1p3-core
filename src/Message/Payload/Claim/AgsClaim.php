@@ -32,7 +32,7 @@ class AgsClaim implements MessagePayloadClaimInterface
     /** @var array */
     private $scopes;
 
-    /** @var string */
+    /** @var string|null */
     private $lineItemsContainerUrl;
 
     /** @var string|null */
@@ -43,7 +43,7 @@ class AgsClaim implements MessagePayloadClaimInterface
         return LtiMessagePayloadInterface::CLAIM_LTI_AGS;
     }
 
-    public function __construct(array $scopes, string $lineItemsContainerUrl, ?string $lineItemUrl = null)
+    public function __construct(array $scopes, ?string $lineItemsContainerUrl = null, ?string $lineItemUrl = null)
     {
         $this->scopes = $scopes;
         $this->lineItemsContainerUrl = $lineItemsContainerUrl;
@@ -55,7 +55,7 @@ class AgsClaim implements MessagePayloadClaimInterface
         return $this->scopes;
     }
 
-    public function getLineItemsContainerUrl(): string
+    public function getLineItemsContainerUrl(): ?string
     {
         return $this->lineItemsContainerUrl;
     }
@@ -78,7 +78,7 @@ class AgsClaim implements MessagePayloadClaimInterface
     {
         return new self(
             $claimData['scope'],
-            $claimData['lineitems'],
+            $claimData['lineitems'] ?? null,
             $claimData['lineitem'] ?? null
         );
     }
