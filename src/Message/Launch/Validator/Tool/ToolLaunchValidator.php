@@ -110,7 +110,7 @@ class ToolLaunchValidator extends AbstractLaunchValidator implements ToolLaunchV
             ? $platformKeyChain->getPublicKey()
             : $this->fetcher->fetchKey(
                 $registration->getPlatformJwksUrl(),
-                $payload->getToken()->getHeaders()->get(LtiMessagePayloadInterface::HEADER_KID)
+                $payload->getToken()->getHeaders()->getMandatory(LtiMessagePayloadInterface::HEADER_KID)
             );
 
         if (!$this->validator->validate($payload->getToken(), $key)) {
@@ -233,7 +233,11 @@ class ToolLaunchValidator extends AbstractLaunchValidator implements ToolLaunchV
      */
     private function validatePayloadDeploymentId(RegistrationInterface $registration, LtiMessagePayloadInterface $payload): self
     {
-        if (!$registration->hasDeploymentId($payload->getClaim(LtiMessagePayloadInterface::CLAIM_LTI_DEPLOYMENT_ID))) {
+        if (!$payload->hasClaim(LtiMessagePayloadInterface::CLAIM_LTI_DEPLOYMENT_ID)) {
+            throw new LtiException('ID token deployment_id claim is missing');
+        }
+
+        if (!$registration->hasDeploymentId($payload->getDeploymentId())) {
             throw new LtiException('ID token deployment_id claim not valid for this registration');
         }
 
