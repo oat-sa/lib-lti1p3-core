@@ -81,8 +81,8 @@ class ToolLaunchValidator extends AbstractLaunchValidator implements ToolLaunchV
             }
 
             $this
-                ->validatePayloadToken($registration, $payload)
                 ->validatePayloadKid($payload)
+                ->validatePayloadToken($registration, $payload)
                 ->validatePayloadVersion($payload)
                 ->validatePayloadMessageType($payload)
                 ->validatePayloadRoles($payload)

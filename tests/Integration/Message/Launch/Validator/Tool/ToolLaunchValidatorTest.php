@@ -116,8 +116,8 @@ class ToolLaunchValidatorTest extends TestCase
 
         $this->assertEquals(
             [
-                'ID token validation success',
                 'ID token kid header is provided',
+                'ID token validation success',
                 'ID token version claim is valid',
                 'ID token message_type claim is valid',
                 'ID token roles claim is valid',
@@ -157,8 +157,8 @@ class ToolLaunchValidatorTest extends TestCase
 
         $this->assertEquals(
             [
-                'ID token validation success',
                 'ID token kid header is provided',
+                'ID token validation success',
                 'ID token version claim is valid',
                 'ID token message_type claim is valid',
                 'ID token roles claim is valid',
@@ -205,8 +205,8 @@ class ToolLaunchValidatorTest extends TestCase
 
         $this->assertEquals(
             [
-                'ID token validation success',
                 'ID token kid header is provided',
+                'ID token validation success',
                 'ID token version claim is valid',
                 'ID token message_type claim is valid',
                 'ID token roles claim is valid',

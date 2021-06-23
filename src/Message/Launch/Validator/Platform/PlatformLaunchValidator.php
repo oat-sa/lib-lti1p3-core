@@ -82,8 +82,8 @@ class PlatformLaunchValidator extends AbstractLaunchValidator implements Platfor
             }
 
             $this
-                ->validatePayload($registration, $payload)
                 ->validatePayloadKid($payload)
+                ->validatePayload($registration, $payload)
                 ->validatePayloadVersion($payload)
                 ->validatePayloadMessageType($payload)
                 ->validatePayloadNonce($payload)
