@@ -82,8 +82,8 @@ class PlatformLaunchValidator extends AbstractLaunchValidator implements Platfor
             }
 
             $this
-                ->validatePayload($registration, $payload)
                 ->validatePayloadKid($payload)
+                ->validatePayload($registration, $payload)
                 ->validatePayloadVersion($payload)
                 ->validatePayloadMessageType($payload)
                 ->validatePayloadNonce($payload)
@@ -156,7 +156,7 @@ class PlatformLaunchValidator extends AbstractLaunchValidator implements Platfor
             ? $toolKeyChain->getPublicKey()
             : $this->fetcher->fetchKey(
                 $registration->getToolJwksUrl(),
-                $payload->getToken()->getHeaders()->get(LtiMessagePayloadInterface::HEADER_KID)
+                $payload->getToken()->getHeaders()->getMandatory(LtiMessagePayloadInterface::HEADER_KID)
             );
 
         if (!$this->validator->validate($payload->getToken(), $key)) {
@@ -201,6 +201,10 @@ class PlatformLaunchValidator extends AbstractLaunchValidator implements Platfor
      */
     private function validatePayloadDeploymentId(RegistrationInterface $registration, LtiMessagePayloadInterface $payload): self
     {
+        if (!$payload->hasClaim(LtiMessagePayloadInterface::CLAIM_LTI_DEPLOYMENT_ID)) {
+            throw new LtiException('JWT deployment_id claim is missing');
+        }
+
         if (!$registration->hasDeploymentId($payload->getDeploymentId())) {
             throw new LtiException('JWT deployment_id claim not valid for this registration');
         }
