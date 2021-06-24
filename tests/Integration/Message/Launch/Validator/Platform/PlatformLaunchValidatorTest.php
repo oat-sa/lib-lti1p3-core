@@ -106,8 +106,8 @@ class PlatformLaunchValidatorTest extends TestCase
 
         $this->assertEquals(
             [
-                'JWT validation success',
                 'JWT kid header is provided',
+                'JWT validation success',
                 'JWT version claim is valid',
                 'JWT message_type claim is valid',
                 'JWT nonce claim is valid',
@@ -351,6 +351,20 @@ class PlatformLaunchValidatorTest extends TestCase
                     LtiMessagePayloadInterface::CLAIM_NONCE => 'existing',
                 ],
                 'JWT nonce claim already used'
+            ],
+            'Missing JWT deployment id' => [
+                [
+                    MessagePayloadInterface::HEADER_KID => $registration->getPlatformKeyChain()->getIdentifier()
+                ],
+                [
+                    MessagePayloadInterface::CLAIM_ISS => $registration->getClientId(),
+                    MessagePayloadInterface::CLAIM_AUD => $registration->getPlatform()->getAudience(),
+                    LtiMessagePayloadInterface::CLAIM_LTI_VERSION => LtiMessageInterface::LTI_VERSION,
+                    LtiMessagePayloadInterface::CLAIM_LTI_MESSAGE_TYPE => LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE,
+                    LtiMessagePayloadInterface::CLAIM_LTI_ROLES => ['Learner'],
+                    LtiMessagePayloadInterface::CLAIM_NONCE => 'value',
+                ],
+                'JWT deployment_id claim is missing'
             ],
             'Invalid JWT deployment id' => [
                 [

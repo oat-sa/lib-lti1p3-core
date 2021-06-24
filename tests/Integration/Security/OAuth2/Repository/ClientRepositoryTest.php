@@ -79,6 +79,21 @@ class ClientRepositoryTest extends TestCase
         $this->assertNull($this->subject->getClientEntity('invalid'));
     }
 
+    public function testValidateClientSuccessWithAccessTokenUrlAsAudience(): void
+    {
+        $registration = $this->createTestRegistration();
+
+        $secret = $this->generateClientAssertion($registration, $registration->getPlatform()->getOAuth2AccessTokenUrl());
+
+        $result = $this->subject->validateClient(
+            $registration->getClientId(),
+            $secret,
+            ClientAssertionCredentialsGrant::GRANT_IDENTIFIER
+        );
+
+        $this->assertTrue($result);
+    }
+
     public function testValidateClientFailureWithInvalidGrantType(): void
     {
         $registration = $this->createTestRegistration();
