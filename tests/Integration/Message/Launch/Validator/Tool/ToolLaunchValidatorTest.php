@@ -483,6 +483,21 @@ class ToolLaunchValidatorTest extends TestCase
                 ],
                 'ID token nonce claim already used'
             ],
+            'Missing ID token deployment id' => [
+                [
+                    MessagePayloadInterface::HEADER_KID => $registration->getPlatformKeyChain()->getIdentifier()
+                ],
+                [
+                    MessagePayloadInterface::CLAIM_ISS => $registration->getPlatform()->getAudience(),
+                    MessagePayloadInterface::CLAIM_AUD => $registration->getClientId(),
+                    LtiMessagePayloadInterface::CLAIM_LTI_VERSION => LtiMessageInterface::LTI_VERSION,
+                    LtiMessagePayloadInterface::CLAIM_LTI_MESSAGE_TYPE => LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
+                    LtiMessagePayloadInterface::CLAIM_LTI_ROLES => ['Learner'],
+                    LtiMessagePayloadInterface::CLAIM_SUB => 'user',
+                    LtiMessagePayloadInterface::CLAIM_NONCE => 'value',
+                ],
+                'ID token deployment_id claim is missing'
+            ],
             'Invalid ID token deployment id' => [
                 [
                     MessagePayloadInterface::HEADER_KID => $registration->getPlatformKeyChain()->getIdentifier()

@@ -112,7 +112,10 @@ class ClientRepository implements ClientRepositoryInterface
         $foundAudience = false;
 
         foreach ($tokenAudiences as $audience) {
-            if ($audience == $registration->getPlatform()->getAudience()) {
+            if (
+                $audience == $registration->getPlatform()->getAudience()
+                || $audience == $registration->getPlatform()->getOAuth2AccessTokenUrl()
+            ) {
                 $foundAudience = true;
                 break;
             }
