@@ -189,6 +189,7 @@ class ToolLaunchValidatorTest extends TestCase
             null,
             [],
             [
+                new ResourceLinkClaim('identifier'),
                 LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_START_ASSESSMENT_URL => 'http://tool.com/start',
                 LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_SESSION_DATA => $validProctoringData->toString(),
                 LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_ATTEMPT_NUMBER => '1',
@@ -613,7 +614,46 @@ class ToolLaunchValidatorTest extends TestCase
                     LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_SESSION_DATA => 'sessionData',
                 ],
                 'ID token attempt_number proctoring claim is invalid'
-            ]
+            ],
+            'Missing ID token for proctoring without resource link' => [
+                [
+                    MessagePayloadInterface::HEADER_KID => $registration->getPlatformKeyChain()->getIdentifier()
+                ],
+                [
+                    MessagePayloadInterface::CLAIM_ISS => $registration->getPlatform()->getAudience(),
+                    MessagePayloadInterface::CLAIM_AUD => $registration->getClientId(),
+                    LtiMessagePayloadInterface::CLAIM_LTI_VERSION => LtiMessageInterface::LTI_VERSION,
+                    LtiMessagePayloadInterface::CLAIM_LTI_MESSAGE_TYPE => LtiMessageInterface::LTI_MESSAGE_TYPE_START_PROCTORING,
+                    LtiMessagePayloadInterface::CLAIM_LTI_ROLES => ['Learner'],
+                    LtiMessagePayloadInterface::CLAIM_SUB => 'user',
+                    LtiMessagePayloadInterface::CLAIM_NONCE => 'value',
+                    LtiMessagePayloadInterface::CLAIM_LTI_DEPLOYMENT_ID => $registration->getDefaultDeploymentId(),
+                    LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_START_ASSESSMENT_URL => 'startAssessmentUrl',
+                    LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_SESSION_DATA => 'sessionData',
+                    LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_ATTEMPT_NUMBER => 1,
+                ],
+                'ID token resource_link claim is missing'
+            ],
+            'Invalid ID token for proctoring without resource link' => [
+                [
+                    MessagePayloadInterface::HEADER_KID => $registration->getPlatformKeyChain()->getIdentifier()
+                ],
+                [
+                    MessagePayloadInterface::CLAIM_ISS => $registration->getPlatform()->getAudience(),
+                    MessagePayloadInterface::CLAIM_AUD => $registration->getClientId(),
+                    LtiMessagePayloadInterface::CLAIM_LTI_VERSION => LtiMessageInterface::LTI_VERSION,
+                    LtiMessagePayloadInterface::CLAIM_LTI_MESSAGE_TYPE => LtiMessageInterface::LTI_MESSAGE_TYPE_START_PROCTORING,
+                    LtiMessagePayloadInterface::CLAIM_LTI_ROLES => ['Learner'],
+                    LtiMessagePayloadInterface::CLAIM_SUB => 'user',
+                    LtiMessagePayloadInterface::CLAIM_NONCE => 'value',
+                    LtiMessagePayloadInterface::CLAIM_LTI_DEPLOYMENT_ID => $registration->getDefaultDeploymentId(),
+                    LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_START_ASSESSMENT_URL => 'startAssessmentUrl',
+                    LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_SESSION_DATA => 'sessionData',
+                    LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_ATTEMPT_NUMBER => 1,
+                    LtiMessagePayloadInterface::CLAIM_LTI_RESOURCE_LINK => ['id' => ''],
+                ],
+                'ID token resource_link id claim is invalid'
+            ],
         ];
     }
 

@@ -271,6 +271,7 @@ class ToolLaunchValidator extends AbstractLaunchValidator implements ToolLaunchV
         }
 
         if ($payload->getMessageType() === LtiMessageInterface::LTI_MESSAGE_TYPE_START_PROCTORING) {
+
             if (empty($payload->getProctoringStartAssessmentUrl())) {
                 throw new LtiException('ID token start_assessment_url proctoring claim is invalid');
             }
@@ -281,6 +282,16 @@ class ToolLaunchValidator extends AbstractLaunchValidator implements ToolLaunchV
 
             if (empty($payload->getProctoringAttemptNumber())) {
                 throw new LtiException('ID token attempt_number proctoring claim is invalid');
+            }
+
+            $resourceLink = $payload->getResourceLink();
+
+            if (null === $resourceLink) {
+                throw new LtiException('ID token resource_link claim is missing');
+            }
+
+            if (empty($resourceLink->getIdentifier())) {
+                throw new LtiException('ID token resource_link id claim is invalid');
             }
         }
 
