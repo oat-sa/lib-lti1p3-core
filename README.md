@@ -12,22 +12,22 @@
 
 ## Table of contents
 
-- [Installation](#installation)
 - [TAO LTI 1.3 PHP framework](#tao-lti-13-php-framework)
+- [Installation](#installation)
 - [IMS](#ims)
 - [Documentation](#documentation)
 - [Wiki](#wiki)
 - [Tests](#tests)
+
+## TAO LTI 1.3 PHP framework
+
+This library is part of the [TAO LTI 1.3 PHP framework](https://oat-sa.github.io/doc-lti1p3/).
 
 ## Installation
 
 ```console
 $ composer require oat-sa/lib-lti1p3-core
 ```
-
-## TAO LTI 1.3 PHP framework
-
-This library is part of the [TAO LTI 1.3 PHP framework](https://oat-sa.github.io/doc-lti1p3/).
 
 ## IMS
 
