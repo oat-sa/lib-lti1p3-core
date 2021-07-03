@@ -1,4 +1,4 @@
-# LTI 1.3 Core Library
+# ![Logo](doc/images/logo/logo.png) LTI 1.3 Core Library
 
 [![Latest Version](https://img.shields.io/github/tag/oat-sa/lib-lti1p3-core.svg?style=flat&label=release)](https://github.com/oat-sa/lib-lti1p3-core/tags)
 [![License GPL2](http://img.shields.io/badge/licence-GPL%202.0-blue.svg)](http://www.gnu.org/licenses/gpl-2.0.html)
@@ -7,27 +7,38 @@
 [![Psalm Level Status](https://shepherd.dev/github/oat-sa/lib-lti1p3-core/level.svg)](https://shepherd.dev/github/oat-sa/lib-lti1p3-core)
 [![Packagist Downloads](http://img.shields.io/packagist/dt/oat-sa/lib-lti1p3-core.svg)](https://packagist.org/packages/oat-sa/lib-lti1p3-core)
 
-> PHP library for [LTI 1.3 Core](http://www.imsglobal.org/spec/lti/v1p3) implementations as platforms and / or as tools.
+> [IMS certified](https://site.imsglobal.org/certifications/open-assessment-technologies-sa/tao-lti-13-devkit) PHP library for [LTI 1.3 Core](http://www.imsglobal.org/spec/lti/v1p3) implementations as platforms and / or as tools.
+>
+> This library is part of the [TAO LTI 1.3 PHP framework](https://oat-sa.github.io/doc-lti1p3/).
 
 ## Table of contents
 
-- [Specifications](#specifications)
 - [Installation](#installation)
+- [IMS information](#ims-information)
 - [Concepts](#concepts)
 - [Tutorials](#tutorials)
 - [Wiki](#wiki)
 - [Tests](#tests)
-
-## Specifications
-
-- [IMS LTI 1.3 Core](http://www.imsglobal.org/spec/lti/v1p3)
-- [IMS Security](https://www.imsglobal.org/spec/security/v1p0)
 
 ## Installation
 
 ```console
 $ composer require oat-sa/lib-lti1p3-core
 ```
+
+## IMS information
+
+You can find below [IMS](https://www.imsglobal.org/) related information.
+
+### Certifications
+
+- [LTI 1.3 advantage complete](https://site.imsglobal.org/certifications/open-assessment-technologies-sa/tao-lti-13-devkit)
+- [LTI 1.3 proctoring Services](https://site.imsglobal.org/certifications/open-assessment-technologies-sa/tao-lti-13-devkit)
+
+### Specifications
+
+- [IMS LTI 1.3 Core](http://www.imsglobal.org/spec/lti/v1p3)
+- [IMS Security](https://www.imsglobal.org/spec/security/v1p0)
 
 ## Concepts
 
