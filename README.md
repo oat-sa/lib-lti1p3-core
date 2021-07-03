@@ -27,12 +27,12 @@ This library is part of the [TAO LTI 1.3 PHP framework](https://oat-sa.github.io
 
 You can find below [IMS](https://www.imsglobal.org/) related information.
 
-### Certifications
+### Related certifications
 
 - [LTI 1.3 advantage complete](https://site.imsglobal.org/certifications/open-assessment-technologies-sa/tao-lti-13-devkit)
 - [LTI 1.3 proctoring services](https://site.imsglobal.org/certifications/open-assessment-technologies-sa/tao-lti-13-devkit)
 
-### Specifications
+### Related specifications
 
 - [IMS LTI 1.3 Core](http://www.imsglobal.org/spec/lti/v1p3)
 - [IMS Security](https://www.imsglobal.org/spec/security/v1p0)
