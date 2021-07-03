@@ -1,4 +1,4 @@
-# <img src="doc/images/logo/logo.png" width="100" height="100"> LTI 1.3 Core Library
+# <img src="doc/images/logo/logo.png" width="100" height="100"> [TAO](https://www.taotesting.com/) - LTI 1.3 Core Library
 
 [![Latest Version](https://img.shields.io/github/tag/oat-sa/lib-lti1p3-core.svg?style=flat&label=release)](https://github.com/oat-sa/lib-lti1p3-core/tags)
 [![License GPL2](http://img.shields.io/badge/licence-GPL%202.0-blue.svg)](http://www.gnu.org/licenses/gpl-2.0.html)
@@ -30,12 +30,12 @@ $ composer require oat-sa/lib-lti1p3-core
 
 You can find below [IMS](https://www.imsglobal.org/) related information.
 
-### Certifications
+### Related certifications
 
 - [LTI 1.3 advantage complete](https://site.imsglobal.org/certifications/open-assessment-technologies-sa/tao-lti-13-devkit)
 - [LTI 1.3 proctoring Services](https://site.imsglobal.org/certifications/open-assessment-technologies-sa/tao-lti-13-devkit)
 
-### Specifications
+### Related specifications
 
 - [IMS LTI 1.3 Core](http://www.imsglobal.org/spec/lti/v1p3)
 - [IMS Security](https://www.imsglobal.org/spec/security/v1p0)
