@@ -1,4 +1,4 @@
-# ![Logo](doc/images/logo/logo.png) LTI 1.3 Core Library
+# ![Logo](doc/images/logo/logo.png | width=100) LTI 1.3 Core Library
 
 [![Latest Version](https://img.shields.io/github/tag/oat-sa/lib-lti1p3-core.svg?style=flat&label=release)](https://github.com/oat-sa/lib-lti1p3-core/tags)
 [![License GPL2](http://img.shields.io/badge/licence-GPL%202.0-blue.svg)](http://www.gnu.org/licenses/gpl-2.0.html)
