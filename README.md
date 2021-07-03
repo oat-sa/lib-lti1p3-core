@@ -6,6 +6,7 @@
 [![Tests Coverage Status](https://coveralls.io/repos/github/oat-sa/lib-lti1p3-core/badge.svg?branch=master)](https://coveralls.io/github/oat-sa/lib-lti1p3-core?branch=master)
 [![Psalm Level Status](https://shepherd.dev/github/oat-sa/lib-lti1p3-core/level.svg)](https://shepherd.dev/github/oat-sa/lib-lti1p3-core)
 [![Packagist Downloads](http://img.shields.io/packagist/dt/oat-sa/lib-lti1p3-core.svg)](https://packagist.org/packages/oat-sa/lib-lti1p3-core)
+[![IMS Certified](https://img.shields.io/badge/IMS-certified-green)](https://site.imsglobal.org/certifications/open-assessment-technologies-sa/tao-lti-13-devkit)
 
 > [IMS certified](https://site.imsglobal.org/certifications/open-assessment-technologies-sa/tao-lti-13-devkit) PHP library for [LTI 1.3 Core](http://www.imsglobal.org/spec/lti/v1p3) implementations as platforms and / or as tools.
 
@@ -35,7 +36,7 @@ You can find below [IMS](https://www.imsglobal.org/) related information.
 ### Related certifications
 
 - [LTI 1.3 advantage complete](https://site.imsglobal.org/certifications/open-assessment-technologies-sa/tao-lti-13-devkit)
-- [LTI 1.3 proctoring Services](https://site.imsglobal.org/certifications/open-assessment-technologies-sa/tao-lti-13-devkit)
+- [LTI 1.3 proctoring services](https://site.imsglobal.org/certifications/open-assessment-technologies-sa/tao-lti-13-devkit)
 
 ### Related specifications
 
