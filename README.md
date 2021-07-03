@@ -8,15 +8,14 @@
 [![Packagist Downloads](http://img.shields.io/packagist/dt/oat-sa/lib-lti1p3-core.svg)](https://packagist.org/packages/oat-sa/lib-lti1p3-core)
 
 > [IMS certified](https://site.imsglobal.org/certifications/open-assessment-technologies-sa/tao-lti-13-devkit) PHP library for [LTI 1.3 Core](http://www.imsglobal.org/spec/lti/v1p3) implementations as platforms and / or as tools.
->
-> This library is part of the [TAO LTI 1.3 PHP framework](https://oat-sa.github.io/doc-lti1p3/).
 
 ## Table of contents
 
 - [Installation](#installation)
-- [IMS information](#ims-information)
+- [TAO LTI 1.3 PHP framework](#tao-lti-13-php-framework)
+- [IMS](#ims)
 - [Concepts](#concepts)
-- [Tutorials](#tutorials)
+- [Documentation](#documentation)
 - [Wiki](#wiki)
 - [Tests](#tests)
 
@@ -26,7 +25,11 @@
 $ composer require oat-sa/lib-lti1p3-core
 ```
 
-## IMS information
+## TAO LTI 1.3 PHP framework
+
+This library is part of the [TAO LTI 1.3 PHP framework](https://oat-sa.github.io/doc-lti1p3/).
+
+## IMS
 
 You can find below [IMS](https://www.imsglobal.org/) related information.
 
@@ -66,9 +69,9 @@ Services represent direct connections between platforms and tools (without invol
 - [Server](src/Service/Server): server side of LTI service
 - [Client](src/Service/Client): client side of LTI service
 
-## Tutorials
+## Documentation
 
-You can find below some tutorials, presented by topics.
+You can find below the library documentation, presented by topics.
 
 ### Quick start
 
