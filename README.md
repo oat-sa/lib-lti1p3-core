@@ -8,7 +8,7 @@
 [![Packagist Downloads](http://img.shields.io/packagist/dt/oat-sa/lib-lti1p3-core.svg)](https://packagist.org/packages/oat-sa/lib-lti1p3-core)
 [![IMS Certified](https://img.shields.io/badge/IMS-certified-brightgreen)](https://site.imsglobal.org/certifications/open-assessment-technologies-sa/tao-lti-13-devkit)
 
-> [IMS certified](https://site.imsglobal.org/certifications/open-assessment-technologies-sa/tao-lti-13-devkit) PHP library for [LTI 1.3 Core](http://www.imsglobal.org/spec/lti/v1p3) implementations as platforms and / or as tools.
+> [IMS certified](https://site.imsglobal.org/certifications/open-assessment-technologies-sa/tao-lti-13-devkit) PHP library for [LTI 1.3 Core](http://www.imsglobal.org/spec/lti/v1p3) implementations as [platforms and / or as tools](http://www.imsglobal.org/spec/lti/v1p3/#platforms-and-tools).
 
 ## Table of contents
 
