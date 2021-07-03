@@ -13,8 +13,8 @@
 ## Table of contents
 
 - [TAO LTI 1.3 PHP framework](#tao-lti-13-php-framework)
-- [Installation](#installation)
 - [IMS](#ims)
+- [Installation](#installation)
 - [Documentation](#documentation)
 - [Wiki](#wiki)
 - [Tests](#tests)
@@ -22,12 +22,6 @@
 ## TAO LTI 1.3 PHP framework
 
 This library is part of the [TAO LTI 1.3 PHP framework](https://oat-sa.github.io/doc-lti1p3/).
-
-## Installation
-
-```console
-$ composer require oat-sa/lib-lti1p3-core
-```
 
 ## IMS
 
@@ -42,6 +36,12 @@ You can find below [IMS](https://www.imsglobal.org/) related information.
 
 - [IMS LTI 1.3 Core](http://www.imsglobal.org/spec/lti/v1p3)
 - [IMS Security](https://www.imsglobal.org/spec/security/v1p0)
+
+## Installation
+
+```console
+$ composer require oat-sa/lib-lti1p3-core
+```
 
 ## Documentation
 
