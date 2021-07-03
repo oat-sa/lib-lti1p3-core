@@ -1,4 +1,4 @@
-# LTI 1.3 Core Library
+# <img src="doc/images/logo/logo.png" width="40" height="40"> [TAO](https://www.taotesting.com/) - LTI 1.3 Core Library
 
 [![Latest Version](https://img.shields.io/github/tag/oat-sa/lib-lti1p3-core.svg?style=flat&label=release)](https://github.com/oat-sa/lib-lti1p3-core/tags)
 [![License GPL2](http://img.shields.io/badge/licence-GPL%202.0-blue.svg)](http://www.gnu.org/licenses/gpl-2.0.html)
@@ -6,19 +6,33 @@
 [![Tests Coverage Status](https://coveralls.io/repos/github/oat-sa/lib-lti1p3-core/badge.svg?branch=master)](https://coveralls.io/github/oat-sa/lib-lti1p3-core?branch=master)
 [![Psalm Level Status](https://shepherd.dev/github/oat-sa/lib-lti1p3-core/level.svg)](https://shepherd.dev/github/oat-sa/lib-lti1p3-core)
 [![Packagist Downloads](http://img.shields.io/packagist/dt/oat-sa/lib-lti1p3-core.svg)](https://packagist.org/packages/oat-sa/lib-lti1p3-core)
+[![IMS Certified](https://img.shields.io/badge/IMS-certified-brightgreen)](https://site.imsglobal.org/certifications/open-assessment-technologies-sa/tao-lti-13-devkit)
 
-> PHP library for [LTI 1.3 Core](http://www.imsglobal.org/spec/lti/v1p3) implementations as platforms and / or as tools.
+> [IMS certified](https://site.imsglobal.org/certifications/open-assessment-technologies-sa/tao-lti-13-devkit) PHP library for [LTI 1.3 Core](http://www.imsglobal.org/spec/lti/v1p3) implementations as [platforms and / or as tools](http://www.imsglobal.org/spec/lti/v1p3/#platforms-and-tools).
 
 ## Table of contents
 
-- [Specifications](#specifications)
+- [TAO LTI 1.3 PHP framework](#tao-lti-13-php-framework)
+- [IMS](#ims)
 - [Installation](#installation)
-- [Concepts](#concepts)
-- [Tutorials](#tutorials)
+- [Documentation](#documentation)
 - [Wiki](#wiki)
 - [Tests](#tests)
 
-## Specifications
+## TAO LTI 1.3 PHP framework
+
+This library is part of the [TAO LTI 1.3 PHP framework](https://oat-sa.github.io/doc-lti1p3/).
+
+## IMS
+
+You can find below [IMS](https://www.imsglobal.org/) related information.
+
+### Related certifications
+
+- [LTI 1.3 advantage complete](https://site.imsglobal.org/certifications/open-assessment-technologies-sa/tao-lti-13-devkit)
+- [LTI 1.3 proctoring services](https://site.imsglobal.org/certifications/open-assessment-technologies-sa/tao-lti-13-devkit)
+
+### Related specifications
 
 - [IMS LTI 1.3 Core](http://www.imsglobal.org/spec/lti/v1p3)
 - [IMS Security](https://www.imsglobal.org/spec/security/v1p0)
@@ -29,35 +43,9 @@
 $ composer require oat-sa/lib-lti1p3-core
 ```
 
-## Concepts
+## Documentation
 
-You can find below the implementations of the main concepts of the [LTI 1.3 Core](http://www.imsglobal.org/spec/lti/v1p3) specification.
-
-###  Platforms, tools and registrations
-
-- [Platform](src/Platform/PlatformInterface.php): any kind of platform that needs to delegate bits of functionality out to a suite of tools.
-- [Tool](src/Tool/ToolInterface.php): external application or service providing functionality to a platform.
-- [Registration](src/Registration/RegistrationInterface.php): defines the scope of contexts under which a tool is made available for a platform.
-
-### Messages
-
-Messages represent integration between platforms and tools intermediated by a user's browser.
-
-- [LTI Message](src/Message/LtiMessageInterface.php): reference to an exchange between platforms and tools in message based communications.
-- [LTI Message Payload](src/Message/Payload/LtiMessagePayloadInterface.php): reference to the payload (JWT) of an exchange between platforms and tools in message based communications, containing LTI claims.
-- [LTI Resource Link](src/Resource/LtiResourceLink/LtiResourceLinkInterface.php): reference to a resource made available from a tool for a platform.
-- [LTI Resource Link Launch](src/Message/Launch/Builder/LtiResourceLinkLaunchRequestBuilder.php): refers to the process in which a user interacts with an LTI Resource Link within the platform and is subsequently "launched" into a tool.
-
-### Services
-
-Services represent direct connections between platforms and tools (without involving user's browser).
-
-- [Server](src/Service/Server): server side of LTI service
-- [Client](src/Service/Client): client side of LTI service
-
-## Tutorials
-
-You can find below some tutorials, presented by topics.
+You can find below the library documentation, presented by topics.
 
 ### Quick start
 
