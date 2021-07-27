@@ -77,11 +77,9 @@ class LtiMessage implements LtiMessageInterface
 
     public function toUrl(): string
     {
-        $separator = '?';
-
-        if (false !== strpos($this->url, '?')) {
-            $separator = '&';
-        }
+        $separator = false !== strpos($this->url, '?')
+            ? '&'
+            : '?';
 
         return sprintf('%s%s%s', $this->url, $separator, http_build_query(array_filter($this->getParameters()->all())));
     }
