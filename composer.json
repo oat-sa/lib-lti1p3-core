@@ -23,6 +23,7 @@
     "require-dev": {
         "cache/array-adapter": "^1.1",
         "phpunit/phpunit": "8.5.14",
+        "php-coveralls/php-coveralls": "^2.4",
         "psalm/plugin-phpunit": "^0.15.1",
         "vimeo/psalm": "^4.6"
     },

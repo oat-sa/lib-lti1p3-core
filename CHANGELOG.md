@@ -193,7 +193,7 @@ CHANGELOG
 
 * Added findAll() method to RegistrationRepositoryInterface
 
-****1.0.0
+1.0.0
 -----
 
 * Provided core messages implementation and documentation
