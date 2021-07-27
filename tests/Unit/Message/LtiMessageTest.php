@@ -120,6 +120,18 @@ class LtiMessageTest extends TestCase
         $this->assertEquals('http://example.com?parameter=value', $this->subject->toUrl());
     }
 
+    public function testToUrlWithExistingQueryParameters(): void
+    {
+        $subject = new LtiMessage(
+            'http://example.com?existingParameter=existingValue',
+            [
+                'newParameter' => 'newValue',
+            ]
+        );
+
+        $this->assertEquals('http://example.com?existingParameter=existingValue&newParameter=newValue', $subject->toUrl());
+    }
+
     public function testToHtmlLink(): void
     {
         $this->assertEquals(

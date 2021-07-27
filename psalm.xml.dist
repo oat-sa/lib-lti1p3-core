@@ -61,6 +61,11 @@
                 <file name="src/Security/Jwt/Decoder/AssociativeDecoder.php"/>
             </errorLevel>
         </UndefinedConstant>
+        <RedundantCondition>
+            <errorLevel type="suppress">
+                <file name="src/Message/LtiMessage.php"/>
+            </errorLevel>
+        </RedundantCondition>
     </issueHandlers>
     <mockClasses>
         <class name="PHPUnit\Framework\MockObject\MockObject"/>
