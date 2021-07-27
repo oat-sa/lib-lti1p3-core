@@ -77,7 +77,11 @@ class LtiMessage implements LtiMessageInterface
 
     public function toUrl(): string
     {
-        return sprintf('%s?%s', $this->url, http_build_query(array_filter($this->getParameters()->all())));
+        $separator = false !== strpos($this->url, '?')
+            ? '&'
+            : '?';
+
+        return sprintf('%s%s%s', $this->url, $separator, http_build_query(array_filter($this->getParameters()->all())));
     }
 
     public function toHtmlLink(string $title, array $attributes = []): string
