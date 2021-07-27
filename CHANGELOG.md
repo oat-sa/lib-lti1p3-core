@@ -1,10 +1,9 @@
 CHANGELOG
 =========
 
-6.1.0
+6.0.1
 -----
 
-* Added phpstan support
 * Fixed issue [#119](https://github.com/oat-sa/lib-lti1p3-core/issues/119)
 
 6.0.0
