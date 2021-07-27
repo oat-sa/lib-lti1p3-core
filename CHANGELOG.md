@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+6.1.0
+-----
+
+* Added phpstan support
+* Fixed issue [#119](https://github.com/oat-sa/lib-lti1p3-core/issues/119)
+
 6.0.0
 -----
 
@@ -188,7 +194,7 @@ CHANGELOG
 
 * Added findAll() method to RegistrationRepositoryInterface
 
-1.0.0
+****1.0.0
 -----
 
 * Provided core messages implementation and documentation
