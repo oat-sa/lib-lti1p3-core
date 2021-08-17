@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.1.0
+-----
+
+* Added claim support for proctoring end assessment message
+
 6.0.1
 -----
 

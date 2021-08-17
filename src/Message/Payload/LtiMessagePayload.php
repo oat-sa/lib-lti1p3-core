@@ -218,6 +218,15 @@ class LtiMessagePayload extends MessagePayload implements LtiMessagePayloadInter
         return $this->getClaim(ProctoringVerifiedUserClaim::class);
     }
 
+    public function getProctoringEndAssessmentReturn(): bool
+    {
+        if ($this->hasClaim(static::CLAIM_LTI_PROCTORING_END_ASSESSMENT_RETURN)) {
+            return boolval($this->getClaim(static::CLAIM_LTI_PROCTORING_END_ASSESSMENT_RETURN));
+        }
+
+        return false;
+    }
+
     public function getAcs(): ?AcsClaim
     {
         return $this->getClaim(AcsClaim::class);

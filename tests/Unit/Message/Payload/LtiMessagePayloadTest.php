@@ -86,6 +86,7 @@ class LtiMessagePayloadTest extends TestCase
             ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_SESSION_DATA, 'proctoringSessionData')
             ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_ATTEMPT_NUMBER, '1')
             ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_VERIFIED_USER, ['picture' => 'picture'])
+            ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_END_ASSESSMENT_RETURN, true)
             ->withClaim(new AcsClaim(['action'], 'assessmentControlUrl'))
             ->withClaim(new AgsClaim(['scope'], 'lineItemContainerUrl'))
             ->withClaim(new NrpsClaim('membershipUrl'))
@@ -119,6 +120,7 @@ class LtiMessagePayloadTest extends TestCase
         $this->assertEquals('startAssessmentUrl', $this->subject->getProctoringStartAssessmentUrl());
         $this->assertEquals('proctoringSettings', $this->subject->getProctoringSettings()->getData());
         $this->assertEquals('proctoringSessionData', $this->subject->getProctoringSessionData());
+        $this->assertTrue($this->subject->getProctoringEndAssessmentReturn());
         $this->assertEquals('1', $this->subject->getProctoringAttemptNumber());
         $this->assertEquals(['picture' => 'picture'], $this->subject->getProctoringVerifiedUser()->getUserData());
         $this->assertEquals(['action'], $this->subject->getAcs()->getActions());
@@ -131,6 +133,7 @@ class LtiMessagePayloadTest extends TestCase
     public function testGetUserIdentity(): void
     {
         $payload = $this->builder
+            ->reset()
             ->withClaim(LtiMessagePayloadInterface::CLAIM_SUB, 'userIdentifier')
             ->withClaim('name', 'userName')
             ->withClaim('email', 'user@example.com')
@@ -146,6 +149,7 @@ class LtiMessagePayloadTest extends TestCase
     public function testGetValidatedRoleCollection(): void
     {
         $payload = $this->builder
+            ->reset()
             ->withClaim(
                 LtiMessagePayloadInterface::CLAIM_LTI_ROLES,
                 [
@@ -159,5 +163,16 @@ class LtiMessagePayloadTest extends TestCase
         $this->subject = new LtiMessagePayload($this->parseJwt($payload->getToken()->toString()));
 
         $this->assertEquals(3, $this->subject->getValidatedRoleCollection()->count());
+    }
+
+    public function testGetEndAssessmentReturnDefaultValue(): void
+    {
+        $payload = $this->builder
+            ->reset()
+            ->buildMessagePayload($this->createTestRegistration()->getPlatformKeyChain());
+
+        $this->subject = new LtiMessagePayload($this->parseJwt($payload->getToken()->toString()));
+
+        $this->assertFalse($this->subject->getProctoringEndAssessmentReturn());
     }
 }
