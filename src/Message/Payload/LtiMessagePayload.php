@@ -207,7 +207,7 @@ class LtiMessagePayload extends MessagePayload implements LtiMessagePayloadInter
     public function getProctoringAttemptNumber(): ?int
     {
         if ($this->hasClaim(static::CLAIM_LTI_PROCTORING_ATTEMPT_NUMBER)) {
-            return intval($this->getClaim(static::CLAIM_LTI_PROCTORING_ATTEMPT_NUMBER));
+            return (int)$this->getClaim(static::CLAIM_LTI_PROCTORING_ATTEMPT_NUMBER);
         }
 
         return null;
@@ -216,6 +216,15 @@ class LtiMessagePayload extends MessagePayload implements LtiMessagePayloadInter
     public function getProctoringVerifiedUser(): ?ProctoringVerifiedUserClaim
     {
         return $this->getClaim(ProctoringVerifiedUserClaim::class);
+    }
+
+    public function getProctoringEndAssessmentReturn(): bool
+    {
+        if ($this->hasClaim(static::CLAIM_LTI_PROCTORING_END_ASSESSMENT_RETURN)) {
+            return (bool)$this->getClaim(static::CLAIM_LTI_PROCTORING_END_ASSESSMENT_RETURN);
+        }
+
+        return false;
     }
 
     public function getAcs(): ?AcsClaim
