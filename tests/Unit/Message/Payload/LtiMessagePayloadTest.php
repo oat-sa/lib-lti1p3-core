@@ -175,4 +175,16 @@ class LtiMessagePayloadTest extends TestCase
 
         $this->assertFalse($this->subject->getProctoringEndAssessmentReturn());
     }
+
+    public function testGetEndAssessmentReturnFalseValue(): void
+    {
+        $payload = $this->builder
+            ->reset()
+            ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_END_ASSESSMENT_RETURN, false)
+            ->buildMessagePayload($this->createTestRegistration()->getPlatformKeyChain());
+
+        $this->subject = new LtiMessagePayload($this->parseJwt($payload->getToken()->toString()));
+
+        $this->assertFalse($this->subject->getProctoringEndAssessmentReturn());
+    }
 }
