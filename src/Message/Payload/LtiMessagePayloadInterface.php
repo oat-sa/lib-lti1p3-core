@@ -72,6 +72,7 @@ interface LtiMessagePayloadInterface extends MessagePayloadInterface
     public const CLAIM_LTI_PROCTORING_SESSION_DATA = 'https://purl.imsglobal.org/spec/lti-ap/claim/session_data';
     public const CLAIM_LTI_PROCTORING_ATTEMPT_NUMBER = 'https://purl.imsglobal.org/spec/lti-ap/claim/attempt_number';
     public const CLAIM_LTI_PROCTORING_VERIFIED_USER = 'https://purl.imsglobal.org/spec/lti-ap/claim/verified_user';
+    public const CLAIM_LTI_PROCTORING_END_ASSESSMENT_RETURN = 'https://purl.imsglobal.org/spec/lti-ap/claim/end_assessment_return';
 
     // ACS claim
     public const CLAIM_LTI_ACS = 'https://purl.imsglobal.org/spec/lti-ap/claim/acs';
@@ -136,6 +137,8 @@ interface LtiMessagePayloadInterface extends MessagePayloadInterface
     public function getProctoringAttemptNumber(): ?int;
 
     public function getProctoringVerifiedUser(): ?ProctoringVerifiedUserClaim;
+
+    public function getProctoringEndAssessmentReturn(): bool;
 
     public function getAcs(): ?AcsClaim;
 

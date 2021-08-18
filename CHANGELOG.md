@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.1.0
+-----
+
+* Added claim support for [proctoring end assessment message](https://www.imsglobal.org/spec/proctoring/v1p0#h.ooq616k28cwm)
+
 6.0.1
 -----
 
