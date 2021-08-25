@@ -87,6 +87,8 @@ class LtiMessagePayloadTest extends TestCase
             ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_ATTEMPT_NUMBER, '1')
             ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_VERIFIED_USER, ['picture' => 'picture'])
             ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_END_ASSESSMENT_RETURN, true)
+            ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_ERROR_MESSAGE, 'proctoringErrorMessage')
+            ->withClaim(LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_ERROR_LOG, 'proctoringErrorLog')
             ->withClaim(new AcsClaim(['action'], 'assessmentControlUrl'))
             ->withClaim(new AgsClaim(['scope'], 'lineItemContainerUrl'))
             ->withClaim(new NrpsClaim('membershipUrl'))
@@ -121,6 +123,8 @@ class LtiMessagePayloadTest extends TestCase
         $this->assertEquals('proctoringSettings', $this->subject->getProctoringSettings()->getData());
         $this->assertEquals('proctoringSessionData', $this->subject->getProctoringSessionData());
         $this->assertTrue($this->subject->getProctoringEndAssessmentReturn());
+        $this->assertEquals('proctoringErrorMessage', $this->subject->getProctoringErrorMessage());
+        $this->assertEquals('proctoringErrorLog', $this->subject->getProctoringErrorLog());
         $this->assertEquals('1', $this->subject->getProctoringAttemptNumber());
         $this->assertEquals(['picture' => 'picture'], $this->subject->getProctoringVerifiedUser()->getUserData());
         $this->assertEquals(['action'], $this->subject->getAcs()->getActions());
