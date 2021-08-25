@@ -37,7 +37,6 @@ use OAT\Library\Lti1p3Core\Message\Payload\Claim\ProctoringSettingsClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ProctoringVerifiedUserClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\Role\Collection\RoleCollection;
-use OAT\Library\Lti1p3Core\Role\Collection\RoleCollectionInterface;
 use OAT\Library\Lti1p3Core\Role\Factory\RoleFactory;
 use OAT\Library\Lti1p3Core\User\UserIdentity;
 use OAT\Library\Lti1p3Core\User\UserIdentityInterface;
@@ -225,6 +224,16 @@ class LtiMessagePayload extends MessagePayload implements LtiMessagePayloadInter
         }
 
         return false;
+    }
+
+    public function getProctoringErrorMessage(): ?string
+    {
+        return $this->getClaim(static::CLAIM_LTI_PROCTORING_ERROR_MESSAGE);
+    }
+
+    public function getProctoringErrorLog(): ?string
+    {
+        return $this->getClaim(static::CLAIM_LTI_PROCTORING_ERROR_LOG);
     }
 
     public function getAcs(): ?AcsClaim
