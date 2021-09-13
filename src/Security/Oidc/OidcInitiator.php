@@ -76,6 +76,14 @@ class OidcInitiator
                 throw new LtiException('Cannot find registration for OIDC request');
             }
 
+            $toolKeyChain = $registration->getToolKeyChain();
+
+            if (null === $toolKeyChain) {
+                throw new LtiException(
+                    sprintf('Registration %s does not have a configured tool key chain', $registration->getIdentifier())
+                );
+            }
+
             $deploymentId = $oidcRequest->getParameters()->get('lti_deployment_id');
 
             if (null !== $deploymentId) {
