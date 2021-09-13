@@ -51,6 +51,7 @@ class ToolLaunchValidator extends AbstractLaunchValidator implements ToolLaunchV
             LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
             LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_REQUEST,
             LtiMessageInterface::LTI_MESSAGE_TYPE_START_PROCTORING,
+            LtiMessageInterface::LTI_MESSAGE_TYPE_END_ASSESSMENT,
         ];
     }
 
@@ -292,6 +293,12 @@ class ToolLaunchValidator extends AbstractLaunchValidator implements ToolLaunchV
 
             if (empty($resourceLink->getIdentifier())) {
                 throw new LtiException('ID token resource_link id claim is invalid');
+            }
+        }
+
+        if ($payload->getMessageType() === LtiMessageInterface::LTI_MESSAGE_TYPE_END_ASSESSMENT) {
+            if (empty($payload->getProctoringAttemptNumber())) {
+                throw new LtiException('ID token attempt_number proctoring claim is invalid');
             }
         }
 

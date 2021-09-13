@@ -24,6 +24,7 @@ namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\Oidc;
 
 use Exception;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Oidc\OidcInitiator;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
@@ -59,6 +60,38 @@ class OidcInitiatorTest extends TestCase
             ->method('findByPlatformIssuer')
             ->with('iss', 'client_id')
             ->willReturn(null);
+
+        $request = $this->createServerRequest(
+            'GET',
+            sprintf('http://tool.com/init?%s', http_build_query([
+                'iss' => 'iss',
+                'client_id' => 'client_id'
+            ]))
+        );
+
+        $this->subject->initiate($request);
+    }
+
+    public function testInitiationFailureOnRegistrationToolKeyChainNotFound(): void
+    {
+        $this->expectException(LtiException::class);
+        $this->expectExceptionMessage('Registration registrationIdentifier does not have a configured tool key chain');
+
+        $registrationMock = $this->createMock(RegistrationInterface::class);
+        $registrationMock
+            ->expects($this->once())
+            ->method('getIdentifier')
+            ->willReturn('registrationIdentifier');
+        $registrationMock
+            ->expects($this->once())
+            ->method('getToolKeyChain')
+            ->willReturn(null);
+
+        $this->repositoryMock
+            ->expects($this->once())
+            ->method('findByPlatformIssuer')
+            ->with('iss', 'client_id')
+            ->willReturn($registrationMock);
 
         $request = $this->createServerRequest(
             'GET',

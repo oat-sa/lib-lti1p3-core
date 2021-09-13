@@ -87,6 +87,7 @@ class ToolLaunchValidatorTest extends TestCase
                 LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
                 LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_REQUEST,
                 LtiMessageInterface::LTI_MESSAGE_TYPE_START_PROCTORING,
+                LtiMessageInterface::LTI_MESSAGE_TYPE_END_ASSESSMENT,
             ],
             $this->subject->getSupportedMessageTypes()
         );
@@ -184,7 +185,7 @@ class ToolLaunchValidatorTest extends TestCase
         $message = $this->builder->buildPlatformOriginatingLaunch(
             $this->registration,
             LtiMessageInterface::LTI_MESSAGE_TYPE_START_PROCTORING,
-            $this->registration->getTool()->getDeepLinkingUrl(),
+            $this->registration->getTool()->getLaunchUrl(),
             'loginHint',
             null,
             [],
@@ -222,6 +223,47 @@ class ToolLaunchValidatorTest extends TestCase
 
         $this->assertEquals('http://tool.com/start', $result->getPayload()->getProctoringStartAssessmentUrl());
         $this->assertEquals($validProctoringData->toString(), $result->getPayload()->getProctoringSessionData());
+        $this->assertEquals('1', $result->getPayload()->getProctoringAttemptNumber());
+    }
+
+    public function testValidatePlatformOriginatingLaunchForEndAssessmentSuccess(): void
+    {
+        $message = $this->builder->buildPlatformOriginatingLaunch(
+            $this->registration,
+            LtiMessageInterface::LTI_MESSAGE_TYPE_END_ASSESSMENT,
+            $this->registration->getTool()->getLaunchUrl(),
+            'loginHint',
+            null,
+            [],
+            [
+                LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_ATTEMPT_NUMBER => '1',
+            ]
+        );
+
+        $result = $this->subject->validatePlatformOriginatingLaunch($this->buildOidcFlowRequest($message));
+
+        $this->assertInstanceOf(LaunchValidationResultInterface::class, $result);
+        $this->assertFalse($result->hasError());
+
+        $this->verifyJwt($result->getPayload()->getToken(), $this->registration->getPlatformKeyChain()->getPublicKey());
+        $this->verifyJwt($result->getState()->getToken(), $this->registration->getToolKeyChain()->getPublicKey());
+
+        $this->assertEquals(
+            [
+                'ID token kid header is provided',
+                'ID token validation success',
+                'ID token version claim is valid',
+                'ID token message_type claim is valid',
+                'ID token roles claim is valid',
+                'ID token user identifier (sub) claim is valid',
+                'ID token nonce claim is valid',
+                'ID token deployment_id claim valid for this registration',
+                'ID token message type claim LtiEndAssessment requirements are valid',
+                'State validation success',
+            ],
+            $result->getSuccesses()
+        );
+
         $this->assertEquals('1', $result->getPayload()->getProctoringAttemptNumber());
     }
 
@@ -564,7 +606,7 @@ class ToolLaunchValidatorTest extends TestCase
                 ],
                 'ID token deep_linking_settings id claim is invalid'
             ],
-            'Invalid ID token for proctoring without start assessment url' => [
+            'Invalid ID token for start proctoring without start assessment url' => [
                 [
                     MessagePayloadInterface::HEADER_KID => $registration->getPlatformKeyChain()->getIdentifier()
                 ],
@@ -580,7 +622,7 @@ class ToolLaunchValidatorTest extends TestCase
                 ],
                 'ID token start_assessment_url proctoring claim is invalid'
             ],
-            'Invalid ID token for proctoring without session data' => [
+            'Invalid ID token for start proctoring without session data' => [
                 [
                     MessagePayloadInterface::HEADER_KID => $registration->getPlatformKeyChain()->getIdentifier()
                 ],
@@ -597,7 +639,7 @@ class ToolLaunchValidatorTest extends TestCase
                 ],
                 'ID token session_data proctoring claim is invalid'
             ],
-            'Invalid ID token for proctoring without attempt number' => [
+            'Invalid ID token for start proctoring without attempt number' => [
                 [
                     MessagePayloadInterface::HEADER_KID => $registration->getPlatformKeyChain()->getIdentifier()
                 ],
@@ -615,7 +657,7 @@ class ToolLaunchValidatorTest extends TestCase
                 ],
                 'ID token attempt_number proctoring claim is invalid'
             ],
-            'Missing ID token for proctoring without resource link' => [
+            'Missing ID token for start proctoring without resource link' => [
                 [
                     MessagePayloadInterface::HEADER_KID => $registration->getPlatformKeyChain()->getIdentifier()
                 ],
@@ -634,7 +676,7 @@ class ToolLaunchValidatorTest extends TestCase
                 ],
                 'ID token resource_link claim is missing'
             ],
-            'Invalid ID token for proctoring without resource link' => [
+            'Invalid ID token for start proctoring without resource link' => [
                 [
                     MessagePayloadInterface::HEADER_KID => $registration->getPlatformKeyChain()->getIdentifier()
                 ],
@@ -653,6 +695,22 @@ class ToolLaunchValidatorTest extends TestCase
                     LtiMessagePayloadInterface::CLAIM_LTI_RESOURCE_LINK => ['id' => ''],
                 ],
                 'ID token resource_link id claim is invalid'
+            ],
+            'Invalid ID token for end assessment without attempt number' => [
+                [
+                    MessagePayloadInterface::HEADER_KID => $registration->getPlatformKeyChain()->getIdentifier()
+                ],
+                [
+                    MessagePayloadInterface::CLAIM_ISS => $registration->getPlatform()->getAudience(),
+                    MessagePayloadInterface::CLAIM_AUD => $registration->getClientId(),
+                    LtiMessagePayloadInterface::CLAIM_LTI_VERSION => LtiMessageInterface::LTI_VERSION,
+                    LtiMessagePayloadInterface::CLAIM_LTI_MESSAGE_TYPE => LtiMessageInterface::LTI_MESSAGE_TYPE_END_ASSESSMENT,
+                    LtiMessagePayloadInterface::CLAIM_LTI_ROLES => ['Learner'],
+                    LtiMessagePayloadInterface::CLAIM_SUB => 'user',
+                    LtiMessagePayloadInterface::CLAIM_NONCE => 'value',
+                    LtiMessagePayloadInterface::CLAIM_LTI_DEPLOYMENT_ID => $registration->getDefaultDeploymentId(),
+                ],
+                'ID token attempt_number proctoring claim is invalid'
             ],
         ];
     }

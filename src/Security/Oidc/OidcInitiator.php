@@ -76,6 +76,14 @@ class OidcInitiator
                 throw new LtiException('Cannot find registration for OIDC request');
             }
 
+            $toolKeyChain = $registration->getToolKeyChain();
+
+            if (null === $toolKeyChain) {
+                throw new LtiException(
+                    sprintf('Registration %s does not have a configured tool key chain', $registration->getIdentifier())
+                );
+            }
+
             $deploymentId = $oidcRequest->getParameters()->get('lti_deployment_id');
 
             if (null !== $deploymentId) {
@@ -93,7 +101,7 @@ class OidcInitiator
                 ->withClaim(LtiMessagePayloadInterface::CLAIM_NONCE, $nonce->getValue())
                 ->withClaim(LtiMessagePayloadInterface::CLAIM_PARAMETERS, $oidcRequest->getParameters());
 
-            $statePayload = $this->builder->buildMessagePayload($registration->getToolKeyChain());
+            $statePayload = $this->builder->buildMessagePayload($toolKeyChain);
 
             return new LtiMessage(
                 $registration->getPlatform()->getOidcAuthenticationUrl(),
