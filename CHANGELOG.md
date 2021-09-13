@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+6.2.0
+-----
+
+* Added [proctoring end assessment message](https://www.imsglobal.org/spec/proctoring/v1p0#h.ooq616k28cwm) tool launch validator support
+* Fixed issue [#128](https://github.com/oat-sa/lib-lti1p3-core/issues/128)
+
 6.1.0
 -----
 
