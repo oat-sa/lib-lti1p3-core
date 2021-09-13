@@ -101,7 +101,7 @@ class OidcInitiator
                 ->withClaim(LtiMessagePayloadInterface::CLAIM_NONCE, $nonce->getValue())
                 ->withClaim(LtiMessagePayloadInterface::CLAIM_PARAMETERS, $oidcRequest->getParameters());
 
-            $statePayload = $this->builder->buildMessagePayload($registration->getToolKeyChain());
+            $statePayload = $this->builder->buildMessagePayload($toolKeyChain);
 
             return new LtiMessage(
                 $registration->getPlatform()->getOidcAuthenticationUrl(),
