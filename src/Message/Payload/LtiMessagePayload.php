@@ -29,6 +29,7 @@ use OAT\Library\Lti1p3Core\Message\Payload\Claim\BasicOutcomeClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\DeepLinkingContentItemsClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\DeepLinkingSettingsClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\ForUserClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\LaunchPresentationClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\LisClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\NrpsClaim;
@@ -151,6 +152,11 @@ class LtiMessagePayload extends MessagePayload implements LtiMessagePayloadInter
             $this->getClaim(self::CLAIM_USER_LOCALE),
             $this->getClaim(self::CLAIM_USER_PICTURE)
         );
+    }
+
+    public function getForUser(): ?ForUserClaim
+    {
+        return $this->getClaim(ForUserClaim::class);
     }
 
     public function getDeepLinkingSettings(): ?DeepLinkingSettingsClaim

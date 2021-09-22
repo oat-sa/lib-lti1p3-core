@@ -40,6 +40,7 @@ interface LtiMessageInterface
     public const LTI_MESSAGE_TYPE_START_PROCTORING = 'LtiStartProctoring';
     public const LTI_MESSAGE_TYPE_START_ASSESSMENT = 'LtiStartAssessment';
     public const LTI_MESSAGE_TYPE_END_ASSESSMENT = 'LtiEndAssessment';
+    public const LTI_MESSAGE_TYPE_SUBMISSION_REVIEW_REQUEST = 'LtiSubmissionReviewRequest';
 
     public function getUrl(): string;
 
