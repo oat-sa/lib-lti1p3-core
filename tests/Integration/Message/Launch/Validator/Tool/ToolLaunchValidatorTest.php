@@ -88,6 +88,7 @@ class ToolLaunchValidatorTest extends TestCase
                 LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_REQUEST,
                 LtiMessageInterface::LTI_MESSAGE_TYPE_START_PROCTORING,
                 LtiMessageInterface::LTI_MESSAGE_TYPE_END_ASSESSMENT,
+                LtiMessageInterface::LTI_MESSAGE_TYPE_SUBMISSION_REVIEW_REQUEST,
             ],
             $this->subject->getSupportedMessageTypes()
         );
@@ -711,6 +712,63 @@ class ToolLaunchValidatorTest extends TestCase
                     LtiMessagePayloadInterface::CLAIM_LTI_DEPLOYMENT_ID => $registration->getDefaultDeploymentId(),
                 ],
                 'ID token attempt_number proctoring claim is invalid'
+            ],
+            'Missing ID token AGS claim for submission review' => [
+                [
+                    MessagePayloadInterface::HEADER_KID => $registration->getPlatformKeyChain()->getIdentifier()
+                ],
+                [
+                    MessagePayloadInterface::CLAIM_ISS => $registration->getPlatform()->getAudience(),
+                    MessagePayloadInterface::CLAIM_AUD => $registration->getClientId(),
+                    LtiMessagePayloadInterface::CLAIM_LTI_VERSION => LtiMessageInterface::LTI_VERSION,
+                    LtiMessagePayloadInterface::CLAIM_LTI_MESSAGE_TYPE => LtiMessageInterface::LTI_MESSAGE_TYPE_SUBMISSION_REVIEW_REQUEST,
+                    LtiMessagePayloadInterface::CLAIM_LTI_ROLES => ['Learner'],
+                    LtiMessagePayloadInterface::CLAIM_SUB => 'user',
+                    LtiMessagePayloadInterface::CLAIM_NONCE => 'value',
+                    LtiMessagePayloadInterface::CLAIM_LTI_DEPLOYMENT_ID => $registration->getDefaultDeploymentId(),
+                ],
+                'ID token AGS submission review claim is missing'
+            ],
+            'Invalid ID token AGS line item claim for submission review' => [
+                [
+                    MessagePayloadInterface::HEADER_KID => $registration->getPlatformKeyChain()->getIdentifier()
+                ],
+                [
+                    MessagePayloadInterface::CLAIM_ISS => $registration->getPlatform()->getAudience(),
+                    MessagePayloadInterface::CLAIM_AUD => $registration->getClientId(),
+                    LtiMessagePayloadInterface::CLAIM_LTI_VERSION => LtiMessageInterface::LTI_VERSION,
+                    LtiMessagePayloadInterface::CLAIM_LTI_MESSAGE_TYPE => LtiMessageInterface::LTI_MESSAGE_TYPE_SUBMISSION_REVIEW_REQUEST,
+                    LtiMessagePayloadInterface::CLAIM_LTI_ROLES => ['Learner'],
+                    LtiMessagePayloadInterface::CLAIM_SUB => 'user',
+                    LtiMessagePayloadInterface::CLAIM_NONCE => 'value',
+                    LtiMessagePayloadInterface::CLAIM_LTI_DEPLOYMENT_ID => $registration->getDefaultDeploymentId(),
+                    LtiMessagePayloadInterface::CLAIM_LTI_AGS => [
+                        'scope' => [],
+                    ],
+
+                ],
+                'ID token AGS line item submission review claim is invalid'
+            ],
+            'Invalid ID token for_user claim for submission review' => [
+                [
+                    MessagePayloadInterface::HEADER_KID => $registration->getPlatformKeyChain()->getIdentifier()
+                ],
+                [
+                    MessagePayloadInterface::CLAIM_ISS => $registration->getPlatform()->getAudience(),
+                    MessagePayloadInterface::CLAIM_AUD => $registration->getClientId(),
+                    LtiMessagePayloadInterface::CLAIM_LTI_VERSION => LtiMessageInterface::LTI_VERSION,
+                    LtiMessagePayloadInterface::CLAIM_LTI_MESSAGE_TYPE => LtiMessageInterface::LTI_MESSAGE_TYPE_SUBMISSION_REVIEW_REQUEST,
+                    LtiMessagePayloadInterface::CLAIM_LTI_ROLES => ['Learner'],
+                    LtiMessagePayloadInterface::CLAIM_SUB => 'user',
+                    LtiMessagePayloadInterface::CLAIM_NONCE => 'value',
+                    LtiMessagePayloadInterface::CLAIM_LTI_DEPLOYMENT_ID => $registration->getDefaultDeploymentId(),
+                    LtiMessagePayloadInterface::CLAIM_LTI_AGS => [
+                        'scope' => [],
+                        'lineitem' => 'lineItemUrl'
+                    ],
+
+                ],
+                'ID token for_user submission review claim is invalid'
             ],
         ];
     }

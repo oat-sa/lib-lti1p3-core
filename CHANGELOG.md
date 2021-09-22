@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3.0
+-----
+
+* Added [submission review service](https://www.imsglobal.org/spec/lti-sr/v1p0) support (validator and claims)
+
 6.2.0
 -----
 

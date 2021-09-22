@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2020 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2021 (original work) Open Assessment Technologies SA;
  */
 
 declare(strict_types=1);
@@ -28,6 +28,7 @@ use OAT\Library\Lti1p3Core\Message\Payload\Claim\BasicOutcomeClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\DeepLinkingContentItemsClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\DeepLinkingSettingsClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\ForUserClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\LaunchPresentationClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\LisClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\NrpsClaim;
@@ -56,6 +57,7 @@ interface LtiMessagePayloadInterface extends MessagePayloadInterface
     public const CLAIM_LTI_CUSTOM = 'https://purl.imsglobal.org/spec/lti/claim/custom';
     public const CLAIM_LTI_TARGET_LINK_URI = 'https://purl.imsglobal.org/spec/lti/claim/target_link_uri';
     public const CLAIM_LTI_RESOURCE_LINK = 'https://purl.imsglobal.org/spec/lti/claim/resource_link';
+    public const CLAIM_LTI_FOR_USER = 'https://purl.imsglobal.org/spec/lti/claim/for_user';
 
     // Deep Linking claims
     public const CLAIM_LTI_DEEP_LINKING_SETTINGS = 'https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings';
@@ -115,6 +117,8 @@ interface LtiMessagePayloadInterface extends MessagePayloadInterface
     public function getLis(): ?LisClaim;
 
     public function getUserIdentity(): ?UserIdentityInterface;
+
+    public function getForUser(): ?ForUserClaim;
 
     public function getDeepLinkingSettings(): ?DeepLinkingSettingsClaim;
 

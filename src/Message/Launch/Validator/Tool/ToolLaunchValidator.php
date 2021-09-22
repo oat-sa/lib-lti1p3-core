@@ -52,6 +52,7 @@ class ToolLaunchValidator extends AbstractLaunchValidator implements ToolLaunchV
             LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_REQUEST,
             LtiMessageInterface::LTI_MESSAGE_TYPE_START_PROCTORING,
             LtiMessageInterface::LTI_MESSAGE_TYPE_END_ASSESSMENT,
+            LtiMessageInterface::LTI_MESSAGE_TYPE_SUBMISSION_REVIEW_REQUEST,
         ];
     }
 
@@ -299,6 +300,23 @@ class ToolLaunchValidator extends AbstractLaunchValidator implements ToolLaunchV
         if ($payload->getMessageType() === LtiMessageInterface::LTI_MESSAGE_TYPE_END_ASSESSMENT) {
             if (empty($payload->getProctoringAttemptNumber())) {
                 throw new LtiException('ID token attempt_number proctoring claim is invalid');
+            }
+        }
+
+        if ($payload->getMessageType() === LtiMessageInterface::LTI_MESSAGE_TYPE_SUBMISSION_REVIEW_REQUEST) {
+
+            $ags = $payload->getAgs();
+
+            if (null === $ags) {
+                throw new LtiException('ID token AGS submission review claim is missing');
+            }
+
+            if (empty($ags->getLineItemUrl())) {
+                throw new LtiException('ID token AGS line item submission review claim is invalid');
+            }
+
+            if (empty($payload->getForUser())) {
+                throw new LtiException('ID token for_user submission review claim is invalid');
             }
         }
 
