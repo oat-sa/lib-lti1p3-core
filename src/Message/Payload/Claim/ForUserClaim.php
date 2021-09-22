@@ -68,7 +68,6 @@ class ForUserClaim implements MessagePayloadClaimInterface
         $this->roles = $roles;
     }
 
-
     public static function getClaimName(): string
     {
         return LtiMessagePayloadInterface::CLAIM_LTI_FOR_USER;
