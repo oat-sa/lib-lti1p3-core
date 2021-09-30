@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3.1
+-----
+
+* Fixed [CVE-2021-41106](https://github.com/advisories/GHSA-7322-jrq4-x5hf) issue
+
 6.3.0
 -----
 

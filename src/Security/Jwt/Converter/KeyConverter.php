@@ -80,7 +80,7 @@ class KeyConverter
         }
 
         if ($key->isFromFile()) {
-            return LocalFileReference::file(
+            return InMemory::file(
                 substr($key->getContent(), strlen(KeyInterface::FILE_PREFIX)),
                 $key->getPassPhrase() ?? ''
             );
