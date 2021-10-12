@@ -367,6 +367,8 @@ if (!$result->hasError()) {
 } 
 ```
 
+**Note**: if you want to work with the message payload claims as array of values (for caching purposes for example), you can use the [MessagePayloadClaimsExtractor](../../src/Message/Payload/Extractor/MessagePayloadClaimsExtractor.php) for extracting claims (provides a configurable claim sanitization).
+
 ### Working with launch roles
 
 The [LtiMessagePayloadInterface](../../src/Message/Payload/LtiMessagePayloadInterface.php) provides the `getValidatedRoleCollection()` getter to allow you to work easily with [the LTI specification roles](http://www.imsglobal.org/spec/lti/v1p3/#role-vocabularies) as a [RoleCollection](../../src/Role/Collection/RoleCollection.php).
