@@ -27,6 +27,7 @@ use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilderInterfac
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Extractor\MessagePayloadClaimsExtractor;
+use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayload;
 use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Tests\Traits\DomainTestingTrait;
@@ -81,6 +82,34 @@ class MessagePayloadExtractorTest extends TestCase
         );
     }
 
+    public function testExtractionFromLtiMessagePayload(): void
+    {
+        $ltiMessagePayload = new LtiMessagePayload($this->message->getToken());
+
+        $extractedClaims = MessagePayloadClaimsExtractor::extract($ltiMessagePayload);
+
+        foreach (MessagePayloadClaimsExtractor::DEFAULT_EXCLUDED_CLAIMS as $defaultExcludedClaim) {
+            $this->assertArrayNotHasKey($defaultExcludedClaim, $extractedClaims);
+        }
+
+        $this->assertEquals(
+            [
+                MessagePayloadInterface::CLAIM_SUB => 'sub',
+                MessagePayloadInterface::CLAIM_AUD => [
+                    'aud',
+                ],
+                'customClaim' => 'customValue',
+                LtiMessagePayloadInterface::CLAIM_LTI_RESOURCE_LINK => [
+                    'id' => 'resourceLinkIdentifier',
+                ],
+                LtiMessagePayloadInterface::CLAIM_LTI_CONTEXT => [
+                    'id' => 'contextIdentifier',
+                ],
+            ],
+            $extractedClaims
+        );
+    }
+
     public function testExtractionWithExclusions(): void
     {
         $extractedClaims = MessagePayloadClaimsExtractor::extract(
@@ -98,7 +127,7 @@ class MessagePayloadExtractorTest extends TestCase
 
         $this->assertEquals(
             [
-                'aud' => [
+                MessagePayloadInterface::CLAIM_AUD => [
                     'aud',
                 ],
                 LtiMessagePayloadInterface::CLAIM_LTI_RESOURCE_LINK => [
