@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+6.6.0
+-----
+
+* Added MessagePayloadClaimsExtractor to ease message claims extraction
+* Updated documentation
+
 6.5.0
 -----
 
