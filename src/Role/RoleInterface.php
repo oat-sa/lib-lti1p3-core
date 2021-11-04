@@ -30,10 +30,12 @@ interface RoleInterface
     public const TYPE_SYSTEM = 'system';
     public const TYPE_INSTITUTION = 'institution';
     public const TYPE_CONTEXT = 'context';
+    public const TYPE_LTI_SYSTEM = 'lti-system';
 
     public const NAMESPACE_SYSTEM = 'http://purl.imsglobal.org/vocab/lis/v2/system/person';
     public const NAMESPACE_INSTITUTION = 'http://purl.imsglobal.org/vocab/lis/v2/institution/person';
     public const NAMESPACE_CONTEXT = 'http://purl.imsglobal.org/vocab/lis/v2/membership';
+    public const NAMESPACE_LTI_SYSTEM = 'http://purl.imsglobal.org/vocab/lti/system/person';
 
     public static function getType(): string;
 
