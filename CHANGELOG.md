@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.7.0
+-----
+
+* Add LtiSystemRole supporting [TestUser role](https://www.imsglobal.org/spec/lti/v1p3/#lti-vocabulary-for-system-roles)
+
 6.6.0
 -----
 

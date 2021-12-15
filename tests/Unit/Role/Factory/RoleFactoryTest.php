@@ -26,6 +26,7 @@ use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Role\Factory\RoleFactory;
 use OAT\Library\Lti1p3Core\Role\Type\ContextRole;
 use OAT\Library\Lti1p3Core\Role\Type\InstitutionRole;
+use OAT\Library\Lti1p3Core\Role\Type\LtiSystemRole;
 use OAT\Library\Lti1p3Core\Role\Type\SystemRole;
 use PHPUnit\Framework\TestCase;
 
@@ -79,6 +80,16 @@ class RoleFactoryTest extends TestCase
         $this->assertEquals('http://purl.imsglobal.org/vocab/lis/v2/membership/Administrator#Administrator', $result->getName());
         $this->assertEquals('Administrator', $result->getSubName());
         $this->assertFalse($result->isCore());
+    }
+
+    public function testCreateLtiSystemRole(): void
+    {
+        $result = RoleFactory::create('http://purl.imsglobal.org/vocab/lti/system/person#TestUser');
+
+        $this->assertInstanceOf(LtiSystemRole::class, $result);
+        $this->assertEquals('http://purl.imsglobal.org/vocab/lti/system/person#TestUser', $result->getName());
+        $this->assertNull($result->getSubName());
+        $this->assertTrue($result->isCore());
     }
 
     public function testCreateFailure(): void

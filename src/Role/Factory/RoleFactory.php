@@ -26,6 +26,7 @@ use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Role\RoleInterface;
 use OAT\Library\Lti1p3Core\Role\Type\ContextRole;
 use OAT\Library\Lti1p3Core\Role\Type\InstitutionRole;
+use OAT\Library\Lti1p3Core\Role\Type\LtiSystemRole;
 use OAT\Library\Lti1p3Core\Role\Type\SystemRole;
 
 class RoleFactory
@@ -41,6 +42,10 @@ class RoleFactory
 
         if (strpos($name, InstitutionRole::getNameSpace()) === 0) {
             return new InstitutionRole($name);
+        }
+
+        if (strpos($name, LtiSystemRole::getNameSpace()) === 0) {
+            return new LtiSystemRole($name);
         }
 
         return new ContextRole($name);
