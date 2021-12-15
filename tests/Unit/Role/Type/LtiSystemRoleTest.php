@@ -59,7 +59,7 @@ class LtiSystemRoleTest extends TestCase
         return [
             [
                 'roleName' => 'http://purl.imsglobal.org/vocab/lti/system/person#TestUser',
-                'isCore' => true
+                'isCore' => true,
             ],
         ];
     }
