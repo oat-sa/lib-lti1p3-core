@@ -105,7 +105,10 @@ class LtiMessage implements LtiMessageInterface
             $formInputs[] = sprintf('<input type="hidden" name="%s" value="%s"/>', $name, $value);
         }
 
-        $autoSubmitScript = sprintf('<script>document.getElementById("%s").submit();</script>', $formId);
+        $autoSubmitScript = sprintf(
+            '<script>window.onload=function(){document.getElementById("%s").submit()}</script>',
+            $formId
+        );
 
         return sprintf(
             '<form id="%s" action="%s" method="POST">%s</form>%s',

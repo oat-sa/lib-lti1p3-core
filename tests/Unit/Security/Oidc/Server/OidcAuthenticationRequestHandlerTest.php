@@ -65,7 +65,7 @@ class OidcAuthenticationRequestHandlerTest extends TestCase
 
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals(
-            '<form id="launch_0e7d4b4c23fd7b077aba0602246820ff" action="http://example.com" method="POST"><input type="hidden" name="parameter" value="value"/></form><script>document.getElementById("launch_0e7d4b4c23fd7b077aba0602246820ff").submit();</script>',
+            '<form id="launch_0e7d4b4c23fd7b077aba0602246820ff" action="http://example.com" method="POST"><input type="hidden" name="parameter" value="value"/></form><script>window.onload=function(){document.getElementById("launch_0e7d4b4c23fd7b077aba0602246820ff").submit()}</script>',
             (string)$response->getBody()
         );
     }
