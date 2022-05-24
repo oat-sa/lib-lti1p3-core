@@ -519,6 +519,26 @@ class LtiServiceClientTest extends TestCase
         $this->subject->request($this->registration, 'GET', 'http://example.com', [], $scopes);
     }
 
+    public function testItThrowsAnLtiExceptionOnNullPlatformAudience(): void
+    {
+        $this->expectException(LtiException::class);
+        $this->expectExceptionMessage('Cannot generate credentials: Platform audience cannot be null');
+
+        $this->registration = $this->createTestRegistrationWithoutPlatformAudience();
+
+        $this->subject->request($this->registration, 'GET', 'http://example.com');
+    }
+
+    public function testItThrowsAnLtiExceptionOnNullPlatformOAuth2AccessTokenUrl(): void
+    {
+        $this->expectException(LtiException::class);
+        $this->expectExceptionMessage('Cannot generate credentials: Platform OAuth2 access token url cannot be null');
+
+        $this->registration = $this->createTestRegistrationWithoutPlatformOAuth2AccessTokenUrl();
+
+        $this->subject->request($this->registration, 'GET', 'http://example.com');
+    }
+
     private function generateAccessTokenCacheKey(RegistrationInterface $registration, array $scopes = []): string
     {
         return sprintf(
