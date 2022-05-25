@@ -197,6 +197,60 @@ trait DomainTestingTrait
         );
     }
 
+    private function createTestRegistrationWithoutPlatformAudience(
+        string $identifier = 'registrationIdentifier',
+        string $clientId = 'registrationClientId',
+        string $platformJwksUrl = 'http://platform.com/jwks',
+        string $toolJwksUrl = 'http://tool.com/jwks'
+    ): Registration {
+        $tool = $this->createTestTool();
+
+        return new Registration(
+            $identifier,
+            $clientId,
+            new Platform(
+                'platformIdentifier',
+                'platformName',
+                '',
+                'http://platform.com/oidc-auth',
+                'http://platform.com/access-token'
+            ),
+            $this->createTestTool(),
+            ['deploymentIdentifier'],
+            $this->createTestKeyChain('platformKeyChain'),
+            $this->createTestKeyChain('toolKeyChain'),
+            $platformJwksUrl,
+            $toolJwksUrl
+        );
+    }
+
+    private function createTestRegistrationWithoutPlatformOAuth2AccessTokenUrl(
+        string $identifier = 'registrationIdentifier',
+        string $clientId = 'registrationClientId',
+        string $platformJwksUrl = 'http://platform.com/jwks',
+        string $toolJwksUrl = 'http://tool.com/jwks'
+    ): Registration {
+        $tool = $this->createTestTool();
+
+        return new Registration(
+            $identifier,
+            $clientId,
+            new Platform(
+                'platformIdentifier',
+                'platformName',
+                'platformAudience',
+                'http://platform.com/oidc-auth',
+                null
+            ),
+            $this->createTestTool(),
+            ['deploymentIdentifier'],
+            $this->createTestKeyChain('platformKeyChain'),
+            $this->createTestKeyChain('toolKeyChain'),
+            $platformJwksUrl,
+            $toolJwksUrl
+        );
+    }
+
     private function createTestRegistrationRepository(array $registrations = []): RegistrationRepositoryInterface
     {
         $registrations = !empty($registrations)

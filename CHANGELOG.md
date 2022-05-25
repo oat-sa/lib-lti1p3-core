@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+Unreleased
+-----
+
+* Added AUD claim validation in `LtiServiceClient`
+
 6.7.1
 -----
 
