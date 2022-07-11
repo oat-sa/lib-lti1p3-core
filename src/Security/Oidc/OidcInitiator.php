@@ -50,7 +50,8 @@ class OidcInitiator
     /** @var MessagePayloadBuilderInterface */
     private $builder;
 
-    private bool $isRemoveDynamicRedirectUriPart;
+    /** @var MessagePayloadBuilderInterface */
+    private $isRemoveDynamicRedirectUriPart;
 
     public function __construct(
         RegistrationRepositoryInterface $repository,
