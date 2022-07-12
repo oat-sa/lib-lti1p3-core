@@ -51,18 +51,18 @@ class OidcInitiator
     private $builder;
 
     /** @var MessagePayloadBuilderInterface */
-    private $isRemoveDynamicRedirectUriPart;
+    private $staticRedirectUri;
 
     public function __construct(
         RegistrationRepositoryInterface $repository,
         ?NonceGeneratorInterface $generator = null,
         ?MessagePayloadBuilderInterface $builder = null,
-        bool $isRemoveDynamicRedirectUriPart = false
+        ?string $staticRedirectUri = null
     ) {
         $this->repository = $repository;
         $this->generator = $generator ?? new NonceGenerator();
         $this->builder = $builder ?? new MessagePayloadBuilder();
-        $this->isRemoveDynamicRedirectUriPart = $isRemoveDynamicRedirectUriPart;
+        $this->staticRedirectUri = $staticRedirectUri;
     }
 
     /**
@@ -108,12 +108,12 @@ class OidcInitiator
                 ->withClaim(LtiMessagePayloadInterface::CLAIM_PARAMETERS, $oidcRequest->getParameters());
 
             $statePayload = $this->builder->buildMessagePayload($toolKeyChain);
-            $redirectUri  = $oidcRequest->getParameters()->getMandatory('target_link_uri');
+            $redirectUri  = $this->staticRedirectUri?: $oidcRequest->getParameters()->getMandatory('target_link_uri');
 
             return new LtiMessage(
                 $registration->getPlatform()->getOidcAuthenticationUrl(),
                 [
-                    'redirect_uri' => $this->removeDynamicUriPart($redirectUri),
+                    'redirect_uri' => $redirectUri,
                     'client_id' => $registration->getClientId(),
                     'login_hint' => $oidcRequest->getParameters()->getMandatory('login_hint'),
                     'nonce' => $nonce->getValue(),
@@ -135,22 +135,5 @@ class OidcInitiator
                 $exception
             );
         }
-    }
-
-    /**
-     * If class configured to remove dynamic parameters part from url end
-     *
-     * @params string $urlPartsDelimiter - could be set to # if dynamic part given as fragment
-     */
-    private function removeDynamicUriPart(string $uri, string $urlPartsDelimiter = '/'): string
-    {
-        if (!$this->isRemoveDynamicRedirectUriPart) {
-            return $uri;
-        }
-
-        $uriParts = explode($urlPartsDelimiter, $uri);
-        $hashPart = array_pop($uriParts);
-
-        return ctype_xdigit($hashPart) ? rtrim(implode($urlPartsDelimiter, $uriParts), $urlPartsDelimiter) : $uri;
     }
 }
