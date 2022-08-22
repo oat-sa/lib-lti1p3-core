@@ -85,7 +85,8 @@ class ConfigurationFactory
     private function convertKey(?KeyInterface $key = null): Key
     {
         if (null === $key) {
-            return InMemory::plainText('');
+            /** @psalm-suppress UndefinedMethod */
+            try { return InMemory::empty(); } catch (\Throwable $t) { return InMemory::plainText(''); }
         }
 
         return $this->converter->convert($key);
