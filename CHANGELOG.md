@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+6.7.2
+-----
+
+* Fixed AUD claim validation in `LtiServiceClient`
+* Fixed empty validation key assignment to the security configuration
+
 6.7.1
 -----
 

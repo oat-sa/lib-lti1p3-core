@@ -25,6 +25,7 @@ namespace OAT\Library\Lti1p3Core\Service\Client;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
+use InvalidArgumentException;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
@@ -195,6 +196,14 @@ class LtiServiceClient implements LtiServiceClientInterface
 
             if (null === $toolKeyChain) {
                 throw new LtiException('Tool key chain is not configured');
+            }
+
+            if ($registration->getPlatform()->getAudience() === '') {
+                throw new InvalidArgumentException('Platform audience cannot be null');
+            }
+
+            if ($registration->getPlatform()->getOAuth2AccessTokenUrl() === null) {
+                throw new InvalidArgumentException('Platform OAuth2 access token url cannot be null');
             }
 
             $token = $this->builder->build(
