@@ -88,11 +88,19 @@ class ToolLaunchValidator extends AbstractLaunchValidator implements ToolLaunchV
                 ->validatePayloadVersion($payload)
                 ->validatePayloadMessageType($payload)
                 ->validatePayloadRoles($payload)
-                ->validatePayloadUserIdentifier($payload)
-                ->validatePayloadNonce($payload)
+                ->validatePayloadUserIdentifier($payload);
+
+            if ($this->isNonceValidationRequired()) {
+                $this->validatePayloadNonce($payload);
+            }
+
+            $this
                 ->validatePayloadDeploymentId($registration, $payload)
-                ->validatePayloadLaunchMessageTypeSpecifics($payload)
-                ->validateStateToken($registration, $state);
+                ->validatePayloadLaunchMessageTypeSpecifics($payload);
+
+            if ($this->isStateValidationRequired()) {
+                $this->validateStateToken($registration, $state);
+            }
 
             return new LaunchValidationResult($registration, $payload, $state, $this->successes);
 
