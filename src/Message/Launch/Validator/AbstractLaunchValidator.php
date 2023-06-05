@@ -52,10 +52,10 @@ abstract class AbstractLaunchValidator implements LaunchValidatorInterface
     protected $successes = [];
 
     /** @var bool */
-    protected bool $isStateValidationRequired = true;
+    protected $isStateValidationRequired = true;
 
     /** @var bool */
-    protected bool $isNonceValidationRequired = true;
+    protected $isNonceValidationRequired = true;
 
     public function __construct(
         RegistrationRepositoryInterface $registrationRepository,
