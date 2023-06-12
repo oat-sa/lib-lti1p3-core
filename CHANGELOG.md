@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.8.0
+-----
+
+* Allowed setting custom JWT TTL
+
 6.7.2
 -----
 

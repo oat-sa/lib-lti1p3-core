@@ -14,6 +14,10 @@ jobs:
         include:
         - php: 8.0
           coverage: "false" # PHPUnit 8.5.14 doesn't support code coverage under PHP 8
+        - php: 8.1
+          coverage: "false" # PHPUnit 8.5.14 doesn't support code coverage under PHP 8
+        - php: 8.2
+          coverage: "false" # PHPUnit 8.5.14 doesn't support code coverage under PHP 8
 
     steps:
     - name: Checkout
@@ -39,7 +43,7 @@ jobs:
     - name: Psalm
       run: |
         ./vendor/bin/psalm --shepherd
-    
+
     - name: Coveralls
       if: ${{ matrix.coverage == 'true' }}
       env:

@@ -42,10 +42,17 @@ class Builder implements BuilderInterface
     /** @var IdGeneratorInterface */
     private $generator;
 
-    public function __construct(?ConfigurationFactory $factory = null, ?IdGeneratorInterface $generator = null)
-    {
+    /** @var int */
+    private $messageTtl;
+
+    public function __construct(
+        ?ConfigurationFactory $factory = null,
+        ?IdGeneratorInterface $generator = null,
+        int $messageTtl = MessagePayloadInterface::TTL
+    ) {
         $this->factory = $factory ?? new ConfigurationFactory();
         $this->generator = $generator ?? new IdGenerator();
+        $this->messageTtl = $messageTtl;
     }
 
     /**
@@ -68,7 +75,7 @@ class Builder implements BuilderInterface
                     MessagePayloadInterface::CLAIM_JTI => $this->generator->generate(),
                     MessagePayloadInterface::CLAIM_IAT => $now->toDateTimeImmutable(),
                     MessagePayloadInterface::CLAIM_NBF => $now->toDateTimeImmutable(),
-                    MessagePayloadInterface::CLAIM_EXP => $now->addSeconds(MessagePayloadInterface::TTL)->toDateTimeImmutable(),
+                    MessagePayloadInterface::CLAIM_EXP => $now->addSeconds($this->messageTtl)->toDateTimeImmutable(),
                 ]
             );
 
