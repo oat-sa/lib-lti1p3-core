@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Integration\Message\Launch\Validator\Tool;
 
 use Carbon\Carbon;
+use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuilder;
 use OAT\Library\Lti1p3Core\Message\Launch\Validator\Result\LaunchValidationResultInterface;
 use OAT\Library\Lti1p3Core\Message\Launch\Validator\Tool\ToolLaunchValidator;
@@ -40,6 +41,7 @@ use OAT\Library\Lti1p3Core\Security\Oidc\OidcInitiator;
 use OAT\Library\Lti1p3Core\Tests\Traits\OidcTestingTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
+use ReflectionProperty;
 
 class ToolLaunchValidatorTest extends TestCase
 {
@@ -93,7 +95,6 @@ class ToolLaunchValidatorTest extends TestCase
             $this->subject->getSupportedMessageTypes()
         );
     }
-
     public function testValidatePlatformOriginatingLaunchForLtiResourceLinkSuccess(): void
     {
         $message = $this->builder->buildPlatformOriginatingLaunch(
@@ -128,6 +129,62 @@ class ToolLaunchValidatorTest extends TestCase
                 'ID token deployment_id claim valid for this registration',
                 'ID token message type claim LtiResourceLinkRequest requirements are valid',
                 'State validation success',
+            ],
+            $result->getSuccesses()
+        );
+
+        $this->assertEquals('identifier', $result->getPayload()->getResourceLink()->getIdentifier());
+    }
+
+    /**
+     * @throws LtiExceptionInterface
+     */
+    public function testValidatePlatformOriginatingLaunchWithoutNonceAndStateValidationsLinkSuccess(): void
+    {
+        $isStateValidationRequiredProperty = new ReflectionProperty(
+            ToolLaunchValidator::class,
+            "isStateValidationRequired"
+        );
+        $isStateValidationRequiredProperty->setAccessible(true);
+        $isStateValidationRequiredProperty->setValue($this->subject, false);
+
+        $isNonceValidationRequiredProperty = new ReflectionProperty(
+            ToolLaunchValidator::class,
+            "isNonceValidationRequired"
+        );
+        $isNonceValidationRequiredProperty->setAccessible(true);
+        $isNonceValidationRequiredProperty->setValue($this->subject, false);
+
+        $message = $this->builder->buildPlatformOriginatingLaunch(
+            $this->registration,
+            LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
+            $this->registration->getTool()->getLaunchUrl(),
+            'loginHint',
+            null,
+            [],
+            [
+                new ResourceLinkClaim('identifier')
+            ]
+        );
+
+        $result = $this->subject->validatePlatformOriginatingLaunch($this->buildOidcFlowRequest($message));
+
+        $this->assertInstanceOf(LaunchValidationResultInterface::class, $result);
+        $this->assertFalse($result->hasError());
+
+        $this->verifyJwt($result->getPayload()->getToken(), $this->registration->getPlatformKeyChain()->getPublicKey());
+        $this->verifyJwt($result->getState()->getToken(), $this->registration->getToolKeyChain()->getPublicKey());
+
+        $this->assertEquals(
+            [
+                'ID token kid header is provided',
+                'ID token validation success',
+                'ID token version claim is valid',
+                'ID token message_type claim is valid',
+                'ID token roles claim is valid',
+                'ID token user identifier (sub) claim is valid',
+                'ID token deployment_id claim valid for this registration',
+                'ID token message type claim LtiResourceLinkRequest requirements are valid',
             ],
             $result->getSuccesses()
         );
