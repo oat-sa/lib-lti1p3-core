@@ -51,6 +51,12 @@ abstract class AbstractLaunchValidator implements LaunchValidatorInterface
     /** @var string[] */
     protected $successes = [];
 
+    /** @var bool */
+    protected $isStateValidationRequired = true;
+
+    /** @var bool */
+    protected $isNonceValidationRequired = true;
+
     public function __construct(
         RegistrationRepositoryInterface $registrationRepository,
         NonceRepositoryInterface $nonceRepository,
@@ -77,5 +83,15 @@ abstract class AbstractLaunchValidator implements LaunchValidatorInterface
         $this->successes = [];
 
         return $this;
+    }
+
+    public function isStateValidationRequired(): bool
+    {
+        return $this->isStateValidationRequired;
+    }
+
+    public function isNonceValidationRequired(): bool
+    {
+        return $this->isNonceValidationRequired;
     }
 }
