@@ -14,7 +14,7 @@
         "nesbot/carbon": "^2.43",
         "nyholm/psr7": "^1.3",
         "php-http/message-factory": "^1.1",
-        "phpseclib/phpseclib": "^2.0.31",
+        "phpseclib/phpseclib": "^3.0.34",
         "psr/cache": "^1.0 || ^2.0 || ^3.0",
         "psr/http-message": "^1.0",
         "psr/http-server-handler": "^1.0",
