@@ -22,8 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Security\Jwks\Server;
 
-use Http\Message\ResponseFactory;
-use Nyholm\Psr7\Factory\HttplugFactory;
+use Nyholm\Psr7\Response;
 use OAT\Library\Lti1p3Core\Security\Jwks\Exporter\JwksExporter;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
@@ -38,19 +37,14 @@ class JwksRequestHandler
     /** @var JwksExporter */
     private $exporter;
 
-    /** @var ResponseFactory */
-    private $factory;
-
     /** @var LoggerInterface */
     private $logger;
 
     public function __construct(
         JwksExporter $exporter,
-        ?ResponseFactory $factory = null,
         ?LoggerInterface $logger = null
     ) {
         $this->exporter = $exporter;
-        $this->factory = $factory ?? new HttplugFactory();
         $this->logger = $logger ?? new NullLogger();
     }
 
@@ -64,12 +58,12 @@ class JwksRequestHandler
                 'Content-Length' => strlen($body)
             ];
 
-            return $this->factory->createResponse(200, null, $headers, $body);
+            return new Response(200, $headers, $body);
 
         } catch (Throwable $exception) {
             $this->logger->error(sprintf('Error during JWKS server handling: %s', $exception->getMessage()));
 
-            return $this->factory->createResponse(500, null, [], 'Internal JWKS server error');
+            return new Response(500, [], 'Internal JWKS server error');
         }
     }
 }

@@ -78,7 +78,7 @@ class LtiServiceServerTest extends TestCase
             ['scope']
         );
 
-        $subject = new LtiServiceServer($this->validator, $handler, null, $this->logger);
+        $subject = new LtiServiceServer($this->validator, $handler, $this->logger);
 
         $response = $subject->handle($serviceRequest);
 
@@ -101,7 +101,7 @@ class LtiServiceServerTest extends TestCase
             ['GET']
         );
 
-        $subject = new LtiServiceServer($this->validator, $handler, null, $this->logger);
+        $subject = new LtiServiceServer($this->validator, $handler, $this->logger);
 
         $response = $subject->handle($serviceRequest);
 
@@ -128,7 +128,7 @@ class LtiServiceServerTest extends TestCase
             ['POST']
         );
 
-        $subject = new LtiServiceServer($this->validator, $handler, null, $this->logger);
+        $subject = new LtiServiceServer($this->validator, $handler, $this->logger);
 
         $response = $subject->handle($serviceRequest);
 
@@ -164,7 +164,7 @@ class LtiServiceServerTest extends TestCase
             ['scope']
         );
 
-        $subject = new LtiServiceServer($this->validator, $handler, null, $this->logger);
+        $subject = new LtiServiceServer($this->validator, $handler, $this->logger);
 
         $response = $subject->handle($serviceRequest);
 
@@ -197,7 +197,7 @@ class LtiServiceServerTest extends TestCase
             ['scope']
         );
 
-        $subject = new LtiServiceServer($this->validator, $handler, null, $this->logger);
+        $subject = new LtiServiceServer($this->validator, $handler, $this->logger);
 
         $response = $subject->handle($serviceRequest);
 

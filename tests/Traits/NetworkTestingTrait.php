@@ -22,8 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Traits;
 
-use Nyholm\Psr7\Factory\HttplugFactory;
 use Nyholm\Psr7\Factory\Psr17Factory;
+use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -56,6 +56,6 @@ trait NetworkTestingTrait
 
     private function createResponse($content = null, int $statusCode = 200, array $headers = []): ResponseInterface
     {
-        return (new HttplugFactory())->createResponse($statusCode, null, $headers, $content);
+        return new Response($statusCode, $headers, $content);
     }
 }
