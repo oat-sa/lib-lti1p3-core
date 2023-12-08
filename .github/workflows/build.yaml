@@ -9,15 +9,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [7.2, 7.3, 7.4]
+        php: [8.0, 8.1, 8.2, 8.3]
         coverage: ["true"]
-        include:
-        - php: 8.0
-          coverage: "false" # PHPUnit 8.5.14 doesn't support code coverage under PHP 8
-        - php: 8.1
-          coverage: "false" # PHPUnit 8.5.14 doesn't support code coverage under PHP 8
-        - php: 8.2
-          coverage: "false" # PHPUnit 8.5.14 doesn't support code coverage under PHP 8
 
     steps:
     - name: Checkout
