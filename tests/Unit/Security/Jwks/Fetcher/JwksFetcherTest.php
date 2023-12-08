@@ -74,16 +74,13 @@ class JwksFetcherTest extends TestCase
         $exporter = new JwksExporter(new KeyChainRepository([$keyChain]));
 
         $this->cacheMock
-            ->expects($this->at(0))
+            ->expects($this->exactly(2))
             ->method('getItem')
             ->with($cacheKey)
-            ->willThrowException(new Exception('cache fetch error'));
-
-        $this->cacheMock
-            ->expects($this->at(1))
-            ->method('getItem')
-            ->with($cacheKey)
-            ->willReturn(new CacheItem($cacheKey));
+            ->willReturnOnConsecutiveCalls(
+                $this->throwException(new Exception('cache fetch error')),
+                new CacheItem($cacheKey)
+            );
 
         $this->cacheMock
             ->expects($this->once())
