@@ -22,8 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Security\Oidc\Server;
 
-use Http\Message\ResponseFactory;
-use Nyholm\Psr7\Factory\HttplugFactory;
+use Nyholm\Psr7\Response;
 use OAT\Library\Lti1p3Core\Security\Oidc\OidcInitiator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -40,19 +39,14 @@ class OidcInitiationRequestHandler implements RequestHandlerInterface
     /** @var OidcInitiator */
     private $initiator;
 
-    /** @var ResponseFactory */
-    private $factory;
-
     /** @var LoggerInterface */
     private $logger;
 
     public function __construct(
         OidcInitiator $initiator,
-        ?ResponseFactory $factory = null,
         ?LoggerInterface $logger = null
     ) {
         $this->initiator = $initiator;
-        $this->factory = $factory ?? new HttplugFactory();
         $this->logger = $logger ?? new NullLogger();
     }
 
@@ -61,12 +55,12 @@ class OidcInitiationRequestHandler implements RequestHandlerInterface
         try {
             $message = $this->initiator->initiate($request);
 
-            return $this->factory->createResponse(302, null, ['Location' => $message->toUrl()]);
+            return new Response(302, ['Location' => $message->toUrl()]);
 
         } catch (Throwable $exception) {
             $this->logger->error($exception->getMessage());
 
-            return $this->factory->createResponse(500, null, [], 'Internal OIDC initiation server error');
+            return new Response(500, [], 'Internal OIDC initiation server error');
         }
     }
 }

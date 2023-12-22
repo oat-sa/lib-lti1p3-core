@@ -22,8 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Security\Oidc\Server;
 
-use Http\Message\ResponseFactory;
-use Nyholm\Psr7\Factory\HttplugFactory;
+use Nyholm\Psr7\Response;
 use OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -40,19 +39,14 @@ class OidcAuthenticationRequestHandler implements RequestHandlerInterface
     /** @var OidcAuthenticator */
     private $authenticator;
 
-    /** @var ResponseFactory */
-    private $factory;
-
     /** @var LoggerInterface */
     private $logger;
 
     public function __construct(
         OidcAuthenticator $authenticator,
-        ?ResponseFactory $factory = null,
         ?LoggerInterface $logger = null
     ) {
         $this->authenticator = $authenticator;
-        $this->factory = $factory ?? new HttplugFactory();
         $this->logger = $logger ?? new NullLogger();
     }
 
@@ -61,12 +55,12 @@ class OidcAuthenticationRequestHandler implements RequestHandlerInterface
         try {
             $message = $this->authenticator->authenticate($request);
 
-            return $this->factory->createResponse(200, null, [], $message->toHtmlRedirectForm());
+            return new Response(200, [], $message->toHtmlRedirectForm());
 
         } catch (Throwable $exception) {
             $this->logger->error($exception->getMessage());
 
-            return $this->factory->createResponse(500, null, [], 'Internal OIDC authentication server error');
+            return new Response(500, [], 'Internal OIDC authentication server error');
         }
     }
 }

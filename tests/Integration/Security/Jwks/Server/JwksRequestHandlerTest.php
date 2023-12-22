@@ -71,7 +71,7 @@ class JwksRequestHandlerTest extends TestCase
 
         $logger = new TestLogger();
 
-        $subject = new JwksRequestHandler($exporterMock, null, $logger);
+        $subject = new JwksRequestHandler($exporterMock, $logger);
 
         $response = $subject->handle('keySetName');
 

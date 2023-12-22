@@ -22,8 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Service\Server;
 
-use Http\Message\ResponseFactory;
-use Nyholm\Psr7\Factory\HttplugFactory;
+use Nyholm\Psr7\Response;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\RequestAccessTokenValidatorInterface;
 use OAT\Library\Lti1p3Core\Service\Server\Handler\LtiServiceServerRequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -41,21 +40,16 @@ class LtiServiceServer implements RequestHandlerInterface
     /** @var LtiServiceServerRequestHandlerInterface */
     private $handler;
 
-    /** @var ResponseFactory */
-    private $factory;
-
     /** @var LoggerInterface */
     private $logger;
 
     public function __construct(
         RequestAccessTokenValidatorInterface $validator,
         LtiServiceServerRequestHandlerInterface $handler,
-        ?ResponseFactory $factory = null,
         ?LoggerInterface $logger = null
     ) {
         $this->validator = $validator;
         $this->handler = $handler;
-        $this->factory = $factory ?? new HttplugFactory();
         $this->logger = $logger ?? new NullLogger();
     }
 
@@ -67,7 +61,7 @@ class LtiServiceServer implements RequestHandlerInterface
             $message = sprintf('Not acceptable request method, accepts: [%s]', implode(', ', $allowedMethods));
             $this->logger->error($message);
 
-            return $this->factory->createResponse(405, null, [], $message);
+            return new Response(405, [], $message);
         }
 
         $allowedContentType = $this->handler->getAllowedContentType();
@@ -78,7 +72,7 @@ class LtiServiceServer implements RequestHandlerInterface
             $message = sprintf('Not acceptable request content type, accepts: %s', $allowedContentType);
             $this->logger->error($message);
 
-            return $this->factory->createResponse(406, null, [], $message);
+            return new Response(406, [], $message);
         }
 
         $validationResult = $this->validator->validate($request, $this->handler->getAllowedScopes());
@@ -86,7 +80,7 @@ class LtiServiceServer implements RequestHandlerInterface
         if ($validationResult->hasError()) {
             $this->logger->error($validationResult->getError());
 
-            return $this->factory->createResponse(401, null, [], $validationResult->getError());
+            return new Response(401, [], $validationResult->getError());
         }
 
         try {
@@ -99,9 +93,8 @@ class LtiServiceServer implements RequestHandlerInterface
         } catch (Throwable $exception) {
             $this->logger->error($exception->getMessage());
 
-            return $this->factory->createResponse(
+            return new Response(
                 500,
-                null,
                 [],
                 sprintf('Internal %s service error', $this->handler->getServiceName())
             );
