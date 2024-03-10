@@ -78,7 +78,6 @@ class Builder implements BuilderInterface
                     MessagePayloadInterface::CLAIM_EXP => $now->addSeconds($this->messageTtl)->toDateTimeImmutable(),
                 ]
             );
-
             foreach ($claims as $claimName => $claimValue) {
                 switch ($claimName) {
                     case MessagePayloadInterface::CLAIM_JTI:
