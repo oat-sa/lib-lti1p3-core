@@ -24,12 +24,12 @@ namespace OAT\Library\Lti1p3Core\Security\Jwt\Configuration;
 
 use Lcobucci\Clock\SystemClock;
 use Lcobucci\JWT\Configuration;
+use Lcobucci\JWT\Encoding\JoseEncoder;
 use Lcobucci\JWT\Signer\Key;
 use Lcobucci\JWT\Signer\Key\InMemory;
+use Lcobucci\JWT\Validation\Constraint\LooseValidAt;
 use Lcobucci\JWT\Validation\Constraint\SignedWith;
-use Lcobucci\JWT\Validation\Constraint\ValidAt;
 use OAT\Library\Lti1p3Core\Security\Jwt\Converter\KeyConverter;
-use OAT\Library\Lti1p3Core\Security\Jwt\Decoder\AssociativeDecoder;
 use OAT\Library\Lti1p3Core\Security\Jwt\Signer\SignerFactory;
 use OAT\Library\Lti1p3Core\Security\Key\KeyInterface;
 
@@ -51,18 +51,16 @@ class ConfigurationFactory
     {
         $algorithm = $this->findAlgorithm($signingKey, $verificationKey);
 
-        $decoder = class_exists('Lcobucci\JWT\Parsing\Decoder') ? new AssociativeDecoder() : null;
-
         $configuration = Configuration::forAsymmetricSigner(
             $this->factory->create($algorithm),
             $this->convertKey($signingKey),
             $this->convertKey($verificationKey),
-            null,
-            $decoder
+            new JoseEncoder(),
+            new JoseEncoder(),
         );
 
         $configuration->setValidationConstraints(
-            new ValidAt(SystemClock::fromUTC()),
+            new LooseValidAt(SystemClock::fromUTC()),
             new SignedWith($configuration->signer(), $configuration->verificationKey())
         );
 
@@ -85,9 +83,7 @@ class ConfigurationFactory
     private function convertKey(?KeyInterface $key = null): Key
     {
         if (null === $key) {
-            return method_exists(InMemory::class, 'empty')
-                ? InMemory::empty()
-                : InMemory::plainText('');
+            return InMemory::plainText('empty', 'empty');
         }
 
         return $this->converter->convert($key);
