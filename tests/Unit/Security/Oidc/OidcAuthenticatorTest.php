@@ -57,7 +57,7 @@ class OidcAuthenticatorTest extends TestCase
         $this->repositoryMock = $this->createMock(RegistrationRepositoryInterface::class);
         $this->authenticatorMock = $this->createMock(UserAuthenticatorInterface::class);
 
-        $this->subject= new OidcAuthenticator($this->repositoryMock, $this->authenticatorMock);
+        $this->subject = new OidcAuthenticator($this->repositoryMock, $this->authenticatorMock);
     }
 
     public function testAuthenticationSuccess(): void
@@ -73,6 +73,7 @@ class OidcAuthenticatorTest extends TestCase
             [
                 LtiMessagePayloadInterface::CLAIM_LTI_TARGET_LINK_URI => 'target_link_uri',
                 LtiMessagePayloadInterface::CLAIM_REGISTRATION_ID => $registration->getIdentifier(),
+                LtiMessagePayloadInterface::CLAIM_NONCE => 'nonce',
 
             ],
             $registration->getToolKeyChain()->getPrivateKey()
@@ -105,6 +106,10 @@ class OidcAuthenticatorTest extends TestCase
         $this->assertEquals(
             $registration->getIdentifier(),
             $idToken->getClaims()->get(LtiMessagePayloadInterface::CLAIM_REGISTRATION_ID)
+        );
+        $this->assertEquals(
+            'nonce',
+            $idToken->getClaims()->get(LtiMessagePayloadInterface::CLAIM_NONCE)
         );
     }
 
