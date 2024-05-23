@@ -64,7 +64,7 @@ class MessagePayloadBuilder implements MessagePayloadBuilderInterface
 
     public function withClaims(array $claims): MessagePayloadBuilderInterface
     {
-        foreach ($claims as $claimName => $claimValue){
+        foreach ($claims as $claimName => $claimValue) {
             if (is_a($claimValue, MessagePayloadClaimInterface::class)) {
                 $this->withClaim($claimValue);
             } else {
@@ -104,15 +104,13 @@ class MessagePayloadBuilder implements MessagePayloadBuilderInterface
                 MessagePayloadInterface::HEADER_KID => $keyChain->getIdentifier()
             ];
 
-            $claims = array_merge(
-                $this->claims->all(),
-                [
-                    MessagePayloadInterface::CLAIM_NONCE => $this->generator->generate()->getValue()
-                ]
-            );
+            $claims = $this->claims->all();
+            // Do not generate a new nonce when one is already present (fixes issue #154)
+            if (!$this->claims->has(MessagePayloadInterface::CLAIM_NONCE)) {
+                $claims[MessagePayloadInterface::CLAIM_NONCE] = $this->generator->generate()->getValue();
+            }
 
             return $this->builder->build($headers, $claims, $keyChain->getPrivateKey());
-
         } catch (Throwable $exception) {
             throw new LtiException(
                 sprintf('Cannot generate message token: %s', $exception->getMessage()),
