@@ -61,7 +61,7 @@ class Builder implements BuilderInterface
     public function build(array $headers, array $claims, KeyInterface $key): TokenInterface
     {
         try {
-            $now = Carbon::now();
+            $now = Carbon::now()->setMicrosecond(0);
             $config = $this->factory->create($key);
             $builder = $config->builder();
 
