@@ -261,4 +261,11 @@ class LtiMessagePayload extends MessagePayload implements LtiMessagePayloadInter
     {
         return $this->getClaim(BasicOutcomeClaim::class);
     }
+
+    public function getLtiTokenExpired(): bool
+    {
+        $exp = $this->getMandatoryClaim(static::CLAIM_EXP);
+
+        return time() - $exp;
+    }
 }

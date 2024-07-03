@@ -157,4 +157,6 @@ interface LtiMessagePayloadInterface extends MessagePayloadInterface
     public function getNrps(): ?NrpsClaim;
 
     public function getBasicOutcome(): ?BasicOutcomeClaim;
+
+    public function getLtiTokenExpired(): bool;
 }
