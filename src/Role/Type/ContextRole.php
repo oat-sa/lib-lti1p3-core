@@ -114,7 +114,8 @@ class ContextRole extends AbstractRole
                'SystemAdministrator',
            ],
            'ContentDeveloper' => [
-               'ContentDeveloper',
+	       'ContentDeveloper',
+	       'ContentCreator',
                'ContentExpert',
                'ExternalContentExpert',
                'Librarian',
