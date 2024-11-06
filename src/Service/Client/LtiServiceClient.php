@@ -211,7 +211,7 @@ class LtiServiceClient implements LtiServiceClientInterface
                     MessagePayloadInterface::HEADER_KID => $toolKeyChain->getIdentifier()
                 ],
                 [
-                    MessagePayloadInterface::CLAIM_ISS => $registration->getTool()->getAudience(),
+                    MessagePayloadInterface::CLAIM_ISS => $registration->getClientId(),
                     MessagePayloadInterface::CLAIM_SUB => $registration->getClientId(),
                     MessagePayloadInterface::CLAIM_AUD => [
                         $registration->getPlatform()->getAudience(),

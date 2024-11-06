@@ -89,7 +89,7 @@ trait SecurityTestingTrait
                 MessagePayloadInterface::HEADER_KID => $registration->getToolKeyChain()->getIdentifier()
             ],
             [
-                MessagePayloadInterface::CLAIM_ISS => $registration->getTool()->getAudience(),
+                MessagePayloadInterface::CLAIM_ISS => $registration->getClientId(),
                 MessagePayloadInterface::CLAIM_SUB => $registration->getClientId(),
                 MessagePayloadInterface::CLAIM_AUD => [
                     $registration->getPlatform()->getAudience(),
