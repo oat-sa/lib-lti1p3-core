@@ -108,6 +108,12 @@ class OidcAuthenticator
                 ->withClaim(LtiMessagePayloadInterface::CLAIM_ISS, $registration->getPlatform()->getAudience())
                 ->withClaim(LtiMessagePayloadInterface::CLAIM_AUD, $registration->getClientId());
 
+            // If the original request contained a nonce, add it to the payload (fixes #154)
+            $nonce = $oidcRequest->getParameters()->get('nonce');
+            if ($nonce) {
+                $this->builder->withClaim(LtiMessagePayloadInterface::CLAIM_NONCE, $nonce);
+            }
+
             if (!$authenticationResult->isAnonymous()) {
                 foreach ($authenticationResult->getUserIdentity()->normalize() as $claimName => $claimValue) {
                     $this->builder->withClaim($claimName, $claimValue);
@@ -123,7 +129,6 @@ class OidcAuthenticator
                     'state' => $oidcRequest->getParameters()->getMandatory('state')
                 ]
             );
-
         } catch (LtiExceptionInterface $exception) {
             throw $exception;
         } catch (Throwable $exception) {
