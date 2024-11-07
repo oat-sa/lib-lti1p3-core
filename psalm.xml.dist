@@ -51,16 +51,6 @@
                 <file name="src/Service/Server/LtiServiceServer.php"/>
             </errorLevel>
         </TypeDoesNotContainType>
-        <UndefinedClass>
-            <errorLevel type="suppress">
-                <file name="src/Security/Jwt/Decoder/AssociativeDecoder.php"/>
-            </errorLevel>
-        </UndefinedClass>
-        <UndefinedConstant>
-            <errorLevel type="suppress">
-                <file name="src/Security/Jwt/Decoder/AssociativeDecoder.php"/>
-            </errorLevel>
-        </UndefinedConstant>
         <RedundantCondition>
             <errorLevel type="suppress">
                 <file name="src/Message/LtiMessage.php"/>
