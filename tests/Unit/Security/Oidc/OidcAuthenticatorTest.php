@@ -24,6 +24,7 @@ namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\Oidc;
 
 use Carbon\Carbon;
 use Exception;
+use OAT\Library\Lti1p3Core\Exception\LtiBadRequestException;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
@@ -165,7 +166,7 @@ class OidcAuthenticatorTest extends TestCase
 
     public function testAuthenticationFailureOnExpiredMessageHint(): void
     {
-        $this->expectException(LtiException::class);
+        $this->expectException(LtiBadRequestException::class);
         $this->expectExceptionMessage('Invalid message hint');
 
         $registration = $this->createTestRegistration();
@@ -198,9 +199,19 @@ class OidcAuthenticatorTest extends TestCase
         $this->subject->authenticate($request);
     }
 
+    public function testAuthenticationFailureOnMissingMessageHint(): void
+    {
+        $this->expectException(LtiBadRequestException::class);
+        $this->expectExceptionMessage('Missing LTI message hint in request');
+
+        $request = $this->createServerRequest('GET','http://platform.com/init');
+
+        $this->subject->authenticate($request);
+    }
+
     public function testAuthenticationFailureOnRegistrationNotFound(): void
     {
-        $this->expectException(LtiException::class);
+        $this->expectException(LtiBadRequestException::class);
         $this->expectExceptionMessage('Invalid message hint registration id claim');
 
         $registration = $this->createTestRegistration();
