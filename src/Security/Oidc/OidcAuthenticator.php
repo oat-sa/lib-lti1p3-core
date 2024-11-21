@@ -85,7 +85,7 @@ class OidcAuthenticator
                 throw new LtiBadRequestException('Missing LTI message hint in request');
             }
 
-            $originalToken = $this->parser->parse($oidcRequest->getParameters()->get('lti_message_hint'));
+            $originalToken = $this->parser->parse($oidcRequest->getParameters()->getMandatory('lti_message_hint'));
 
             $registration = $this->repository->find(
                 $originalToken->getClaims()->getMandatory(LtiMessagePayloadInterface::CLAIM_REGISTRATION_ID)
