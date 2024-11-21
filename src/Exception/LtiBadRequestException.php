@@ -22,8 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Exception;
 
-use Exception;
-
-class LtiBadRequestException extends Exception implements LtiExceptionInterface
+class LtiBadRequestException extends LtiException implements LtiExceptionInterface
 {
 }
