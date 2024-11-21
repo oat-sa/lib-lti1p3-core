@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\Oidc;
 
 use Exception;
+use OAT\Library\Lti1p3Core\Exception\LtiBadRequestException;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
@@ -147,6 +148,16 @@ class OidcInitiatorTest extends TestCase
                 'client_id' => 'client_id'
             ]))
         );
+
+        $this->subject->initiate($request);
+    }
+
+    public function testInitiationFailureOnMissingMandatoryRequestParams(): void
+    {
+        $this->expectException(LtiBadRequestException::class);
+        $this->expectExceptionMessage('OIDC initiation request failed: Missing mandatory iss');
+
+        $request = $this->createServerRequest('GET','http://tool.com/init');
 
         $this->subject->initiate($request);
     }
