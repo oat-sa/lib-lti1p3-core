@@ -22,6 +22,8 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Security\Oidc;
 
+use InvalidArgumentException;
+use OAT\Library\Lti1p3Core\Exception\LtiBadRequestException;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessage;
@@ -121,6 +123,12 @@ class OidcInitiator
 
         } catch (LtiExceptionInterface $exception) {
             throw $exception;
+        } catch (InvalidArgumentException $exception) {
+            throw new LtiBadRequestException(
+                sprintf('OIDC initiation request failed: %s', $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         } catch (Throwable $exception) {
             throw new LtiException(
                 sprintf('OIDC initiation failed: %s', $exception->getMessage()),

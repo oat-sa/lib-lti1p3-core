@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Security\Oidc;
 
 use OAT\Library\Lti1p3Core\Exception\LtiException;
+use OAT\Library\Lti1p3Core\Exception\LtiBadRequestException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessage;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
@@ -80,18 +81,22 @@ class OidcAuthenticator
         try {
             $oidcRequest = LtiMessage::fromServerRequest($request);
 
-            $originalToken = $this->parser->parse($oidcRequest->getParameters()->get('lti_message_hint'));
+            if (!$oidcRequest->getParameters()->has('lti_message_hint')) {
+                throw new LtiBadRequestException('Missing LTI message hint in request');
+            }
+
+            $originalToken = $this->parser->parse($oidcRequest->getParameters()->getMandatory('lti_message_hint'));
 
             $registration = $this->repository->find(
                 $originalToken->getClaims()->getMandatory(LtiMessagePayloadInterface::CLAIM_REGISTRATION_ID)
             );
 
             if (null === $registration) {
-                throw new LtiException('Invalid message hint registration id claim');
+                throw new LtiBadRequestException('Invalid message hint registration id claim');
             }
 
             if (!$this->validator->validate($originalToken, $registration->getPlatformKeyChain()->getPublicKey())) {
-                throw new LtiException('Invalid message hint');
+                throw new LtiBadRequestException('Invalid message hint');
             }
 
             $authenticationResult = $this->authenticator->authenticate(
