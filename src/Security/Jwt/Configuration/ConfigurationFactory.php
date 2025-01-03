@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Security\Jwt\Configuration;
 
+use DateInterval;
 use Lcobucci\Clock\SystemClock;
 use Lcobucci\JWT\Configuration;
 use Lcobucci\JWT\Encoding\JoseEncoder;
@@ -60,7 +61,7 @@ class ConfigurationFactory
         );
 
         $configuration->setValidationConstraints(
-            new LooseValidAt(SystemClock::fromUTC()),
+            new LooseValidAt(SystemClock::fromUTC(), new DateInterval('PT1S')),
             new SignedWith($configuration->signer(), $configuration->verificationKey())
         );
 
