@@ -28,7 +28,7 @@ use OAT\Library\Lti1p3Core\Role\Type\ContextRole;
 use OAT\Library\Lti1p3Core\Role\Type\InstitutionRole;
 use OAT\Library\Lti1p3Core\Role\Type\LtiSystemRole;
 use OAT\Library\Lti1p3Core\Role\Type\SystemRole;
-use OAT\Library\Lti1p3Core\Role\Type\TaoRole;
+use OAT\Library\Lti1p3Core\Role\Type\CustomRole;
 
 class RoleFactory
 {
@@ -49,8 +49,12 @@ class RoleFactory
             return new LtiSystemRole($name);
         }
 
-        if (str_starts_with($name, TaoRole::getNameSpace())) {
-            return new TaoRole($name);
+        if (str_starts_with($name, ContextRole::getNameSpace())) {
+            return new ContextRole($name);
+        }
+
+        if (filter_var($name, FILTER_VALIDATE_URL)) {
+            return new CustomRole($name);
         }
 
         return new ContextRole($name);

@@ -27,7 +27,7 @@ use OAT\Library\Lti1p3Core\Role\AbstractRole;
 /**
  * @see https://www.imsglobal.org/node/162741#roles-claim
  */
-class TaoRole extends AbstractRole
+class CustomRole extends AbstractRole
 {
     public static function getType(): string
     {
@@ -36,7 +36,7 @@ class TaoRole extends AbstractRole
 
     public static function getNameSpace(): string
     {
-        return static::NAMESPACE_CUSTOM_TAO;
+        return '';
     }
 
     public function getSubName(): ?string

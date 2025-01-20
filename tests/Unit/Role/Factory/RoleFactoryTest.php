@@ -28,7 +28,7 @@ use OAT\Library\Lti1p3Core\Role\Type\ContextRole;
 use OAT\Library\Lti1p3Core\Role\Type\InstitutionRole;
 use OAT\Library\Lti1p3Core\Role\Type\LtiSystemRole;
 use OAT\Library\Lti1p3Core\Role\Type\SystemRole;
-use OAT\Library\Lti1p3Core\Role\Type\TaoRole;
+use OAT\Library\Lti1p3Core\Role\Type\CustomRole;
 use PHPUnit\Framework\TestCase;
 
 class RoleFactoryTest extends TestCase
@@ -97,7 +97,7 @@ class RoleFactoryTest extends TestCase
     {
         $result = RoleFactory::create('http://www.tao.lu/Ontologies/TAOLTI.rdf#ContentTranslator');
 
-        $this->assertInstanceOf(TaoRole::class, $result);
+        $this->assertInstanceOf(CustomRole::class, $result);
         $this->assertEquals('http://www.tao.lu/Ontologies/TAOLTI.rdf#ContentTranslator', $result->getName());
         $this->assertEquals('ContentTranslator', $result->getSubName());
         $this->assertFalse($result->isCore());
