@@ -28,6 +28,7 @@ use OAT\Library\Lti1p3Core\Role\Type\ContextRole;
 use OAT\Library\Lti1p3Core\Role\Type\InstitutionRole;
 use OAT\Library\Lti1p3Core\Role\Type\LtiSystemRole;
 use OAT\Library\Lti1p3Core\Role\Type\SystemRole;
+use OAT\Library\Lti1p3Core\Role\Type\CustomRole;
 
 class RoleFactory
 {
@@ -36,16 +37,24 @@ class RoleFactory
      */
     public static function create(string $name): RoleInterface
     {
-        if (strpos($name, SystemRole::getNameSpace()) === 0) {
+        if (str_starts_with($name, SystemRole::getNameSpace())) {
             return new SystemRole($name);
         }
 
-        if (strpos($name, InstitutionRole::getNameSpace()) === 0) {
+        if (str_starts_with($name, InstitutionRole::getNameSpace())) {
             return new InstitutionRole($name);
         }
 
-        if (strpos($name, LtiSystemRole::getNameSpace()) === 0) {
+        if (str_starts_with($name, LtiSystemRole::getNameSpace())) {
             return new LtiSystemRole($name);
+        }
+
+        if (str_starts_with($name, ContextRole::getNameSpace())) {
+            return new ContextRole($name);
+        }
+
+        if (filter_var($name, FILTER_VALIDATE_URL)) {
+            return new CustomRole($name);
         }
 
         return new ContextRole($name);

@@ -31,6 +31,7 @@ interface RoleInterface
     public const TYPE_INSTITUTION = 'institution';
     public const TYPE_CONTEXT = 'context';
     public const TYPE_LTI_SYSTEM = 'lti-system';
+    public const TYPE_CUSTOM_TAO = 'non-lti-custom';
 
     public const NAMESPACE_SYSTEM = 'http://purl.imsglobal.org/vocab/lis/v2/system/person';
     public const NAMESPACE_INSTITUTION = 'http://purl.imsglobal.org/vocab/lis/v2/institution/person';
