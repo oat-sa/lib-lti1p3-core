@@ -76,6 +76,9 @@ class ToolLaunchValidator extends AbstractLaunchValidator implements ToolLaunchV
                     $payload->getMandatoryClaim(MessagePayloadInterface::CLAIM_ISS),
                     $audience
                 );
+                if ($registration !== null) {
+                  break;
+                }
             }
 
             if (null === $registration) {
