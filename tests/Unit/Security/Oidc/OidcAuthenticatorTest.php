@@ -85,7 +85,8 @@ class OidcAuthenticatorTest extends TestCase
             sprintf('http://platform.com/init?%s', http_build_query([
                 'login_hint' => 'login_hint',
                 'lti_message_hint' => $messageHint->toString(),
-                'state' => 'state'
+                'state' => 'state',
+                'redirect_uri' => 'http://tool.com/redirect',
             ]))
         );
 
@@ -111,6 +112,10 @@ class OidcAuthenticatorTest extends TestCase
         $this->assertEquals(
             'nonce',
             $idToken->getClaims()->get(LtiMessagePayloadInterface::CLAIM_NONCE)
+        );
+        $this->assertEquals(
+            'http://tool.com/redirect',
+            $result->getUrl()
         );
     }
 
@@ -145,7 +150,8 @@ class OidcAuthenticatorTest extends TestCase
             sprintf('http://platform.com/init?%s', http_build_query([
                 'login_hint' => 'login_hint',
                 'lti_message_hint' => $messageHint->toString(),
-                'state' => 'state'
+                'state' => 'state',
+                'redirect_uri' => 'http://tool.com/redirect',
             ]))
         );
 
@@ -167,6 +173,113 @@ class OidcAuthenticatorTest extends TestCase
         $this->assertEquals('userMiddleName', $idToken->getClaims()->get(LtiMessagePayloadInterface::CLAIM_USER_MIDDLE_NAME));
         $this->assertEquals('userLocale', $idToken->getClaims()->get(LtiMessagePayloadInterface::CLAIM_USER_LOCALE));
         $this->assertEquals('userPicture', $idToken->getClaims()->get(LtiMessagePayloadInterface::CLAIM_USER_PICTURE));
+    }
+
+    public function testAuthenticationEmptyRedirectUri(): void
+    {
+        $this->expectException(LtiException::class);
+        $this->expectExceptionMessage('OIDC authentication failed: Missing mandatory redirect_uri');
+
+        $registration = $this->createTestRegistration();
+
+        $messageHint = $this->buildJwt(
+            [
+                MessagePayloadInterface::HEADER_KID => $registration->getToolKeyChain()->getIdentifier()
+            ],
+            [
+                MessagePayloadInterface::CLAIM_REGISTRATION_ID => $registration->getIdentifier()
+            ],
+            $registration->getToolKeyChain()->getPrivateKey()
+        );
+
+        $this->repositoryMock
+            ->expects($this->once())
+            ->method('find')
+            ->with($registration->getIdentifier())
+            ->willReturn($registration);
+
+        $request = $this->createServerRequest(
+            'GET',
+            sprintf('http://platform.com/init?%s', http_build_query([
+                'login_hint' => 'login_hint',
+                'lti_message_hint' => $messageHint->toString(),
+                'state' => 'state',
+            ]))
+        );
+
+        $this->subject->authenticate($request);
+    }
+
+    public function testAuthenticationMalformedRedirectUri(): void
+    {
+        $this->expectException(LtiBadRequestException::class);
+        $this->expectExceptionMessage('Invalid redirect_uri');
+
+        $registration = $this->createTestRegistration();
+
+        $messageHint = $this->buildJwt(
+            [
+                MessagePayloadInterface::HEADER_KID => $registration->getToolKeyChain()->getIdentifier()
+            ],
+            [
+                MessagePayloadInterface::CLAIM_REGISTRATION_ID => $registration->getIdentifier()
+            ],
+            $registration->getToolKeyChain()->getPrivateKey()
+        );
+
+        $this->repositoryMock
+            ->expects($this->once())
+            ->method('find')
+            ->with($registration->getIdentifier())
+            ->willReturn($registration);
+
+        $request = $this->createServerRequest(
+            'GET',
+            sprintf('http://platform.com/init?%s', http_build_query([
+                'login_hint' => 'login_hint',
+                'lti_message_hint' => $messageHint->toString(),
+                'state' => 'state',
+                'redirect_uri' => 'tool.com/redirect'
+            ]))
+        );
+
+        $this->subject->authenticate($request);
+    }
+
+    public function testAuthenticationMismatchingRedirectUri(): void
+    {
+        $this->expectException(LtiBadRequestException::class);
+        $this->expectExceptionMessage('Invalid redirect_uri');
+
+        $registration = $this->createTestRegistration();
+
+        $messageHint = $this->buildJwt(
+            [
+                MessagePayloadInterface::HEADER_KID => $registration->getToolKeyChain()->getIdentifier()
+            ],
+            [
+                MessagePayloadInterface::CLAIM_REGISTRATION_ID => $registration->getIdentifier()
+            ],
+            $registration->getToolKeyChain()->getPrivateKey()
+        );
+
+        $this->repositoryMock
+            ->expects($this->once())
+            ->method('find')
+            ->with($registration->getIdentifier())
+            ->willReturn($registration);
+
+        $request = $this->createServerRequest(
+            'GET',
+            sprintf('http://platform.com/init?%s', http_build_query([
+                'login_hint' => 'login_hint',
+                'lti_message_hint' => $messageHint->toString(),
+                'state' => 'state',
+                'redirect_uri' => 'http://tool.malicious.com/redirect'
+            ]))
+        );
+
+        $this->subject->authenticate($request);
     }
 
     public function testAuthenticationFailureOnExpiredMessageHint(): void
@@ -274,7 +387,8 @@ class OidcAuthenticatorTest extends TestCase
             'GET',
             sprintf('http://platform.com/init?%s', http_build_query([
                 'lti_message_hint' => $messageHint->toString(),
-                'login_hint' => 'login_hint'
+                'login_hint' => 'login_hint',
+                'redirect_uri' => 'http://tool.com/redirect',
             ]))
         );
 
