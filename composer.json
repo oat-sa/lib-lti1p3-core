@@ -24,8 +24,8 @@
         "cache/array-adapter": "^1.2",
         "phpunit/phpunit": "^9.6",
         "php-coveralls/php-coveralls": "^2.7",
-        "psalm/plugin-phpunit": "^0.15",
-        "vimeo/psalm": "^4.30"
+        "psalm/plugin-phpunit": "^0.19",
+        "vimeo/psalm": "^5.25 || ^6.8"
     },
     "autoload": {
         "psr-4": {
