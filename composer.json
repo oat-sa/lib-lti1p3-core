@@ -10,7 +10,7 @@
         "codercat/jwk-to-pem": "^1.1",
         "guzzlehttp/guzzle": "^7.8",
         "lcobucci/jwt": "^4.3",
-        "league/oauth2-server": "^8.5",
+        "league/oauth2-server": "^8.5 || ^9.2",
         "nesbot/carbon": "^2.72 || ^3.0",
         "nyholm/psr7": "^1.8",
         "phpseclib/phpseclib": "^3.0.37",
