@@ -45,9 +45,9 @@ trait SecurityTestingTrait
     private function createTestKeyChain(
         string $identifier = 'keyChainIdentifier',
         string $keySetName = 'keySetName',
-        string $publicKey = null,
-        string $privateKey = null,
-        string $privateKeyPassPhrase = null,
+        ?string $publicKey = null,
+        ?string $privateKey = null,
+        ?string $privateKeyPassPhrase = null,
         string $algorithm = KeyInterface::ALG_RS256
     ): KeyChainInterface {
         return (new KeyChainFactory)->create(
@@ -63,7 +63,7 @@ trait SecurityTestingTrait
     private function buildJwt(
         array $headers = [],
         array $claims = [],
-        KeyInterface $key = null
+        ?KeyInterface $key = null
     ): TokenInterface {
         return (new Builder(null, $this->createTestIdGenerator()))->build(
             $headers,
@@ -116,14 +116,14 @@ trait SecurityTestingTrait
         return $accessToken->toString();
     }
 
-    private function createTestIdGenerator(string $generatedId = null): IdGeneratorInterface
+    private function createTestIdGenerator(?string $generatedId = null): IdGeneratorInterface
     {
         return new class ($generatedId) implements IdGeneratorInterface
         {
             /** @var string */
             private $generatedId;
 
-            public function __construct(string $generatedId = null)
+            public function __construct(?string $generatedId = null)
             {
                 $this->generatedId = $generatedId ?? 'id';
             }

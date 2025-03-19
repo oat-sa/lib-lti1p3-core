@@ -224,7 +224,7 @@ class ClientRepositoryTest extends TestCase
         $this->assertTrue($this->logger->hasLog(LogLevel::ERROR, 'Invalid client_assertion JWT'));
     }
 
-    private function generateClientAssertion(RegistrationInterface $registration, string $audience = null): string
+    private function generateClientAssertion(RegistrationInterface $registration, ?string $audience = null): string
     {
         $assertion = $this->buildJwt(
             [

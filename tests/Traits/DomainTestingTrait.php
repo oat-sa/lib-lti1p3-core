@@ -92,13 +92,13 @@ trait DomainTestingTrait
     private function createTestRegistration(
         string $identifier = 'registrationIdentifier',
         string $clientId = 'registrationClientId',
-        PlatformInterface $platform = null,
-        ToolInterface $tool = null,
+        ?PlatformInterface $platform = null,
+        ?ToolInterface $tool = null,
         array $deploymentIds = ['deploymentIdentifier'],
-        KeyChainInterface $platformKeyChain = null,
-        KeyChainInterface $toolKeyChain = null,
-        string $platformJwksUrl = null,
-        string $toolJwksUrl = null
+        ?KeyChainInterface $platformKeyChain = null,
+        ?KeyChainInterface $toolKeyChain = null,
+        ?string $platformJwksUrl = null,
+        ?string $toolJwksUrl = null
     ): Registration {
         return new Registration(
             $identifier,
@@ -116,12 +116,12 @@ trait DomainTestingTrait
     private function createTestRegistrationWithoutDeploymentId(
         string $identifier = 'registrationIdentifier',
         string $clientId = 'registrationClientId',
-        PlatformInterface $platform = null,
-        ToolInterface $tool = null,
-        KeyChainInterface $platformKeyChain = null,
-        KeyChainInterface $toolKeyChain = null,
-        string $platformJwksUrl = null,
-        string $toolJwksUrl = null
+        ?PlatformInterface $platform = null,
+        ?ToolInterface $tool = null,
+        ?KeyChainInterface $platformKeyChain = null,
+        ?KeyChainInterface $toolKeyChain = null,
+        ?string $platformJwksUrl = null,
+        ?string $toolJwksUrl = null
     ): Registration {
         return new Registration(
             $identifier,

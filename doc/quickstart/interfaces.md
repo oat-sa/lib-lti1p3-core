@@ -43,12 +43,12 @@ $registrationRepository = new class implements RegistrationRepositoryInterface
        // TODO: Implement findByClientId() method to find a registration by client id, or null if not found.
    }
 
-   public function findByPlatformIssuer(string $issuer, string $clientId = null): ?RegistrationInterface
+   public function findByPlatformIssuer(string $issuer, ?string $clientId = null): ?RegistrationInterface
    {
         // TODO: Implement findByPlatformIssuer() method to find a registration by platform issuer, and client id if provided.
    }
 
-   public function findByToolIssuer(string $issuer, string $clientId = null): ?RegistrationInterface
+   public function findByToolIssuer(string $issuer, ?string $clientId = null): ?RegistrationInterface
    {
         // TODO: Implement findByToolIssuer() method to find a registration by tool issuer, and client id if provided.
    }
