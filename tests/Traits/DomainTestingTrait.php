@@ -139,7 +139,7 @@ trait DomainTestingTrait
     private function createTestRegistrationWithoutToolKeyChain(
         string $identifier = 'registrationIdentifier',
         string $clientId = 'registrationClientId',
-        KeyChainInterface $platformKeyChain = null,
+        ?KeyChainInterface $platformKeyChain = null,
         string $platformJwksUrl = 'http://platform.com/jwks',
         string $toolJwksUrl = 'http://tool.com/jwks'
     ): Registration {
