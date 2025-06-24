@@ -35,8 +35,8 @@ trait OidcTestingTrait
 
     private function performOidcFlow(
         LtiMessageInterface $message,
-        RegistrationRepositoryInterface $repository = null,
-        UserAuthenticatorInterface $authenticator = null
+        ?RegistrationRepositoryInterface $repository = null,
+        ?UserAuthenticatorInterface $authenticator = null
     ): LtiMessageInterface {
         $repository = $repository ?? $this->createTestRegistrationRepository();
         $authenticator = $authenticator ?? $this->createTestUserAuthenticator();

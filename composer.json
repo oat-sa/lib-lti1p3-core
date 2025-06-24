@@ -10,7 +10,7 @@
         "codercat/jwk-to-pem": "^1.1",
         "guzzlehttp/guzzle": "^7.8",
         "lcobucci/jwt": "^4.3",
-        "league/oauth2-server": "^8.5",
+        "league/oauth2-server": "^8.5 || ^9.2",
         "nesbot/carbon": "^2.72 || ^3.0",
         "nyholm/psr7": "^1.8",
         "phpseclib/phpseclib": "^3.0.37",
@@ -24,8 +24,8 @@
         "cache/array-adapter": "^1.2",
         "phpunit/phpunit": "^9.6",
         "php-coveralls/php-coveralls": "^2.7",
-        "psalm/plugin-phpunit": "^0.15",
-        "vimeo/psalm": "^4.30"
+        "psalm/plugin-phpunit": "^0.19",
+        "vimeo/psalm": "^5.25 || ^6.8"
     },
     "autoload": {
         "psr-4": {

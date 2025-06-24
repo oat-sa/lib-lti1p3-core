@@ -17,45 +17,53 @@
         </ignoreFiles>
     </projectFiles>
     <issueHandlers>
+        <MissingOverrideAttribute errorLevel="suppress" />
+        <PossiblyUnusedMethod errorLevel="suppress" />
+        <UnusedClass errorLevel="suppress" />
+
+        <PossiblyUnusedReturnValue>
+            <errorLevel type="suppress">
+                <file name="src/Message/Payload/Builder/MessagePayloadBuilderInterface.php" />
+                <file name="src/Resource/ResourceCollectionInterface.php" />
+            </errorLevel>
+        </PossiblyUnusedReturnValue>
+        
+        <MissingTemplateParam>
+            <errorLevel type="suppress">
+                <file name="src/Resource/ResourceCollectionInterface.php" />
+                <file name="src/Util/Collection/CollectionInterface.php" />
+            </errorLevel>
+        </MissingTemplateParam>
+        
+        <FalsableReturnStatement>
+            <errorLevel type="suppress">
+                <file name="src/Role/Type/CustomRole.php" />
+            </errorLevel>
+        </FalsableReturnStatement>
+        
+        <PossiblyFalseArgument>
+            <errorLevel type="suppress">
+                <file name="src/Security/Jwks/Exporter/Jwk/JwkRS256Exporter.php" />
+            </errorLevel>
+        </PossiblyFalseArgument>
+        
+        <PossiblyInvalidArrayAccess>
+            <errorLevel type="suppress">
+                <file name="src/Security/Jwks/Exporter/Jwk/JwkRS256Exporter.php" />
+            </errorLevel>
+        </PossiblyInvalidArrayAccess>
+        
+        <UnusedProperty>
+            <errorLevel type="suppress">
+                <file name="src/Security/Jwks/Fetcher/JwksFetcher.php" />
+            </errorLevel>
+        </UnusedProperty>
+        
         <InternalClass>
             <errorLevel type="suppress">
                 <file name="src/Security/Jwt/Signer/SignerFactory.php"/>
             </errorLevel>
         </InternalClass>
-        <InvalidArgument>
-            <errorLevel type="suppress">
-                <file name="src/Security/Jwt/Configuration/ConfigurationFactory.php"/>
-            </errorLevel>
-        </InvalidArgument>
-        <InvalidCatch>
-            <errorLevel type="suppress">
-                <referencedClass name="Psr\Cache\CacheException"/>
-                <file name="src/Security/Jwks/Fetcher/JwksFetcher.php"/>
-                <file name="src/Security/OAuth2/Repository/AccessTokenRepository.php"/>
-                <file name="src/Service/Client/LtiServiceClient.php"/>
-            </errorLevel>
-        </InvalidCatch>
-        <InvalidThrow>
-            <errorLevel type="suppress">
-                <referencedClass name="Psr\Cache\CacheException"/>
-                <file name="src/Security/Nonce/NonceRepository.php"/>
-            </errorLevel>
-        </InvalidThrow>
-        <MissingDependency>
-            <errorLevel type="suppress">
-                <file name="src/Security/Jwt/Configuration/ConfigurationFactory.php"/>
-            </errorLevel>
-        </MissingDependency>
-        <TypeDoesNotContainType>
-            <errorLevel type="suppress">
-                <file name="src/Service/Server/LtiServiceServer.php"/>
-            </errorLevel>
-        </TypeDoesNotContainType>
-        <RedundantCondition>
-            <errorLevel type="suppress">
-                <file name="src/Message/LtiMessage.php"/>
-            </errorLevel>
-        </RedundantCondition>
     </issueHandlers>
     <mockClasses>
         <class name="PHPUnit\Framework\MockObject\MockObject"/>

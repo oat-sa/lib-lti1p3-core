@@ -37,7 +37,7 @@ class ProctoringSettingsClaim implements MessagePayloadClaimInterface
         return LtiMessagePayloadInterface::CLAIM_LTI_PROCTORING_SETTINGS;
     }
 
-    public function __construct(string $data = null)
+    public function __construct(?string $data = null)
     {
         $this->data = $data;
     }

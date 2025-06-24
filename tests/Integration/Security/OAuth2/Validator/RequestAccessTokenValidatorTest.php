@@ -211,7 +211,7 @@ class RequestAccessTokenValidatorTest extends TestCase
     private function generateTestClientAccessToken(
         RegistrationInterface $registration,
         array $scopes = [],
-        string $audience = null
+        ?string $audience = null
     ): string {
         $accessToken = $this->buildJwt(
             [],
