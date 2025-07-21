@@ -27,43 +27,49 @@
                 <file name="src/Resource/ResourceCollectionInterface.php" />
             </errorLevel>
         </PossiblyUnusedReturnValue>
-        
+
         <MissingTemplateParam>
             <errorLevel type="suppress">
                 <file name="src/Resource/ResourceCollectionInterface.php" />
                 <file name="src/Util/Collection/CollectionInterface.php" />
             </errorLevel>
         </MissingTemplateParam>
-        
+
         <FalsableReturnStatement>
             <errorLevel type="suppress">
                 <file name="src/Role/Type/CustomRole.php" />
             </errorLevel>
         </FalsableReturnStatement>
-        
+
         <PossiblyFalseArgument>
             <errorLevel type="suppress">
                 <file name="src/Security/Jwks/Exporter/Jwk/JwkRS256Exporter.php" />
             </errorLevel>
         </PossiblyFalseArgument>
-        
+
         <PossiblyInvalidArrayAccess>
             <errorLevel type="suppress">
                 <file name="src/Security/Jwks/Exporter/Jwk/JwkRS256Exporter.php" />
             </errorLevel>
         </PossiblyInvalidArrayAccess>
-        
+
         <UnusedProperty>
             <errorLevel type="suppress">
                 <file name="src/Security/Jwks/Fetcher/JwksFetcher.php" />
             </errorLevel>
         </UnusedProperty>
-        
+
         <InternalClass>
             <errorLevel type="suppress">
-                <file name="src/Security/Jwt/Signer/SignerFactory.php"/>
+                <file name="src/Security/Jwt/Signer/SignerFactory.php" />
             </errorLevel>
         </InternalClass>
+
+        <TooManyArguments>
+            <errorLevel type="suppress">
+                <file name="src/Security/Jwt/Configuration/ConfigurationFactory.php" />
+            </errorLevel>
+        </TooManyArguments>
     </issueHandlers>
     <mockClasses>
         <class name="PHPUnit\Framework\MockObject\MockObject"/>

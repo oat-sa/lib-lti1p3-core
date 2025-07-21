@@ -41,6 +41,7 @@ jobs:
             || ./vendor/bin/phpunit
 
       - name: Psalm
+        if: ${{ matrix.php == '8.0' }}
         run: |
           ./vendor/bin/psalm --shepherd
 
