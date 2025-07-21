@@ -37,7 +37,7 @@ class Client implements ClientEntityInterface
     {
         $this->registration = $registration;
         $this->name = $this->registration->getTool()->getName();
-        $this->redirectUri = $this->registration->getTool()->getLaunchUrl();
+        $this->redirectUri = (string)$this->registration->getTool()->getLaunchUrl();
         $this->isConfidential = true;
     }
 

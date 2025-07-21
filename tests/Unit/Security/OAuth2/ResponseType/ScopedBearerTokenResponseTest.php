@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\OAuth2\ResponseType;
 
-use Carbon\Carbon;
+use DateTimeImmutable;
 use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
 use League\OAuth2\Server\Entities\ScopeEntityInterface;
 use League\OAuth2\Server\ResponseTypes\BearerTokenResponse;
@@ -53,7 +53,7 @@ class ScopedBearerTokenResponseTest extends TestCase
 
         /** @var AccessTokenEntityInterface|MockObject $accessToken */
         $accessToken = $this->createMock(AccessTokenEntityInterface::class);
-        $accessToken->method('getExpiryDateTime')->willReturn(Carbon::now());
+        $accessToken->method('getExpiryDateTime')->willReturn(new DateTimeImmutable());
         $accessToken->method('getScopes')->willReturn([$scope]);
 
         $this->subject->setAccessToken($accessToken);

@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Integration\Security\OAuth2\Repository;
 
 use Cache\Adapter\PHPArray\ArrayCachePool;
+use DateTimeImmutable;
 use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Entity\AccessToken;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Entity\Client;
@@ -94,6 +95,7 @@ class AccessTokenRepositoryTest extends TestCase
         $accessToken = new AccessToken();
 
         $accessToken->setIdentifier($accessTokenIdentifier ?? 'accessTokenIdentifier');
+        $accessToken->setExpiryDateTime(new DateTimeImmutable('+1 minute'));
         $accessToken->setClient(new Client($this->createTestRegistration()));
         $accessToken->addScope(new Scope('scope1'));
         $accessToken->addScope(new Scope('scope2'));
