@@ -152,12 +152,10 @@ class PlatformLaunchValidator extends AbstractLaunchValidator implements Platfor
     {
         $toolKeyChain = $registration->getToolKeyChain();
 
-        $key = $toolKeyChain
-            ? $toolKeyChain->getPublicKey()
-            : $this->fetcher->fetchKey(
-                $registration->getToolJwksUrl(),
-                $payload->getToken()->getHeaders()->getMandatory(LtiMessagePayloadInterface::HEADER_KID)
-            );
+        $key = $registration->getToolJwksUrl() ? $this->fetcher->fetchKey(
+            $registration->getToolJwksUrl(),
+            $payload->getToken()->getHeaders()->getMandatory(LtiMessagePayloadInterface::HEADER_KID)
+        ) : $registration->getToolKeyChain()->getPublicKey();
 
         if (!$this->validator->validate($payload->getToken(), $key)) {
             throw new LtiException('JWT validation failure');
