@@ -22,36 +22,32 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Security\Jwt;
 
-use Lcobucci\JWT\Token\Plain;
+use Lcobucci\JWT\UnencryptedToken;
 use OAT\Library\Lti1p3Core\Util\Collection\Collection;
 use OAT\Library\Lti1p3Core\Util\Collection\CollectionInterface;
 
 class Token implements TokenInterface
 {
-    /** @var Plain */
-    private $plainToken;
-
-    public function __construct(Plain $plainToken)
+    public function __construct(private UnencryptedToken $token)
     {
-        $this->plainToken = $plainToken;
     }
 
     public function getHeaders(): CollectionInterface
     {
         $headers = new Collection();
 
-        return $headers->add($this->plainToken->headers()->all());
+        return $headers->add($this->token->headers()->all());
     }
 
     public function getClaims(): CollectionInterface
     {
         $headers = new Collection();
 
-        return $headers->add($this->plainToken->claims()->all());
+        return $headers->add($this->token->claims()->all());
     }
 
     public function toString(): string
     {
-        return $this->plainToken->toString();
+        return $this->token->toString();
     }
 }
