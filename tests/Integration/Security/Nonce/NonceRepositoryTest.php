@@ -27,6 +27,7 @@ use OAT\Library\Lti1p3Core\Security\Nonce\Nonce;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepository;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 
 class NonceRepositoryTest extends TestCase
 {
@@ -47,7 +48,7 @@ class NonceRepositoryTest extends TestCase
     {
         $this->assertNull($this->subject->find('nonce'));
 
-        $this->cache->set('lti1p3-nonce-nonce', 'nonce');
+        $this->cache->set('lti1p3-nonce-eDd7UldXtJRCf4kBT5fXmSjzk40U61HiD7XeyYNOswQ', 'nonce');
 
         $nonce = $this->subject->find('nonce');
 
@@ -57,13 +58,37 @@ class NonceRepositoryTest extends TestCase
 
     public function testSave(): void
     {
-        $this->assertFalse($this->cache->has('lti1p3-nonce-nonce'));
+        $this->assertFalse($this->cache->has('lti1p3-nonce-eDd7UldXtJRCf4kBT5fXmSjzk40U61HiD7XeyYNOswQ'));
 
         $nonce = new Nonce('nonce');
 
         $this->subject->save($nonce);
 
-        $this->assertTrue($this->cache->has('lti1p3-nonce-nonce'));
-        $this->assertEquals('nonce', $this->cache->get('lti1p3-nonce-nonce'));
+        $this->assertTrue($this->cache->has('lti1p3-nonce-eDd7UldXtJRCf4kBT5fXmSjzk40U61HiD7XeyYNOswQ'));
+        $this->assertEquals('nonce', $this->cache->get('lti1p3-nonce-eDd7UldXtJRCf4kBT5fXmSjzk40U61HiD7XeyYNOswQ'));
+    }
+
+    public function testSaveAndFindWithReservedCharacters(): void
+    {
+        $nonce = new Nonce('nonce{}()/\@:value');
+
+        $this->subject->save($nonce);
+
+        $result = $this->subject->find('nonce{}()/\@:value');
+
+        $this->assertInstanceOf(NonceInterface::class, $result);
+        $this->assertEquals('nonce{}()/\@:value', $result->getValue());
+    }
+
+    public function testKeyStaysWithinTheLengthPsr6Guarantees(): void
+    {
+        $method = new ReflectionMethod(NonceRepository::class, 'getNonceCacheKey');
+        $method->setAccessible(true);
+
+        // PSR-6 guarantees support for 64 characters and no more, and the nonce arrives from the
+        // platform, so its length is not ours to assume. The digest makes the key the same size
+        // whatever turns up; an encoding proportional to the input fails this.
+        $this->assertLessThanOrEqual(64, strlen($method->invoke($this->subject, 'nonce')));
+        $this->assertLessThanOrEqual(64, strlen($method->invoke($this->subject, str_repeat('a', 4096))));
     }
 }
