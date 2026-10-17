@@ -22,11 +22,11 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Security\Jwks\Fetcher;
 
-use CoderCat\JWKToPEM\JWKConverter;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
+use OAT\Library\Lti1p3Core\Security\Jwt\Converter\JWKConverter;
 use OAT\Library\Lti1p3Core\Security\Key\Key;
 use OAT\Library\Lti1p3Core\Security\Key\KeyInterface;
 use Psr\Cache\CacheException;
@@ -46,16 +46,23 @@ class JwksFetcher implements JwksFetcherInterface
     /** @var ClientInterface */
     private $client;
 
-    /** @var JWKConverter */
+    /** @var JWKConverter|\CoderCat\JWKToPEM\JWKConverter */
     private $converter;
 
     /** @var LoggerInterface */
     private $logger;
 
+    /**
+     * @param JWKConverter|\CoderCat\JWKToPEM\JWKConverter|null $converter Passing a
+     *        codercat/jwk-to-pem converter is deprecated and will be removed in 8.0;
+     *        that package is no longer a dependency, so install it yourself to keep doing so.
+     *
+     * @psalm-suppress UndefinedClass
+     */
     public function __construct(
         ?CacheItemPoolInterface $cache = null,
         ?ClientInterface $client = null,
-        ?JWKConverter $converter = null,
+        JWKConverter|\CoderCat\JWKToPEM\JWKConverter|null $converter = null,
         ?LoggerInterface $logger = null
     ) {
         $this->cache = $cache;

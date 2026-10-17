@@ -22,7 +22,6 @@ declare(strict_types=1);
 
 namespace OAT\Library\Lti1p3Core\Security\Jwt\Converter;
 
-use CoderCat\JWKToPEM\JWKConverter;
 use Lcobucci\JWT\Signer\Key;
 use Lcobucci\JWT\Signer\Key\InMemory;
 use Lcobucci\JWT\Signer\Key\LocalFileReference;
@@ -35,13 +34,20 @@ use Throwable;
 
 class KeyConverter
 {
-    /** @var JWKConverter */
+    /** @var JWKConverter|\CoderCat\JWKToPEM\JWKConverter */
     private $converter;
 
     /** @var CollectionInterface|Key[] */
     private $collection;
 
-    public function __construct(?JWKConverter $converter = null)
+    /**
+     * @param JWKConverter|\CoderCat\JWKToPEM\JWKConverter|null $converter Passing a
+     *        codercat/jwk-to-pem converter is deprecated and will be removed in 8.0;
+     *        that package is no longer a dependency, so install it yourself to keep doing so.
+     *
+     * @psalm-suppress UndefinedClass
+     */
+    public function __construct(JWKConverter|\CoderCat\JWKToPEM\JWKConverter|null $converter = null)
     {
         $this->converter = $converter ?? new JWKConverter();
         $this->collection = new Collection();
