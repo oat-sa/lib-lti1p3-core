@@ -23,11 +23,11 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\Jwks\Fetcher;
 
 use Cache\Adapter\Common\CacheItem;
-use CoderCat\JWKToPEM\JWKConverter;
 use Exception;
 use GuzzleHttp\ClientInterface;
 use OAT\Library\Lti1p3Core\Security\Jwks\Exporter\JwksExporter;
 use OAT\Library\Lti1p3Core\Security\Jwks\Fetcher\JwksFetcher;
+use OAT\Library\Lti1p3Core\Security\Jwt\Converter\JWKConverter;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepository;
 use OAT\Library\Lti1p3Core\Tests\Resource\Logger\TestLogger;
 use OAT\Library\Lti1p3Core\Tests\Traits\NetworkTestingTrait;
@@ -99,5 +99,15 @@ class JwksFetcherTest extends TestCase
 
         $this->assertTrue($this->logger->hasLog(LogLevel::ERROR, 'Cannot fetch JWKS data from cache: cache fetch error'));
         $this->assertTrue($this->logger->hasLog(LogLevel::ERROR, 'Cannot save JWKS data in cache: cache save error'));
+    }
+
+    public function testItStillAcceptsAJwkToPemConverter(): void
+    {
+        require_once __DIR__ . '/../../../../Resource/Legacy/codercat-jwk-converter.php';
+
+        $this->assertInstanceOf(
+            JwksFetcher::class,
+            new JwksFetcher($this->cacheMock, $this->clientMock, new \CoderCat\JWKToPEM\JWKConverter(), $this->logger)
+        );
     }
 }

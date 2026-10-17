@@ -79,4 +79,17 @@ class KeyConverterTest extends TestCase
 
         $this->subject->convert(new Key(['invalid']));
     }
+
+    public function testConvertFromArrayStillAcceptsAJwkToPemConverter(): void
+    {
+        require_once __DIR__ . '/../../../../Resource/Legacy/codercat-jwk-converter.php';
+
+        $legacyConverter = new \CoderCat\JWKToPEM\JWKConverter();
+        $subject = new KeyConverter($legacyConverter);
+
+        $result = $subject->convert(new Key(['kty' => 'RSA', 'n' => 'AQAB', 'e' => 'AQAB', 'kid' => 'legacy']));
+
+        $this->assertInstanceOf(VendorKey::class, $result);
+        $this->assertSame(['legacy'], $legacyConverter->converted, 'An injected converter must still be the one used.');
+    }
 }
