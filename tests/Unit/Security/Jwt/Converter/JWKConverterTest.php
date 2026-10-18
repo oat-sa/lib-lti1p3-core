@@ -26,6 +26,7 @@ namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\Jwt\Converter;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Security\Jwt\Converter\JWKConverter;
 use PHPUnit\Framework\TestCase;
+use Throwable;
 
 class JWKConverterTest extends TestCase
 {
@@ -77,6 +78,17 @@ class JWKConverterTest extends TestCase
         $this->expectExceptionMessage('Public key is currently only supported.');
 
         $this->subject->toPEM(self::FIXTURE_JWK + ['d' => 'AQAB']);
+    }
+
+    public function testToPemWrapsParsingFailures(): void
+    {
+        try {
+            $this->subject->toPEM(['kty' => 'RSA', 'n' => [], 'e' => 'AQAB']);
+            $this->fail('A malformed modulus must be rejected.');
+        } catch (LtiException $exception) {
+            $this->assertStringStartsWith('Cannot read the converted JWK: ', $exception->getMessage());
+            $this->assertInstanceOf(Throwable::class, $exception->getPrevious());
+        }
     }
 
     private function der(string $pem): string

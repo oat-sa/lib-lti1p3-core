@@ -25,6 +25,7 @@ namespace OAT\Library\Lti1p3Core\Security\Jwt\Converter;
 
 use Firebase\JWT\JWK;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
+use Throwable;
 
 /**
  * Converts an RSA public JWK into a PEM, in place of codercat/jwk-to-pem.
@@ -52,7 +53,12 @@ class JWKConverter
             throw new LtiException('Public key is currently only supported.');
         }
 
-        $key = JWK::parseKey($jwk, 'RS256');
+        try {
+            $key = JWK::parseKey($jwk, 'RS256');
+        } catch (Throwable $exception) {
+            throw new LtiException(sprintf('Cannot read the converted JWK: %s', $exception->getMessage()), 0, $exception);
+        }
+
         $details = null === $key ? false : openssl_pkey_get_details($key->getKeyMaterial());
 
         if (false === $details) {
