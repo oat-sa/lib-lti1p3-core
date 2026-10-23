@@ -42,7 +42,7 @@ class NonceRepository implements NonceRepositoryInterface
      */
     public function find(string $value): ?NonceInterface
     {
-        $item = $this->cache->getItem(sprintf('%s-%s', self::CACHE_PREFIX, $value));
+        $item = $this->cache->getItem($this->getNonceCacheKey($value));
 
         return $item->isHit() ? new Nonce($item->get()) : null;
     }
@@ -52,10 +52,25 @@ class NonceRepository implements NonceRepositoryInterface
      */
     public function save(NonceInterface $nonce): void
     {
-        $item = $this->cache->getItem(sprintf('%s-%s', self::CACHE_PREFIX, $nonce->getValue()));
+        $item = $this->cache->getItem($this->getNonceCacheKey($nonce->getValue()));
 
         $this->cache->save(
             $item->set($nonce->getValue())->expiresAt($nonce->getExpiredAt())
+        );
+    }
+
+    /**
+     * PSR-6 reserves {}()/\@: in a key and only guarantees support up to 64 characters. A nonce is
+     * supplied by the platform, so it can carry either problem. Hashing settles both at once: the
+     * digest is fixed length, so the key is always 56 characters whatever arrives, and base64url
+     * of it uses none of the reserved characters.
+     */
+    private function getNonceCacheKey(string $value): string
+    {
+        return sprintf(
+            '%s-%s',
+            self::CACHE_PREFIX,
+            rtrim(strtr(base64_encode(hash('sha256', $value, true)), '+/', '-_'), '=')
         );
     }
 }
