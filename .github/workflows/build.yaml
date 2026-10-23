@@ -14,10 +14,20 @@ jobs:
       fail-fast: false
       matrix:
         php: [ 8.0, 8.1, 8.2, 8.3, 8.4 ]
+        guzzle: [ "^7.8", "^8.0" ]
         coverage: [ "false" ]
+        exclude:
+          # Guzzle 8 pulls guzzlehttp/psr7 ^3.0, which needs psr/http-message ^2.0. On PHP 8.0 the
+          # only installable league/oauth2-server is 8.5.x, which pins psr/http-message ^1.0.
+          - php: 8.0
+            guzzle: "^8.0"
         include:
           - php: 8.5
+            guzzle: "^7.8"
             coverage: "true" # Collecting coverage reports only once
+          - php: 8.5
+            guzzle: "^8.0"
+            coverage: "false"
 
     steps:
       - name: Checkout
@@ -28,6 +38,17 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: composer:v2
+
+      - name: Constrain Guzzle to ${{ matrix.guzzle }}
+        env:
+          GUZZLE: ${{ matrix.guzzle }}
+        run: |
+          # php-coveralls only supports Guzzle ^6.0 || ^7.0 and would block resolution of
+          # Guzzle 8. It is a dev tool used solely by the coverage job, which runs on Guzzle 7.
+          if [ "$GUZZLE" = "^8.0" ]; then
+            composer remove --dev php-coveralls/php-coveralls --no-update --no-interaction
+          fi
+          composer require "guzzlehttp/guzzle:$GUZZLE" --no-update --no-interaction
 
       - name: Install dependencies
         run: composer install --no-interaction --no-suggest
@@ -41,7 +62,7 @@ jobs:
             || ./vendor/bin/phpunit
 
       - name: Psalm
-        if: ${{ matrix.php == '8.0' }}
+        if: ${{ matrix.php == '8.0' && matrix.guzzle == '^7.8' }}
         run: |
           ./vendor/bin/psalm --shepherd
 
