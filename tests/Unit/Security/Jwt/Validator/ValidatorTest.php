@@ -23,6 +23,10 @@ declare(strict_types=1);
 namespace OAT\Library\Lti1p3Core\Tests\Unit\Security\Jwt\Validator;
 
 use Carbon\Carbon;
+use DateTimeImmutable;
+use Lcobucci\JWT\Validation\Constraint\PermissiveValidAt;
+use OAT\Library\Lti1p3Core\Security\Jwt\Configuration\ConfigurationFactory;
+use OAT\Library\Lti1p3Core\Security\Jwt\Token;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Security\Jwt\Validator\Validator;
 use OAT\Library\Lti1p3Core\Security\Jwt\Validator\ValidatorInterface;
@@ -68,6 +72,25 @@ class ValidatorTest extends TestCase
         $token = $this->buildJwt([], [], $registration->getPlatformKeyChain()->getPrivateKey());
         Carbon::setTestNow();
 
+
+        $this->assertFalse($this->subject->validate($token, $registration->getPlatformKeyChain()->getPublicKey()));
+    }
+
+    public function testValidationFailureOnTokenWithoutExpiration(): void
+    {
+        if (!class_exists(PermissiveValidAt::class)) {
+            $this->markTestSkipped('lcobucci/jwt below 5.7 accepts tokens without an "exp" claim.');
+        }
+
+        $registration = $this->createTestRegistration();
+        $privateKey = $registration->getPlatformKeyChain()->getPrivateKey();
+
+        $config = (new ConfigurationFactory())->create($privateKey);
+        $token = new Token(
+            $config->builder()
+                ->issuedAt(new DateTimeImmutable())
+                ->getToken($config->signer(), $config->signingKey())
+        );
 
         $this->assertFalse($this->subject->validate($token, $registration->getPlatformKeyChain()->getPublicKey()));
     }

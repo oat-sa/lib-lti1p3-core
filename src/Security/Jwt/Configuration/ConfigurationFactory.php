@@ -29,7 +29,9 @@ use Lcobucci\JWT\Encoding\JoseEncoder;
 use Lcobucci\JWT\Signer\Key;
 use Lcobucci\JWT\Signer\Key\InMemory;
 use Lcobucci\JWT\Validation\Constraint\LooseValidAt;
+use Lcobucci\JWT\Validation\Constraint\PermissiveValidAt;
 use Lcobucci\JWT\Validation\Constraint\SignedWith;
+use Lcobucci\JWT\Validation\ValidAt;
 use OAT\Library\Lti1p3Core\Security\Jwt\Converter\KeyConverter;
 use OAT\Library\Lti1p3Core\Security\Jwt\Signer\SignerFactory;
 use OAT\Library\Lti1p3Core\Security\Key\KeyInterface;
@@ -61,11 +63,27 @@ class ConfigurationFactory
         );
 
         $configuration->setValidationConstraints(
-            new LooseValidAt(SystemClock::fromUTC(), new DateInterval('PT1S')),
+            $this->createValidAtConstraint(),
             new SignedWith($configuration->signer(), $configuration->verificationKey())
         );
 
         return $configuration;
+    }
+
+    /**
+     * PermissiveValidAt (lcobucci/jwt 5.7+) rejects tokens without an "exp" claim, which LTI 1.3 requires.
+     * LooseValidAt is deprecated since 5.7, but it is the only option on older lcobucci/jwt versions.
+     */
+    private function createValidAtConstraint(): ValidAt
+    {
+        $clock = SystemClock::fromUTC();
+        $leeway = new DateInterval('PT1S');
+
+        if (class_exists(PermissiveValidAt::class)) {
+            return new PermissiveValidAt($clock, $leeway);
+        }
+
+        return new LooseValidAt($clock, $leeway);
     }
 
     private function findAlgorithm(?KeyInterface $signingKey = null, ?KeyInterface $verificationKey = null): string
