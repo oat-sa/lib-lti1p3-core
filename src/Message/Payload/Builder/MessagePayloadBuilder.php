@@ -65,7 +65,7 @@ class MessagePayloadBuilder implements MessagePayloadBuilderInterface
     public function withClaims(array $claims): MessagePayloadBuilderInterface
     {
         foreach ($claims as $claimName => $claimValue) {
-            if (is_a($claimValue, MessagePayloadClaimInterface::class)) {
+            if ($claimValue instanceof MessagePayloadClaimInterface) {
                 $this->withClaim($claimValue);
             } else {
                 $this->withClaim((string)$claimName, $claimValue);
@@ -77,7 +77,7 @@ class MessagePayloadBuilder implements MessagePayloadBuilderInterface
 
     public function withClaim($claim, $claimValue = null): MessagePayloadBuilderInterface
     {
-        if (is_a($claim, MessagePayloadClaimInterface::class)) {
+        if ($claim instanceof MessagePayloadClaimInterface) {
             $this->claims->set($claim::getClaimName(), $claim->normalize());
         } else {
             $this->claims->set((string)$claim, $claimValue);
