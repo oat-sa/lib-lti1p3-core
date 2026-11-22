@@ -145,18 +145,12 @@ class ToolLaunchValidatorTest extends TestCase
             ToolLaunchValidator::class,
             "isStateValidationRequired"
         );
-        if (PHP_VERSION_ID < 80100) {
-            $isStateValidationRequiredProperty->setAccessible(true);
-        }
         $isStateValidationRequiredProperty->setValue($this->subject, false);
 
         $isNonceValidationRequiredProperty = new ReflectionProperty(
             ToolLaunchValidator::class,
             "isNonceValidationRequired"
         );
-        if (PHP_VERSION_ID < 80100) {
-            $isNonceValidationRequiredProperty->setAccessible(true);
-        }
         $isNonceValidationRequiredProperty->setValue($this->subject, false);
 
         $message = $this->builder->buildPlatformOriginatingLaunch(

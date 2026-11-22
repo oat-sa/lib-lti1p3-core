@@ -64,12 +64,6 @@
                 <file name="src/Security/Jwt/Signer/SignerFactory.php" />
             </errorLevel>
         </InternalClass>
-
-        <TooManyArguments>
-            <errorLevel type="suppress">
-                <file name="src/Security/Jwt/Configuration/ConfigurationFactory.php" />
-            </errorLevel>
-        </TooManyArguments>
     </issueHandlers>
     <mockClasses>
         <class name="PHPUnit\Framework\MockObject\MockObject"/>

@@ -83,7 +83,6 @@ class NonceRepositoryTest extends TestCase
     public function testKeyStaysWithinTheLengthPsr6Guarantees(): void
     {
         $method = new ReflectionMethod(NonceRepository::class, 'getNonceCacheKey');
-        $method->setAccessible(true);
 
         // PSR-6 guarantees support for 64 characters and no more, and the nonce arrives from the
         // platform, so its length is not ours to assume. The digest makes the key the same size
