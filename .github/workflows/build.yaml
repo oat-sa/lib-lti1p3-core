@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [ 8.0, 8.1, 8.2, 8.3, 8.4 ]
+        php: [ 8.0, 8.1, 8.2, 8.3, 8.4, 8.6 ]
         guzzle: [ "^7.8", "^8.0" ]
         coverage: [ "false" ]
         exclude:
@@ -49,6 +49,11 @@ jobs:
             composer remove --dev php-coveralls/php-coveralls --no-update --no-interaction
           fi
           composer require "guzzlehttp/guzzle:$GUZZLE" --no-update --no-interaction
+
+      - name: Remove Psalm
+        # Psalm does not support PHP 8.6 yet. The Psalm step runs on PHP 8.0 only.
+        if: ${{ matrix.php == '8.6' }}
+        run: composer remove --dev vimeo/psalm psalm/plugin-phpunit --no-update --no-interaction
 
       - name: Install dependencies
         run: composer install --no-interaction --no-suggest
